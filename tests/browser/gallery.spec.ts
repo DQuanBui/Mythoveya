@@ -1,9 +1,6 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
 import { SPECIES, AVATARS } from "../../packages/shared/content";
-test("all models, eight keepers, ten mythic effects, and bounded audio", async ({
-  page,
-}) => {
-  test.setTimeout(300000);
+async function openGallery(page: Page) {
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("/");
@@ -36,6 +33,12 @@ test("all models, eight keepers, ten mythic effects, and bounded audio", async (
   await page.keyboard.press("Escape");
   await page.getByRole("button", { name: "Asset gallery" }).click();
   await expect(page.locator(".gallery-list button")).toHaveCount(60);
+  return errors;
+}
+
+test("all models, eight keepers, and bounded audio", async ({ page }) => {
+  test.setTimeout(360000);
+  const errors = await openGallery(page);
   const hashes = await page.evaluate(
     async (ids) => {
       const path = "/src/portraits.tsx";
@@ -72,21 +75,6 @@ test("all models, eight keepers, ten mythic effects, and bounded audio", async (
       .locator(".gallery-preview")
       .screenshot({ path: `artifacts/avatar-${i}.png` });
   }
-  for (const s of SPECIES.filter((s) => s.tier === "S")) {
-    await page
-      .locator(".gallery-list")
-      .getByRole("button", { name: `S · ${s.name}`, exact: true })
-      .click();
-    await page
-      .getByRole("button", { name: "Preview ultimate", exact: true })
-      .click();
-    await page.waitForTimeout(950);
-    await page.getByRole("button", { name: "Pause", exact: true }).click();
-    await page
-      .locator(".gallery-preview")
-      .screenshot({ path: `artifacts/ultimate-${s.id}.png` });
-    await page.getByRole("button", { name: "Play", exact: true }).click();
-  }
   const audio = await page.evaluate(async () => {
     const path = "/src/audio.ts";
     const m = await import(/* @vite-ignore */ path);
@@ -108,5 +96,45 @@ test("all models, eight keepers, ten mythic effects, and bounded audio", async (
   expect(audio.state).toBe("running");
   expect(audio.voices).toBeLessThanOrEqual(40);
   await page.waitForTimeout(2000);
+  expect(errors).toEqual([]);
+});
+
+test("ten mythic effects remain visible at paused impact", async ({ page }) => {
+  test.setTimeout(360000);
+  const errors = await openGallery(page);
+  for (const s of SPECIES.filter((s) => s.tier === "S")) {
+    await page
+      .locator(".gallery-list")
+      .getByRole("button", { name: `S · ${s.name}`, exact: true })
+      .click();
+    await page
+      .getByRole("button", { name: "Preview ultimate", exact: true })
+      .click();
+    await page.waitForTimeout(950);
+    await page.getByRole("button", { name: "Pause", exact: true }).click();
+    const visible = await page.evaluate(async (id) => {
+      const moduleUrl = performance
+        .getEntriesByType("resource")
+        .map((r) => r.name)
+        .find((url) => url.includes("@react-three_fiber.js"));
+      if (!moduleUrl) throw new Error("Renderer module not loaded");
+      const { _roots } = await import(/* @vite-ignore */ moduleUrl);
+      const canvas = document.querySelector(".gallery-preview canvas");
+      const scene = _roots.get(canvas).store.getState().scene;
+      const effect = scene.getObjectByName("skill-effect");
+      const mythic = scene.getObjectByName("mythic-" + id);
+      return Boolean(
+        effect?.visible &&
+          mythic?.visible &&
+          mythic.children.length > 0 &&
+          effect.scale.x > 0.1,
+      );
+    }, s.id);
+    expect(visible, s.name + " paused impact is visible").toBe(true);
+    await page
+      .locator(".gallery-preview")
+      .screenshot({ path: `artifacts/ultimate-${s.id}.png` });
+    await page.getByRole("button", { name: "Play", exact: true }).click();
+  }
   expect(errors).toEqual([]);
 });

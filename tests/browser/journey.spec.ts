@@ -1,21 +1,31 @@
 import { test, expect, type Page } from "@playwright/test";
 async function walkTo(page: Page, key: string, label: string) {
   await expect(page.locator(".interact")).toBeVisible();
-  for (let i = 0; i < 24; i++) {
-    if (
-      (
-        await page
-          .locator(".interact")
-          .textContent({ timeout: 100 })
-          .catch(() => "")
-      )?.includes(label)
-    )
-      return;
-    await page.keyboard.down(key);
-    await page.waitForTimeout(250);
-    await page.keyboard.up(key);
-    await page.waitForTimeout(100);
-  }
+  // Stop inside the browser when the marker appears. Repeated driver round trips
+  // can hold a key too long on a busy GPU and walk past a valid interaction.
+  await page.evaluate(
+    ({ key, label }) =>
+      new Promise<void>((resolve, reject) => {
+        const started = performance.now();
+        document.body.dispatchEvent(
+          new KeyboardEvent("keydown", { code: key, bubbles: true }),
+        );
+        const timer = setInterval(() => {
+          const arrived = document
+            .querySelector(".interact")
+            ?.textContent?.includes(label);
+          if (arrived || performance.now() - started > 20000) {
+            document.body.dispatchEvent(
+              new KeyboardEvent("keyup", { code: key, bubbles: true }),
+            );
+            clearInterval(timer);
+            if (arrived) resolve();
+            else reject(new Error(`Did not reach ${label}`));
+          }
+        }, 30);
+      }),
+    { key, label },
+  );
   await expect(page.locator(".interact")).toContainText(label);
 }
 async function newKeeper(page: Page, name: string) {
@@ -60,6 +70,7 @@ test("first journey, battle, recruitment, formation, reload and settings", async
     .click();
   await page.getByRole("button", { name: "Bond once" }).click();
   await expect(page.locator(".reveal-card")).toHaveCount(1);
+  await expect(page.locator(".recruitment-stage canvas")).toBeVisible();
   await page.screenshot({ path: "artifacts/recruitment.png" });
   await page.getByLabel("Close panel").click();
   await page

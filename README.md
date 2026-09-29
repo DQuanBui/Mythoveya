@@ -2,6 +2,8 @@
 
 **Find your wild. Forge your six.**
 
+![Mythoveya's floating-island title scene](docs/screenshots/title.png)
+
 Become a Riftkeeper in a world of floating islands, forgotten waystones, and extraordinary companions. Begin in Havenreach, choose the creature that speaks to you, and build a team of six Wildbound. Explore the reaches, discover new species, face their guardians, and challenge another keeper in the Rift Arena.
 
 Mythoveya is a locally playable, browser-based 3D creature-collection RPG. Its world, characters, portraits, music, and effects are created from assets and recipes included in this project. Once installed, it plays without third-party asset downloads or an online service.
@@ -14,11 +16,14 @@ Mythoveya is a locally playable, browser-based 3D creature-collection RPG. Its w
 - **Four destinations:** Havenreach, Whisperleaf Meadow, Emberglass Canyon, and Moonfrost Hollow, with resources, roaming encounters, and enhanced region guardians.
 - **Tactical battles:** elemental advantages, energy, cooldowns, shields, healing, status effects, delayed attacks, revivals, and a visible turn queue. Manual and automatic controls are available in PvE.
 - **A growing collection:** recruit with earned diamonds, bond with wild creatures, train companions, collect shards, and claim story and daily rewards.
+- **Meet each new bond:** watch your recruited Wildbound arrive on the 3D shrine stage, and select any result from a ten-bond reveal to meet it up close.
 - **Human arena battles:** friendly room codes and ranked matchmaking, separate Power and Tactical ratings, authoritative turns, and reconnect support.
 - **A living presentation:** articulated creatures and keepers, model-rendered portraits, eight synthesized music arrangements, elemental effects, species voices, and ten mythic ultimate recipes.
 - **Saved adventures:** SQLite stores profiles, formations, inventory, currency, pity counters, quests, completed results, and competitive ratings.
 
 This first playable version uses a compact procedural art style. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for presentation and scope limits, and [PROGRESS.md](PROGRESS.md) for the verification record.
+
+![A Wildbound arrives at the 3D bond shrine](docs/screenshots/recruitment.png)
 
 ## Install and play
 
@@ -127,6 +132,8 @@ npm run build
 npx playwright install chromium
 npm run test:e2e
 npm run content:audit
+node scripts/smoke-production.mjs
+node scripts/verify-layouts.mjs
 ```
 
 The Playwright browser download is a one-time installation. Browser checks use ports **5174/2568** and a separate **`data/browser-tests.sqlite`** database. Network tests start an isolated server on port **27861** with a temporary database. They can take several minutes because ranked battles respect real presentation windows. Screenshots are written to `artifacts`; Playwright videos and failure traces are in `test-results`.
