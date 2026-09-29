@@ -1,2 +1,21 @@
 /* System fonts keep the game available without an external font service. */
-html{font-size:16px;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}::selection{background:#809f86;color:#fff6d9}::-webkit-scrollbar{width:7px;height:7px}::-webkit-scrollbar-thumb{background:#617e73;border-radius:8px}::-webkit-scrollbar-track{background:#143039}
+html {
+  font-size: 16px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+::selection {
+  background: #809f86;
+  color: #fff6d9;
+}
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-thumb {
+  background: #617e73;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #143039;
+}

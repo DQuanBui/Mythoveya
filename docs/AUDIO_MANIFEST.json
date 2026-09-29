@@ -1,0 +1,1133 @@
+{
+  "source": "Original Web Audio synthesis; no external audio files",
+  "music": {
+    "title": {
+      "steps": 128,
+      "bpm": 76,
+      "root": 50,
+      "wave": "sine",
+      "pattern": [
+        0,
+        7,
+        12,
+        14,
+        12,
+        7,
+        3,
+        7
+      ],
+      "seconds": 50.526315789473685
+    },
+    "haven": {
+      "steps": 160,
+      "bpm": 88,
+      "root": 55,
+      "wave": "triangle",
+      "pattern": [
+        0,
+        4,
+        7,
+        11,
+        7,
+        4,
+        2,
+        7
+      ],
+      "seconds": 54.54545454545455
+    },
+    "meadow": {
+      "steps": 160,
+      "bpm": 96,
+      "root": 57,
+      "wave": "sine",
+      "pattern": [
+        0,
+        7,
+        9,
+        12,
+        9,
+        7,
+        4,
+        2
+      ],
+      "seconds": 50
+    },
+    "canyon": {
+      "steps": 192,
+      "bpm": 108,
+      "root": 45,
+      "wave": "triangle",
+      "pattern": [
+        0,
+        0,
+        7,
+        3,
+        5,
+        7,
+        10,
+        7
+      ],
+      "seconds": 53.333333333333336
+    },
+    "hollow": {
+      "steps": 128,
+      "bpm": 72,
+      "root": 54,
+      "wave": "sine",
+      "pattern": [
+        0,
+        12,
+        7,
+        14,
+        3,
+        10,
+        7,
+        12
+      ],
+      "seconds": 53.333333333333336
+    },
+    "battle": {
+      "steps": 192,
+      "bpm": 120,
+      "root": 48,
+      "wave": "triangle",
+      "pattern": [
+        0,
+        7,
+        3,
+        7,
+        5,
+        12,
+        10,
+        7
+      ],
+      "seconds": 48
+    },
+    "arena": {
+      "steps": 256,
+      "bpm": 128,
+      "root": 50,
+      "wave": "triangle",
+      "pattern": [
+        0,
+        3,
+        7,
+        10,
+        7,
+        12,
+        5,
+        7
+      ],
+      "seconds": 60
+    },
+    "boss": {
+      "steps": 192,
+      "bpm": 100,
+      "root": 43,
+      "wave": "triangle",
+      "pattern": [
+        0,
+        1,
+        7,
+        3,
+        0,
+        10,
+        7,
+        1
+      ],
+      "seconds": 57.6
+    }
+  },
+  "cues": {
+    "focus": [
+      "sine",
+      520,
+      680,
+      0.07,
+      0,
+      []
+    ],
+    "confirm": [
+      "triangle",
+      440,
+      660,
+      0.18,
+      0,
+      [
+        0,
+        7
+      ]
+    ],
+    "back": [
+      "sine",
+      420,
+      230,
+      0.17,
+      0,
+      []
+    ],
+    "error": [
+      "triangle",
+      180,
+      140,
+      0.2,
+      0.03,
+      [
+        0,
+        1
+      ]
+    ],
+    "grass": [
+      "triangle",
+      110,
+      50,
+      0.09,
+      0.7,
+      []
+    ],
+    "stoneStep": [
+      "sine",
+      170,
+      65,
+      0.075,
+      0.35,
+      []
+    ],
+    "snowStep": [
+      "sine",
+      220,
+      90,
+      0.12,
+      0.8,
+      []
+    ],
+    "interact": [
+      "sine",
+      420,
+      630,
+      0.3,
+      0,
+      [
+        0,
+        4,
+        7
+      ]
+    ],
+    "collect": [
+      "triangle",
+      660,
+      990,
+      0.24,
+      0.03,
+      [
+        0,
+        7,
+        12
+      ]
+    ],
+    "quest": [
+      "sine",
+      440,
+      880,
+      0.65,
+      0,
+      [
+        0,
+        4,
+        7,
+        12
+      ]
+    ],
+    "charge": [
+      "triangle",
+      120,
+      480,
+      0.7,
+      0.12,
+      [
+        0,
+        7
+      ]
+    ],
+    "reveal": [
+      "sine",
+      330,
+      660,
+      0.8,
+      0.04,
+      [
+        0,
+        4,
+        7,
+        12,
+        16
+      ]
+    ],
+    "swing": [
+      "sine",
+      240,
+      90,
+      0.18,
+      0.65,
+      []
+    ],
+    "hit": [
+      "triangle",
+      110,
+      40,
+      0.15,
+      0.5,
+      []
+    ],
+    "launch": [
+      "triangle",
+      350,
+      800,
+      0.22,
+      0.18,
+      []
+    ],
+    "impact": [
+      "sine",
+      90,
+      35,
+      0.3,
+      0.65,
+      []
+    ],
+    "shield": [
+      "sine",
+      260,
+      520,
+      0.5,
+      0.03,
+      [
+        0,
+        7,
+        12
+      ]
+    ],
+    "break": [
+      "triangle",
+      360,
+      80,
+      0.28,
+      0.7,
+      []
+    ],
+    "heal": [
+      "sine",
+      440,
+      740,
+      0.6,
+      0.02,
+      [
+        0,
+        4,
+        9
+      ]
+    ],
+    "critical": [
+      "triangle",
+      180,
+      460,
+      0.35,
+      0.22,
+      [
+        0,
+        7
+      ]
+    ],
+    "status": [
+      "sine",
+      320,
+      170,
+      0.35,
+      0.1,
+      [
+        0,
+        3
+      ]
+    ],
+    "defeat": [
+      "triangle",
+      220,
+      55,
+      0.8,
+      0.2,
+      [
+        0,
+        -5,
+        -12
+      ]
+    ],
+    "flame": [
+      "triangle",
+      90,
+      280,
+      0.5,
+      0.75,
+      []
+    ],
+    "tide": [
+      "sine",
+      340,
+      90,
+      0.6,
+      0.55,
+      [
+        0,
+        7
+      ]
+    ],
+    "grove": [
+      "triangle",
+      240,
+      480,
+      0.5,
+      0.35,
+      [
+        0,
+        4,
+        9
+      ]
+    ],
+    "stone": [
+      "triangle",
+      85,
+      32,
+      0.35,
+      0.8,
+      []
+    ],
+    "storm": [
+      "sine",
+      110,
+      55,
+      0.45,
+      0.8,
+      [
+        0,
+        12
+      ]
+    ],
+    "frost": [
+      "sine",
+      960,
+      540,
+      0.5,
+      0.15,
+      [
+        0,
+        7,
+        12
+      ]
+    ],
+    "light": [
+      "sine",
+      523,
+      784,
+      0.7,
+      0,
+      [
+        0,
+        4,
+        7,
+        12
+      ]
+    ],
+    "shadow": [
+      "triangle",
+      120,
+      60,
+      0.7,
+      0.15,
+      [
+        0,
+        1,
+        7
+      ]
+    ],
+    "victory": [
+      "triangle",
+      392,
+      784,
+      1.5,
+      0,
+      [
+        0,
+        4,
+        7,
+        12,
+        16
+      ]
+    ],
+    "level": [
+      "sine",
+      440,
+      880,
+      0.9,
+      0,
+      [
+        0,
+        2,
+        7,
+        12
+      ]
+    ],
+    "rare": [
+      "sine",
+      330,
+      990,
+      1.7,
+      0.06,
+      [
+        0,
+        7,
+        12,
+        16,
+        19
+      ]
+    ],
+    "pet": [
+      "sine",
+      520,
+      740,
+      0.3,
+      0.02,
+      [
+        0,
+        4
+      ]
+    ],
+    "wind": [
+      "sine",
+      120,
+      160,
+      2,
+      0.9,
+      []
+    ],
+    "leaves": [
+      "sine",
+      600,
+      300,
+      1.2,
+      0.8,
+      []
+    ],
+    "chime": [
+      "sine",
+      880,
+      760,
+      1.4,
+      0.02,
+      [
+        0,
+        7
+      ]
+    ]
+  },
+  "voices": [
+    {
+      "species": "cindermite",
+      "family": "insect",
+      "profile": "insect:0",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "puddlepip",
+      "family": "amphibian",
+      "profile": "amphibian:1",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "mossprig",
+      "family": "quadruped",
+      "profile": "quadruped:2",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "pebblit",
+      "family": "shell",
+      "profile": "shell:3",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "zippinch",
+      "family": "bird",
+      "profile": "bird:4",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "snowmew",
+      "family": "fox",
+      "profile": "fox:5",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "glimlet",
+      "family": "insect",
+      "profile": "insect:6",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "duskblob",
+      "family": "spirit",
+      "profile": "spirit:7",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "wickwaddle",
+      "family": "bird",
+      "profile": "bird:8",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "bubbloom",
+      "family": "aquatic",
+      "profile": "aquatic:9",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "emberfox",
+      "family": "fox",
+      "profile": "fox:10",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "ripplefin",
+      "family": "aquatic",
+      "profile": "aquatic:11",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "thornhare",
+      "family": "antler",
+      "profile": "antler:12",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "cragpup",
+      "family": "fox",
+      "profile": "fox:13",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "voltwing",
+      "family": "bird",
+      "profile": "bird:14",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "frostwhisk",
+      "family": "quadruped",
+      "profile": "quadruped:15",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "dawnfawn",
+      "family": "antler",
+      "profile": "antler:16",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "shadecko",
+      "family": "amphibian",
+      "profile": "amphibian:17",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "fernibble",
+      "family": "quadruped",
+      "profile": "quadruped:18",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "flintuff",
+      "family": "quadruped",
+      "profile": "quadruped:19",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "magmole",
+      "family": "quadruped",
+      "profile": "quadruped:20",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "coralisk",
+      "family": "serpent",
+      "profile": "serpent:21",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "floraclaw",
+      "family": "quadruped",
+      "profile": "quadruped:22",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "basalhorn",
+      "family": "antler",
+      "profile": "antler:23",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "nimbuskit",
+      "family": "fox",
+      "profile": "fox:24",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "rimeowl",
+      "family": "bird",
+      "profile": "bird:25",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "prismoth",
+      "family": "insect",
+      "profile": "insect:26",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "murkfang",
+      "family": "fox",
+      "profile": "fox:27",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "chimewing",
+      "family": "bird",
+      "profile": "bird:28",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "velvetrime",
+      "family": "quadruped",
+      "profile": "quadruped:29",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "pyroclast",
+      "family": "amphibian",
+      "profile": "amphibian:30",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "abysshell",
+      "family": "shell",
+      "profile": "shell:31",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "briarhart",
+      "family": "antler",
+      "profile": "antler:32",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "obsidrake",
+      "family": "dragon",
+      "profile": "dragon:33",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "tempestrix",
+      "family": "bird",
+      "profile": "bird:34",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "glaciermaw",
+      "family": "quadruped",
+      "profile": "quadruped:35",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "solmane",
+      "family": "quadruped",
+      "profile": "quadruped:36",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "nocturnyx",
+      "family": "fox",
+      "profile": "fox:37",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "halovelle",
+      "family": "antler",
+      "profile": "antler:38",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "inkmantle",
+      "family": "aquatic",
+      "profile": "aquatic:39",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "ignivara",
+      "family": "bird",
+      "profile": "bird:40",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "leviacrest",
+      "family": "serpent",
+      "profile": "serpent:41",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "sylvarion",
+      "family": "antler",
+      "profile": "antler:42",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "titanusk",
+      "family": "quadruped",
+      "profile": "quadruped:43",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "raijora",
+      "family": "fox",
+      "profile": "fox:44",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "crysalune",
+      "family": "fox",
+      "profile": "fox:45",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "auroriel",
+      "family": "bird",
+      "profile": "bird:46",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "umbrawyrm",
+      "family": "serpent",
+      "profile": "serpent:47",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "cindervault",
+      "family": "shell",
+      "profile": "shell:48",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "orchivyra",
+      "family": "insect",
+      "profile": "insect:49",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "solkarath",
+      "family": "dragon",
+      "profile": "dragon:50",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "thaloryx",
+      "family": "aquatic",
+      "profile": "aquatic:51",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "everbloom",
+      "family": "antler",
+      "profile": "antler:52",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "orogantis",
+      "family": "golem",
+      "profile": "golem:53",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "zephyreon",
+      "family": "dragon",
+      "profile": "dragon:54",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "iskavelle",
+      "family": "antler",
+      "profile": "antler:55",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "aurelith",
+      "family": "quadruped",
+      "profile": "quadruped:56",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "nyxavorn",
+      "family": "dragon",
+      "profile": "dragon:57",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "pelagryth",
+      "family": "aquatic",
+      "profile": "aquatic:58",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "vortalyx",
+      "family": "fox",
+      "profile": "fox:59",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    }
+  ]
+}

@@ -87,7 +87,7 @@
     "element": "Tide",
     "role": "controller",
     "appearance": "Transparent jellyfish with flower-shaped fins and a visible pearl heart",
-    "signature": "Bubble Tether lowers one target’s speed for one round"
+    "signature": "Bubble Tether lowers one target's speed for one round"
   },
   {
     "id": "emberfox",
@@ -258,7 +258,7 @@
     "element": "Storm",
     "role": "support",
     "appearance": "Hummingbird with tuning-fork tail feathers and suspended bell-like throat plates",
-    "signature": "Resonant Lift advances one ally in the next round’s initiative without granting an extra turn"
+    "signature": "Resonant Lift advances one ally in the next round's initiative without granting an extra turn"
   },
   {
     "id": "velvetrime",
@@ -267,7 +267,7 @@
     "element": "Frost",
     "role": "controller",
     "appearance": "Silvery chinchilla with a ruffled ice collar and snowflake-tipped tail",
-    "signature": "Quiet Flurry reduces one enemy’s next skill damage and applies a short slow"
+    "signature": "Quiet Flurry reduces one enemy's next skill damage and applies a short slow"
   },
   {
     "id": "pyroclast",
