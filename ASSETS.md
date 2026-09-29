@@ -5,6 +5,8 @@
 - `apps/client/src/models.ts`: original procedural Wildbound and keeper geometry, materials, articulated limbs, and animation recipes.
 - `apps/client/src/Scene.tsx`: original floating-island scenery, buildings, ruins, vegetation, crystals, world markers, and battle presentation.
 - `apps/client/src/UltimateEffects.tsx`: ten original mythic effect compositions.
+- `apps/client/src/RegionScenery.tsx`: original region landmarks, flowers, ice, rock formations, and village buildings.
+- `apps/client/src/RecruitmentStage.tsx`: original bond-shrine stage, entrance motion, and rarity accents using the actual creature models.
 - `apps/client/public/emblem.svg`: original six-point bond emblem.
 - Collection portraits are rendered from those same Three.js creature models by one on-demand renderer, then cached for the session. They are not hotlinked pictures or separate concept art.
 - `packages/shared/audio-content.ts`: original oscillator, envelope, chord, melody, percussion, and noise recipes. `apps/client/src/audio.ts` synthesizes them locally. No sampled commercial music, outside voice recordings, or paid audio service is used.

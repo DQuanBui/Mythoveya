@@ -3,8 +3,8 @@
 ## Presentation
 
 - The 60 species have distinct procedural recipes and complete gameplay mappings, but some anatomical details are stylized approximations. They are not sixty individually sculpted, production-finished character assets. Further silhouette and material work would improve resemblance to every authored description.
-- Regions share a compact island layout with different palettes, vegetation, encounter rosters, and guardians. Bespoke canyon geography, reflective ice, denser village life, and longer region stories remain future work.
-- Creature family rigs support the requested states. Recruitment uses portrait-card reveals rather than a full staged 3D entrance for every species. Greet/victory responses and keeper gestures are intentionally simple.
+- Regions share a compact walkable island layout, with distinct canyon mesas/arch, icy pond/crystal ridge, meadow flowers/waterfall, and village buildings. Larger terrain variation, animated village life, and longer region stories remain future work.
+- Creature family rigs support the requested states. Recruitment now has a staged 3D shrine entrance for every species; species-specific choreography, greet/victory responses, and keeper gestures remain simple.
 - The battle effect system is bounded and includes ten distinct mythic recipes. Delayed outcomes are authoritative and telegraphed, but their presentation is attached to the round transition rather than a separate cinematic sequence. Further support-skill choreography would make multi-target healing and protection clearer.
 - Music and voices are original Web Audio synthesis. Playback, settings and voice limits are checked programmatically; a subjective headphone/speaker listening pass has not been performed. Musical mixing and voice personality should be refined through listening before describing the sound as finished.
 - The client is a substantial WebGL bundle. Graphics presets reduce decorative work, but laptop/GPU performance varies and no universal frame-rate claim is made. Mobile movement controls are not included.

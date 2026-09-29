@@ -19,6 +19,7 @@ import { Portrait } from "./portraits";
 import { Preview, BattleScene } from "./Scene";
 import { api } from "./api";
 import type { Motion } from "./models";
+import { RecruitmentStage } from "./RecruitmentStage";
 export type Mutation = (
   kind: string,
   data?: Record<string, unknown>,
@@ -533,6 +534,7 @@ export function Recruitment({
       { species: string; duplicate: boolean }[]
     >([]),
     [busy, setBusy] = useState(false),
+    [reveal, setReveal] = useState(0),
     [confirm, setConfirm] = useState(false);
   async function recruit(count: number) {
     setBusy(true);
@@ -541,6 +543,7 @@ export function Recruitment({
       const r = await run("recruit", { count });
       if (r) {
         setResult(r);
+        setReveal(0);
         audio.cue(
           r.some((x: any) => byId[x.species].tier === "S") ? "rare" : "reveal",
         );
@@ -557,16 +560,26 @@ export function Recruitment({
       <p className="muted">Offer a little starlight. Begin a new story.</p>
       {result.length ? (
         <>
+          <RecruitmentStage
+            key={`${reveal}-${result[reveal].species}`}
+            id={result[reveal].species}
+          />
           <div className="recruit-results">
             {result.map((r, i) => (
-              <div className="reveal-card" key={i}>
+              <button
+                className={`reveal-card ${reveal === i ? "selected" : ""}`}
+                key={i}
+                onClick={() => setReveal(i)}
+                aria-label={`Meet ${byId[r.species].name}`}
+                aria-pressed={reveal === i}
+              >
                 <span className={`tier tier-${byId[r.species].tier}`}>
                   TIER {byId[r.species].tier}
                 </span>
                 <Portrait id={r.species} />
                 <h3>{byId[r.species].name}</h3>
                 <p>{r.duplicate ? "+1 species shard" : "A new bond begins"}</p>
-              </div>
+              </button>
             ))}
           </div>
           <button onClick={() => setResult([])}>Continue</button>
@@ -790,6 +803,7 @@ export function Gallery() {
     [query, setQuery] = useState(""),
     [motion, setMotion] = useState<Motion>("idle"),
     [paused, setPaused] = useState(false),
+    [previewPhase, setPreviewPhase] = useState(0.55),
     [avatar, setAvatar] = useState(-1),
     [battle, setBattle] = useState<Battle | null>(null);
   const s = byId[id];
@@ -866,6 +880,7 @@ export function Gallery() {
                 onTarget={() => {}}
                 preview
                 paused={paused}
+                previewPhase={previewPhase}
               />
             ) : (
               <Preview
@@ -877,6 +892,19 @@ export function Gallery() {
             )}
           </div>
           <h3>{avatar < 0 ? s.name : AVATARS[avatar].name}</h3>
+          {battle && paused && (
+            <label className="effect-timeline">
+              Effect phase {Math.round(previewPhase * 100)}%
+              <input
+                aria-label="Effect phase"
+                type="range"
+                min="0"
+                max="99"
+                value={Math.round(previewPhase * 100)}
+                onChange={(e) => setPreviewPhase(Number(e.target.value) / 100)}
+              />
+            </label>
+          )}
           <p>
             {s.family} · voice {s.voice} · {s.actions[2].presentation}
           </p>

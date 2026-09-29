@@ -8,16 +8,18 @@ export function UltimateEffect({
   id,
   at,
   duration,
+  phase,
 }: {
   id: string;
   at: number;
   duration: number;
+  phase?: number;
 }) {
   const ref = useRef<T.Group>(null);
   const color = byId[id].color;
   useFrame(() => {
     if (!ref.current) return;
-    const p = Math.min(1, Math.max(0, (Date.now() - at) / duration));
+    const p = phase ?? Math.min(1, Math.max(0, (Date.now() - at) / duration));
     ref.current.children.forEach((child, i) => {
       if (id === "pelagryth") {
         const wave = Math.max(0, p - i * 0.12);
@@ -45,7 +47,7 @@ export function UltimateEffect({
     </mesh>
   );
   return (
-    <group ref={ref}>
+    <group ref={ref} name={`mythic-${id}`}>
       {id === "solkarath" && (
         <>
           <mesh position={[0, 1.4, 0]}>

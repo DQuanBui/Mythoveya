@@ -13,6 +13,7 @@ import {
 } from "./models";
 import { audio, settings } from "./audio";
 import { UltimateEffect } from "./UltimateEffects";
+import { RegionScenery, blocksLandmark } from "./RegionScenery";
 function RenderStats() {
   const label = useRef<HTMLSpanElement>(null);
   const elapsed = useRef(0),
@@ -387,6 +388,7 @@ function Environment({
         fade
         speed={0.2}
       />
+      <RegionScenery region={region} />
     </>
   );
 }
@@ -475,7 +477,11 @@ function Explorer({
   const follow = useRef(new T.Vector3(-1, 0, 6.5));
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if ((e.target as HTMLElement)?.matches("input,textarea,select")) return;
+      if (
+        e.target instanceof HTMLElement &&
+        e.target.matches("input,textarea,select")
+      )
+        return;
       keys.current.add(e.code);
       if (e.code === "KeyE" && !blocked && near.current)
         onInteract(near.current);
@@ -515,6 +521,7 @@ function Explorer({
       const next = player.current.clone().add(v);
       if (
         next.length() < 16.5 &&
+        !blocksLandmark(profile.region, next.x, next.z) &&
         !((next.x - 7) ** 2 + (next.z + 3) ** 2 < 3.2) &&
         !((next.x + 6) ** 2 + (next.z + 3) ** 2 < 0.8)
       ) {
@@ -786,15 +793,17 @@ export function unitPosition(
 function BattleCamera({
   battle,
   preview = false,
+  phase,
 }: {
   battle: Battle;
   preview?: boolean;
+  phase?: number;
 }) {
   const { camera, size } = useThree();
   useFrame(() => {
     const cam = camera as T.PerspectiveCamera;
     const e = battle.event;
-    const p = e ? (Date.now() - e.at) / e.duration : 2;
+    const p = phase ?? (e ? (Date.now() - e.at) / e.duration : 2);
     const ultimate = e?.action.endsWith("-2");
     const amount =
       !settings.reduced && ultimate && p >= 0 && p < 1
@@ -818,11 +827,11 @@ function BattleCamera({
   });
   return null;
 }
-function SkillEffect({ battle }: { battle: Battle }) {
+function SkillEffect({ battle, phase }: { battle: Battle; phase?: number }) {
   const ref = useRef<T.Group>(null);
   useFrame(() => {
     if (!ref.current || !battle.event) return;
-    const p = (Date.now() - battle.event.at) / battle.event.duration;
+    const p = phase ?? (Date.now() - battle.event.at) / battle.event.duration;
     ref.current.visible = p >= 0 && p < 1;
     if (p >= 1) return;
     const actor = battle.units.find((u) => u.id === battle.event!.actor)!,
@@ -847,9 +856,14 @@ function SkillEffect({ battle }: { battle: Battle }) {
     ult = e.action.endsWith("-2"),
     v = s.index % 10;
   return (
-    <group ref={ref}>
+    <group ref={ref} name="skill-effect">
       {ult && s.tier === "S" && (
-        <UltimateEffect id={s.id} at={e.at} duration={e.duration} />
+        <UltimateEffect
+          id={s.id}
+          at={e.at}
+          duration={e.duration}
+          phase={phase}
+        />
       )}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[0.55, 0.055, 6, 32]} />
@@ -910,12 +924,14 @@ export function BattleScene({
   onTarget,
   preview = false,
   paused = false,
+  previewPhase = 0.55,
 }: {
   battle: Battle;
   target: string;
   onTarget: (id: string) => void;
   preview?: boolean;
   paused?: boolean;
+  previewPhase?: number;
 }) {
   const [, tick] = useState(0);
   const phase = useRef(0);
@@ -940,7 +956,9 @@ export function BattleScene({
             ...sourceBattle.event,
             at:
               Date.now() -
-              (phase.current % (sourceBattle.event.duration + 650)),
+              (paused
+                ? previewPhase * sourceBattle.event.duration
+                : phase.current % (sourceBattle.event.duration + 650)),
           },
           units: sourceBattle.units
             .filter(
@@ -955,7 +973,11 @@ export function BattleScene({
       camera={{ position: preview ? [7, 6, 10] : [10, 12, 15], fov: 42 }}
       dpr={[1, 1.5]}
     >
-      <BattleCamera battle={battle} preview={preview} />
+      <BattleCamera
+        battle={battle}
+        preview={preview}
+        phase={preview && paused ? previewPhase : undefined}
+      />
       <color attach="background" args={["#75939b"]} />
       <fog attach="fog" args={["#75939b", 25, 70]} />
       <ambientLight intensity={1.6} />
@@ -971,7 +993,12 @@ export function BattleScene({
       {battle.units.map((u) => {
         const p = unitPosition(u.side, u.slot),
           event = battle.event,
-          elapsed = event ? (Date.now() - event.at) / event.duration : 2,
+          elapsed =
+            preview && paused
+              ? previewPhase
+              : event
+                ? (Date.now() - event.at) / event.duration
+                : 2,
           active = elapsed < 1;
         const outcome =
           event?.amounts
@@ -1071,7 +1098,10 @@ export function BattleScene({
           </group>
         );
       })}
-      <SkillEffect battle={battle} />
+      <SkillEffect
+        battle={battle}
+        phase={preview && paused ? previewPhase : undefined}
+      />
       <Island position={[-22, 0, -24]} />
       <Island position={[23, 6, -38]} />
       <OrbitControls

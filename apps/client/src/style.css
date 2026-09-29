@@ -927,6 +927,24 @@ main {
   animation: reveal 0.6s ease-out;
   min-width: 150px;
 }
+.recruitment-stage {
+  height: 240px;
+  margin: 12px auto;
+  max-width: 580px;
+  border-radius: 18px;
+  background: radial-gradient(ellipse at center, #365861, #142932 75%);
+}
+.reveal-card.selected {
+  border-color: #e3c58e;
+}
+.effect-timeline {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.effect-timeline input {
+  flex: 1;
+}
 .reveal-card .portrait {
   width: 150px;
   height: 150px;

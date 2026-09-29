@@ -481,7 +481,7 @@ export default function App() {
                 ▲
               </b>
             </div>
-            <span>N · HAVEN WAYSTONE</span>
+            <span>N · {region.name.toUpperCase()}</span>
             <button onClick={() => open("map")}>Travel map</button>
           </div>
           <div className="interaction-zone">

@@ -14,6 +14,8 @@ The family rig exposes articulated limbs, wings, and tails. `animateCreature` ha
 
 The game drives idle/walk, attack/cast/ultimate, hit, and defeat in context. The companion's greet action uses a small victory-like bounce and a species call. The gallery can independently inspect every state. Some specialized entrances and victory poses remain simplified; see known issues.
 
+Recruitment presents the selected Wildbound on a 3D shrine platform with an eased entrance, living pose, orbiting motes, and warm accents for A/S tiers. Each result card selects that species for the stage. Reduced motion presents the model immediately without the entrance spin. The gallery's paused effect timeline permits inspection of anticipation, impact, and recovery at a repeatable phase.
+
 ## Effects and timing
 
 Server action events contain monotonic IDs, action/target identifiers, outcomes, timestamps, and bounded presentation durations. Basic/skill/ultimate windows are 700/1,200/2,200 ms; fast PvE uses 220 ms. PvP decisions start after the same server-defined window for both players. Presentation never computes rewards or damage.
