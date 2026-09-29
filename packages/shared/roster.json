@@ -1,0 +1,542 @@
+[
+  {
+    "id": "cindermite",
+    "name": "Cindermite",
+    "tier": "E",
+    "element": "Flame",
+    "role": "striker",
+    "appearance": "Ember-bellied beetle with chimney-like antennae",
+    "signature": "Spark Bite applies a short burn"
+  },
+  {
+    "id": "puddlepip",
+    "name": "Puddlepip",
+    "tier": "E",
+    "element": "Tide",
+    "role": "healer",
+    "appearance": "Round blue amphibian carrying a floating water bubble",
+    "signature": "Dewdrop heals the weakest ally"
+  },
+  {
+    "id": "mossprig",
+    "name": "Mossprig",
+    "tier": "E",
+    "element": "Grove",
+    "role": "support",
+    "appearance": "Leaf-eared rabbit with a sprout tail",
+    "signature": "Sprout Guard grants a small shield"
+  },
+  {
+    "id": "pebblit",
+    "name": "Pebblit",
+    "tier": "E",
+    "element": "Stone",
+    "role": "tank",
+    "appearance": "Short stone-backed tortoise with mineral eyebrows",
+    "signature": "Pebble Shell reduces incoming damage"
+  },
+  {
+    "id": "zippinch",
+    "name": "Zippinch",
+    "tier": "E",
+    "element": "Storm",
+    "role": "striker",
+    "appearance": "Tiny finch with forked lightning feathers",
+    "signature": "Quick Peck gains a modest speed bonus"
+  },
+  {
+    "id": "snowmew",
+    "name": "Snowmew",
+    "tier": "E",
+    "element": "Frost",
+    "role": "controller",
+    "appearance": "Snow-white kitten with oversized crystalline paws",
+    "signature": "Chilly Pounce temporarily slows"
+  },
+  {
+    "id": "glimlet",
+    "name": "Glimlet",
+    "tier": "E",
+    "element": "Light",
+    "role": "support",
+    "appearance": "Golden moth with translucent lantern wings",
+    "signature": "Lantern Dust cleanses one debuff"
+  },
+  {
+    "id": "duskblob",
+    "name": "Duskblob",
+    "tier": "E",
+    "element": "Shadow",
+    "role": "controller",
+    "appearance": "Inky floating spirit with folded ear-like fins",
+    "signature": "Gloom Touch briefly reduces attack"
+  },
+  {
+    "id": "wickwaddle",
+    "name": "Wickwaddle",
+    "tier": "E",
+    "element": "Flame",
+    "role": "support",
+    "appearance": "Tiny penguin-like bird with a waxy crest and ember freckles",
+    "signature": "Hearthlight shields the weakest ally and removes one burn"
+  },
+  {
+    "id": "bubbloom",
+    "name": "Bubbloom",
+    "tier": "E",
+    "element": "Tide",
+    "role": "controller",
+    "appearance": "Transparent jellyfish with flower-shaped fins and a visible pearl heart",
+    "signature": "Bubble Tether lowers one target’s speed for one round"
+  },
+  {
+    "id": "emberfox",
+    "name": "Emberfox",
+    "tier": "D",
+    "element": "Flame",
+    "role": "striker",
+    "appearance": "Russet fox with a candle-shaped tail",
+    "signature": "Flare Dash deals extra damage to shields"
+  },
+  {
+    "id": "ripplefin",
+    "name": "Ripplefin",
+    "tier": "D",
+    "element": "Tide",
+    "role": "healer",
+    "appearance": "Hovering otter with a broad fin-shaped tail",
+    "signature": "Healing Current heals two injured allies"
+  },
+  {
+    "id": "thornhare",
+    "name": "Thornhare",
+    "tier": "D",
+    "element": "Grove",
+    "role": "controller",
+    "appearance": "Long-legged hare with curling bramble antlers",
+    "signature": "Bramble Snare lowers target speed"
+  },
+  {
+    "id": "cragpup",
+    "name": "Cragpup",
+    "tier": "D",
+    "element": "Stone",
+    "role": "tank",
+    "appearance": "Stout puppy with layered slate armor",
+    "signature": "Loyal Guard protects one ally"
+  },
+  {
+    "id": "voltwing",
+    "name": "Voltwing",
+    "tier": "D",
+    "element": "Storm",
+    "role": "striker",
+    "appearance": "Bat with bright zigzag wing membranes",
+    "signature": "Arc Spark chains to a second target"
+  },
+  {
+    "id": "frostwhisk",
+    "name": "Frostwhisk",
+    "tier": "D",
+    "element": "Frost",
+    "role": "support",
+    "appearance": "Pale ferret with a fan-shaped frost tail",
+    "signature": "Snow Veil shields the back row"
+  },
+  {
+    "id": "dawnfawn",
+    "name": "Dawnfawn",
+    "tier": "D",
+    "element": "Light",
+    "role": "healer",
+    "appearance": "Small deer with a glowing floral forehead crest",
+    "signature": "Morning Grace heals and cleanses"
+  },
+  {
+    "id": "shadecko",
+    "name": "Shadecko",
+    "tier": "D",
+    "element": "Shadow",
+    "role": "controller",
+    "appearance": "Violet gecko with a crescent sail on its back",
+    "signature": "Shadow Mark makes a target take more damage"
+  },
+  {
+    "id": "fernibble",
+    "name": "Fernibble",
+    "tier": "D",
+    "element": "Grove",
+    "role": "healer",
+    "appearance": "Chubby squirrel with fern-frond ears and a seed-pod backpack",
+    "signature": "Seedshare plants a two-turn heal on the lowest-HP ally"
+  },
+  {
+    "id": "flintuff",
+    "name": "Flintuff",
+    "tier": "D",
+    "element": "Stone",
+    "role": "striker",
+    "appearance": "Porcupine with uneven flint quills and copper-colored paws",
+    "signature": "Quillburst hits a front target, then splinters onto an adjacent front slot"
+  },
+  {
+    "id": "magmole",
+    "name": "Magmole",
+    "tier": "C",
+    "element": "Flame",
+    "role": "tank",
+    "appearance": "Heavy digging mole with molten foreclaws",
+    "signature": "Furnace Hide burns direct attackers"
+  },
+  {
+    "id": "coralisk",
+    "name": "Coralisk",
+    "tier": "C",
+    "element": "Tide",
+    "role": "controller",
+    "appearance": "Coiled sea serpent crowned with coral branches",
+    "signature": "Undertow delays one enemy's next action"
+  },
+  {
+    "id": "floraclaw",
+    "name": "Floraclaw",
+    "tier": "C",
+    "element": "Grove",
+    "role": "healer",
+    "appearance": "Leaf-maned lynx with petal-tipped claws",
+    "signature": "Bloom Pulse provides healing over time"
+  },
+  {
+    "id": "basalhorn",
+    "name": "Basalhorn",
+    "tier": "C",
+    "element": "Stone",
+    "role": "tank",
+    "appearance": "Ram with flat basalt horns and crystal hooves",
+    "signature": "Faultline Brace shields the front row"
+  },
+  {
+    "id": "nimbuskit",
+    "name": "Nimbuskit",
+    "tier": "C",
+    "element": "Storm",
+    "role": "support",
+    "appearance": "Cloud-maned cat with a floating ring tail",
+    "signature": "Tailwind raises allied speed temporarily"
+  },
+  {
+    "id": "rimeowl",
+    "name": "Rimeowl",
+    "tier": "C",
+    "element": "Frost",
+    "role": "controller",
+    "appearance": "Broad-winged owl with an icicle facial disc",
+    "signature": "Hush of Winter interrupts a charged move"
+  },
+  {
+    "id": "prismoth",
+    "name": "Prismoth",
+    "tier": "C",
+    "element": "Light",
+    "role": "support",
+    "appearance": "Large moth with faceted rainbow wings",
+    "signature": "Refraction shields and cleanses one ally"
+  },
+  {
+    "id": "murkfang",
+    "name": "Murkfang",
+    "tier": "C",
+    "element": "Shadow",
+    "role": "striker",
+    "appearance": "Low prowling jackal with smoky tusks",
+    "signature": "Night Hunt deals extra damage to marked targets"
+  },
+  {
+    "id": "chimewing",
+    "name": "Chimewing",
+    "tier": "C",
+    "element": "Storm",
+    "role": "support",
+    "appearance": "Hummingbird with tuning-fork tail feathers and suspended bell-like throat plates",
+    "signature": "Resonant Lift advances one ally in the next round’s initiative without granting an extra turn"
+  },
+  {
+    "id": "velvetrime",
+    "name": "Velvetrime",
+    "tier": "C",
+    "element": "Frost",
+    "role": "controller",
+    "appearance": "Silvery chinchilla with a ruffled ice collar and snowflake-tipped tail",
+    "signature": "Quiet Flurry reduces one enemy’s next skill damage and applies a short slow"
+  },
+  {
+    "id": "pyroclast",
+    "name": "Pyroclast",
+    "tier": "B",
+    "element": "Flame",
+    "role": "striker",
+    "appearance": "Thick salamander with volcanic dorsal vents",
+    "signature": "Eruption damages a row and applies burn"
+  },
+  {
+    "id": "abysshell",
+    "name": "Abysshell",
+    "tier": "B",
+    "element": "Tide",
+    "role": "tank",
+    "appearance": "Armored crab with a luminous pearl core",
+    "signature": "Tidal Bastion absorbs damage for the team"
+  },
+  {
+    "id": "briarhart",
+    "name": "Briarhart",
+    "tier": "B",
+    "element": "Grove",
+    "role": "support",
+    "appearance": "Stag with flowering antlers and bark legs",
+    "signature": "Living Thicket grants regeneration and thorns"
+  },
+  {
+    "id": "obsidrake",
+    "name": "Obsidrake",
+    "tier": "B",
+    "element": "Stone",
+    "role": "striker",
+    "appearance": "Wingless drake with obsidian blade plates",
+    "signature": "Shatterstrike breaks shields before striking"
+  },
+  {
+    "id": "tempestrix",
+    "name": "Tempestrix",
+    "tier": "B",
+    "element": "Storm",
+    "role": "striker",
+    "appearance": "Long-winged raptor with ribbon lightning plumes",
+    "signature": "Storm Spiral chains between enemies"
+  },
+  {
+    "id": "glaciermaw",
+    "name": "Glaciermaw",
+    "tier": "B",
+    "element": "Frost",
+    "role": "tank",
+    "appearance": "Ice-plated crocodile with a broad frozen jaw",
+    "signature": "Permafrost Guard reduces row damage"
+  },
+  {
+    "id": "solmane",
+    "name": "Solmane",
+    "tier": "B",
+    "element": "Light",
+    "role": "healer",
+    "appearance": "Lion with a sun-disc mane and luminous paw pads",
+    "signature": "Solar Renewal heals the team over several turns"
+  },
+  {
+    "id": "nocturnyx",
+    "name": "Nocturnyx",
+    "tier": "B",
+    "element": "Shadow",
+    "role": "controller",
+    "appearance": "Black lynx with twin crescent ear ornaments",
+    "signature": "Eclipse Howl lowers enemy attack temporarily"
+  },
+  {
+    "id": "halovelle",
+    "name": "Halovelle",
+    "tier": "B",
+    "element": "Light",
+    "role": "support",
+    "appearance": "Graceful gazelle with spiral glass horns and a floating pearl chest crest",
+    "signature": "Prism Shelter shields an ally and reflects a capped amount of the next direct hit; no reflection loops"
+  },
+  {
+    "id": "inkmantle",
+    "name": "Inkmantle",
+    "tier": "B",
+    "element": "Shadow",
+    "role": "controller",
+    "appearance": "Broad-winged cuttlefish hovering inside a folded ink cloak",
+    "signature": "Inkbound Seal suppresses one non-ultimate active skill for one turn; basic attacks remain available"
+  },
+  {
+    "id": "ignivara",
+    "name": "Ignivara",
+    "tier": "A",
+    "element": "Flame",
+    "role": "striker",
+    "appearance": "Four-winged phoenix with molten gold feathers",
+    "signature": "Rebirth Ember grants one limited self-revival"
+  },
+  {
+    "id": "leviacrest",
+    "name": "Leviacrest",
+    "tier": "A",
+    "element": "Tide",
+    "role": "controller",
+    "appearance": "Whale-like sky serpent with a crown-shaped dorsal fin",
+    "signature": "Sovereign Tide sweeps a row and lowers speed"
+  },
+  {
+    "id": "sylvarion",
+    "name": "Sylvarion",
+    "tier": "A",
+    "element": "Grove",
+    "role": "healer",
+    "appearance": "Ancient wooden stag with a miniature canopy",
+    "signature": "Heartwood Sanctuary grants broad regeneration"
+  },
+  {
+    "id": "titanusk",
+    "name": "Titanusk",
+    "tier": "A",
+    "element": "Stone",
+    "role": "tank",
+    "appearance": "Mammoth with stone tusks and mossy shoulder towers",
+    "signature": "Mountain Oath intercepts limited allied damage"
+  },
+  {
+    "id": "raijora",
+    "name": "Raijora",
+    "tier": "A",
+    "element": "Storm",
+    "role": "striker",
+    "appearance": "Sleek tiger with floating thunder rings",
+    "signature": "Thunder Pursuit follows up one allied attack per round"
+  },
+  {
+    "id": "crysalune",
+    "name": "Crysalune",
+    "tier": "A",
+    "element": "Frost",
+    "role": "support",
+    "appearance": "Arctic fox with a crescent ice fan instead of a tail",
+    "signature": "Moonfrost slows enemies and shields allies"
+  },
+  {
+    "id": "auroriel",
+    "name": "Auroriel",
+    "tier": "A",
+    "element": "Light",
+    "role": "support",
+    "appearance": "Tall crane with aurora-ribbon wings",
+    "signature": "Celestial Chorus boosts one ally's next skill"
+  },
+  {
+    "id": "umbrawyrm",
+    "name": "Umbrawyrm",
+    "tier": "A",
+    "element": "Shadow",
+    "role": "striker",
+    "appearance": "Long winged serpent with fractured shadow fins",
+    "signature": "Rift Fang partially bypasses defense"
+  },
+  {
+    "id": "cindervault",
+    "name": "Cindervault",
+    "tier": "A",
+    "element": "Flame",
+    "role": "tank",
+    "appearance": "Pangolin with overlapping kiln-red plates and vented bronze claws",
+    "signature": "Crucible Curl banks a capped amount of absorbed direct damage, then releases an ember counter once"
+  },
+  {
+    "id": "orchivyra",
+    "name": "Orchivyra",
+    "tier": "A",
+    "element": "Grove",
+    "role": "controller",
+    "appearance": "Orchid mantis with petal shields and long vine-like forearms",
+    "signature": "Petal Ambush marks a rear enemy and roots it briefly after a telegraphed strike"
+  },
+  {
+    "id": "solkarath",
+    "name": "Solkarath",
+    "tier": "S",
+    "element": "Flame",
+    "role": "striker",
+    "appearance": "Six-horned dragon with a miniature sun between its horns",
+    "signature": "Crown of Embers charges before a powerful row attack"
+  },
+  {
+    "id": "thaloryx",
+    "name": "Thaloryx",
+    "tier": "S",
+    "element": "Tide",
+    "role": "tank",
+    "appearance": "Colossal manta ray with an orbiting water halo",
+    "signature": "Ocean's Covenant distributes some incoming allied damage"
+  },
+  {
+    "id": "everbloom",
+    "name": "Everbloom",
+    "tier": "S",
+    "element": "Grove",
+    "role": "healer",
+    "appearance": "Long-legged kirin with a living garden on its back",
+    "signature": "Worldroot restores allies and cleanses debuffs"
+  },
+  {
+    "id": "orogantis",
+    "name": "Orogantis",
+    "tier": "S",
+    "element": "Stone",
+    "role": "tank",
+    "appearance": "Towering gorilla-shaped golem with suspended stone shoulders",
+    "signature": "Continental Aegis erects a powerful temporary shield"
+  },
+  {
+    "id": "zephyreon",
+    "name": "Zephyreon",
+    "tier": "S",
+    "element": "Storm",
+    "role": "striker",
+    "appearance": "Three-tailed sky dragon with turbine-like feather wings",
+    "signature": "Eye of the Storm marks a target, then triggers lightning"
+  },
+  {
+    "id": "iskavelle",
+    "name": "Iskavelle",
+    "tier": "S",
+    "element": "Frost",
+    "role": "controller",
+    "appearance": "Elegant six-legged snow deer with a floating ice crown",
+    "signature": "Absolute Stillness briefly controls one target; no permanent lock"
+  },
+  {
+    "id": "aurelith",
+    "name": "Aurelith",
+    "tier": "S",
+    "element": "Light",
+    "role": "support",
+    "appearance": "Winged leonine guardian with a faceted golden halo",
+    "signature": "Dawn Requiem revives one ally once per battle"
+  },
+  {
+    "id": "nyxavorn",
+    "name": "Nyxavorn",
+    "tier": "S",
+    "element": "Shadow",
+    "role": "controller",
+    "appearance": "Raven-dragon with orbiting dark feathers and star-like eyes",
+    "signature": "Eventide Gate weakens a row before a delayed shadow burst"
+  },
+  {
+    "id": "pelagryth",
+    "name": "Pelagryth",
+    "tier": "S",
+    "element": "Tide",
+    "role": "healer",
+    "appearance": "Regal seahorse-dragon with sail-like fins and orbiting luminous droplets",
+    "signature": "Heart of the Deep sends three healing waves, with one cleanse across the full sequence"
+  },
+  {
+    "id": "vortalyx",
+    "name": "Vortalyx",
+    "tier": "S",
+    "element": "Storm",
+    "role": "controller",
+    "appearance": "Winged lynx with curved storm horns and a slowly orbiting cyclone tail",
+    "signature": "Tempest Loom marks one enemy for a delayed gust that reorders its next-round initiative"
+  }
+]
