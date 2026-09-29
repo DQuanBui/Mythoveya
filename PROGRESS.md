@@ -14,3 +14,6 @@ Implement and verify milestone 1, then progression, multiplayer, content and pre
 
 ## Verification
 No build checks run yet. No visual or listening review yet.
+
+## Foundation systems
+Implemented 60 structured species, deterministic combat, atomic SQLite economy, opaque guest sessions, PvE services and Colyseus room lifecycle. Six core tests and TypeScript check pass. Browser gameplay remains to be connected and verified.
