@@ -2,6 +2,14 @@
 
 ## Current playable build
 
+### Havenreach clarity upgrade - Phase 1
+
+Reviewed the supplied improvement brief and screenshot. Implemented a safe-area HUD with a complete bottom dock, persistent quest/map information on small screens, a three-step introduction, objective distance and world/minimap waypoints, fixed-size nearby labels, resource sparkles, currency explanations, and a touch movement joystick. No saved-profile or server schema changes were required.
+
+The first milestone is committed as `66eb9bd`. The first-journey browser scenario passed, including victory, recruitment, saved formation edits, reload, and settings. The production build and all **22 tests across five files** passed. Seven viewport checks and an additional emulated touch-landscape check passed after correcting the inherited landscape rule and joystick spacing. Desktop, portrait, and landscape captures were inspected.
+
+The supplied brief requested a checkpoint after Phase 1. The subsequent instruction to continue authorizes the NPC, dialogue, and mission-services phase, now in progress. See [the upgrade review](docs/UPGRADE_REVIEW.md) for implemented files, testing instructions, and later proposals that affect existing systems.
+
 Run `npm run dev` and open http://127.0.0.1:5173/. For a compiled build, run `npm run build`, then `npm start` and open http://127.0.0.1:2567/. SQLite progress remains independent of source updates. Repository: https://github.com/DQuanBui/Mythoveya.
 
 The initial workspace was empty. The complete specification was read before implementation. Subsequent updates preserve the database and guest sessions.
@@ -26,7 +34,7 @@ The initial workspace was empty. The complete specification was read before impl
 
 Screenshots were captured and inspected for title, exploration, battle, recruitment, journal, twelve families, eight keepers, and ten mythic previews. Browser gameplay recordings are under ignored `test-results/`. Playback and mixer limits were checked programmatically; subjective listening review has not been performed.
 
-The final production build passed after the paused-preview correction. The project has twelve meaningful commits across foundation, combat, saves, exploration, progression, multiplayer, presentation, and verification. Saves, guest tokens, recordings, and temporary test databases are excluded from Git.
+The initial playable delivery passed its production build after the paused-preview correction and comprises twelve meaningful commits across foundation, combat, saves, exploration, progression, multiplayer, presentation, and verification. Subsequent upgrade commits extend that baseline. Saves, guest tokens, recordings, and temporary test databases are excluded from Git.
 
 ## Recent refinements
 

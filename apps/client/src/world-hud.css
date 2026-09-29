@@ -89,6 +89,7 @@
   margin: 8px 0 0;
 }
 .world-hud .quest-tracker {
+  display: block;
   left: 0;
   top: 104px;
   width: 282px;
@@ -161,6 +162,7 @@
   text-align: left;
 }
 .world-hud .minimap {
+  display: block;
   right: 4px;
   top: 108px;
   width: 144px;
@@ -555,6 +557,16 @@
   }
   .world-hud .interaction-zone {
     bottom: 85px;
+  }
+  .world-hud .quest-tracker .text-button {
+    min-height: 32px;
+  }
+  .touch-movement {
+    bottom: 68px;
+  }
+  .touch-pad {
+    width: 72px;
+    height: 72px;
   }
   .world-hud .controls-hint {
     display: none;

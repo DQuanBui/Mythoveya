@@ -15,7 +15,7 @@ export const WORLD_GUIDE = {
       name: "Gold",
       symbol: "◉",
       description:
-        "Earned from gathering and battles. Spend on companion training and shard upgrades.",
+        "Earned from gathering and battles. Spend 50 Gold to train a companion and earn creature XP.",
     },
   },
   markers: {
