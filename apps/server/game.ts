@@ -107,6 +107,8 @@ export function mutate(p: Profile, kind: string, v: any) {
       break;
     }
     case "avatar":
+      if (!Number.isInteger(v.avatar) || v.avatar < 0 || v.avatar > 7)
+        throw Error("Choose one of the eight keepers.");
       p.avatar = v.avatar;
       break;
     case "travel": {
@@ -182,7 +184,15 @@ export function startPve(p: Profile, boss: boolean, practice = false) {
     practice ? "practice" : "pve",
     randomInt(0, 10000000),
   );
-  b.title=practice?'Practice vs computer':boss?(p.region==='canyon'?'Cinder Regent':p.region==='hollow'?'Hollow Sentinel':'Thorncrown'):'Wild encounter';
+  b.title = practice
+    ? "Practice vs computer"
+    : boss
+      ? p.region === "canyon"
+        ? "Cinder Regent"
+        : p.region === "hollow"
+          ? "Hollow Sentinel"
+          : "Thorncrown"
+      : "Wild encounter";
   if (p.wins === 0 && !boss)
     for (const u of b.units.filter((u) => u.side === 1)) {
       u.hp = u.maxHp = Math.round(u.maxHp * 0.5);
@@ -196,7 +206,7 @@ export function startPve(p: Profile, boss: boolean, practice = false) {
           ? "glaciermaw"
           : "briarhart";
     b.units[6].species = s;
-    b.units[6].hp = b.units[6].maxHp *= 1.7;
+    b.units[6].hp = b.units[6].maxHp = Math.round(b.units[6].maxHp * 1.7);
   }
   pve.set(p.id, b);
   battleMeta.set(b.id, { region: practice ? "practice" : p.region, boss });
@@ -207,7 +217,12 @@ export function finishPve(profileId: string, b: Battle) {
   atomic(() => {
     if (db.prepare("SELECT id FROM matches WHERE id=?").get(b.id)) return;
     const p = getProfile(profileId);
-    const before={gold:p.gold,diamonds:p.diamonds,tokens:p.tokens,species:p.owned.map(o=>o.species)};
+    const before = {
+      gold: p.gold,
+      diamonds: p.diamonds,
+      tokens: p.tokens,
+      species: p.owned.map((o) => o.species),
+    };
     const meta = battleMeta.get(b.id);
     if (meta?.region !== "practice" && b.winner === 0) {
       p.wins++;
@@ -215,8 +230,11 @@ export function finishPve(profileId: string, b: Battle) {
       p.gold += 80;
       p.tokens++;
       gainXp(p, 90);
-      const candidate=b.units.find(u=>u.side===1&&['E','D','C'].includes(byId[u.species].tier));
-      if(candidate)p.bond = { species:candidate.species, chance: 0.8, used: false };
+      const candidate = b.units.find(
+        (u) => u.side === 1 && ["E", "D", "C"].includes(byId[u.species].tier),
+      );
+      if (candidate)
+        p.bond = { species: candidate.species, chance: 0.8, used: false };
       if (meta?.boss && !p.bosses.includes(meta.region)) {
         p.bosses.push(meta.region);
         own(
@@ -230,7 +248,15 @@ export function finishPve(profileId: string, b: Battle) {
         p.diamonds += 150;
       }
     }
-    b.rewards={gold:p.gold-before.gold,diamonds:p.diamonds-before.diamonds,tokens:p.tokens-before.tokens,xp:meta?.region!=='practice'&&b.winner===0?90:0,newSpecies:p.owned.filter(o=>!before.species.includes(o.species)).map(o=>o.species)};
+    b.rewards = {
+      gold: p.gold - before.gold,
+      diamonds: p.diamonds - before.diamonds,
+      tokens: p.tokens - before.tokens,
+      xp: meta?.region !== "practice" && b.winner === 0 ? 90 : 0,
+      newSpecies: p.owned
+        .filter((o) => !before.species.includes(o.species))
+        .map((o) => o.species),
+    };
     db.prepare("INSERT INTO matches VALUES(?,?)").run(
       b.id,
       JSON.stringify({ winner: b.winner, kind: "pve", profileId }),
@@ -254,5 +280,17 @@ export function pveAction(
   return b;
 }
 export function ranking(p: Profile) {
-  return Math.max(0,...[p.team,...(p.savedFormations||[])].filter(t=>t.length===6&&new Set(t).size===6&&t.every(id=>p.owned.some(o=>o.id===id))).map(t=>t.reduce((n,id)=>n+power(p.owned.find(o=>o.id===id)!),0)));
+  return Math.max(
+    0,
+    ...[p.team, ...(p.savedFormations || [])]
+      .filter(
+        (t) =>
+          t.length === 6 &&
+          new Set(t).size === 6 &&
+          t.every((id) => p.owned.some((o) => o.id === id)),
+      )
+      .map((t) =>
+        t.reduce((n, id) => n + power(p.owned.find((o) => o.id === id)!), 0),
+      ),
+  );
 }

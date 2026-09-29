@@ -12,7 +12,27 @@ import {
   type Motion,
 } from "./models";
 import { audio, settings } from "./audio";
-import {UltimateEffect} from './UltimateEffects';
+import { UltimateEffect } from "./UltimateEffects";
+function RenderStats() {
+  const label = useRef<HTMLSpanElement>(null);
+  const elapsed = useRef(0),
+    frames = useRef(0);
+  useFrame((_state, dt) => {
+    elapsed.current += dt;
+    frames.current++;
+    if (elapsed.current > 1) {
+      if (label.current)
+        label.current.textContent = `DEV · ${Math.round(frames.current / elapsed.current)} FPS`;
+      elapsed.current = 0;
+      frames.current = 0;
+    }
+  });
+  return import.meta.env.DEV ? (
+    <Html fullscreen style={{ pointerEvents: "none" }} zIndexRange={[1, 0]}>
+      <span ref={label} className="fps-readout" />
+    </Html>
+  ) : null;
+}
 export function Creature({
   id,
   state = "idle",
@@ -77,8 +97,32 @@ function Tree({
   scale?: number;
   color?: string;
 }) {
-  const tree=useRef<T.Group>(null);const point=useMemo(()=>new T.Vector3(),[]);const direction=useMemo(()=>new T.Vector3(),[]);const ray=useMemo(()=>new T.Ray(),[]);const lastFade=useRef(false);
-  useFrame(({camera})=>{if(!tree.current)return;tree.current.getWorldPosition(point);point.y+=2.5*scale;camera.getWorldDirection(direction);ray.set(camera.position,direction);const faded=camera.position.distanceTo(point)<8 && ray.distanceToPoint(point)<2*scale;if(faded!==lastFade.current){tree.current.traverse(obj=>{if(obj instanceof T.Mesh){const mat=obj.material as T.MeshStandardMaterial;mat.transparent=true;mat.opacity=faded?.16:1;mat.depthWrite=!faded;}});lastFade.current=faded;}});
+  const tree = useRef<T.Group>(null);
+  const point = useMemo(() => new T.Vector3(), []);
+  const direction = useMemo(() => new T.Vector3(), []);
+  const ray = useMemo(() => new T.Ray(), []);
+  const lastFade = useRef(false);
+  useFrame(({ camera }) => {
+    if (!tree.current) return;
+    tree.current.getWorldPosition(point);
+    point.y += 2.5 * scale;
+    camera.getWorldDirection(direction);
+    ray.set(camera.position, direction);
+    const faded =
+      camera.position.distanceTo(point) < 8 &&
+      ray.distanceToPoint(point) < 2 * scale;
+    if (faded !== lastFade.current) {
+      tree.current.traverse((obj) => {
+        if (obj instanceof T.Mesh) {
+          const mat = obj.material as T.MeshStandardMaterial;
+          mat.transparent = true;
+          mat.opacity = faded ? 0.16 : 1;
+          mat.depthWrite = !faded;
+        }
+      });
+      lastFade.current = faded;
+    }
+  });
   return (
     <group ref={tree} position={position} scale={scale}>
       <mesh position={[0, 1.3, 0]} castShadow>
@@ -556,14 +600,25 @@ function Roamer({
   position: [number, number, number];
 }) {
   const ref = useRef<T.Group>(null);
-  const lastCall=useRef(0);
-  useFrame(({ clock,camera }) => {
+  const lastCall = useRef(0);
+  useFrame(({ clock, camera }) => {
     if (ref.current) {
       ref.current.position.x =
         position[0] + Math.sin(clock.elapsedTime * 0.25) * 0.8;
       ref.current.rotation.y = Math.cos(clock.elapsedTime * 0.25) * 0.6;
-      const distance=camera.position.distanceTo(ref.current.position);
-      if(clock.elapsedTime-lastCall.current>14+byId[id].variant&&distance<22){audio.voice(id,'call',(ref.current.position.x-camera.position.x)/15,Math.min(.65,5/distance));lastCall.current=clock.elapsedTime;}
+      const distance = camera.position.distanceTo(ref.current.position);
+      if (
+        clock.elapsedTime - lastCall.current > 14 + byId[id].variant &&
+        distance < 22
+      ) {
+        audio.voice(
+          id,
+          "call",
+          (ref.current.position.x - camera.position.x) / 15,
+          Math.min(0.65, 5 / distance),
+        );
+        lastCall.current = clock.elapsedTime;
+      }
     }
   });
   return (
@@ -656,6 +711,7 @@ export function TitleScene({
 }) {
   return (
     <Canvas shadows camera={{ position: [8, 5.2, 12], fov: 38 }} dpr={[1, 1.5]}>
+      <RenderStats />
       <Environment title />
       <group position={[2.5, 0, 2]} rotation={[0, -0.35, 0]}>
         <Avatar index={avatar} />
@@ -725,10 +781,40 @@ export function unitPosition(
     (side === 0 ? 1 : -1) * (Math.floor(slot / 3) * 2.1 + 1.9),
   ];
 }
-function BattleCamera({battle}:{battle:Battle}){
- const {camera,size}=useThree();
- useFrame(()=>{const cam=camera as T.PerspectiveCamera;const e=battle.event;const p=e?(Date.now()-e.at)/e.duration:2;const ultimate=e?.action.endsWith('-2');const amount=!settings.reduced&&ultimate&&p>=0&&p<1?Math.sin(p*Math.PI)*(2+(byId[battle.units.find(u=>u.id===e!.actor)!.species].index%3)):0;cam.fov=42-amount;cam.setViewOffset(size.width,size.height,settings.shake&&!settings.reduced&&p>.43&&p<.57?Math.sin(p*100)*2:0,0,size.width,size.height);cam.updateProjectionMatrix();});
- return null;
+function BattleCamera({
+  battle,
+  preview = false,
+}: {
+  battle: Battle;
+  preview?: boolean;
+}) {
+  const { camera, size } = useThree();
+  useFrame(() => {
+    const cam = camera as T.PerspectiveCamera;
+    const e = battle.event;
+    const p = e ? (Date.now() - e.at) / e.duration : 2;
+    const ultimate = e?.action.endsWith("-2");
+    const amount =
+      !settings.reduced && ultimate && p >= 0 && p < 1
+        ? Math.sin(p * Math.PI) *
+          (2 +
+            (byId[battle.units.find((u) => u.id === e!.actor)!.species].index %
+              3))
+        : 0;
+    cam.fov = (preview ? 38 : 42) - amount;
+    cam.setViewOffset(
+      size.width,
+      size.height,
+      settings.shake && !settings.reduced && p > 0.43 && p < 0.57
+        ? Math.sin(p * 100) * 2
+        : 0,
+      0,
+      size.width,
+      size.height,
+    );
+    cam.updateProjectionMatrix();
+  });
+  return null;
 }
 function SkillEffect({ battle }: { battle: Battle }) {
   const ref = useRef<T.Group>(null);
@@ -760,7 +846,9 @@ function SkillEffect({ battle }: { battle: Battle }) {
     v = s.index % 10;
   return (
     <group ref={ref}>
-      {ult && s.tier === 'S' && <UltimateEffect id={s.id} at={e.at} duration={e.duration}/>}
+      {ult && s.tier === "S" && (
+        <UltimateEffect id={s.id} at={e.at} duration={e.duration} />
+      )}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[0.55, 0.055, 6, 32]} />
         <meshBasicMaterial color={s.color} transparent opacity={0.75} />
@@ -815,22 +903,57 @@ function SkillEffect({ battle }: { battle: Battle }) {
   );
 }
 export function BattleScene({
-  battle,
+  battle: sourceBattle,
   target,
   onTarget,
+  preview = false,
+  paused = false,
 }: {
   battle: Battle;
   target: string;
   onTarget: (id: string) => void;
+  preview?: boolean;
+  paused?: boolean;
 }) {
   const [, tick] = useState(0);
+  const phase = useRef(0);
   useEffect(() => {
-    const t = setInterval(() => tick((x) => x + 1), 100);
+    phase.current = 0;
+  }, [sourceBattle.event?.at]);
+  useEffect(() => {
+    let previous = Date.now();
+    const t = setInterval(() => {
+      const now = Date.now();
+      if (!paused) phase.current += now - previous;
+      previous = now;
+      tick((x) => x + 1);
+    }, 50);
     return () => clearInterval(t);
-  }, []);
+  }, [paused]);
+  const battle =
+    preview && sourceBattle.event
+      ? {
+          ...sourceBattle,
+          event: {
+            ...sourceBattle.event,
+            at:
+              Date.now() -
+              (phase.current % (sourceBattle.event.duration + 650)),
+          },
+          units: sourceBattle.units
+            .filter(
+              (u) => u.id === "0:0" || u.id === sourceBattle.event?.target,
+            )
+            .map((u) => ({ ...u, slot: 1 })),
+        }
+      : sourceBattle;
   return (
-    <Canvas shadows camera={{ position: [10, 12, 15], fov: 42 }} dpr={[1, 1.5]}>
-      <BattleCamera battle={battle}/>
+    <Canvas
+      shadows
+      camera={{ position: preview ? [7, 6, 10] : [10, 12, 15], fov: 42 }}
+      dpr={[1, 1.5]}
+    >
+      <BattleCamera battle={battle} preview={preview} />
       <color attach="background" args={["#75939b"]} />
       <fog attach="fog" args={["#75939b", 25, 70]} />
       <ambientLight intensity={1.6} />
@@ -848,8 +971,14 @@ export function BattleScene({
           event = battle.event,
           elapsed = event ? (Date.now() - event.at) / event.duration : 2,
           active = elapsed < 1;
-        const outcome = event?.amounts.filter(a=>a.id===u.id).reduce((sum,a)=>sum+a.amount,0)||0;
-        const shownHp = active && elapsed < .45 ? Math.max(0,Math.min(u.maxHp,u.hp+outcome)) : u.hp;
+        const outcome =
+          event?.amounts
+            .filter((a) => a.id === u.id)
+            .reduce((sum, a) => sum + a.amount, 0) || 0;
+        const shownHp =
+          active && elapsed < 0.45
+            ? Math.max(0, Math.min(u.maxHp, u.hp + outcome))
+            : u.hp;
         const state: Motion =
           shownHp === 0
             ? "defeat"
@@ -859,7 +988,8 @@ export function BattleScene({
                 : event.action.endsWith("-1")
                   ? "cast"
                   : "attack"
-              : active && elapsed >= .45 &&
+              : active &&
+                  elapsed >= 0.45 &&
                   event?.amounts.some((a) => a.id === u.id && a.amount > 0)
                 ? "hit"
                 : "idle";
@@ -886,46 +1016,56 @@ export function BattleScene({
                 }
               />
             </mesh>
-            <Html position={[0, 2.05, 0]} center distanceFactor={17}>
-              <button
-                className={`unit-label ${target === u.id ? "selected" : ""}`}
-                onClick={() => onTarget(u.id)}
+            {!preview && (
+              <Html
+                position={[0, 2.05, 0]}
+                center
+                distanceFactor={17}
+                zIndexRange={[3, 0]}
               >
-                <strong>{byId[u.species].name}</strong>
-                <span className="hp">
-                  <i style={{ width: `${(shownHp / u.maxHp) * 100}%` }} />
-                </span>
-                <small>
-                  {shownHp}/{u.maxHp}
-                  {u.shield > 0 ? ` · ◇${u.shield}` : ""}
-                </small>
-                <span className="statuses">
-                  {u.statuses.map((s) => (
-                    <abbr key={s.kind} title={`${s.kind}: ${s.turns} round(s)`}>
-                      {s.kind.slice(0, 3)} {s.turns}
-                    </abbr>
-                  ))}
-                </span>
-                {active &&
-                  elapsed > 0.4 &&
-                  event?.amounts
-                    .filter((a) => a.id === u.id)
-                    .map((a) => (
-                      <em
-                        key={a.id}
-                        className={a.amount < 0 ? "healing" : "damage"}
+                <button
+                  className={`unit-label ${target === u.id ? "selected" : ""}`}
+                  onClick={() => onTarget(u.id)}
+                >
+                  <strong>{byId[u.species].name}</strong>
+                  <span className="hp">
+                    <i style={{ width: `${(shownHp / u.maxHp) * 100}%` }} />
+                  </span>
+                  <small>
+                    {shownHp}/{u.maxHp}
+                    {u.shield > 0 ? ` · ◇${u.shield}` : ""}
+                  </small>
+                  <span className="statuses">
+                    {u.statuses.map((s) => (
+                      <abbr
+                        key={s.kind}
+                        title={`${s.kind}: ${s.turns} round(s)`}
                       >
-                        {a.amount === 0
-                          ? a.shield > 0
-                            ? `◇ +${a.shield}`
-                            : ""
-                          : a.amount > 0
-                            ? `−${a.amount}`
-                            : `+${-a.amount}`}
-                      </em>
+                        {s.kind.slice(0, 3)} {s.turns}
+                      </abbr>
                     ))}
-              </button>
-            </Html>
+                  </span>
+                  {active &&
+                    elapsed > 0.4 &&
+                    event?.amounts
+                      .filter((a) => a.id === u.id)
+                      .map((a) => (
+                        <em
+                          key={a.id}
+                          className={a.amount < 0 ? "healing" : "damage"}
+                        >
+                          {a.amount === 0
+                            ? a.shield > 0
+                              ? `◇ +${a.shield}`
+                              : ""
+                            : a.amount > 0
+                              ? `−${a.amount}`
+                              : `+${-a.amount}`}
+                        </em>
+                      ))}
+                </button>
+              </Html>
+            )}
           </group>
         );
       })}
@@ -935,7 +1075,7 @@ export function BattleScene({
       <OrbitControls
         target={[0, 0, 0]}
         enablePan={false}
-        minDistance={15}
+        minDistance={preview ? 7 : 15}
         maxDistance={25}
         minPolarAngle={0.5}
         maxPolarAngle={1.1}

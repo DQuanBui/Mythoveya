@@ -38,7 +38,12 @@ export type Profile = {
   bond?: { species: string; chance: number; used: boolean };
   bosses: string[];
 };
-export type Status = { kind: string; turns: number; value: number; source?: string };
+export type Status = {
+  kind: string;
+  turns: number;
+  value: number;
+  source?: string;
+};
 export type Unit = {
   id: string;
   species: string;
@@ -84,5 +89,11 @@ export type Battle = {
   delayed: { actor: string; target: string; action: number; round: number }[];
   mode: string;
   title?: string;
-  rewards?: {gold:number;diamonds:number;xp:number;tokens:number;newSpecies:string[]};
+  rewards?: {
+    gold: number;
+    diamonds: number;
+    xp: number;
+    tokens: number;
+    newSpecies: string[];
+  };
 };

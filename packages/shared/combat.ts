@@ -14,7 +14,9 @@ export function stats(o: Owned, tactical = false) {
     hp: Math.round(s.stats.hp * f * budget),
     attack: Math.round(s.stats.attack * f * budget),
     defense: Math.round(s.stats.defense * f * budget),
-    speed: Math.round(s.stats.speed * (s.passive.effect === "haste" ? 1.05 : 1)),
+    speed: Math.round(
+      s.stats.speed * (s.passive.effect === "haste" ? 1.05 : 1),
+    ),
   };
 }
 export const power = (o: Owned) => {
@@ -105,15 +107,54 @@ function nextRound(b: Battle) {
     for (const s of u.statuses) {
       if (s.kind === "burn")
         u.hp = Math.max(0, u.hp - Math.round(u.maxHp * 0.05));
-      if (s.kind === "regen")
+      if (s.kind === "regen" && u.hp > 0)
         u.hp = Math.min(u.maxHp, u.hp + Math.round(u.maxHp * 0.08));
       if (!["stun", "silence"].includes(s.kind)) s.turns--;
     }
+    if (u.statuses.some((s) => s.kind === "shielded" && s.turns <= 0))
+      u.shield = 0;
     u.statuses = u.statuses.filter((s) => s.turns > 0);
-    if (byId[u.species].passive.effect === "regen")
+    if (byId[u.species].passive.effect === "regen" && u.hp > 0)
       u.hp = Math.min(u.maxHp, u.hp + Math.round(u.maxHp * 0.03));
     u.cooldowns = u.cooldowns.map((c) => Math.max(0, c - 1));
   }
+  for (const d of b.delayed.filter((d) => d.round <= b.round)) {
+    const a = b.units.find((u) => u.id === d.actor),
+      t = b.units.find((u) => u.id === d.target);
+    if (a && t && a.hp > 0 && t.hp > 0) {
+      const skill = byId[a.species].actions[d.action];
+      const delayedTargets =
+        skill.target === "row"
+          ? b.units.filter(
+              (u) =>
+                u.side === t.side &&
+                Math.floor(u.slot / 3) === Math.floor(t.slot / 3) &&
+                u.hp > 0,
+            )
+          : [t];
+      for (const victim of delayedTargets) {
+        const before = victim.hp;
+        const damage = Math.round(
+          (a.attack * skill.power * 100) / (100 + victim.defense),
+        );
+        const absorbed = Math.min(victim.shield, damage);
+        victim.shield -= absorbed;
+        victim.hp = Math.max(0, victim.hp - damage + absorbed);
+        victim.statuses = victim.statuses.filter((s) => s.kind !== "warning");
+        if (skill.effects.includes("stun") && !victim.controlledLast)
+          status(victim, "stun", 1);
+        if (skill.effects.includes("slow")) status(victim, "slow", 2);
+        if (skill.effects.includes("burn")) status(victim, "burn", 2);
+        b.event?.amounts.push({
+          id: victim.id,
+          amount: before - victim.hp,
+          shield: -absorbed,
+        });
+      }
+      b.log.push(`${byId[a.species].name}'s telegraphed strike resolves.`);
+    }
+  }
+  b.delayed = b.delayed.filter((d) => d.round > b.round);
   b.queue = b.units
     .filter((u) => u.hp > 0)
     .sort(
@@ -123,28 +164,6 @@ function nextRound(b: Battle) {
         a.id.localeCompare(c.id),
     )
     .map((u) => u.id);
-  for (const d of b.delayed.filter((d) => d.round <= b.round)) {
-    const a = b.units.find((u) => u.id === d.actor),
-      t = b.units.find((u) => u.id === d.target);
-    if (a && t && a.hp > 0 && t.hp > 0) {
-      const skill = byId[a.species].actions[d.action];
-      const delayedTargets = skill.target === "row" ? b.units.filter(u => u.side === t.side && Math.floor(u.slot / 3) === Math.floor(t.slot / 3) && u.hp > 0) : [t];
-      for (const victim of delayedTargets) {
-        const before = victim.hp;
-        const damage = Math.round(a.attack * skill.power * 100 / (100 + victim.defense));
-        const absorbed = Math.min(victim.shield, damage);
-        victim.shield -= absorbed;
-        victim.hp = Math.max(0, victim.hp - damage + absorbed);
-        victim.statuses = victim.statuses.filter(s => s.kind !== "warning");
-        if (skill.effects.includes("stun") && !victim.controlledLast) status(victim, "stun", 1);
-        if (skill.effects.includes("slow")) status(victim, "slow", 2);
-        if (skill.effects.includes("burn")) status(victim, "burn", 2);
-        b.event?.amounts.push({id:victim.id,amount:before-victim.hp,shield:-absorbed});
-      }
-      b.log.push(`${byId[a.species].name}'s telegraphed strike resolves.`);
-    }
-  }
-  b.delayed = b.delayed.filter((d) => d.round > b.round);
   checkWinner(b);
   b.queue = b.queue.filter((id) => b.units.find((u) => u.id === id)!.hp > 0);
 }
@@ -154,6 +173,7 @@ export function targets(b: Battle, actor: Unit, n: number) {
   return b.units.filter((u) => {
     if (
       a.effects.includes("revive") &&
+      !(actor.species === "aurelith" && has(actor, "reviveUsed")) &&
       allied &&
       u.side === actor.side &&
       !u.revived
@@ -202,7 +222,7 @@ export function act(
     s = byId[actor.species],
     a = s.actions[n],
     t = b.units.find((u) => u.id === target)!;
-  const consumeBoost = n>0 && Boolean(has(actor,'boost'));
+  const consumeBoost = n > 0 && Boolean(has(actor, "boost"));
   b.energy[side] -= a.cost;
   actor.cooldowns[n] = a.cooldown;
   const amounts: { id: string; amount: number; shield: number }[] = [];
@@ -218,11 +238,36 @@ export function act(
           )
         : [t];
   // Authored signatures select targets; all actual effects remain reusable primitives.
-  if (n > 0 && s.id === "ripplefin") affected = b.units.filter(u => u.side === side && u.hp > 0).sort((a,b) => a.hp/a.maxHp-b.hp/b.maxHp).slice(0,2);
-  if (n > 0 && ["frostwhisk", "basalhorn", "glaciermaw"].includes(s.id)) affected = b.units.filter(u => u.side === side && u.hp > 0 && (s.id === "frostwhisk" ? u.slot >= 3 : u.slot < 3));
-  if (n > 0 && ["voltwing", "flintuff", "tempestrix"].includes(s.id)) affected = [t,...b.units.filter(u => u.side !== side && u.hp > 0 && u.id !== t.id && (s.id !== "flintuff" || u.slot < 3 && Math.abs(u.slot-t.slot) === 1)).slice(0,s.id === "tempestrix"?2:1)];
+  if (n > 0 && s.id === "ripplefin")
+    affected = b.units
+      .filter((u) => u.side === side && u.hp > 0)
+      .sort((a, b) => a.hp / a.maxHp - b.hp / b.maxHp)
+      .slice(0, 2);
+  if (n > 0 && ["frostwhisk", "basalhorn", "glaciermaw"].includes(s.id))
+    affected = b.units.filter(
+      (u) =>
+        u.side === side &&
+        u.hp > 0 &&
+        (s.id === "frostwhisk" ? u.slot >= 3 : u.slot < 3),
+    );
+  if (n > 0 && ["voltwing", "flintuff", "tempestrix"].includes(s.id))
+    affected = [
+      t,
+      ...b.units
+        .filter(
+          (u) =>
+            u.side !== side &&
+            u.hp > 0 &&
+            u.id !== t.id &&
+            (s.id !== "flintuff" ||
+              (u.slot < 3 && Math.abs(u.slot - t.slot) === 1)),
+        )
+        .slice(0, s.id === "tempestrix" ? 2 : 1),
+    ];
   if (n > 0 && s.id === "aurelith") affected = [t];
-  const beforeUnits = new Map(b.units.map(u => [u.id,{hp:u.hp,shield:u.shield}]));
+  const beforeUnits = new Map(
+    b.units.map((u) => [u.id, { hp: u.hp, shield: u.shield }]),
+  );
   const stunned = has(actor, "stun") && !actor.controlledLast;
   actor.controlledLast = Boolean(stunned);
   if (!stunned) {
@@ -239,14 +284,36 @@ export function act(
       const before = u.hp,
         shieldBefore = u.shield;
       for (const effect of a.effects) {
-        const beneficial = ["heal","shield","cleanse","revive","regen","haste","guard","reflect","thorns","boost","bank"].includes(effect);
+        const beneficial = [
+          "heal",
+          "shield",
+          "cleanse",
+          "revive",
+          "regen",
+          "haste",
+          "guard",
+          "reflect",
+          "thorns",
+          "boost",
+          "bank",
+        ].includes(effect);
         if (beneficial && u.side !== side) {
-          if (effect === "revive" && !actor.revived) status(actor,"rebirth",99);
-          else if (["haste","boost"].includes(effect)) status(actor,effect,2);
+          if (effect === "revive" && !actor.revived)
+            status(actor, "rebirth", 99);
+          else if (["haste", "boost"].includes(effect))
+            status(actor, effect, 2);
           continue;
         }
-        if (!beneficial && u.side === side && !["delay","pierce"].includes(effect)) {
-          if (s.id === "crysalune" && effect === "slow") for (const enemy of b.units.filter(e => e.side !== side && e.hp > 0)) status(enemy,"slow",2);
+        if (
+          !beneficial &&
+          u.side === side &&
+          !["delay", "pierce"].includes(effect)
+        ) {
+          if (s.id === "crysalune" && effect === "slow")
+            for (const enemy of b.units.filter(
+              (e) => e.side !== side && e.hp > 0,
+            ))
+              status(enemy, "slow", 2);
           continue;
         }
         if (effect === "stun" && a.effects.includes("delay")) continue;
@@ -272,14 +339,27 @@ export function act(
             ),
           );
           if (s.id === "obsidrake" && n > 0) u.shield = 0;
-          if (s.id === "emberfox" && n > 0 && u.shield > 0) dmg = Math.round(dmg * 1.5);
-          if (s.id === "murkfang" && n > 0 && has(u,"mark")) dmg = Math.round(dmg * 1.25);
+          if (s.id === "emberfox" && n > 0 && u.shield > 0)
+            dmg = Math.round(dmg * 1.5);
+          if (s.id === "murkfang" && n > 0 && has(u, "mark"))
+            dmg = Math.round(dmg * 1.25);
           const absorbed = Math.min(u.shield, dmg);
           u.shield -= absorbed;
           dmg -= absorbed;
-          const guard = has(u,"guard");
-          const protector = guard?.source && b.units.find(p => p.id === guard.source && p.hp > 0 && p.id !== u.id);
-          if (protector) {const share = Math.min(Math.round(dmg*.25), Math.max(0,protector.hp-1));protector.hp-=share;dmg-=share;}
+          const guard = has(u, "guard");
+          const protector =
+            guard?.source &&
+            b.units.find(
+              (p) => p.id === guard.source && p.hp > 0 && p.id !== u.id,
+            );
+          if (protector) {
+            const share = Math.min(
+              Math.round(dmg * 0.25),
+              Math.max(0, protector.hp - 1),
+            );
+            protector.hp -= share;
+            dmg -= share;
+          }
           u.hp = Math.max(0, u.hp - dmg);
           if (has(u, "reflect")) {
             actor.hp = Math.max(
@@ -288,12 +368,33 @@ export function act(
             );
             u.statuses = u.statuses.filter((s) => s.kind !== "reflect");
           }
-          if (has(u, "thorns")) {actor.hp = Math.max(1, actor.hp - 5);if(u.species === "magmole")status(actor,"burn",2);}
-          if (has(u, "bank")) u.bank = Math.min(35, u.bank + absorbed + Math.round(dmg*.15));
-          if (n > 0 && s.id === "rimeowl") {b.delayed=b.delayed.filter(d=>d.actor!==u.id);u.statuses=u.statuses.filter(x=>x.kind!=="warning");}
-          const pursuit = b.units.find(p=>p.side===side&&p.hp>0&&p.species==='raijora'&&p.id!==actor.id&&has(p,'boost'));
-          if(pursuit&&!has(pursuit,'followed')){u.hp=Math.max(0,u.hp-Math.round(pursuit.attack*.3));status(pursuit,'followed',1);}
-          if(actor.bank>0){u.hp=Math.max(0,u.hp-actor.bank);actor.bank=0;actor.statuses=actor.statuses.filter(s=>s.kind!=='bank');}
+          if (has(u, "thorns")) {
+            actor.hp = Math.max(1, actor.hp - 5);
+            if (u.species === "magmole") status(actor, "burn", 2);
+          }
+          if (has(u, "bank"))
+            u.bank = Math.min(35, u.bank + absorbed + Math.round(dmg * 0.15));
+          if (n > 0 && s.id === "rimeowl") {
+            b.delayed = b.delayed.filter((d) => d.actor !== u.id);
+            u.statuses = u.statuses.filter((x) => x.kind !== "warning");
+          }
+          const pursuit = b.units.find(
+            (p) =>
+              p.side === side &&
+              p.hp > 0 &&
+              p.species === "raijora" &&
+              p.id !== actor.id &&
+              has(p, "boost"),
+          );
+          if (pursuit && !has(pursuit, "followed")) {
+            u.hp = Math.max(0, u.hp - Math.round(pursuit.attack * 0.3));
+            status(pursuit, "followed", 1);
+          }
+          if (actor.bank > 0) {
+            u.hp = Math.max(0, u.hp - actor.bank);
+            actor.bank = 0;
+            actor.statuses = actor.statuses.filter((s) => s.kind !== "bank");
+          }
         }
         if (effect === "heal" && u.hp > 0)
           u.hp = Math.min(
@@ -303,6 +404,7 @@ export function act(
                 actor.attack * a.power * (s.id === "pelagryth" ? 1.8 : 1.3),
               ),
           );
+        if (effect === "shield" && u.hp > 0) status(u, "shielded", 3);
         if (effect === "shield" && u.hp > 0)
           u.shield = Math.min(
             Math.round(u.maxHp * 0.6),
@@ -322,9 +424,11 @@ export function act(
               ].includes(s.kind),
           );
         if (effect === "revive" && !u.revived) {
+          if (s.id === "aurelith" && has(actor, "reviveUsed")) continue;
           if (u.hp === 0) {
             u.hp = Math.round(u.maxHp * 0.35);
             u.revived = true;
+            if (s.id === "aurelith") status(actor, "reviveUsed", 99);
           } else if (u.id === actor.id) status(u, "rebirth", 99);
         }
         if (
@@ -347,7 +451,11 @@ export function act(
         ) {
           if (effect === "stun" && u.controlledLast) continue;
           status(u, effect, effect === "stun" || effect === "silence" ? 1 : 2);
-          if (effect === "guard" && ["cragpup","titanusk","thaloryx"].includes(s.id)) has(u,"guard")!.source = actor.id;
+          if (
+            effect === "guard" &&
+            ["cragpup", "titanusk", "thaloryx"].includes(s.id)
+          )
+            has(u, "guard")!.source = actor.id;
         }
       }
       if (actor.bank > 0 && a.effects.includes("bank")) {
@@ -362,16 +470,30 @@ export function act(
       });
     }
   }
-  actor.statuses = actor.statuses.filter(x=>x.kind!=="stun"&&x.kind!=="silence" && !(consumeBoost && x.kind==='boost' && s.id!=='raijora'));
-  amounts.length=0;
-  for (const u of b.units) {const before=beforeUnits.get(u.id)!;if(before.hp!==u.hp||before.shield!==u.shield)amounts.push({id:u.id,amount:before.hp-u.hp,shield:u.shield-before.shield});}
+  actor.statuses = actor.statuses.filter(
+    (x) =>
+      x.kind !== "stun" &&
+      x.kind !== "silence" &&
+      !(consumeBoost && x.kind === "boost" && s.id !== "raijora"),
+  );
+  amounts.length = 0;
+  for (const u of b.units) {
+    const before = beforeUnits.get(u.id)!;
+    if (before.hp !== u.hp || before.shield !== u.shield)
+      amounts.push({
+        id: u.id,
+        amount: before.hp - u.hp,
+        shield: u.shield - before.shield,
+      });
+  }
   for (const u of b.units)
     if (u.hp === 0 && has(u, "rebirth") && !u.revived) {
       u.hp = Math.round(u.maxHp * 0.3);
       u.revived = true;
       u.statuses = u.statuses.filter((s) => s.kind !== "rebirth");
     }
-  const duration = fast && ['pve','practice'].includes(b.mode) ? 220 : a.duration;
+  const duration =
+    fast && ["pve", "practice"].includes(b.mode) ? 220 : a.duration;
   b.sequence++;
   b.event = {
     id: b.sequence,

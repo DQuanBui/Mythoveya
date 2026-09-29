@@ -6,7 +6,7 @@ async function walkTo(page: Page, key: string, label: string) {
       (
         await page
           .locator(".interact")
-          .textContent({timeout:100})
+          .textContent({ timeout: 100 })
           .catch(() => "")
       )?.includes(label)
     )
@@ -113,10 +113,40 @@ test("two isolated keepers share an authoritative arena result", async ({
     b = await two.newPage();
   // The preceding journey test covers onboarding UI. Set up arena opponents through
   // the same authenticated public endpoints so this test isolates synchronization.
-  for(const [page,name] of [[a,'First Rival'],[b,'Second Rival']] as const){
-    await page.goto('/');
-    await page.evaluate(async(name)=>{const post=async(path:string,data:any,token='')=>fetch('/api/'+path,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify(data)}).then(r=>r.json());const guest=await post('guest',{name,avatar:0});localStorage.setItem('mythoveya-session',guest.token);await post('mutate',{kind:'starter',species:'emberfox',requestId:crypto.randomUUID()},guest.token);await post('mutate',{kind:'guide',requestId:crypto.randomUUID()},guest.token);},name);
-    await page.reload();await page.getByRole('button',{name:'Continue your journey'}).click();
+  for (const [page, name] of [
+    [a, "First Rival"],
+    [b, "Second Rival"],
+  ] as const) {
+    await page.goto("/");
+    await page.evaluate(async (name) => {
+      const post = async (path: string, data: any, token = "") =>
+        fetch("/api/" + path, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+          body: JSON.stringify(data),
+        }).then((r) => r.json());
+      const guest = await post("guest", { name, avatar: 0 });
+      localStorage.setItem("mythoveya-session", guest.token);
+      await post(
+        "mutate",
+        {
+          kind: "starter",
+          species: "emberfox",
+          requestId: crypto.randomUUID(),
+        },
+        guest.token,
+      );
+      await post(
+        "mutate",
+        { kind: "guide", requestId: crypto.randomUUID() },
+        guest.token,
+      );
+    }, name);
+    await page.reload();
+    await page.getByRole("button", { name: "Continue your journey" }).click();
   }
   await a.bringToFront();
   await a.locator(".world-nav").getByRole("button", { name: "Arena" }).click();

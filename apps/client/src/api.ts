@@ -13,6 +13,10 @@ export async function api<T = any>(path: string, body?: unknown): Promise<T> {
     },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   });
+  if (!response.headers.get("content-type")?.includes("application/json"))
+    throw Error(
+      "The local game server is unavailable. Keep npm run dev running, then try again.",
+    );
   const result = await response.json();
   if (!response.ok)
     throw Error(result.error || "The server could not complete this request.");

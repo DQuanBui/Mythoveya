@@ -1,5 +1,8 @@
 @import url("./typography.css");
-html[data-reduced="true"] * {animation:none!important;transition:none!important;}
+html[data-reduced="true"] * {
+  animation: none !important;
+  transition: none !important;
+}
 :root {
   font-family: "Segoe UI", Arial, sans-serif;
   color: #f1ecdb;
@@ -103,6 +106,24 @@ main {
 }
 .scene canvas {
   display: block;
+}
+.scene {
+  isolation: isolate;
+  z-index: 0;
+}
+.fps-readout {
+  position: absolute;
+  right: 12px;
+  bottom: 8px;
+  font: 8px monospace;
+  color: #bcd0c2;
+  opacity: 0.65;
+}
+.battle-top,
+.battle-controls,
+.turn-queue,
+.battle-log {
+  z-index: 5;
 }
 .eyebrow {
   font-size: 10px;
@@ -1363,7 +1384,24 @@ main {
   font-size: 12px;
   color: #b8d2b9;
 }
-.lobby-team{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:12px 0}.lobby-team .portrait{width:65px;height:65px;display:block;margin:auto}.lobby-team small{display:block;font-size:8px;text-align:center;color:#bdceb9}
+.lobby-team {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  margin: 12px 0;
+}
+.lobby-team .portrait {
+  width: 65px;
+  height: 65px;
+  display: block;
+  margin: auto;
+}
+.lobby-team small {
+  display: block;
+  font-size: 8px;
+  text-align: center;
+  color: #bdceb9;
+}
 .forfeit {
   position: absolute;
   top: 116px;

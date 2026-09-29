@@ -136,14 +136,12 @@ app.use(
     res: express.Response,
     _next: express.NextFunction,
   ) =>
-    res
-      .status(400)
-      .json({
-        error:
-          err instanceof z.ZodError
-            ? "Invalid request. Check the entered values."
-            : err.message,
-      }),
+    res.status(400).json({
+      error:
+        err instanceof z.ZodError
+          ? "Invalid request. Check the entered values."
+          : err.message,
+    }),
 );
 const server = createServer(app);
 const gameServer = new Server({
@@ -154,5 +152,5 @@ gameServer.define("arena", ArenaRoom).filterBy(["mode", "ranked"]);
 const port = Number(process.env.SERVER_PORT || 2567);
 await gameServer.listen(port, "127.0.0.1");
 console.log(
-  `Mythoveya server http://127.0.0.1:${port} | Game http://127.0.0.1:${import.meta.url.includes('/dist/')?port:process.env.CLIENT_PORT || 5173}`,
+  `Mythoveya server http://127.0.0.1:${port} | Game http://127.0.0.1:${import.meta.url.includes("/dist/") ? port : process.env.CLIENT_PORT || 5173}`,
 );

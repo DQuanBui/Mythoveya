@@ -811,7 +811,7 @@ export function Gallery() {
     setBattle(b);
     audio.cue(s.element.toLowerCase());
     audio.voice(s.id, "attack");
-    if(n===2)audio.ultimate(s.id);
+    if (n === 2) audio.ultimate(s.id);
   }
   return (
     <>
@@ -864,6 +864,8 @@ export function Gallery() {
                 battle={battle}
                 target={battle.event?.target || ""}
                 onTarget={() => {}}
+                preview
+                paused={paused}
               />
             ) : (
               <Preview

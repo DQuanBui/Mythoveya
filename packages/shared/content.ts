@@ -208,6 +208,7 @@ const targets: Record<number, Action["target"]> = {
 };
 export type Species = (typeof roster)[number] & {
   index: number;
+  lore: string;
   family: string;
   color: string;
   size: number;
@@ -249,6 +250,7 @@ export const SPECIES: Species[] = roster.map((r, i) => {
   });
   return {
     ...r,
+    lore: `${r.appearance}. ${r.name} is drawn to keepers who share its ${r.role === "healer" ? "gentleness" : r.role === "tank" ? "courage" : "curiosity"}.`,
     index: i,
     family: FAMILIES[i],
     color: COLORS[r.element],
@@ -263,7 +265,7 @@ export const SPECIES: Species[] = roster.map((r, i) => {
       ),
     },
     growth: 0.075,
-    portrait: `/portraits/${r.id}.png`,
+    portrait: `model-render:${r.id}`,
     animation: FAMILIES[i],
     voice: `${FAMILIES[i]}:${i}`,
     passive: {

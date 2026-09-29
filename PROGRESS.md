@@ -26,3 +26,6 @@ Initial visual review found foreground tree obstruction; corrected the opening c
 
 ## Verified progression and multiplayer
 The full first-session browser path passed: profile/keeper/starter, movement to guide, six companions, PvE victory, quest claim, recruitment, formation, reload persistence, mute and reduced motion. Two isolated browser contexts completed a friendly match. A separate real Colyseus ranked match passed legal-window, reconnect, snapshot integrity, once-only rating and server-restart persistence checks. Eighteen focused content/economy/signature tests pass. Gallery capture is now running after correcting a test that pressed Escape before world entry finished. GitHub private repository: https://github.com/DQuanBui/Mythoveya.
+
+## Presentation review fixes
+All 60 portraits rendered uniquely. Gallery automation captured 12 body families, all eight keepers and all ten mythic ultimates; bounded audio playback passed. Visual inspection found two issues: world labels over modal content, and battle labels crowding the small effect preview. Added isolated world layering and a focused looping two-creature preview with pause. Also corrected mixed support targeting, temporary shields, once-per-battle revival, and exact reward summaries. Final full verification is next.

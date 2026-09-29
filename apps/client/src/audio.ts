@@ -1,4 +1,4 @@
-import {MUSIC,CUES} from '../../../packages/shared/audio-content';
+import { MUSIC, CUES } from "../../../packages/shared/audio-content";
 import { byId } from "../../../packages/shared/content";
 export type Settings = {
   master: number;
@@ -22,7 +22,13 @@ export const defaults: Settings = {
   shake: false,
   quality: "Medium",
 };
-function storedSettings(){try{return JSON.parse(localStorage.getItem("mythoveya-settings")||"{}");}catch{return {};}}
+function storedSettings() {
+  try {
+    return JSON.parse(localStorage.getItem("mythoveya-settings") || "{}");
+  } catch {
+    return {};
+  }
+}
 export const settings: Settings = {
   ...defaults,
   ...storedSettings(),
@@ -171,7 +177,7 @@ class AudioEngine {
       );
     }
   }
-  voice(id: string, kind = "call", pan = 0, attenuation=1) {
+  voice(id: string, kind = "call", pan = 0, attenuation = 1) {
     const s = byId[id];
     if (!s || !this.ctx) return;
     const f = 180 + (5 - Math.floor(s.index / 10)) * 65 + (s.index % 10) * 12;
@@ -195,7 +201,7 @@ class AudioEngine {
       base * (kind === "hurt" ? 0.7 : kind === "attack" ? 1.35 : 1.15),
       0.25 + s.variant * 0.04,
       s.index % 3 ? "sine" : "triangle",
-      0.12 * Math.max(0,Math.min(1,attenuation)),
+      0.12 * Math.max(0, Math.min(1, attenuation)),
       "voices",
       undefined,
       pan,
@@ -203,7 +209,35 @@ class AudioEngine {
     if (["dragon", "golem", "shell"].includes(s.family))
       this.noise(0.32, 0.08 * attenuation, "voices", 350);
   }
-  ultimate(id:string){const s=byId[id];if(!this.ctx||s.tier!=='S')return;const motifs=[[0,7,12,19],[0,5,9,12],[0,4,7,9,12],[0,0,7,5],[0,7,14,10,19],[12,7,3,14],[0,4,7,12,16],[0,1,7,3,-5],[0,7,9,12,7,4],[0,3,10,7,14]];const root=150+(s.index-50)*17;motifs[s.index-50].forEach((n,i)=>{const f=root*2**(n/12);this.tone(f,f,.65,s.index%2?'sine':'triangle',.045,'sfx',this.ctx!.currentTime+i*.13);});}
+  ultimate(id: string) {
+    const s = byId[id];
+    if (!this.ctx || s.tier !== "S") return;
+    const motifs = [
+      [0, 7, 12, 19],
+      [0, 5, 9, 12],
+      [0, 4, 7, 9, 12],
+      [0, 0, 7, 5],
+      [0, 7, 14, 10, 19],
+      [12, 7, 3, 14],
+      [0, 4, 7, 12, 16],
+      [0, 1, 7, 3, -5],
+      [0, 7, 9, 12, 7, 4],
+      [0, 3, 10, 7, 14],
+    ];
+    const root = 150 + (s.index - 50) * 17;
+    motifs[s.index - 50].forEach((n, i) => {
+      const f = root * 2 ** (n / 12);
+      this.tone(
+        f,
+        f,
+        0.65,
+        s.index % 2 ? "sine" : "triangle",
+        0.045,
+        "sfx",
+        this.ctx!.currentTime + i * 0.13,
+      );
+    });
+  }
   location(scene: string) {
     if (this.scene === scene) return;
     this.scene = scene;
@@ -228,7 +262,11 @@ class AudioEngine {
     while (this.next < this.ctx.currentTime + 0.2) {
       const bar = Math.floor(this.beat / 8) % 16,
         chord = [0, 5, 3, 7][Math.floor(bar / 4)],
-        note = song.pattern[this.beat % 8] + song.root + chord + (this.beat >= 128 && this.beat % 3 === 0 ? 12 : 0);
+        note =
+          song.pattern[this.beat % 8] +
+          song.root +
+          chord +
+          (this.beat >= 128 && this.beat % 3 === 0 ? 12 : 0);
       const hz = 440 * 2 ** ((note - 69) / 12);
       if (
         this.beat % 2 === 0 ||

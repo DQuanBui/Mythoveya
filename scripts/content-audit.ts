@@ -1,8 +1,30 @@
 import { writeFileSync, mkdirSync } from "node:fs";
 import { SPECIES, TIERS } from "../packages/shared/content";
-import {MUSIC,CUES} from '../packages/shared/audio-content';
+import { MUSIC, CUES } from "../packages/shared/audio-content";
 mkdirSync("docs", { recursive: true });
-writeFileSync('docs/AUDIO_MANIFEST.json',JSON.stringify({source:'Original Web Audio synthesis; no external audio files',music:Object.fromEntries(Object.entries(MUSIC).map(([id,song])=>[id,{...song,seconds:song.steps*60/song.bpm/2}])),cues:CUES,voices:SPECIES.map(s=>({species:s.id,family:s.family,profile:s.voice,variants:['call','attack','hurt']}))},null,2)+'\n');
+writeFileSync(
+  "docs/AUDIO_MANIFEST.json",
+  JSON.stringify(
+    {
+      source: "Original Web Audio synthesis; no external audio files",
+      music: Object.fromEntries(
+        Object.entries(MUSIC).map(([id, song]) => [
+          id,
+          { ...song, seconds: (song.steps * 60) / song.bpm / 2 },
+        ]),
+      ),
+      cues: CUES,
+      voices: SPECIES.map((s) => ({
+        species: s.id,
+        family: s.family,
+        profile: s.voice,
+        variants: ["call", "attack", "hurt"],
+      })),
+    },
+    null,
+    2,
+  ) + "\n",
+);
 if (
   SPECIES.length !== 60 ||
   TIERS.some((t) => SPECIES.filter((s) => s.tier === t).length !== 10)
