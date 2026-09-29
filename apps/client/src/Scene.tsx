@@ -14,6 +14,12 @@ import {
 import { audio, settings } from "./audio";
 import { UltimateEffect } from "./UltimateEffects";
 import { RegionScenery, blocksLandmark } from "./RegionScenery";
+import {
+  WORLD_GUIDE,
+  type ExplorationInput,
+  type Objective,
+} from "./world-guide";
+import type { MutableRefObject } from "react";
 function RenderStats() {
   const label = useRef<HTMLSpanElement>(null);
   const elapsed = useRef(0),
@@ -449,6 +455,7 @@ function Explorer({
   onInteract,
   onPosition,
   pet,
+  input,
 }: {
   profile: Profile;
   blocked: boolean;
@@ -456,6 +463,7 @@ function Explorer({
   onInteract: (id: string) => void;
   onPosition: (x: number, z: number) => void;
   pet: boolean;
+  input: MutableRefObject<ExplorationInput>;
 }) {
   const avatar = useMemo(() => createAvatar(profile.avatar), [profile.avatar]);
   const companion = useMemo(
@@ -502,11 +510,13 @@ function Explorer({
     const k = keys.current;
     let x = blocked
       ? 0
-      : Number(k.has("KeyD") || k.has("ArrowRight")) -
+      : input.current.x +
+        Number(k.has("KeyD") || k.has("ArrowRight")) -
         Number(k.has("KeyA") || k.has("ArrowLeft"));
     let z = blocked
       ? 0
-      : Number(k.has("KeyS") || k.has("ArrowDown")) -
+      : input.current.z +
+        Number(k.has("KeyS") || k.has("ArrowDown")) -
         Number(k.has("KeyW") || k.has("ArrowUp"));
     const moving = !!(x || z);
     if (moving) {
@@ -568,6 +578,11 @@ function Explorer({
       let nearest = "";
       let dist = 3.3;
       for (const obj of INTERACTABLES) {
+        if (
+          obj.id.startsWith("resource") &&
+          profile.resources.includes(`${profile.region}:${obj.id}`)
+        )
+          continue;
         const d = Math.hypot(
           player.current.x - obj.p[0],
           player.current.z - obj.p[2],
@@ -643,6 +658,9 @@ export function WorldScene({
   onInteract,
   onPosition,
   pet,
+  position,
+  objective,
+  input,
 }: {
   profile: Profile;
   blocked: boolean;
@@ -650,6 +668,9 @@ export function WorldScene({
   onInteract: (s: string) => void;
   onPosition: (x: number, z: number) => void;
   pet: boolean;
+  position: number[];
+  objective: Objective;
+  input: MutableRefObject<ExplorationInput>;
 }) {
   return (
     <Canvas
@@ -660,7 +681,7 @@ export function WorldScene({
       <Environment region={profile.region} />
       <Explorer
         key={profile.region}
-        {...{ profile, blocked, onNear, onInteract, onPosition, pet }}
+        {...{ profile, blocked, onNear, onInteract, onPosition, pet, input }}
       />
       <Avatar index={2} position={[-3, 0, 1]} />
       <Roamer
@@ -683,32 +704,110 @@ export function WorldScene({
         }
         position={[-10, 0, -7]}
       />
-      {INTERACTABLES.map((o) => (
-        <group key={o.id} position={o.p as [number, number, number]}>
-          {o.id.startsWith("resource") && (
-            <Crystal position={[0, 0, 0]} color="#ead892" scale={0.3} />
-          )}
-          <Html
-            position={[0, o.id === "arena" ? 4.8 : 2.25, 0]}
-            center
-            distanceFactor={14}
-          >
-            <div className="world-label">
-              <span>
-                {o.id === "guide"
-                  ? "!"
-                  : o.id === "boss"
-                    ? "♜"
-                    : o.id.startsWith("resource")
-                      ? "✧"
-                      : "◇"}
-              </span>
-              {o.name}
-            </div>
-          </Html>
-        </group>
-      ))}
+      {INTERACTABLES.map((o) => {
+        const resource = o.id.startsWith("resource");
+        const collected = profile.resources.includes(
+          `${profile.region}:${o.id}`,
+        );
+        const distance = Math.hypot(position[0] - o.p[0], position[1] - o.p[2]);
+        const marker = WORLD_GUIDE.markers[o.id];
+        const opacity = Math.min(
+          1,
+          Math.max(
+            0,
+            (WORLD_GUIDE.labelRange - distance) /
+              (WORLD_GUIDE.labelRange - WORLD_GUIDE.labelFadeStart),
+          ),
+        );
+        return (
+          <group key={o.id} position={o.p as [number, number, number]}>
+            {resource && (
+              <>
+                <Crystal
+                  position={[0, 0, 0]}
+                  color={collected ? "#8d9c79" : "#ead892"}
+                  scale={0.22}
+                />
+                {!collected && <ResourceSparkle />}
+              </>
+            )}
+            {!resource && !blocked && opacity > 0 && (
+              <Html
+                position={[0, marker.height, 0]}
+                center
+                occlude
+                zIndexRange={[2, 0]}
+                style={{ pointerEvents: "none", opacity }}
+              >
+                <div
+                  className={`world-label ${objective.target === o.id ? "objective-label" : ""}`}
+                  data-marker={o.id}
+                >
+                  <span>{marker.icon}</span>
+                  {o.name}
+                </div>
+              </Html>
+            )}
+            {objective.target === o.id && !blocked && <QuestBeacon />}
+          </group>
+        );
+      })}
     </Canvas>
+  );
+}
+function ResourceSparkle() {
+  const ref = useRef<T.Group>(null);
+  useFrame(({ clock }) => {
+    if (ref.current && !settings.reduced) {
+      ref.current.rotation.y = clock.elapsedTime * 0.7;
+      ref.current.position.y = 0.58 + Math.sin(clock.elapsedTime * 2) * 0.07;
+    }
+  });
+  return (
+    <group ref={ref} position={[0, 0.58, 0]}>
+      {[-1, 0, 1].map((i) => (
+        <mesh
+          key={i}
+          position={[i * 0.12, Math.abs(i) * 0.1, 0]}
+          scale={i ? 0.5 : 1}
+        >
+          <octahedronGeometry args={[0.09, 0]} />
+          <meshBasicMaterial color="#fff2bd" />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+function QuestBeacon() {
+  const ref = useRef<T.Group>(null);
+  useFrame(({ clock }) => {
+    if (ref.current && !settings.reduced) {
+      ref.current.rotation.y = clock.elapsedTime;
+      ref.current.position.y = 3.15 + Math.sin(clock.elapsedTime * 2) * 0.12;
+    }
+  });
+  return (
+    <group name="quest-waypoint">
+      <group ref={ref} position={[0, 3.15, 0]}>
+        <mesh>
+          <octahedronGeometry args={[0.23, 0]} />
+          <meshBasicMaterial color="#ffe1a1" />
+        </mesh>
+        <mesh scale={1.5}>
+          <octahedronGeometry args={[0.23, 0]} />
+          <meshBasicMaterial
+            color="#ffe1a1"
+            wireframe
+            transparent
+            opacity={0.5}
+          />
+        </mesh>
+      </group>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.05, 0]}>
+        <ringGeometry args={[0.75, 0.83, 48]} />
+        <meshBasicMaterial color="#ffe1a1" transparent opacity={0.8} />
+      </mesh>
+    </group>
   );
 }
 export function TitleScene({

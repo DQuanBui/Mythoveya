@@ -1,0 +1,562 @@
+/* Exploration layout owns one safe rectangle instead of independent screen offsets. */
+.world-hud {
+  --safe-x: max(24px, env(safe-area-inset-left), env(safe-area-inset-right));
+  --safe-y: max(24px, env(safe-area-inset-top), env(safe-area-inset-bottom));
+  position: absolute;
+  inset: var(--safe-y) var(--safe-x);
+  max-width: 2440px;
+  margin-inline: auto;
+  pointer-events: none;
+  z-index: 3;
+}
+.world-hud button,
+.world-hud aside,
+.world-hud .minimap,
+.world-hud .currencies {
+  pointer-events: auto;
+}
+.world-hud .hud-top {
+  position: relative;
+  inset: auto;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 20px;
+  align-items: start;
+}
+.world-hud .keeper-badge {
+  width: fit-content;
+  max-width: 100%;
+  min-width: 0;
+  padding: 12px 16px;
+}
+.world-hud .keeper-badge > div {
+  min-width: 0;
+}
+.world-hud .keeper-badge strong {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.world-hud .location {
+  padding-top: 8px;
+}
+.world-hud .currencies {
+  justify-self: end;
+  padding: 5px;
+  gap: 2px;
+  position: relative;
+}
+.currency-button {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  gap: 3px 7px;
+  border: 0;
+  background: none;
+  min-height: 48px;
+}
+.currency-button > span {
+  font-size: 18px;
+}
+.currency-button b {
+  font-weight: 600;
+}
+.currency-button small {
+  grid-column: 1 / -1;
+  color: #d0ddcf;
+  font-size: 10px;
+}
+.currency-tooltip {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  width: 250px;
+  max-width: calc(100vw - 48px);
+  border: 1px solid #b9cdbc66;
+  border-radius: 10px;
+  padding: 16px;
+  background: #15343df5;
+  box-shadow: 0 8px 30px #122c3555;
+  z-index: 10;
+  color: #f1ecdb;
+}
+.currency-tooltip strong {
+  color: #edce95;
+}
+.currency-tooltip p {
+  font-size: 12px;
+  margin: 8px 0 0;
+}
+.world-hud .quest-tracker {
+  left: 0;
+  top: 104px;
+  width: 282px;
+  padding: 20px;
+  border-radius: 0 14px 14px 0;
+  background: linear-gradient(125deg, #173b42ed, #21473de0);
+  box-shadow: 0 8px 28px #223e2826;
+}
+.quest-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.quest-count {
+  color: #b8cec1;
+  font-size: 10px;
+}
+.world-hud .quest-tracker strong {
+  font-size: 23px;
+  line-height: 1.2;
+}
+.world-hud .quest-tracker p {
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 12px 0;
+}
+.chapter-progress {
+  display: flex;
+  gap: 12px;
+  margin: 16px 0;
+}
+.chapter-progress span {
+  font-size: 9px;
+  color: #a8bcb1;
+  flex: 1;
+}
+.chapter-progress i {
+  display: block;
+  height: 3px;
+  background: #628073;
+  border-radius: 3px;
+  margin-bottom: 7px;
+}
+.chapter-progress .done {
+  color: #e8d3a5;
+}
+.chapter-progress .done i {
+  background: #e7cc93;
+}
+.objective-distance {
+  font-size: 11px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  border-top: 1px solid #b4c8ad2e;
+  padding-top: 12px;
+}
+.objective-distance span {
+  color: #f2d393;
+}
+.objective-distance b {
+  margin-left: auto;
+  font-weight: 400;
+  color: #d6e2c9;
+}
+.world-hud .quest-tracker .text-button {
+  min-height: 40px;
+  margin-top: 5px;
+  font-size: 12px;
+  text-align: left;
+}
+.world-hud .minimap {
+  right: 4px;
+  top: 108px;
+  width: 144px;
+}
+.world-hud .map-ring {
+  width: 136px;
+  height: 136px;
+  margin-inline: auto;
+}
+.world-hud .minimap > span {
+  font-size: 8px;
+  letter-spacing: 1px;
+}
+.world-hud .minimap button {
+  min-height: 40px;
+  width: 100%;
+  font-size: 12px;
+}
+.map-ring .map-objective {
+  font-size: 17px;
+  color: #ffe3a2;
+  text-shadow: 0 0 8px #ffe0a0;
+  z-index: 3;
+}
+.world-dock {
+  position: absolute;
+  inset: auto 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 24px;
+}
+.world-hud .companion-strip,
+.world-hud .world-nav {
+  position: relative;
+  inset: auto;
+}
+.world-hud .companion-strip {
+  gap: 5px;
+  padding: 7px;
+  border: 1px solid #aac4b64d;
+  border-radius: 11px;
+  background: #16343de8;
+  align-items: center;
+}
+.world-hud .companion-strip button {
+  width: 46px;
+  height: 50px;
+}
+.world-hud .companion-strip .portrait {
+  width: 44px;
+  height: 44px;
+}
+.world-hud .companion-strip .pet-button {
+  width: 34px;
+}
+.world-hud .world-nav {
+  gap: 2px;
+  border-radius: 11px;
+}
+.world-hud .world-nav button {
+  min-width: 65px;
+  min-height: 56px;
+  padding: 8px;
+  font-size: 11px;
+}
+.world-hud .world-nav button > span {
+  font-size: 21px;
+  margin-bottom: 6px;
+}
+.world-hud .interaction-zone {
+  bottom: 92px;
+  max-width: 100%;
+  width: 450px;
+}
+.world-hud .interact {
+  min-height: 60px;
+  min-width: 230px;
+  margin-bottom: 12px;
+  border-color: #d4d8ad70;
+  box-shadow: 0 8px 25px #17332828;
+}
+.world-hud .controls-hint {
+  font-size: 10px;
+}
+.world-hud .controls-hint span {
+  margin: 0 8px;
+}
+.world-label {
+  font-size: 12px;
+  max-width: 160px;
+  padding: 6px 9px;
+  border: 1px solid #dae0bb44;
+  background: #24454de8;
+  border-radius: 6px;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 3px 8px #17342d20;
+}
+.world-label.objective-label {
+  border-color: #f3d8a4b8;
+  color: #ffe9bb;
+}
+.touch-movement {
+  display: none;
+  position: absolute;
+  left: 0;
+  bottom: 150px;
+  text-align: center;
+  pointer-events: auto;
+}
+.touch-pad {
+  display: grid;
+  place-items: center;
+  width: 108px;
+  height: 108px;
+  border-radius: 50%;
+  padding: 0;
+  background: #1b3b438a;
+  border: 1px solid #e6dbb66b;
+  touch-action: none;
+}
+.touch-pad span {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  background: #e3d5acbf;
+  color: #2c4a46;
+  border-radius: 50%;
+  font-size: 25px;
+}
+.touch-movement small {
+  display: block;
+  font-size: 8px;
+  letter-spacing: 1px;
+  margin-top: 7px;
+  color: #fff4d6;
+  text-shadow: 0 1px 3px #244;
+}
+@media (max-width: 1100px) {
+  .world-hud .hud-top {
+    grid-template-columns: 1fr 1fr;
+  }
+  .world-hud .location {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 72px;
+    white-space: nowrap;
+  }
+  .world-hud .location > span {
+    font-size: 20px;
+  }
+  .world-hud .location small {
+    display: none;
+  }
+  .world-hud .quest-tracker {
+    top: 128px;
+    width: 238px;
+    padding: 14px;
+  }
+  .world-hud .minimap {
+    top: 132px;
+  }
+  .world-dock {
+    gap: 10px;
+  }
+  .world-hud .world-nav button {
+    min-width: 51px;
+    font-size: 10px;
+  }
+  .world-hud .companion-strip button {
+    width: 35px;
+    height: 42px;
+  }
+  .world-hud .companion-strip .portrait {
+    width: 34px;
+    height: 34px;
+  }
+}
+@media (max-width: 700px) {
+  .world-hud {
+    --safe-x: max(16px, env(safe-area-inset-left), env(safe-area-inset-right));
+    --safe-y: max(16px, env(safe-area-inset-top), env(safe-area-inset-bottom));
+  }
+  .world-hud .hud-top {
+    gap: 8px;
+  }
+  .world-hud .keeper-badge {
+    padding: 10px;
+    gap: 7px;
+    min-height: 61px;
+  }
+  .world-hud .keeper-badge img {
+    width: 22px;
+  }
+  .world-hud .keeper-badge strong {
+    font-size: 15px;
+    max-width: 95px;
+  }
+  .world-hud .keeper-badge small {
+    font-size: 6px;
+    letter-spacing: 0.7px;
+  }
+  .world-hud .location {
+    display: none;
+  }
+  .world-hud .currencies {
+    font-size: 11px;
+    gap: 0;
+  }
+  .world-hud .currencies button {
+    padding: 5px;
+  }
+  .currency-button small {
+    font-size: 8px;
+  }
+  .currency-tooltip {
+    max-width: calc(100vw - 32px);
+  }
+  .world-hud .quest-tracker {
+    display: block;
+    top: 82px;
+    width: calc(100% - 108px);
+    max-width: 280px;
+    padding: 12px;
+  }
+  .world-hud .quest-tracker strong {
+    font-size: 18px;
+    margin-top: 5px;
+  }
+  .world-hud .quest-tracker p {
+    font-size: 11px;
+    margin: 8px 0;
+  }
+  .world-hud .quest-tracker .eyebrow,
+  .quest-count {
+    display: none;
+  }
+  .chapter-progress {
+    margin: 10px 0;
+    gap: 8px;
+  }
+  .chapter-progress span {
+    font-size: 0;
+  }
+  .chapter-progress i {
+    margin: 0;
+  }
+  .objective-distance {
+    padding-top: 8px;
+    font-size: 10px;
+    gap: 5px;
+  }
+  .world-hud .quest-tracker .text-button {
+    min-height: 32px;
+    font-size: 11px;
+    margin: 0;
+  }
+  .world-hud .minimap {
+    display: block;
+    top: 87px;
+    width: 88px;
+    right: 3px;
+  }
+  .world-hud .map-ring {
+    width: 80px;
+    height: 80px;
+  }
+  .world-hud .minimap > span {
+    display: none;
+  }
+  .world-hud .minimap button {
+    margin-top: 12px;
+    min-height: 44px;
+    font-size: 10px;
+    padding: 5px;
+  }
+  .world-dock {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .world-hud .companion-strip {
+    padding: 4px;
+    align-self: center;
+  }
+  .world-hud .companion-strip button {
+    width: 33px;
+    height: 38px;
+  }
+  .world-hud .companion-strip .portrait {
+    width: 32px;
+    height: 32px;
+  }
+  .world-hud .world-nav {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    padding: 4px;
+  }
+  .world-hud .world-nav button {
+    min-width: 0;
+    min-height: 49px;
+    padding: 4px 1px;
+    font-size: 8px;
+  }
+  .world-hud .world-nav button > span {
+    font-size: 19px;
+  }
+  .world-hud .interaction-zone {
+    left: auto;
+    right: 0;
+    bottom: 163px;
+    transform: none;
+    width: calc(100% - 126px);
+  }
+  .world-hud .interact {
+    min-width: 0;
+    width: 100%;
+    padding: 12px;
+    gap: 8px;
+  }
+  .world-hud .interact kbd {
+    display: none;
+  }
+  .world-hud .interact span {
+    font-size: 12px;
+  }
+  .world-hud .controls-hint {
+    display: none;
+  }
+  .touch-movement {
+    display: block;
+  }
+  .modal-backdrop {
+    padding: max(16px, env(safe-area-inset-top)) 16px;
+  }
+  .modal {
+    max-height: calc(100dvh - 32px);
+    padding: 32px 18px 20px;
+  }
+  .modal h2 {
+    font-size: 27px;
+    padding-right: 20px;
+  }
+}
+@media (pointer: coarse) and (min-width: 701px) {
+  .touch-movement {
+    display: block;
+    bottom: 110px;
+  }
+}
+@media (max-height: 540px) and (min-width: 701px) {
+  .world-hud {
+    --safe-y: 16px;
+    --safe-x: 16px;
+  }
+  .world-hud .location {
+    display: none;
+  }
+  .world-hud .quest-tracker {
+    top: 78px;
+    width: 230px;
+    padding: 12px;
+  }
+  .world-hud .quest-tracker p,
+  .chapter-progress,
+  .quest-heading {
+    display: none;
+  }
+  .world-hud .quest-tracker strong {
+    font-size: 18px;
+    margin: 0 0 8px;
+  }
+  .world-hud .minimap {
+    top: 85px;
+    width: 100px;
+  }
+  .world-hud .map-ring {
+    width: 80px;
+    height: 80px;
+  }
+  .world-hud .minimap > span {
+    display: none;
+  }
+  .world-hud .minimap button {
+    margin-top: 8px;
+  }
+  .world-hud .interaction-zone {
+    bottom: 85px;
+  }
+  .world-hud .controls-hint {
+    display: none;
+  }
+}

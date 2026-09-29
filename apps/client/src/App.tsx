@@ -10,6 +10,8 @@ import { api, mutate, session, setSession } from "./api";
 import { audio, settings } from "./audio";
 import { INTERACTABLES, Preview, TitleScene, WorldScene } from "./Scene";
 import { Portrait } from "./portraits";
+import { WorldHUD } from "./WorldHUD";
+import { currentObjective, type ExplorationInput } from "./world-guide";
 import {
   Appearance,
   Collection,
@@ -38,6 +40,7 @@ export default function App() {
     [battle, setBattle] = useState<Battle | null>(null),
     [auto, setAuto] = useState(false),
     [fast, setFast] = useState(false);
+  const input = useRef<ExplorationInput>({ x: 0, z: 0 });
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined),
     inFlight = useRef(false);
   const notify = useCallback((message: string) => {
@@ -106,6 +109,7 @@ export default function App() {
       const result = await mutate(kind, data);
       setProfile(result.profile);
       audio.cue("confirm");
+      if (kind === "resource") notify("Sunseed gathered · +25 Gold");
       if (["formation", "train", "upgrade", "avatar"].includes(kind))
         notify(
           kind === "formation"
@@ -237,16 +241,7 @@ export default function App() {
       setScreen("arena");
     } else setPanel(id);
   }
-  const nav = [
-    ["quests", "⌑", "Quests"],
-    ["collection", "✦", "Journal"],
-    ["formation", "⚑", "Team"],
-    ["recruit", "◇", "Recruit"],
-    ["arena", "⚔", "Arena"],
-    ["leaderboard", "♜", "Rankings"],
-    ["map", "⌖", "World"],
-  ];
-  const region = REGIONS.find((r) => r.id === profile?.region) || REGIONS[0];
+  const objective = profile ? currentObjective(profile) : null;
   const onboarding = screen === "avatar" || screen === "starter";
   return (
     <main
@@ -407,135 +402,30 @@ export default function App() {
               onInteract={interact}
               onPosition={(x, z) => setPosition([x, z])}
               pet={pet}
+              position={position}
+              objective={objective!}
+              input={input}
             />
           </div>
-          <header className="hud-top">
-            <div className="keeper-badge">
-              <img src="/emblem.svg" />
-              <div>
-                <strong>{profile.name}</strong>
-                <small>RIFTKEEPER · LEVEL {profile.level}</small>
-              </div>
-            </div>
-            <div className="location">
-              <span>{region.name}</span>
-              <small>{region.subtitle}</small>
-            </div>
-            <div className="currencies">
-              <span title="Diamonds">◇ {profile.diamonds}</span>
-              <span title="Gold">◉ {profile.gold}</span>
-              <button
-                aria-label="Open settings"
-                onClick={() => open("settings")}
-              >
-                ☷
-              </button>
-            </div>
-          </header>
-          <aside className="quest-tracker">
-            <span className="eyebrow">YOUR NEXT CHAPTER</span>
-            <strong>
-              {!profile.quests.guide
-                ? "A keeper needs companions"
-                : !profile.claims.includes("tutorial")
-                  ? "A first bond"
-                  : !profile.quests.recruit
-                    ? "Answer the call"
-                    : "Make this world your own"}
-            </strong>
-            <p>
-              {!profile.quests.guide
-                ? "Walk to Warden Liora and press E."
-                : !profile.wins
-                  ? "Find a wild encounter. Win your first battle."
-                  : !profile.claims.includes("tutorial")
-                    ? "Your first victory! Claim 600 diamonds in Quests."
-                    : !profile.quests.recruit
-                      ? "Visit the bond shrine and recruit a companion."
-                      : "Explore, train, and meet another keeper in the arena."}
-            </p>
-            <button className="text-button" onClick={() => open("quests")}>
-              Open journal →
-            </button>
-          </aside>
-          <div className="minimap" title="Area map">
-            <div className="map-ring">
-              {INTERACTABLES.slice(0, 7).map((o) => (
-                <i
-                  key={o.id}
-                  style={{
-                    left: `${50 + o.p[0] * 2.5}%`,
-                    top: `${50 + o.p[2] * 2.5}%`,
-                  }}
-                  title={o.name}
-                >
-                  ◇
-                </i>
-              ))}
-              <b
-                style={{
-                  left: `${50 + position[0] * 2.5}%`,
-                  top: `${50 + position[1] * 2.5}%`,
-                }}
-              >
-                ▲
-              </b>
-            </div>
-            <span>N · {region.name.toUpperCase()}</span>
-            <button onClick={() => open("map")}>Travel map</button>
-          </div>
-          <div className="interaction-zone">
-            {near && (
-              <button className="interact" onClick={() => interact(near)}>
-                <kbd>E</kbd>
-                <span>
-                  {INTERACTABLES.find((o) => o.id === near)?.name}
-                  <small>
-                    {INTERACTABLES.find((o) => o.id === near)?.hint}
-                  </small>
-                </span>
-              </button>
-            )}
-            <div className="controls-hint">
-              W A S D / arrows · Move <span>Drag · Look</span> Scroll · Zoom{" "}
-              <span>Esc · Pause</span>
-            </div>
-          </div>
-          <div className="companion-strip">
-            {profile.team.map((id) => {
-              const o = profile.owned.find((o) => o.id === id)!;
-              return (
-                <button
-                  key={id}
-                  title={byId[o.species].name}
-                  onClick={() => open("formation")}
-                >
-                  <Portrait id={o.species} />
-                  <small>{o.level}</small>
-                </button>
+          <WorldHUD
+            profile={profile}
+            position={position}
+            near={near}
+            objective={objective!}
+            open={open}
+            interact={interact}
+            input={input}
+            blocked={!!panel}
+            greet={() => {
+              setPet(true);
+              audio.voice(
+                profile.owned.find((o) => o.id === profile.team[0])?.species ||
+                  profile.owned[0].species,
               );
-            })}
-            <button
-              className="pet-button"
-              onClick={() => {
-                setPet(true);
-                audio.voice(profile.owned[0].species);
-                audio.cue("pet");
-                setTimeout(() => setPet(false), 1800);
-              }}
-              title="Greet your companion"
-            >
-              ♡
-            </button>
-          </div>
-          <nav className="world-nav">
-            {nav.map(([id, icon, label]) => (
-              <button key={id} onClick={() => open(id)}>
-                <span>{icon}</span>
-                {label}
-              </button>
-            ))}
-          </nav>
+              audio.cue("pet");
+              setTimeout(() => setPet(false), 1800);
+            }}
+          />
         </>
       )}
       {screen === "battle" && battle && (

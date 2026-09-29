@@ -2,6 +2,7 @@ import { createRoot } from "react-dom/client";
 import { Component, type ReactNode } from "react";
 import App from "./App";
 import "./style.css";
+import "./world-hud.css";
 class Boundary extends Component<{ children: ReactNode }, { error: string }> {
   state = { error: "" };
   static getDerivedStateFromError(e: Error) {
@@ -28,3 +29,4 @@ createRoot(document.getElementById("root")!).render(
     <App />
   </Boundary>,
 );
+
