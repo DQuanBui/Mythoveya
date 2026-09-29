@@ -20,3 +20,6 @@ Implemented 60 structured species, deterministic combat, atomic SQLite economy, 
 
 ## Playable interface
 Connected title, keeper/starter selection, WASD exploration, guide interaction, server battles, collection, recruitment, formation, quests, regions and arena. Procedural portraits use a single cached renderer. TypeScript and six gameplay tests pass. Dependency audit now reports zero vulnerabilities. Next: browser acceptance and persistence/multiplayer integration tests.
+
+## Browser verification in progress
+Initial visual review found foreground tree obstruction; corrected the opening composition. Upgraded matching Colyseus packages to 0.17 and adapted reconnect lifecycle after runtime compatibility testing. Eleven unit/economy tests pass; production build passes. Browser tests exposed an initial scene-ready timing assumption in movement automation; fixing that check before continuing.

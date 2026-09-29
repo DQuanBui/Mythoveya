@@ -17,16 +17,16 @@
     "content:audit": "tsx scripts/content-audit.ts"
   },
   "dependencies": {
-    "@colyseus/core": "0.16.26",
-    "@colyseus/ws-transport": "0.16.5",
+    "@colyseus/core": "0.17.51",
+    "@colyseus/sdk": "0.17.43",
+    "@colyseus/ws-transport": "0.17.13",
     "@react-three/drei": "10.7.6",
     "@react-three/fiber": "9.3.0",
-    "colyseus.js": "0.16.22",
     "express": "5.1.0",
     "react": "19.1.1",
     "react-dom": "19.1.1",
     "three": "0.180.0",
-    "zod": "3.25.76"
+    "zod": "4.1.12"
   },
   "devDependencies": {
     "@playwright/test": "1.55.1",
