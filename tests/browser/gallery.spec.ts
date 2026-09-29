@@ -3,7 +3,7 @@ import {SPECIES,AVATARS} from '../../packages/shared/content';
 test('all models, eight keepers, ten mythic effects, and bounded audio',async({page})=>{
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('/');
  await page.evaluate(async()=>{const post=async(path:string,data:any,token='')=>fetch('/api/'+path,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify(data)}).then(r=>r.json());const g=await post('guest',{name:'Gallery Reviewer',avatar:0});localStorage.setItem('mythoveya-session',g.token);await post('mutate',{kind:'starter',species:'emberfox',requestId:crypto.randomUUID()},g.token);await post('mutate',{kind:'guide',requestId:crypto.randomUUID()},g.token);});
- await page.reload();await page.getByRole('button',{name:'Continue your journey'}).click();await page.keyboard.press('Escape');await page.getByRole('button',{name:'Asset gallery'}).click();
+ await page.reload();await page.getByRole('button',{name:'Continue your journey'}).click();await expect(page.locator('.keeper-badge')).toContainText('Gallery Reviewer');await page.keyboard.press('Escape');await page.getByRole('button',{name:'Asset gallery'}).click();
  await expect(page.locator('.gallery-list button')).toHaveCount(60);
  const hashes=await page.evaluate(async(ids)=>{const path='/src/portraits.tsx';const portraits=await import(/* @vite-ignore */path);return ids.map(id=>portraits.renderPortrait(id));},SPECIES.map(s=>s.id));
  expect(hashes).toHaveLength(60);expect(new Set(hashes).size).toBe(60);expect(hashes.every(h=>h.startsWith('data:image/png;base64,'))).toBe(true);

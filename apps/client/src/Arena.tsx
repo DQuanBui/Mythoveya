@@ -6,12 +6,14 @@ import { byId } from "../../../packages/shared/content";
 import { targets } from "../../../packages/shared/combat";
 import { BattleScene } from "./Scene";
 import { audio } from "./audio";
+import {Portrait} from './portraits';
 export type Snapshot = {
   code: string;
-  players: { id: string; name: string; ready: boolean }[];
+  players: { id: string; name: string; ready: boolean;team:{species:string;level:number}[] }[];
   battle: Battle | null;
   mode: string;
   ranked: boolean;
+  ratingChanges:{before:number;after:number}[];
 };
 export function BattleUI({
   battle,
@@ -22,6 +24,7 @@ export function BattleUI({
   fast,
   setFast,
   human = false,
+  rating,
   finish,
 }: {
   battle: Battle;
@@ -32,6 +35,7 @@ export function BattleUI({
   fast: boolean;
   setFast: (v: boolean) => void;
   human?: boolean;
+  rating?:{before:number;after:number};
   finish: () => void;
 }) {
   const [action, setAction] = useState(0),
@@ -79,7 +83,7 @@ export function BattleUI({
       <header className="battle-top">
         <div>
           <span className="eyebrow">
-            {human ? "KEEPER ARENA" : "WILD ENCOUNTER"}
+            {human ? "KEEPER ARENA" : (battle.title||'Wild encounter').toUpperCase()}
           </span>
           <h2>
             Round {battle.round} <small>of 25</small>
@@ -213,9 +217,11 @@ export function BattleUI({
             {human
               ? "Both keepers share this confirmed result. Ranked ratings update once; friendly rooms are unranked."
               : battle.winner === 0
-                ? "Wild encounter complete · 80 gold · 90 XP · 1 bond token"
+                ? battle.mode==='practice'?'Practice complete · no rewards or rating changes':`${battle.title||'Encounter'} complete · ${battle.rewards?.gold||0} gold · ${battle.rewards?.xp||0} XP · ${battle.rewards?.tokens||0} bond token · ${battle.rewards?.diamonds||0} diamonds`
                 : "Your companions have recovered. Try another formation or train before returning."}
           </p>
+          {rating&&<p className="rating-result">Rating {rating.before} → {rating.after} ({rating.after-rating.before>=0?'+':''}{rating.after-rating.before})</p>}
+          {!!battle.rewards?.newSpecies.length&&<p>New guardian bond: {battle.rewards.newSpecies.map(id=>byId[id].name).join(', ')}</p>}
           <button className="primary" onClick={finish}>
             Continue your journey →
           </button>
@@ -238,7 +244,7 @@ export function Arena({
   const room = useRef<Room | null>(null),
     client = useRef(
       new Client(
-        `${location.protocol === "https:" ? "wss:" : "ws:"}//${location.host}/socket`,
+      `${location.protocol === "https:" ? "wss:" : "ws:"}//${location.host}${import.meta.env.DEV?'/socket':''}`,
       ),
     );
   const [snap, setSnap] = useState<Snapshot | null>(null),
@@ -318,6 +324,7 @@ export function Arena({
           fast={false}
           setFast={() => {}}
           human
+          rating={snap.ratingChanges?.[snap.players.findIndex(p=>p.id===profile.id)]}
           finish={() => {
             refresh();
             leave();
@@ -365,6 +372,7 @@ export function Arena({
             {snap.players.map((p) => (
               <div key={p.id}>
                 <h3>{p.name}</h3>
+                <div className="lobby-team">{p.team.map((o,i)=><div key={i} title={`${byId[o.species].name} · Level ${o.level}`}><Portrait id={o.species}/><small>{byId[o.species].name}</small></div>)}</div>
                 <span>{p.ready ? "Ready ✓" : "Preparing their team"}</span>
               </div>
             ))}

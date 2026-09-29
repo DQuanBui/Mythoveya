@@ -23,3 +23,6 @@ Connected title, keeper/starter selection, WASD exploration, guide interaction, 
 
 ## Browser verification in progress
 Initial visual review found foreground tree obstruction; corrected the opening composition. Upgraded matching Colyseus packages to 0.17 and adapted reconnect lifecycle after runtime compatibility testing. Eleven unit/economy tests pass; production build passes. Browser tests exposed an initial scene-ready timing assumption in movement automation; fixing that check before continuing.
+
+## Verified progression and multiplayer
+The full first-session browser path passed: profile/keeper/starter, movement to guide, six companions, PvE victory, quest claim, recruitment, formation, reload persistence, mute and reduced motion. Two isolated browser contexts completed a friendly match. A separate real Colyseus ranked match passed legal-window, reconnect, snapshot integrity, once-only rating and server-restart persistence checks. Eighteen focused content/economy/signature tests pass. Gallery capture is now running after correcting a test that pressed Escape before world entry finished. GitHub private repository: https://github.com/DQuanBui/Mythoveya.

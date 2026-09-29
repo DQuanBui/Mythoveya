@@ -18,6 +18,7 @@ export class ArenaRoom extends Room {
   mode: "power" | "tactical" = "tactical";
   ranked = false;
   settled = false;
+  ratingChanges:{before:number;after:number}[]=[];
   last = new Map<string, number>();
   onCreate(options: any) {
     this.mode = options.mode === "power" ? "power" : "tactical";
@@ -146,6 +147,7 @@ export class ArenaRoom extends Room {
           ps[1].ratings[this.mode],
           b.winner === 2 ? 0.5 : b.winner === 0 ? 1 : 0,
         );
+        this.ratingChanges=ps.map((p,i)=>({before:p.ratings[this.mode],after:ratings[i]}));
         ps.forEach((p, i) => {
           p.ratings[this.mode] = ratings[i];
           p.ranked[this.mode]++;
@@ -173,10 +175,11 @@ export class ArenaRoom extends Room {
   sync() {
     this.broadcast("snapshot", {
       code: this.roomId,
-      players: this.players.map(({ id, name, ready }) => ({ id, name, ready })),
+      players: this.players.map(({ id, name, ready }) => ({ id, name, ready,team:team(getProfile(id)).map(o=>({species:o.species,level:o.level})) })),
       battle: this.battle,
       mode: this.mode,
       ranked: this.ranked,
+      ratingChanges:this.ratingChanges,
     });
   }
 }

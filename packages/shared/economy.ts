@@ -69,5 +69,7 @@ export function formation(p: Profile, ids: string[]) {
   )
     throw Error("Choose six different owned companions.");
   p.team = ids;
+  p.savedFormations ||= [];
+  if(!p.savedFormations.some(t=>t.join('|')===ids.join('|')))p.savedFormations.push([...ids]);
   p.quests.formation = 1;
 }

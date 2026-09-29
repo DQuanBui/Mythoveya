@@ -77,8 +77,10 @@ function Tree({
   scale?: number;
   color?: string;
 }) {
+  const tree=useRef<T.Group>(null);const point=useMemo(()=>new T.Vector3(),[]);const direction=useMemo(()=>new T.Vector3(),[]);const ray=useMemo(()=>new T.Ray(),[]);const lastFade=useRef(false);
+  useFrame(({camera})=>{if(!tree.current)return;tree.current.getWorldPosition(point);point.y+=2.5*scale;camera.getWorldDirection(direction);ray.set(camera.position,direction);const faded=camera.position.distanceTo(point)<8 && ray.distanceToPoint(point)<2*scale;if(faded!==lastFade.current){tree.current.traverse(obj=>{if(obj instanceof T.Mesh){const mat=obj.material as T.MeshStandardMaterial;mat.transparent=true;mat.opacity=faded?.16:1;mat.depthWrite=!faded;}});lastFade.current=faded;}});
   return (
-    <group position={position} scale={scale}>
+    <group ref={tree} position={position} scale={scale}>
       <mesh position={[0, 1.3, 0]} castShadow>
         <cylinderGeometry args={[0.14, 0.25, 2.6, 6]} />
         <meshStandardMaterial color="#6c6253" />
@@ -554,11 +556,14 @@ function Roamer({
   position: [number, number, number];
 }) {
   const ref = useRef<T.Group>(null);
-  useFrame(({ clock }) => {
+  const lastCall=useRef(0);
+  useFrame(({ clock,camera }) => {
     if (ref.current) {
       ref.current.position.x =
         position[0] + Math.sin(clock.elapsedTime * 0.25) * 0.8;
       ref.current.rotation.y = Math.cos(clock.elapsedTime * 0.25) * 0.6;
+      const distance=camera.position.distanceTo(ref.current.position);
+      if(clock.elapsedTime-lastCall.current>14+byId[id].variant&&distance<22){audio.voice(id,'call',(ref.current.position.x-camera.position.x)/15,Math.min(.65,5/distance));lastCall.current=clock.elapsedTime;}
     }
   });
   return (

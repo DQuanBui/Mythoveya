@@ -1,4 +1,4 @@
-import roster from "./roster.json";
+import roster from "./roster.json" with { type: "json" };
 export const TIERS = ["E", "D", "C", "B", "A", "S"] as const;
 export const ELEMENTS = [
   "Flame",

@@ -182,6 +182,7 @@ export function startPve(p: Profile, boss: boolean, practice = false) {
     practice ? "practice" : "pve",
     randomInt(0, 10000000),
   );
+  b.title=practice?'Practice vs computer':boss?(p.region==='canyon'?'Cinder Regent':p.region==='hollow'?'Hollow Sentinel':'Thorncrown'):'Wild encounter';
   if (p.wins === 0 && !boss)
     for (const u of b.units.filter((u) => u.side === 1)) {
       u.hp = u.maxHp = Math.round(u.maxHp * 0.5);
@@ -206,6 +207,7 @@ export function finishPve(profileId: string, b: Battle) {
   atomic(() => {
     if (db.prepare("SELECT id FROM matches WHERE id=?").get(b.id)) return;
     const p = getProfile(profileId);
+    const before={gold:p.gold,diamonds:p.diamonds,tokens:p.tokens,species:p.owned.map(o=>o.species)};
     const meta = battleMeta.get(b.id);
     if (meta?.region !== "practice" && b.winner === 0) {
       p.wins++;
@@ -228,6 +230,7 @@ export function finishPve(profileId: string, b: Battle) {
         p.diamonds += 150;
       }
     }
+    b.rewards={gold:p.gold-before.gold,diamonds:p.diamonds-before.diamonds,tokens:p.tokens-before.tokens,xp:meta?.region!=='practice'&&b.winner===0?90:0,newSpecies:p.owned.filter(o=>!before.species.includes(o.species)).map(o=>o.species)};
     db.prepare("INSERT INTO matches VALUES(?,?)").run(
       b.id,
       JSON.stringify({ winner: b.winner, kind: "pve", profileId }),
@@ -251,7 +254,5 @@ export function pveAction(
   return b;
 }
 export function ranking(p: Profile) {
-  return p.team.length === 6
-    ? p.team.reduce((n, id) => n + power(p.owned.find((o) => o.id === id)!), 0)
-    : 0;
+  return Math.max(0,...[p.team,...(p.savedFormations||[])].filter(t=>t.length===6&&new Set(t).size===6&&t.every(id=>p.owned.some(o=>o.id===id))).map(t=>t.reduce((n,id)=>n+power(p.owned.find(o=>o.id===id)!),0)));
 }

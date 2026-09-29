@@ -19,6 +19,7 @@ export type Profile = {
   tokens: number;
   owned: Owned[];
   team: string[];
+  savedFormations?: string[][];
   pity: { as: number; s: number };
   quests: Record<string, number>;
   claims: string[];
@@ -82,4 +83,6 @@ export type Battle = {
   deadline: number;
   delayed: { actor: string; target: string; action: number; round: number }[];
   mode: string;
+  title?: string;
+  rewards?: {gold:number;diamonds:number;xp:number;tokens:number;newSpecies:string[]};
 };
