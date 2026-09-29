@@ -1,0 +1,14 @@
+{
+  "name": "mythoveya", "version": "0.1.0", "private": true, "type": "module",
+  "description": "Mythoveya: Call of the Wildbound — a local 3D creature-collection RPG",
+  "engines": {"node": ">=24.0.0 <25"},
+  "scripts": {
+    "dev": "concurrently -k -n server,game \"tsx watch apps/server/index.ts\" \"vite\"",
+    "build": "tsc --noEmit && vite build && esbuild apps/server/index.ts --bundle --platform=node --format=esm --packages=external --outfile=dist/server/index.js",
+    "start": "node dist/server/index.js",
+    "typecheck": "tsc --noEmit", "test": "vitest run", "test:e2e": "playwright test",
+    "content:audit": "tsx scripts/content-audit.ts"
+  },
+  "dependencies": {"@colyseus/core":"0.16.26","@colyseus/ws-transport":"0.16.5","colyseus.js":"0.16.22","@react-three/fiber":"9.3.0","@react-three/drei":"10.7.6","react":"19.1.1","react-dom":"19.1.1","three":"0.180.0","express":"5.1.0","zod":"3.25.76"},
+  "devDependencies": {"@types/express":"5.0.3","@types/node":"24.5.2","@types/react":"19.1.16","@types/react-dom":"19.1.9","@types/three":"0.180.0","@vitejs/plugin-react":"5.0.3","vite":"7.1.7","typescript":"5.9.2","tsx":"4.20.5","concurrently":"9.2.1","vitest":"3.2.4","@playwright/test":"1.55.1","esbuild":"0.25.10"}
+}
