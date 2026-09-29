@@ -17,3 +17,6 @@ No build checks run yet. No visual or listening review yet.
 
 ## Foundation systems
 Implemented 60 structured species, deterministic combat, atomic SQLite economy, opaque guest sessions, PvE services and Colyseus room lifecycle. Six core tests and TypeScript check pass. Browser gameplay remains to be connected and verified.
+
+## Playable interface
+Connected title, keeper/starter selection, WASD exploration, guide interaction, server battles, collection, recruitment, formation, quests, regions and arena. Procedural portraits use a single cached renderer. TypeScript and six gameplay tests pass. Dependency audit now reports zero vulnerabilities. Next: browser acceptance and persistence/multiplayer integration tests.
