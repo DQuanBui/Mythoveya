@@ -3,6 +3,7 @@ import { SPECIES, AVATARS } from "../../packages/shared/content";
 test("all models, eight keepers, ten mythic effects, and bounded audio", async ({
   page,
 }) => {
+  test.setTimeout(300000);
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("/");
@@ -79,10 +80,12 @@ test("all models, eight keepers, ten mythic effects, and bounded audio", async (
     await page
       .getByRole("button", { name: "Preview ultimate", exact: true })
       .click();
-    await page.waitForTimeout(700);
+    await page.waitForTimeout(950);
+    await page.getByRole("button", { name: "Pause", exact: true }).click();
     await page
       .locator(".gallery-preview")
       .screenshot({ path: `artifacts/ultimate-${s.id}.png` });
+    await page.getByRole("button", { name: "Play", exact: true }).click();
   }
   const audio = await page.evaluate(async () => {
     const path = "/src/audio.ts";

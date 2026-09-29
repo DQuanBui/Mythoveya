@@ -66,6 +66,11 @@ test("first journey, battle, recruitment, formation, reload and settings", async
     .locator(".world-nav")
     .getByRole("button", { name: "Team", exact: false })
     .click();
+  await page.locator(".owned-strip button").first().click();
+  await page.locator(".formation-slot").nth(1).click();
+  await expect(page.locator(".formation-slot").nth(1)).toContainText(
+    "Emberfox",
+  );
   await page.getByRole("button", { name: "Save formation" }).click();
   await expect(page.getByRole("status")).toContainText("Formation saved");
   await page.getByLabel("Close panel").click();

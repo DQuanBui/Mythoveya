@@ -78,6 +78,7 @@ export function createCreature(id: string) {
         [0, side * -0.4, side * 0.22],
       );
     wings.push(w);
+    return w;
   };
   const horn = (x: number, y: number, z: number, sz = 0.4) =>
     part(
@@ -107,7 +108,7 @@ export function createCreature(id: string) {
     if (s.family === "dragon") {
       wing(-1, 1.2);
       wing(1, 1.2);
-      for (let i = 0; i < 3; i++)
+      for (let i = 0; i < (s.id === "solkarath" ? 0 : 3); i++)
         horn((i - 1) * 0.2, 1.58, 0.42, 0.3 + i * 0.07);
       for (let i = 0; i < 4; i++) horn(0, 1.16, -0.65 + i * 0.25, 0.28);
     }
@@ -365,7 +366,11 @@ export function createCreature(id: string) {
         [0.3, 0, a],
       );
     }
-  if (/horn|tusk/.test(s.appearance) && s.family !== "antler")
+  if (
+    /horn|tusk/.test(s.appearance) &&
+    s.family !== "antler" &&
+    s.id !== "solkarath"
+  )
     for (const side of [-1, 1])
       horn(side * 0.3, headY + 0.36, headZ + 0.12, 0.4);
   for (let i = 0; i <= s.variant; i++)
@@ -374,10 +379,31 @@ export function createCreature(id: string) {
       [0.035, 0.085, 0.055],
       light,
     );
-  if (s.id === "solkarath")
+  if (/winged/i.test(s.appearance) && ["quadruped", "fox"].includes(s.family)) {
+    wing(-1, 1.2);
+    wing(1, 1.2);
+  }
+  if (s.id === "ignivara") {
+    for (const side of [-1, 1]) {
+      const rearWing = wing(side, 0.7);
+      rearWing.position.z = -0.45;
+      rearWing.position.y = 0.75;
+    }
+  }
+  if (s.id === "solkarath") {
+    part(
+      rig,
+      "orb",
+      "#ffe4a2",
+      [0, 1.8, 0.36],
+      [0.18, 0.18, 0.18],
+      [0, 0, 0],
+      true,
+    );
     for (const side of [-1, 1])
       for (let i = 0; i < 3; i++)
         horn(side * (0.18 + i * 0.15), 1.7 - i * 0.03, 0.46 - i * 0.15, 0.5);
+  }
   if (s.id === "iskavelle") {
     limb(-0.35, 0, 0.65);
     limb(0.35, 0, 0.65);

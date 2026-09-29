@@ -437,7 +437,7 @@ export const INTERACTABLES = [
     id: `resource-${i}`,
     name: "Sunseed",
     hint: "Gather resource",
-    p: [(i - 1) * 6, 0, 8 - i * 2],
+    p: i === 2 ? [7, 0, 7] : [(i - 1) * 6, 0, 8 - i * 2],
   })),
 ];
 function Explorer({
@@ -468,6 +468,7 @@ function Explorer({
   const keys = useRef(new Set<string>());
   const { camera } = useThree();
   const controls = useRef<any>(null);
+  const initialTarget = useMemo(() => new T.Vector3(0, 1, 5), []);
   const near = useRef("");
   const last = useRef(0);
   const foot = useRef(0);
@@ -536,7 +537,8 @@ function Explorer({
     avatar.position.z = player.current.z;
     animateAvatar(avatar, clock.elapsedTime, moving, pet, settings.reduced);
     const delta = player.current.clone().sub(follow.current);
-    if (delta.length() > 1.6)
+    const following = delta.length() > 1.6;
+    if (following)
       follow.current.add(delta.normalize().multiplyScalar(dt * 3.8));
     companion.position.copy(follow.current);
     companion.rotation.y = Math.atan2(
@@ -546,7 +548,7 @@ function Explorer({
     animateCreature(
       companion,
       clock.elapsedTime,
-      pet ? "victory" : delta.length() > 1.65 ? "walk" : "idle",
+      pet ? "victory" : following ? "walk" : "idle",
       0,
       settings.reduced,
     );
@@ -587,7 +589,7 @@ function Explorer({
         maxDistance={16}
         minPolarAngle={0.5}
         maxPolarAngle={1.3}
-        target={[0, 1, 5]}
+        target={initialTarget}
       />
     </>
   );
@@ -623,7 +625,7 @@ function Roamer({
   });
   return (
     <group ref={ref} position={position}>
-      <Creature id={id} />
+      <Creature id={id} state="walk" />
     </group>
   );
 }
@@ -836,7 +838,7 @@ function SkillEffect({ battle }: { battle: Battle }) {
     const scale = p < 0.5 ? 0.25 + p : 1 + Math.sin((p - 0.5) * Math.PI) * 1.5;
     ref.current.scale.setScalar(settings.reduced ? 0.8 : scale);
     ref.current.children.forEach((m, i) => {
-      m.rotation.z = p * (i % 2 ? 1 : -1) * 6;
+      if (m instanceof T.Mesh) m.rotation.z = p * (i % 2 ? 1 : -1) * 6;
     });
   });
   const e = battle.event;
