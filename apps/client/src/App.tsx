@@ -511,6 +511,32 @@ export default function App() {
               ×
             </button>
             {panel === "settings" && <SettingsPanel />}
+            {panel.startsWith("observe-") && byId[panel.slice(8)] && (
+              <div className="wildlife-note">
+                <p className="eyebrow">A MOMENT IN THE WILD</p>
+                <Portrait id={panel.slice(8)} />
+                <h2>{byId[panel.slice(8)].name}</h2>
+                <p>
+                  {byId[panel.slice(8)].element} Wildbound ·{" "}
+                  {byId[panel.slice(8)].role}
+                </p>
+                <p className="muted">
+                  Watch this companion in its habitat, listen to its call, or
+                  ask Ranger Tali about friendly wild encounters.
+                </p>
+                <div className="button-row">
+                  <button onClick={() => audio.voice(panel.slice(8), "call")}>
+                    Hear its call
+                  </button>
+                  <button onClick={() => setPanel("collection")}>
+                    Open field journal
+                  </button>
+                  <button onClick={() => setPanel("npc-tali")}>
+                    Visit Ranger Tali
+                  </button>
+                </div>
+              </div>
+            )}
             {panel === "town" && profile && (
               <TownDirectory profile={profile} open={open} />
             )}

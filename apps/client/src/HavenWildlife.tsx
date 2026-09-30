@@ -1,3 +1,4 @@
+import { WorldInteraction } from "./WorldInteraction";
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as T from "three";
@@ -8,9 +9,13 @@ import { audio, settings } from "./audio";
 function Resident({
   site,
   index,
+  onInteract,
+  disabled,
 }: {
   site: (typeof HAVEN_WILDLIFE)[number];
   index: number;
+  onInteract: (id: string) => void;
+  disabled: boolean;
 }) {
   const model = useMemo(() => createCreature(site.species), [site.species]),
     lastVoice = useRef(0),
@@ -53,13 +58,33 @@ function Resident({
       lastVoice.current = t;
     }
   });
-  return <primitive name={`habitat-${site.species}-${index}`} object={model} />;
+  return (
+    <WorldInteraction
+      name={`habitat-${site.species}-${index}`}
+      disabled={disabled}
+      activate={() => onInteract(`observe-${site.species}`)}
+    >
+      <primitive object={model} />
+    </WorldInteraction>
+  );
 }
-export function HavenWildlife() {
+export function HavenWildlife({
+  onInteract,
+  disabled,
+}: {
+  onInteract: (id: string) => void;
+  disabled: boolean;
+}) {
   return (
     <group name="haven-wildlife">
       {HAVEN_WILDLIFE.map((site, i) => (
-        <Resident key={i} site={site} index={i} />
+        <Resident
+          key={i}
+          site={site}
+          index={i}
+          onInteract={onInteract}
+          disabled={disabled}
+        />
       ))}
       <Butterflies />
     </group>

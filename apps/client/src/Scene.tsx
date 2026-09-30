@@ -1,3 +1,4 @@
+import { WorldInteraction } from "./WorldInteraction";
 import { useMemo, useRef, useEffect, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Stars } from "@react-three/drei";
@@ -558,8 +559,6 @@ function Explorer({
         return;
       keys.current.add(e.code);
       if (e.code === "KeyR" && !blocked) recenter();
-      if (e.code === "KeyE" && !blocked && near.current)
-        onInteract(near.current);
     };
     const up = (e: KeyboardEvent) => keys.current.delete(e.code);
     const blur = () => keys.current.clear();
@@ -722,8 +721,12 @@ function Explorer({
 function Roamer({
   id,
   position,
+  activate,
+  disabled,
 }: {
   id: string;
+  activate: () => void;
+  disabled: boolean;
   position: [number, number, number];
 }) {
   const ref = useRef<T.Group>(null);
@@ -750,7 +753,9 @@ function Roamer({
   });
   return (
     <group ref={ref} position={position}>
-      <Creature id={id} state="walk" />
+      <WorldInteraction activate={activate} disabled={disabled}>
+        <Creature id={id} state="walk" />
+      </WorldInteraction>
     </group>
   );
 }
@@ -787,7 +792,9 @@ export function WorldScene({
       dpr={[1, settings.quality === "High" ? 1.75 : 1.3]}
     >
       <Environment region={profile.region} />
-      {profile.region === "haven" && <HavenWildlife />}
+      {profile.region === "haven" && (
+        <HavenWildlife onInteract={onInteract} disabled={blocked} />
+      )}
       <TownScenery garden={profile.town?.garden ?? null} />
       <Explorer
         key={profile.region}
@@ -795,9 +802,14 @@ export function WorldScene({
         {...{ profile, blocked, onNear, onInteract, onPosition, pet, input }}
       />
       {NPCS.map((n) => (
-        <group key={n.id} name={`npc-${n.id}`}>
+        <WorldInteraction
+          key={n.id}
+          name={`npc-${n.id}`}
+          disabled={blocked}
+          activate={() => onInteract(n.location)}
+        >
           <Avatar index={n.avatar} position={n.position} />
-        </group>
+        </WorldInteraction>
       ))}
       <Roamer
         id={
@@ -807,6 +819,8 @@ export function WorldScene({
               ? "snowmew"
               : "mossprig"
         }
+        activate={() => onInteract("encounter")}
+        disabled={blocked}
         position={[-6, 0, 6]}
       />
       <Roamer
@@ -817,6 +831,8 @@ export function WorldScene({
               ? "glaciermaw"
               : "briarhart"
         }
+        activate={() => onInteract("boss")}
+        disabled={blocked}
         position={[-10, 0, -7]}
       />
       {getInteractables(profile.region).map((o) => {
@@ -836,7 +852,13 @@ export function WorldScene({
           ),
         );
         return (
-          <group key={o.id} position={o.p as [number, number, number]}>
+          <WorldInteraction
+            key={o.id}
+            name={`interactable-${o.id}`}
+            position={o.p as [number, number, number]}
+            activate={() => onInteract(o.id)}
+            disabled={blocked || (resource && collected)}
+          >
             {resource && (
               <>
                 <Crystal
@@ -847,29 +869,37 @@ export function WorldScene({
                 {!collected && <ResourceSparkle />}
               </>
             )}
-            {!resource && !blocked && opacity > 0 && (
-              <Html
-                position={
-                  npc
-                    ? [npc.position[0] - o.p[0], 2.25, npc.position[2] - o.p[2]]
-                    : [0, marker.height, 0]
-                }
-                center
-                occlude
-                zIndexRange={[2, 0]}
-                style={{ pointerEvents: "none", opacity }}
-              >
-                <div
-                  className={`world-label ${npc ? "npc-label" : ""} ${objective.target === o.id ? "objective-label" : ""}`}
-                  data-marker={o.id}
+            {!resource &&
+              !blocked &&
+              opacity > 0 &&
+              (o.id !== "trail-village" || objective.target === o.id) && (
+                <Html
+                  position={
+                    npc
+                      ? [
+                          npc.position[0] - o.p[0],
+                          2.25,
+                          npc.position[2] - o.p[2],
+                        ]
+                      : [0, marker.height, 0]
+                  }
+                  center
+                  occlude
+                  zIndexRange={[2, 0]}
+                  style={{ pointerEvents: "auto", opacity }}
                 >
-                  <span>{npc ? npcSignal(profile, npc) : marker.icon}</span>
-                  {npc ? npc.name : o.name}
-                </div>
-              </Html>
-            )}
+                  <button
+                    onClick={() => onInteract(o.id)}
+                    className={`world-label ${npc ? "npc-label" : ""} ${objective.target === o.id ? "objective-label" : ""}`}
+                    data-marker={o.id}
+                  >
+                    <span>{npc ? npcSignal(profile, npc) : marker.icon}</span>
+                    {npc ? npc.name : o.name}
+                  </button>
+                </Html>
+              )}
             {objective.target === o.id && !blocked && <QuestBeacon />}
-          </group>
+          </WorldInteraction>
         );
       })}
     </Canvas>

@@ -202,7 +202,7 @@ export function WorldHUD({
       <div className="interaction-zone">
         {nearest && (
           <button className="interact" onClick={() => interact(near)}>
-            <kbd>E</kbd>
+            <kbd>Click</kbd>
             <span>
               {nearest.name}
               <small>{nearest.hint}</small>

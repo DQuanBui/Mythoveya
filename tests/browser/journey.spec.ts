@@ -36,7 +36,7 @@ async function newKeeper(page: Page, name: string) {
   await page.getByRole("button", { name: "Begin with Emberfox" }).click();
   await expect(page.locator(".keeper-badge")).toContainText(name);
   await walkTo(page, "KeyW", "Warden Liora");
-  await page.keyboard.press("KeyE");
+  await page.locator(".interact").click();
   await page.getByRole("button", { name: "Accept companions & quest" }).click();
   await expect(page.locator(".companion-strip .portrait")).toHaveCount(6);
 }
@@ -48,7 +48,7 @@ test("first journey, battle, recruitment, formation, reload and settings", async
   await newKeeper(page, "Meadow Keeper");
   await page.screenshot({ path: "artifacts/world.png" });
   await walkTo(page, "KeyA", "Wild encounter");
-  await page.keyboard.press("KeyE");
+  await page.locator(".interact").click();
   await page.getByRole("tab", { name: "Services", exact: true }).click();
   await page.getByRole("button", { name: "Begin a wild encounter" }).click();
   await expect(page.getByRole("button", { name: "Auto OFF" })).toBeVisible();
