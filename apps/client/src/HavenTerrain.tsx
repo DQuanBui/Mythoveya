@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import * as T from "three";
+import { HavenNature } from "./HavenNature";
 import {
   HAVEN_PATHS,
   HAVEN_PLACES,
@@ -72,6 +73,7 @@ export function HavenTerrain() {
   // Trail discs overlap gently, making curved joins without blocking movement.
   return (
     <group name="haven-terrain">
+      <HavenNature />
       <mesh geometry={ground} receiveShadow>
         <meshStandardMaterial vertexColors roughness={1} />
       </mesh>

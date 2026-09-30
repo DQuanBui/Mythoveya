@@ -140,7 +140,13 @@ export function onBridge(x: number, z: number) {
   );
 }
 export function havenWalkable(x: number, z: number) {
-  return onIsland(x, z) && (!inPond(x, z, 0.35) || onBridge(x, z));
+  return (
+    onIsland(x, z) &&
+    (!inPond(x, z, 0.35) || onBridge(x, z)) &&
+    !HAVEN_TREES.some(
+      (t) => Math.hypot(x - t.x, z - t.z) < 0.3 * t.scale + 0.24,
+    )
+  );
 }
 export function segmentDistance(x: number, z: number, a: Point, b: Point) {
   const dx = b[0] - a[0],
@@ -178,3 +184,30 @@ export function seeded(seed: number) {
     return s / 4294967296;
   };
 }
+
+export type TreeSite = { x: number; z: number; scale: number; pine: boolean };
+export function forestSites(): TreeSite[] {
+  const random = seeded(8315),
+    sites: TreeSite[] = [];
+  for (let i = 0; i < 900; i++) {
+    const x = (random() - 0.5) * 90,
+      z = (random() - 0.5) * 90;
+    if (
+      !onIsland(x, z, 3) ||
+      Math.hypot(x, z) < 14 ||
+      inPond(x, z, 2) ||
+      pathDistance(x, z) < 2.7 ||
+      HAVEN_PLACES.some((p) => Math.hypot(x - p.point[0], z - p.point[1]) < 4.9)
+    )
+      continue;
+    if (sites.some((t) => Math.hypot(t.x - x, t.z - z) < 2.4)) continue;
+    sites.push({
+      x,
+      z,
+      scale: 0.85 + random() * 0.75,
+      pine: x < -18 && z < 12,
+    });
+  }
+  return sites;
+}
+export const HAVEN_TREES = forestSites();
