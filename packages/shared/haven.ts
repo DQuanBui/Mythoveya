@@ -233,3 +233,22 @@ export const HAVEN_LANDMARK_OBSTACLES = [
     [32, -1],
   ].map(([x, z]) => ({ x, z, radius: 0.75, kind: "bench" })),
 ];
+export const HAVEN_WILDLIFE = [
+  { species: "thornhare", point: [-24, 20] as Point, radius: 1.2 },
+  { species: "pebblit", point: [-20, 24] as Point, radius: 1 },
+  { species: "mossprig", point: [-27, -4] as Point, radius: 1.3 },
+  { species: "mossprig", point: [-31, -9] as Point, radius: 1 },
+  { species: "briarhart", point: [-26, -12] as Point, radius: 1.4 },
+  { species: "glimlet", point: [-16, -25] as Point, radius: 1.1 },
+  { species: "pebblit", point: [-12, -26] as Point, radius: 0.8 },
+  { species: "zippinch", point: [22, -28] as Point, radius: 1.1 },
+  { species: "voltwing", point: [16, -32] as Point, radius: 1 },
+  { species: "ripplefin", point: [21, -8] as Point, radius: 1.2, water: true },
+  { species: "bubbloom", point: [22, -1] as Point, radius: 0.8, water: true },
+  { species: "puddlepip", point: [29, 1] as Point, radius: 0.7 },
+  { species: "thornhare", point: [5, 25] as Point, radius: 1.1 },
+  { species: "cindermite", point: [11, 28] as Point, radius: 1.3 },
+  { species: "pebblit", point: [3, 22] as Point, radius: 1.1 },
+  { species: "zippinch", point: [3, 13] as Point, radius: 0.8 },
+  { species: "mossprig", point: [-13, 12] as Point, radius: 0.9 },
+];

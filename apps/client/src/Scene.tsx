@@ -6,6 +6,7 @@ import { byId, REGIONS } from "../../../packages/shared/content";
 import { NPCS, npcSignal } from "../../../packages/shared/town";
 import { TownScenery, dressCompanion } from "./TownScenery";
 import { HavenTerrain } from "./HavenTerrain";
+import { HavenWildlife } from "./HavenWildlife";
 import { havenWalkable } from "../../../packages/shared/haven";
 import type { Battle, Profile } from "../../../packages/shared/types";
 import {
@@ -714,6 +715,7 @@ export function WorldScene({
       dpr={[1, settings.quality === "High" ? 1.75 : 1.3]}
     >
       <Environment region={profile.region} />
+      {profile.region === "haven" && <HavenWildlife />}
       <TownScenery garden={profile.town?.garden ?? null} />
       <Explorer
         key={profile.region}

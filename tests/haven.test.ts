@@ -1,4 +1,6 @@
 import { describe, it, expect } from "vitest";
+import { HAVEN_WILDLIFE, HAVEN_TREES } from "../packages/shared/haven";
+import { byId } from "../packages/shared/content";
 import {
   HAVEN_PLACES,
   HAVEN_PATHS,
@@ -10,6 +12,14 @@ import {
   pathDistance,
 } from "../packages/shared/haven";
 describe("Havenreach exploration layout", () => {
+  it("uses existing species and keeps woodland off the walking routes", () => {
+    expect(HAVEN_WILDLIFE.length).toBeGreaterThan(12);
+    for (const resident of HAVEN_WILDLIFE)
+      expect(byId[resident.species]).toBeTruthy();
+    expect(HAVEN_TREES.length).toBeGreaterThan(100);
+    for (const tree of HAVEN_TREES)
+      expect(pathDistance(tree.x, tree.z)).toBeGreaterThan(2.7);
+  });
   it("keeps every destination and the full walking loop on safe ground", () => {
     for (const p of HAVEN_PLACES)
       expect(havenWalkable(...p.point), p.id).toBe(true);
