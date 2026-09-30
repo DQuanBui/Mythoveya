@@ -143,6 +143,9 @@ export function havenWalkable(x: number, z: number) {
   return (
     onIsland(x, z) &&
     (!inPond(x, z, 0.35) || onBridge(x, z)) &&
+    !HAVEN_LANDMARK_OBSTACLES.some(
+      (o) => Math.hypot(x - o.x, z - o.z) < o.radius,
+    ) &&
     !HAVEN_TREES.some(
       (t) => Math.hypot(x - t.x, z - t.z) < 0.3 * t.scale + 0.24,
     )
@@ -211,3 +214,22 @@ export function forestSites(): TreeSite[] {
   return sites;
 }
 export const HAVEN_TREES = forestSites();
+export const HAVEN_LANDMARK_OBSTACLES = [
+  ...[
+    [-18.7, -28],
+    [-11.3, -28],
+    [-16.8, -31.5],
+    [-13.2, -31.5],
+  ].map(([x, z]) => ({ x, z, radius: 0.65, kind: "stone" })),
+  ...[
+    [-27, 24],
+    [-25, 27],
+    [-18, 27],
+    [-17, 20],
+  ].map(([x, z]) => ({ x, z, radius: 0.55, kind: "fruit" })),
+  ...[
+    [18, -27.4],
+    [7, 29],
+    [32, -1],
+  ].map(([x, z]) => ({ x, z, radius: 0.75, kind: "bench" })),
+];

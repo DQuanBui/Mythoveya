@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import * as T from "three";
 import { HavenNature } from "./HavenNature";
 import { HavenWater } from "./HavenWater";
+import { HavenLandmarks } from "./HavenLandmarks";
 import {
   HAVEN_PATHS,
   HAVEN_PLACES,
@@ -76,6 +77,7 @@ export function HavenTerrain() {
     <group name="haven-terrain">
       <HavenNature />
       <HavenWater />
+      <HavenLandmarks />
       <mesh geometry={ground} receiveShadow>
         <meshStandardMaterial vertexColors roughness={1} />
       </mesh>

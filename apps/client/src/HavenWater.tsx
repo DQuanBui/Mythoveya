@@ -110,7 +110,7 @@ export function HavenWater() {
           </group>
         ))}
       </group>
-      <group name="cloudfall" position={[38, 0, 9]} rotation={[0, 0.2, 0]}>
+      <group name="cloudfall" position={[45.7, 0, 9.5]} rotation={[0, 0.2, 0]}>
         <mesh position={[0, -4, 0]}>
           <boxGeometry args={[2.8, 8, 0.2]} />
           <meshStandardMaterial
