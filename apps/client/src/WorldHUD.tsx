@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type MutableRefObject } from "react";
 import { byId, REGIONS } from "../../../packages/shared/content";
 import type { Profile } from "../../../packages/shared/types";
 import { INTERACTABLES } from "./Scene";
+import { mapPercent } from "../../../packages/shared/haven";
 import { Portrait } from "./portraits";
 import {
   WORLD_GUIDE,
@@ -144,8 +145,8 @@ export function WorldHUD({
                 key={o.id}
                 className={o.id === objective.target ? "map-objective" : ""}
                 style={{
-                  left: `${50 + o.p[0] * 2.5}%`,
-                  top: `${50 + o.p[2] * 2.5}%`,
+                  left: `${mapPercent(o.p[0], profile.region)}%`,
+                  top: `${mapPercent(o.p[2], profile.region)}%`,
                 }}
                 title={o.name}
                 aria-label={
@@ -160,8 +161,8 @@ export function WorldHUD({
           )}
           <b
             style={{
-              left: `${50 + position[0] * 2.5}%`,
-              top: `${50 + position[1] * 2.5}%`,
+              left: `${mapPercent(position[0], profile.region)}%`,
+              top: `${mapPercent(position[1], profile.region)}%`,
             }}
             title="Your position"
           >

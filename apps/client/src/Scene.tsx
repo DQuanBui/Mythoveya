@@ -5,6 +5,8 @@ import * as T from "three";
 import { byId, REGIONS } from "../../../packages/shared/content";
 import { NPCS, npcSignal } from "../../../packages/shared/town";
 import { TownScenery, dressCompanion } from "./TownScenery";
+import { HavenTerrain } from "./HavenTerrain";
+import { havenWalkable } from "../../../packages/shared/haven";
 import type { Battle, Profile } from "../../../packages/shared/types";
 import {
   animateAvatar,
@@ -220,6 +222,7 @@ function Environment({
   const r = REGIONS.find((r) => r.id === region) || REGIONS[0];
   const canyon = region === "canyon",
     snow = region === "hollow";
+  const expanded = region === "haven" && !title;
   const trees = useMemo(
     () =>
       Array.from({ length: settings.quality === "Low" ? 24 : 45 }, (_, i) => {
@@ -259,14 +262,20 @@ function Environment({
         shadow-camera-bottom={-22}
         shadow-bias={-0.001}
       />
-      <mesh receiveShadow position={[0, -0.3, 0]}>
-        <cylinderGeometry args={[18, 18.5, 0.6, 64]} />
-        <meshStandardMaterial color={r.ground} roughness={1} />
-      </mesh>
-      <mesh position={[0, -3.6, 0]} rotation={[Math.PI, 0, 0]}>
-        <coneGeometry args={[18.4, 7, 11]} />
-        <meshStandardMaterial color="#526964" flatShading />
-      </mesh>
+      {expanded ? (
+        <HavenTerrain />
+      ) : (
+        <>
+          <mesh receiveShadow position={[0, -0.3, 0]}>
+            <cylinderGeometry args={[18, 18.5, 0.6, 64]} />
+            <meshStandardMaterial color={r.ground} roughness={1} />
+          </mesh>
+          <mesh position={[0, -3.6, 0]} rotation={[Math.PI, 0, 0]}>
+            <coneGeometry args={[18.4, 7, 11]} />
+            <meshStandardMaterial color="#526964" flatShading />
+          </mesh>
+        </>
+      )}
       <mesh
         receiveShadow
         rotation={[-Math.PI / 2, 0, 0]}
@@ -290,7 +299,7 @@ function Environment({
         </mesh>
       ))}
       {trees
-        .filter((t) => t.pos[2] < 2 || t.pos[0] < -13)
+        .filter((t) => !expanded && (t.pos[2] < 2 || t.pos[0] < -13))
         .map(({ pos, s }, i) =>
           canyon ? (
             <Crystal
@@ -331,10 +340,12 @@ function Environment({
           </mesh>
         </group>
       ))}
-      <Island position={[-23, 8, -35]} scale={1.4} />
-      <Island position={[24, 6, -30]} scale={0.9} />
-      <Island position={[4, 14, -62]} scale={1.8} />
-      <Island position={[-38, 2, -10]} scale={0.6} />
+      <group position={expanded ? [0, -4, -48] : [0, 0, 0]}>
+        <Island position={[-23, 8, -35]} scale={1.4} />
+        <Island position={[24, 6, -30]} scale={0.9} />
+        <Island position={[4, 14, -62]} scale={1.8} />
+        <Island position={[-38, 2, -10]} scale={0.6} />
+      </group>
       <mesh position={[-23, 26, -60]}>
         <sphereGeometry args={[5, 32, 24]} />
         <meshBasicMaterial color="#f6e6bb" />
@@ -550,7 +561,9 @@ function Explorer({
         .multiplyScalar(dt * 4);
       const next = player.current.clone().add(v);
       if (
-        next.length() < 16.5 &&
+        (profile.region === "haven"
+          ? havenWalkable(next.x, next.z)
+          : next.length() < 16.5) &&
         !blocksLandmark(profile.region, next.x, next.z) &&
         !((next.x - 11) ** 2 + (next.z - 4.4) ** 2 < 1.4) &&
         !((next.x - 7) ** 2 + (next.z + 3) ** 2 < 3.2) &&
