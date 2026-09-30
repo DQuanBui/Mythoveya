@@ -112,4 +112,10 @@ export function currentObjective(p: Profile): Objective {
   };
 }
 
-export type ExplorationInput = { x: number; z: number };
+export type ExplorationInput = {
+  x: number;
+  z: number;
+  sprint?: boolean;
+  resetCamera?: number;
+  returnHome?: number;
+};

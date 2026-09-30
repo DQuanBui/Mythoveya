@@ -265,3 +265,15 @@ export const RESOURCE_NODES = [
 ];
 export const resourcesForRegion = (region: string) =>
   RESOURCE_NODES.filter((n) => !n.haven || region === "haven");
+export function slideStep(
+  x: number,
+  z: number,
+  dx: number,
+  dz: number,
+  allowed: (x: number, z: number) => boolean,
+): Point {
+  if (allowed(x + dx, z + dz)) return [x + dx, z + dz];
+  if (allowed(x + dx, z)) x += dx;
+  if (allowed(x, z + dz)) z += dz;
+  return [x, z];
+}

@@ -12,6 +12,8 @@ import {
   HAVEN_PLACES,
   RESOURCE_NODES,
   resourcesForRegion,
+  HAVEN,
+  slideStep,
 } from "../../../packages/shared/haven";
 import type { Battle, Profile } from "../../../packages/shared/types";
 import {
@@ -500,6 +502,7 @@ function Explorer({
   onPosition,
   pet,
   input,
+  spawn,
 }: {
   profile: Profile;
   blocked: boolean;
@@ -508,6 +511,7 @@ function Explorer({
   onPosition: (x: number, z: number) => void;
   pet: boolean;
   input: MutableRefObject<ExplorationInput>;
+  spawn: number[];
 }) {
   const avatar = useMemo(() => createAvatar(profile.avatar), [profile.avatar]);
   const leader = profile.owned.find((o) => o.id === profile.team[0]);
@@ -519,15 +523,32 @@ function Explorer({
       ),
     [leader?.species, leader?.accessory],
   );
-  const player = useRef(new T.Vector3(0, 0, 5));
+  const player = useRef(new T.Vector3(spawn[0], 0, spawn[1]));
   const keys = useRef(new Set<string>());
   const { camera } = useThree();
   const controls = useRef<any>(null);
-  const initialTarget = useMemo(() => new T.Vector3(0, 1, 5), []);
+  const initialTarget = useMemo(() => new T.Vector3(spawn[0], 1, spawn[1]), []);
   const near = useRef("");
   const last = useRef(0);
   const foot = useRef(0);
-  const follow = useRef(new T.Vector3(-1, 0, 6.5));
+  const follow = useRef(new T.Vector3(spawn[0] - 1, 0, spawn[1] + 1.5));
+  const resetSeen = useRef(input.current.resetCamera || 0),
+    homeSeen = useRef(input.current.returnHome || 0);
+  const recenter = () => {
+    camera.position.set(player.current.x + 10, 10, player.current.z + 11);
+    if (controls.current) {
+      controls.current.target.set(player.current.x, 1, player.current.z);
+      controls.current.update();
+    }
+  };
+  const allowed = (x: number, z: number) =>
+    (profile.region === "haven"
+      ? havenWalkable(x, z)
+      : Math.hypot(x, z) < 16.5) &&
+    !blocksLandmark(profile.region, x, z) &&
+    !((x - 11) ** 2 + (z - 4.4) ** 2 < 1.4) &&
+    !((x - 7) ** 2 + (z + 3) ** 2 < 3.2) &&
+    !((x + 6) ** 2 + (z + 3) ** 2 < 0.8);
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (
@@ -536,6 +557,7 @@ function Explorer({
       )
         return;
       keys.current.add(e.code);
+      if (e.code === "KeyR" && !blocked) recenter();
       if (e.code === "KeyE" && !blocked && near.current)
         onInteract(near.current);
     };
@@ -558,6 +580,17 @@ function Explorer({
       foot.current = 0;
     }
     const k = keys.current;
+    if ((input.current.resetCamera || 0) !== resetSeen.current) {
+      resetSeen.current = input.current.resetCamera || 0;
+      recenter();
+    }
+    if ((input.current.returnHome || 0) !== homeSeen.current) {
+      homeSeen.current = input.current.returnHome || 0;
+      player.current.set(0, 0, 5);
+      follow.current.set(-1, 0, 6.5);
+      recenter();
+      last.current = -1;
+    }
     let x = blocked
       ? 0
       : input.current.x +
@@ -569,6 +602,9 @@ function Explorer({
         Number(k.has("KeyS") || k.has("ArrowDown")) -
         Number(k.has("KeyW") || k.has("ArrowUp"));
     const moving = !!(x || z);
+    const sprinting =
+      !blocked &&
+      (input.current.sprint || k.has("ShiftLeft") || k.has("ShiftRight"));
     if (moving) {
       const yaw = Math.atan2(
         camera.position.x - player.current.x,
@@ -577,20 +613,21 @@ function Explorer({
       const v = new T.Vector3(x, 0, z)
         .normalize()
         .applyAxisAngle(new T.Vector3(0, 1, 0), yaw)
-        .multiplyScalar(dt * 4);
-      const next = player.current.clone().add(v);
-      if (
-        (profile.region === "haven"
-          ? havenWalkable(next.x, next.z)
-          : next.length() < 16.5) &&
-        !blocksLandmark(profile.region, next.x, next.z) &&
-        !((next.x - 11) ** 2 + (next.z - 4.4) ** 2 < 1.4) &&
-        !((next.x - 7) ** 2 + (next.z + 3) ** 2 < 3.2) &&
-        !((next.x + 6) ** 2 + (next.z + 3) ** 2 < 0.8)
-      ) {
-        player.current.copy(next);
-        camera.position.add(v);
-      }
+        .multiplyScalar(
+          dt *
+            (sprinting ? HAVEN.sprintSpeed : HAVEN.walkSpeed) *
+            Math.min(1, Math.hypot(x, z)),
+        );
+      const [nx, nz] = slideStep(
+        player.current.x,
+        player.current.z,
+        v.x,
+        v.z,
+        allowed,
+      );
+      camera.position.x += nx - player.current.x;
+      camera.position.z += nz - player.current.z;
+      player.current.set(nx, 0, nz);
       avatar.rotation.y = Math.atan2(v.x, v.z);
       if (clock.elapsedTime - foot.current > 0.32) {
         audio.cue(
@@ -608,8 +645,20 @@ function Explorer({
     animateAvatar(avatar, clock.elapsedTime, moving, pet, settings.reduced);
     const delta = player.current.clone().sub(follow.current);
     const following = delta.length() > 1.6;
-    if (following)
-      follow.current.add(delta.normalize().multiplyScalar(dt * 3.8));
+    if (following) {
+      if (delta.length() > 6) follow.current.copy(player.current);
+      else {
+        delta.normalize().multiplyScalar(dt * (sprinting ? 7.4 : 5));
+        const [fx, fz] = slideStep(
+          follow.current.x,
+          follow.current.z,
+          delta.x,
+          delta.z,
+          allowed,
+        );
+        follow.current.set(fx, 0, fz);
+      }
+    }
     companion.position.copy(follow.current);
     companion.rotation.y = Math.atan2(
       player.current.x - follow.current.x,
@@ -726,10 +775,14 @@ export function WorldScene({
   objective: Objective;
   input: MutableRefObject<ExplorationInput>;
 }) {
+  const initialPosition = useMemo(() => position, [profile.region]);
   return (
     <Canvas
       shadows
-      camera={{ position: [10, 10, 16], fov: 45 }}
+      camera={{
+        position: [initialPosition[0] + 10, 10, initialPosition[1] + 11],
+        fov: 45,
+      }}
       frameloop={blocked ? "demand" : "always"}
       dpr={[1, settings.quality === "High" ? 1.75 : 1.3]}
     >
@@ -738,6 +791,7 @@ export function WorldScene({
       <TownScenery garden={profile.town?.garden ?? null} />
       <Explorer
         key={profile.region}
+        spawn={initialPosition}
         {...{ profile, blocked, onNear, onInteract, onPosition, pet, input }}
       />
       {NPCS.map((n) => (

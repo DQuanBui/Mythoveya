@@ -210,7 +210,8 @@ export function WorldHUD({
           </button>
         )}
         <div className="controls-hint">
-          WASD / arrows · Move <span>Drag · Look</span> Scroll · Zoom{" "}
+          WASD · Move <span>Shift · Sprint</span>
+          <span>R · Camera</span> Drag · Look · Scroll · Zoom{" "}
           <span>Esc · Pause</span>
         </div>
       </div>
@@ -271,7 +272,7 @@ function TouchPad({
   const active = useRef<number | null>(null);
   const reset = () => {
     active.current = null;
-    input.current = { x: 0, z: 0 };
+    input.current = { ...input.current, x: 0, z: 0, sprint: false };
     setStick({ x: 0, z: 0 });
   };
   useEffect(() => {
@@ -281,7 +282,7 @@ function TouchPad({
     window.addEventListener("blur", reset);
     return () => {
       window.removeEventListener("blur", reset);
-      input.current = { x: 0, z: 0 };
+      input.current = { ...input.current, x: 0, z: 0, sprint: false };
     };
   }, []);
   return (
@@ -300,7 +301,12 @@ function TouchPad({
           const x = (e.clientX - box.x - box.width / 2) / 38,
             z = (e.clientY - box.y - box.height / 2) / 38;
           const length = Math.max(1, Math.hypot(x, z));
-          input.current = { x: x / length, z: z / length };
+          input.current = {
+            ...input.current,
+            x: x / length,
+            z: z / length,
+            sprint: Math.hypot(x, z) > 0.92,
+          };
           setStick(input.current);
         }}
         onPointerUp={reset}
@@ -316,7 +322,7 @@ function TouchPad({
           ✥
         </span>
       </button>
-      <small>DRAG TO WALK</small>
+      <small>DRAG / RUN</small>
     </div>
   );
 }

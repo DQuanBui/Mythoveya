@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import { slideStep } from "../packages/shared/haven";
 import {
   HAVEN_WILDLIFE,
   HAVEN_TREES,
@@ -16,6 +17,14 @@ import {
   pathDistance,
 } from "../packages/shared/haven";
 describe("Havenreach exploration layout", () => {
+  it("slides along obstacles without crossing water or blocked walls", () => {
+    expect(slideStep(0.8, 0, 0.4, 0.2, (x) => x < 1)).toEqual([0.8, 0.2]);
+    let p: [number, number] = [21, -5];
+    for (let i = 0; i < 30; i++)
+      p = slideStep(p[0], p[1], 0, 0.2, havenWalkable);
+    expect(p[1]).toBeLessThan(-3.7);
+    expect(havenWalkable(...p)).toBe(true);
+  });
   it("places nine gathering nodes on reachable ground without changing other regions", () => {
     expect(resourcesForRegion("haven")).toHaveLength(9);
     expect(resourcesForRegion("meadow")).toHaveLength(3);

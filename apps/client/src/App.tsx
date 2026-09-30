@@ -113,7 +113,10 @@ export default function App() {
     try {
       const result = await mutate(kind, data);
       setProfile(result.profile);
-      if (kind === "travel") setTrail(null);
+      if (kind === "travel") {
+        setTrail(null);
+        setPosition([0, 5]);
+      }
       audio.cue("confirm");
       if (kind === "resource") notify("Gathered +1 Sunseed · +25 Gold");
       if (
@@ -661,6 +664,27 @@ export default function App() {
                   <button onClick={() => setPanel("town")}>
                     People of the reaches
                   </button>
+                  <button
+                    onClick={() => {
+                      input.current.resetCamera =
+                        (input.current.resetCamera || 0) + 1;
+                      setPanel("");
+                    }}
+                  >
+                    Reset exploration camera
+                  </button>
+                  {profile?.region === "haven" && (
+                    <button
+                      onClick={() => {
+                        input.current.returnHome =
+                          (input.current.returnHome || 0) + 1;
+                        setTrail(null);
+                        setPanel("");
+                      }}
+                    >
+                      Return to Havenreach village
+                    </button>
+                  )}
                   {import.meta.env.DEV && (
                     <button onClick={() => setPanel("gallery")}>
                       Asset gallery
