@@ -6,6 +6,25 @@ export type Owned = {
   shards: number;
   upgrade: number;
   locked: boolean;
+  nickname?: string;
+  friendship?: number;
+  accessory?: "ribbon" | "bell";
+};
+export type TownState = {
+  trackedNpc?: string;
+  inventory: Record<string, number>;
+  met: string[];
+  claims: string[];
+  helpers: string[];
+  helperDays: Record<string, string>;
+  stock: { date: string; bought: Record<string, number> };
+  garden: { plantedAt: number; readyAt: number } | null;
+  stats: Record<string, number>;
+  visited: string[];
+  sparWon?: string;
+  sparClaimed?: string;
+  guardianWeek?: string;
+  guardianClaimed?: string;
 };
 export type Profile = {
   id: string;
@@ -37,6 +56,7 @@ export type Profile = {
   resources: string[];
   bond?: { species: string; chance: number; used: boolean };
   bosses: string[];
+  town?: TownState;
 };
 export type Status = {
   kind: string;

@@ -14,6 +14,8 @@ import {
 } from "../../packages/shared/combat";
 import type { Battle, Owned, Profile } from "../../packages/shared/types";
 import { atomic, db, getProfile, save } from "./store";
+import { ensureTown, utcDay, utcWeek } from "../../packages/shared/town";
+import { townMutation } from "./town-game";
 export const pve = new Map<string, Battle>();
 export const activeHuman = new Set<string>();
 export const battleMeta = new Map<string, { region: string; boss: boolean }>();
@@ -23,6 +25,8 @@ export function team(p: Profile) {
   return p.team.map((id) => structuredClone(p.owned.find((o) => o.id === id)!));
 }
 export function mutate(p: Profile, kind: string, v: any) {
+  const town = ensureTown(p);
+  if (kind.startsWith("town-")) return townMutation(p, kind, v);
   switch (kind) {
     case "starter":
       if (p.owned.length) throw Error("You already chose a starter.");
@@ -81,6 +85,7 @@ export function mutate(p: Profile, kind: string, v: any) {
         p.daily.resources++;
         p.gold += 25;
         p.quests.resources = (p.quests.resources || 0) + 1;
+        town.inventory.sunseed = (town.inventory.sunseed || 0) + 1;
       }
       break;
     case "train": {
@@ -91,6 +96,7 @@ export function mutate(p: Profile, kind: string, v: any) {
       o.xp += 60;
       gainXp(p, 10);
       p.daily.train++;
+      town.stats.trained = (town.stats.trained || 0) + 1;
       break;
     }
     case "upgrade": {
@@ -116,6 +122,7 @@ export function mutate(p: Profile, kind: string, v: any) {
       if (!r || p.wins < r.unlock)
         throw Error("Win more encounters to unlock this region.");
       p.region = r.id;
+      if (!town.visited.includes(r.id)) town.visited.push(r.id);
       break;
     }
     case "daily":
@@ -224,6 +231,10 @@ export function finishPve(profileId: string, b: Battle) {
       species: p.owned.map((o) => o.species),
     };
     const meta = battleMeta.get(b.id);
+    const town = ensureTown(p);
+    if (meta?.region === "practice" && b.winner === 0) town.sparWon = utcDay();
+    if (meta?.boss && meta.region !== "practice" && b.winner === 0)
+      town.guardianWeek = utcWeek();
     if (meta?.region !== "practice" && b.winner === 0) {
       p.wins++;
       p.daily.wins++;

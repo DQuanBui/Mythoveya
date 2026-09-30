@@ -4,6 +4,7 @@ import { dirname } from "node:path";
 import { randomBytes, randomUUID, createHash } from "node:crypto";
 import type { Profile } from "../../packages/shared/types";
 import { day, resetDaily } from "../../packages/shared/economy";
+import { ensureTown } from "../../packages/shared/town";
 const path = process.env.DB_PATH || "data/mythoveya.sqlite";
 mkdirSync(dirname(path), { recursive: true });
 export const db = new DatabaseSync(path);
@@ -55,6 +56,7 @@ export function authenticate(token: string) {
     );
   const p = JSON.parse(row.data) as Profile;
   resetDaily(p);
+  ensureTown(p);
   return p;
 }
 export function getProfile(id: string) {
@@ -64,6 +66,7 @@ export function getProfile(id: string) {
   if (!row) throw Error("Profile not found");
   const p = JSON.parse(row.data) as Profile;
   resetDaily(p);
+  ensureTown(p);
   return p;
 }
 export function save(p: Profile) {
