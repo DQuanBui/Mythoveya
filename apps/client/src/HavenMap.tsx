@@ -1,6 +1,8 @@
 import { useState } from "react";
 import {
   HAVEN_PLACES,
+  HAVEN_HOUSES,
+  houseDoor,
   HAVEN_PATHS,
   HAVEN_TREES,
   HAVEN_POND,
@@ -8,6 +10,16 @@ import {
   placeAt,
 } from "../../../packages/shared/haven";
 import { Portrait } from "./portraits";
+const destinations = [
+  ...HAVEN_PLACES,
+  ...HAVEN_HOUSES.map((h) => ({
+    ...h,
+    id: `porch-${h.id}`,
+    short: h.name,
+    point: houseDoor(h),
+    species: [] as string[],
+  })),
+];
 export function HavenMap({
   position,
   trail,
@@ -22,7 +34,7 @@ export function HavenMap({
   const [selected, setSelected] = useState(
     trail || placeAt(position[0], position[1]).id,
   );
-  const place = HAVEN_PLACES.find((p) => p.id === selected) || HAVEN_PLACES[0];
+  const place = destinations.find((p) => p.id === selected) || HAVEN_PLACES[0];
   const coast = Array.from({ length: 96 }, (_, i) => {
     const a = (i / 96) * Math.PI * 2;
     return `${Math.cos(a) * edgeRadius(a)},${Math.sin(a) * edgeRadius(a)}`;
@@ -75,7 +87,7 @@ export function HavenMap({
               fill="#88bec4"
             />
             <path d="M12 -5 H30" stroke="#ba9872" strokeWidth="1.5" />
-            {HAVEN_PLACES.map((p) => (
+            {destinations.map((p) => (
               <g
                 key={p.id}
                 role="button"
@@ -99,7 +111,7 @@ export function HavenMap({
                   strokeWidth=".5"
                 />
                 <text x={p.point[0]} y={p.point[1] - 4.4} textAnchor="middle">
-                  {p.short}
+                  {p.id.startsWith("porch-") ? "House" : p.short}
                 </text>
               </g>
             ))}
@@ -135,7 +147,11 @@ export function HavenMap({
               <Portrait key={id} id={id} />
             ))}
           </div>
-          <p className="muted">Wildbound you may see here</p>
+          <p className="muted">
+            {place.species.length
+              ? "Wildbound you may see here"
+              : "A porch to visit and a stamp for your visitor book"}
+          </p>
           <button className="primary" onClick={() => choose(place.id)}>
             Set walking waypoint →
           </button>
@@ -143,7 +159,7 @@ export function HavenMap({
             <button onClick={() => choose(null)}>Clear walking waypoint</button>
           )}
           <div className="haven-destinations">
-            {HAVEN_PLACES.map((p) => (
+            {destinations.map((p) => (
               <button
                 key={p.id}
                 className={selected === p.id ? "selected" : ""}

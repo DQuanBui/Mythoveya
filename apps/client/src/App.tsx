@@ -14,7 +14,8 @@ import { WorldHUD } from "./WorldHUD";
 import { NPCS } from "../../../packages/shared/town";
 import { NpcPanel, TownDirectory } from "./TownPanels";
 import { HavenMap } from "./HavenMap";
-import { HAVEN_PLACES } from "../../../packages/shared/haven";
+import { HouseVisit } from "./HavenHouses";
+import { HAVEN_PLACES, HAVEN_HOUSES } from "../../../packages/shared/haven";
 import { currentObjective, type ExplorationInput } from "./world-guide";
 import {
   Appearance,
@@ -264,7 +265,8 @@ export default function App() {
   }
   const destination =
     profile?.region === "haven"
-      ? HAVEN_PLACES.find((p) => p.id === trail)
+      ? HAVEN_PLACES.find((p) => p.id === trail) ||
+        HAVEN_HOUSES.find((h) => `porch-${h.id}` === trail)
       : undefined;
   const objective = profile
     ? {
@@ -273,7 +275,9 @@ export default function App() {
           ? {
               title: destination.name,
               text: destination.description,
-              target: `trail-${destination.id}`,
+              target: trail?.startsWith("porch-")
+                ? trail
+                : `trail-${destination.id}`,
               action: "map",
               button: "View walking route",
             }
@@ -511,6 +515,9 @@ export default function App() {
               ×
             </button>
             {panel === "settings" && <SettingsPanel />}
+            {panel.startsWith("porch-") && profile && (
+              <HouseVisit id={panel.slice(6)} profile={profile} run={run} />
+            )}
             {panel.startsWith("observe-") && byId[panel.slice(8)] && (
               <div className="wildlife-note">
                 <p className="eyebrow">A MOMENT IN THE WILD</p>

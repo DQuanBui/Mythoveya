@@ -1,4 +1,5 @@
 import { WorldInteraction } from "./WorldInteraction";
+import { HavenHouses } from "./HavenHouses";
 import { useMemo, useRef, useEffect, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Stars } from "@react-three/drei";
@@ -11,6 +12,8 @@ import { HavenWildlife } from "./HavenWildlife";
 import {
   havenWalkable,
   HAVEN_PLACES,
+  HAVEN_HOUSES,
+  houseDoor,
   RESOURCE_NODES,
   resourcesForRegion,
   HAVEN,
@@ -421,6 +424,12 @@ function Environment({
   );
 }
 export const INTERACTABLES = [
+  ...HAVEN_HOUSES.map((h) => ({
+    id: `porch-${h.id}`,
+    name: h.name,
+    hint: "Visit the porch & visitor book",
+    p: [houseDoor(h)[0], 0, houseDoor(h)[1]],
+  })),
   ...HAVEN_PLACES.map((p) => ({
     id: `trail-${p.id}`,
     name: p.name,
@@ -491,7 +500,8 @@ export const INTERACTABLES = [
 export const getInteractables = (region: string) =>
   INTERACTABLES.filter(
     (o) =>
-      (region === "haven" || !o.id.startsWith("trail-")) &&
+      (region === "haven" ||
+        (!o.id.startsWith("trail-") && !o.id.startsWith("porch-"))) &&
       (!o.id.startsWith("resource-") ||
         resourcesForRegion(region).some((n) => n.id === o.id)),
   );
@@ -792,6 +802,9 @@ export function WorldScene({
       dpr={[1, settings.quality === "High" ? 1.75 : 1.3]}
     >
       <Environment region={profile.region} />
+      {profile.region === "haven" && (
+        <HavenHouses onInteract={onInteract} disabled={blocked} />
+      )}
       {profile.region === "haven" && (
         <HavenWildlife onInteract={onInteract} disabled={blocked} />
       )}

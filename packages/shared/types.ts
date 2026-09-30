@@ -11,6 +11,7 @@ export type Owned = {
   accessory?: "ribbon" | "bell";
 };
 export type TownState = {
+  stamps?: string[];
   trackedNpc?: string;
   inventory: Record<string, number>;
   met: string[];

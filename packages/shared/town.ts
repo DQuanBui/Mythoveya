@@ -539,6 +539,7 @@ export function utcWeek(now = Date.now()) {
 }
 export function defaultTown(region = "haven", now = Date.now()): TownState {
   return {
+    stamps: [],
     inventory: { sunseed: 2, treat: 0, ribbon: 0, bell: 0 },
     met: [],
     claims: [],
@@ -553,6 +554,7 @@ export function defaultTown(region = "haven", now = Date.now()): TownState {
 export const townOf = (p: Profile) => p.town || defaultTown(p.region);
 export function ensureTown(p: Profile, now = Date.now()) {
   p.town ||= defaultTown(p.region, now);
+  p.town.stamps ||= [];
   p.version = Math.max(p.version, 2);
   if (p.town.stock.date !== utcDay(now))
     p.town.stock = { date: utcDay(now), bought: {} };

@@ -61,6 +61,7 @@ const mutation = z.object({
     "daily",
     "bond",
     "town-talk",
+    "town-visit",
     "town-claim",
     "town-helper",
     "town-buy",

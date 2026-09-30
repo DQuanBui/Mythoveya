@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { slideStep } from "../packages/shared/haven";
+import { slideStep, HAVEN_HOUSES, houseDoor } from "../packages/shared/haven";
 import {
   HAVEN_WILDLIFE,
   HAVEN_TREES,
@@ -17,6 +17,13 @@ import {
   pathDistance,
 } from "../packages/shared/haven";
 describe("Havenreach exploration layout", () => {
+  it("keeps all six porches reachable while blocking house walls", () => {
+    for (const h of HAVEN_HOUSES) {
+      expect(havenWalkable(...h.point), h.id).toBe(false);
+      expect(havenWalkable(...houseDoor(h)), h.id).toBe(true);
+      expect(pathDistance(...houseDoor(h)), h.id).toBeLessThan(0.01);
+    }
+  });
   it("slides along obstacles without crossing water or blocked walls", () => {
     expect(slideStep(0.8, 0, 0.4, 0.2, (x) => x < 1)).toEqual([0.8, 0.2]);
     let p: [number, number] = [21, -5];

@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { townMutation } from "../apps/server/town-game";
+import { HAVEN_HOUSES } from "../packages/shared/haven";
 import {
   NPCS,
   ensureTown,
@@ -39,6 +40,38 @@ function keeper() {
 }
 
 describe("village progress and durable services", () => {
+  it("keeps visitor stamps across reloads and grants the complete-book reward only once", () => {
+    const token = keeper(),
+      before = authenticate(token);
+    delete before.town!.stamps;
+    save(before);
+    const requestId = crypto.randomUUID();
+    op(token, "town-visit", { id: HAVEN_HOUSES[0].id }, Date.now(), requestId);
+    op(token, "town-visit", { id: HAVEN_HOUSES[0].id }, Date.now(), requestId);
+    expect(authenticate(token).town?.stamps).toHaveLength(1);
+    expect(() => op(token, "town-visit", { id: HAVEN_HOUSES[0].id })).toThrow(
+      "already collected",
+    );
+    expect(() => op(token, "town-visit", { id: "fake" })).toThrow(
+      "Visit a house",
+    );
+    for (const h of HAVEN_HOUSES.slice(1))
+      op(token, "town-visit", { id: h.id });
+    const after = authenticate(token);
+    expect(after.town?.stamps).toHaveLength(6);
+    expect(after.gold).toBe(before.gold + 90);
+    expect(after.diamonds).toBe(before.diamonds + 50);
+    expect(after.owned).toEqual(before.owned.map(o => ({ ...o, xp: o.xp + 60 })));
+    expect(after.town?.visited).toEqual(before.town?.visited);
+    expect(() => op(token, "town-visit", { id: HAVEN_HOUSES[5].id })).toThrow(
+      "already collected",
+    );
+    after.region = "meadow";
+    save(after);
+    expect(() => op(token, "town-visit", { id: HAVEN_HOUSES[0].id })).toThrow(
+      "Visit a house",
+    );
+  });
   it("preserves original gathering IDs and gates outer nodes to Havenreach", () => {
     const token = keeper();
     operation(token, crypto.randomUUID(), (p) =>

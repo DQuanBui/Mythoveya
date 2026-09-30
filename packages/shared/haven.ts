@@ -1,5 +1,65 @@
 // All starting-island routes, habitats, and navigation coordinates share this map.
 export type Point = [number, number];
+export const HAVEN_HOUSES = [
+  {
+    id: "bakery",
+    name: "Hearthcrumb Bakery",
+    point: [-10, -11] as Point,
+    roof: "#bc7e63",
+    wall: "#e4ccb0",
+    description:
+      "A warm oven, a flour-dusted doorstep, and a basket left for travelers. The baker presses a little wheat stamp into your visitor book.",
+  },
+  {
+    id: "workshop",
+    name: "Maplewick Workshop",
+    point: [-14, 5] as Point,
+    roof: "#688d8a",
+    wall: "#cfc6a5",
+    description:
+      "Wooden toys and repaired trail lanterns line the porch. A carved leaf marks the workshop's page in your book.",
+  },
+  {
+    id: "glasshouse",
+    name: "Sunpetal Glasshouse",
+    point: [13, 15] as Point,
+    roof: "#91bec0",
+    wall: "#d7d3ad",
+    description:
+      "Young plants shelter behind sea-green glass. Wren leaves growing notes here, beside a stamp shaped like a tiny seedling.",
+  },
+  {
+    id: "orchard-home",
+    name: "Applebright Cottage",
+    point: [-28, 27] as Point,
+    roof: "#a97569",
+    wall: "#e7d0ae",
+    description:
+      "Ribbons flutter beside jars of orchard preserves. A small apple stamp remembers your walk through the golden fruit trees.",
+  },
+  {
+    id: "ranger-lodge",
+    name: "Cloudwatch Lodge",
+    point: [29, -23] as Point,
+    roof: "#627f86",
+    wall: "#bea782",
+    description:
+      "The rangers keep spare blankets and weather journals on this sheltered porch. Their feather stamp belongs to anyone who takes the long path.",
+  },
+  {
+    id: "grove-refuge",
+    name: "Oldleaf Refuge",
+    point: [-34, -14] as Point,
+    roof: "#789076",
+    wall: "#c9ba98",
+    description:
+      "A quiet woodland shelter with mossy pots and a kettle by the door. Its acorn stamp celebrates the patient explorer.",
+  },
+] as const;
+export const houseDoor = (h: (typeof HAVEN_HOUSES)[number]): Point => [
+  h.point[0],
+  h.point[1] + 2.5,
+];
 export const HAVEN = {
   extent: 50,
   spawn: [0, 5] as Point,
@@ -118,6 +178,35 @@ export const HAVEN_PATHS: Point[][] = [
     [-18, 2],
     [-29, -6],
   ],
+  [
+    [0, -10],
+    [-5, -7],
+    [-10, -8.5],
+  ],
+  [
+    [-18, 2],
+    [-18, 8],
+    [-14, 7.5],
+  ],
+  [
+    [14, 11],
+    [17, 13],
+    [17, 18],
+    [13, 17.5],
+  ],
+  [
+    [-22, 22],
+    [-22, 30],
+    [-28, 29.5],
+  ],
+  [
+    [29, -17],
+    [29, -20.5],
+  ],
+  [
+    [-29, -6],
+    [-34, -11.5],
+  ],
 ];
 export const HAVEN_POND = { x: 21, z: -5, rx: 8, rz: 6, bridgeHalfWidth: 1.25 };
 export function edgeRadius(angle: number) {
@@ -143,6 +232,9 @@ export function havenWalkable(x: number, z: number) {
   return (
     onIsland(x, z) &&
     (!inPond(x, z, 0.35) || onBridge(x, z)) &&
+    !HAVEN_HOUSES.some(
+      (h) => Math.abs(x - h.point[0]) < 1.9 && Math.abs(z - h.point[1]) < 1.8,
+    ) &&
     !HAVEN_LANDMARK_OBSTACLES.some(
       (o) => Math.hypot(x - o.x, z - o.z) < o.radius,
     ) &&
@@ -199,6 +291,10 @@ export function forestSites(): TreeSite[] {
       !onIsland(x, z, 3) ||
       Math.hypot(x, z) < 14 ||
       inPond(x, z, 2) ||
+      (z < -28 && x > 10 && x < 29) ||
+      HAVEN_HOUSES.some(
+        (h) => Math.hypot(x - h.point[0], z - h.point[1]) < 5,
+      ) ||
       pathDistance(x, z) < 2.7 ||
       HAVEN_PLACES.some((p) => Math.hypot(x - p.point[0], z - p.point[1]) < 4.9)
     )

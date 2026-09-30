@@ -125,3 +125,97 @@
     font-size: 10px;
   }
 }
+.house-visit {
+  max-width: 640px;
+  margin: auto;
+}
+.house-visit > p {
+  line-height: 1.7;
+}
+.house-illustration {
+  position: relative;
+  height: 135px;
+  margin: 10px auto 28px;
+  width: 190px;
+}
+.house-illustration i {
+  position: absolute;
+  width: 120px;
+  height: 85px;
+  background: var(--wall);
+  bottom: 0;
+  left: 35px;
+  border-radius: 3px;
+}
+.house-illustration b {
+  position: absolute;
+  width: 110px;
+  height: 110px;
+  background: var(--roof);
+  transform: rotate(45deg);
+  left: 40px;
+  top: 5px;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+.house-illustration span {
+  position: absolute;
+  bottom: 0;
+  left: 75px;
+  background: #546d64;
+  width: 40px;
+  height: 57px;
+  border-radius: 20px 20px 0 0;
+  text-align: center;
+  padding-top: 12px;
+  color: #ead59e;
+}
+.visitor-stamps {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 16px 0;
+}
+.visitor-stamps > div {
+  border: 1px dashed #83958b;
+  padding: 14px;
+  font-size: 13px;
+  opacity: 0.65;
+  border-radius: 8px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.visitor-stamps .stamped {
+  border-style: solid;
+  color: #efd7a4;
+  opacity: 1;
+  background: #405d52;
+}
+.visitor-stamps span {
+  font-size: 24px;
+}
+.wildlife-note .portrait {
+  width: 150px;
+  height: 150px;
+}
+.world-hud .interact kbd {
+  min-width: 44px;
+  width: auto;
+  padding: 7px;
+  font-size: 11px;
+}
+button.world-label {
+  pointer-events: auto;
+  border: 0;
+  cursor: pointer;
+  white-space: nowrap;
+}
+button.world-label:hover {
+  color: #fff3cd;
+  background: #355b54;
+}
+@media (max-width: 480px) {
+  .visitor-stamps {
+    grid-template-columns: 1fr;
+  }
+}

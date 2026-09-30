@@ -1,4 +1,5 @@
 import type { Profile } from "../../packages/shared/types";
+import { HAVEN_HOUSES } from "../../packages/shared/haven";
 import { gainXp } from "../../packages/shared/economy";
 import {
   NPCS,
@@ -46,6 +47,21 @@ export function townMutation(
     return o;
   };
   switch (kind) {
+    case "town-visit": {
+      const house = HAVEN_HOUSES.find((h) => h.id === v.id);
+      if (!house || p.region !== "haven")
+        throw Error("Visit a house in Havenreach.");
+      if (t.stamps!.includes(house.id))
+        throw Error("This visitor stamp is already collected.");
+      t.stamps!.push(house.id);
+      const complete = HAVEN_HOUSES.every((h) => t.stamps!.includes(h.id));
+      grant(p, { gold: 15, xp: 10, diamonds: complete ? 50 : 0 });
+      return {
+        message: complete
+          ? "All six stamps! Your visitor book earned 50 Diamonds."
+          : `${house.name}: visitor stamp, 15 Gold and 10 keeper XP.`,
+      };
+    }
     case "town-talk": {
       const n = npc();
       if (!t.met.includes(n.id)) t.met.push(n.id);

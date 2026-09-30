@@ -4,7 +4,7 @@
 
 ### Broader Havenreach - starting-island expansion
 
-Work is underway to turn the starting island into a connected village, orchard, grove, ruins, lookout, pond, and flower clearing while preserving the existing services and save format. The expansion uses shared route and habitat configuration. Three layout checks currently pass, including every trail segment, safe shoreline/bridge traversal, and regional map scaling.
+Implemented the connected seven-place starting island, instanced woodland, pond and bridge, 17 roaming habitat companions, nine daily gathering nodes, trail map, sprint, camera reset, and village return. The latest extension adds six clickable houses with porches and a saved visitor stamp book. Clicking villagers, wildlife, resources, or labels replaces the E interaction. Existing saves receive only an optional stamps field; existing game progression is retained. Seventeen focused layout and village tests currently pass, including all walking paths, house doors, duplicate stamp rewards, and legacy saves. Final browser and production verification is in progress.
 
 Planned commit milestones: world layout; expanded terrain and paths; instanced woodland; pond and bridge; exploration landmarks; habitat wildlife; local trail map; expanded gathering; movement and camera controls; browser verification and player documentation. At least ten meaningful commits will be published for this upgrade. New lands, creature tiers, and a redesigned mission system remain later work as requested.
 
@@ -81,4 +81,4 @@ Install browser tooling once with `npx playwright install chromium`. Browser tes
 
 Remaining work includes longer authored region stories, anatomical and animation refinement, subjective listening review, broader balance playtesting, and performance tuning. The current compact procedural presentation is a playable first version, not a claim that every production-polish requirement is finished.
 
-The later improvement brief still has unimplemented features: evolution, day/night and weather, additional gatherables and potions, autonomous helper abilities, an exclusive rotating weekly boss, expanded guided onboarding, text-size/colorblind settings, sprint/camera-reset controls, and an in-game manual backup flow. Combat and currency replacements require a separate design decision; existing working rules and server-owned progress have been preserved. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for the complete boundary.
+The later improvement brief still has unimplemented features: evolution, day/night and weather, additional gatherables and potions, autonomous helper abilities, an exclusive rotating weekly boss, expanded guided onboarding, text-size/colorblind settings, and an in-game manual backup flow. Combat and currency replacements require a separate design decision; existing working rules and server-owned progress have been preserved. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for the complete boundary.
