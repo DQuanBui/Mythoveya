@@ -11,6 +11,8 @@ import { audio, settings } from "./audio";
 import { INTERACTABLES, Preview, TitleScene, WorldScene } from "./Scene";
 import { Portrait } from "./portraits";
 import { WorldHUD } from "./WorldHUD";
+import { NPCS } from "../../../packages/shared/town";
+import { NpcPanel, TownDirectory } from "./TownPanels";
 import { currentObjective, type ExplorationInput } from "./world-guide";
 import {
   Appearance,
@@ -109,7 +111,13 @@ export default function App() {
       const result = await mutate(kind, data);
       setProfile(result.profile);
       audio.cue("confirm");
-      if (kind === "resource") notify("Sunseed gathered · +25 Gold");
+      if (kind === "resource") notify("Gathered +1 Sunseed · +25 Gold");
+      if (
+        kind.startsWith("town-") &&
+        result.value?.message &&
+        kind !== "town-talk"
+      )
+        notify(result.value.message);
       if (["formation", "train", "upgrade", "avatar"].includes(kind))
         notify(
           kind === "formation"
@@ -219,7 +227,9 @@ export default function App() {
   const interact = useCallback(
     (id: string) => {
       audio.cue("interact");
-      if (id === "encounter" || id === "boss") startBattle(id === "boss");
+      const villager = NPCS.find((n) => n.location === id);
+      if (villager) setPanel(`npc-${villager.id}`);
+      else if (id === "boss") startBattle(true);
       else if (id.startsWith("resource")) {
         run("resource", { resource: id });
         audio.cue("collect");
@@ -239,6 +249,7 @@ export default function App() {
         return;
       }
       setScreen("arena");
+      setPanel("");
     } else setPanel(id);
   }
   const objective = profile ? currentObjective(profile) : null;
@@ -458,7 +469,7 @@ export default function App() {
       {panel && (
         <div className="modal-backdrop">
           <section
-            className={`panel modal ${["collection", "formation", "gallery"].includes(panel) ? "wide" : ""}`}
+            className={`panel modal ${["collection", "formation", "gallery", "town"].includes(panel) || panel.startsWith("npc-") ? "wide" : ""}`}
             aria-label={panel}
           >
             <button
@@ -472,6 +483,21 @@ export default function App() {
               ×
             </button>
             {panel === "settings" && <SettingsPanel />}
+            {panel === "town" && profile && (
+              <TownDirectory profile={profile} open={open} />
+            )}
+            {profile &&
+              NPCS.filter((n) => panel === `npc-${n.id}`).map((n) => (
+                <NpcPanel
+                  key={n.id}
+                  npc={n}
+                  profile={profile}
+                  run={run}
+                  open={open}
+                  close={() => setPanel("")}
+                  startBattle={startBattle}
+                />
+              ))}
             {panel === "collection" && profile && (
               <Collection profile={profile} run={run} />
             )}{" "}
@@ -482,7 +508,12 @@ export default function App() {
               <Formation profile={profile} run={run} />
             )}{" "}
             {panel === "quests" && profile && (
-              <Quests profile={profile} run={run} />
+              <>
+                <button className="town-entry" onClick={() => open("town")}>
+                  People & missions · Meet the village →
+                </button>
+                <Quests profile={profile} run={run} />
+              </>
             )}{" "}
             {panel === "recruit" && profile && (
               <Recruitment profile={profile} run={run} />
@@ -588,6 +619,9 @@ export default function App() {
                   </button>
                   <button onClick={() => setPanel("appearance")}>
                     Change keeper appearance
+                  </button>
+                  <button onClick={() => setPanel("town")}>
+                    People of the reaches
                   </button>
                   {import.meta.env.DEV && (
                     <button onClick={() => setPanel("gallery")}>

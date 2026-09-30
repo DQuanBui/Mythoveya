@@ -3,6 +3,8 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Stars } from "@react-three/drei";
 import * as T from "three";
 import { byId, REGIONS } from "../../../packages/shared/content";
+import { NPCS, npcSignal } from "../../../packages/shared/town";
+import { TownScenery, dressCompanion } from "./TownScenery";
 import type { Battle, Profile } from "../../../packages/shared/types";
 import {
   animateAvatar,
@@ -441,6 +443,18 @@ export const INTERACTABLES = [
     hint: "A greater challenge",
     p: [-10, 0, -7],
   },
+  {
+    id: "market",
+    name: "Pip's market",
+    hint: "Trade supplies & accessories",
+    p: [11, 0, 6],
+  },
+  {
+    id: "garden",
+    name: "Wren's garden",
+    hint: "Plant, craft & care",
+    p: [-9, 0, 10],
+  },
   ...Array.from({ length: 3 }, (_, i) => ({
     id: `resource-${i}`,
     name: "Sunseed",
@@ -466,13 +480,14 @@ function Explorer({
   input: MutableRefObject<ExplorationInput>;
 }) {
   const avatar = useMemo(() => createAvatar(profile.avatar), [profile.avatar]);
+  const leader = profile.owned.find((o) => o.id === profile.team[0]);
   const companion = useMemo(
     () =>
-      createCreature(
-        profile.owned.find((o) => o.id === profile.team[0])?.species ||
-          "emberfox",
+      dressCompanion(
+        createCreature(leader?.species || "emberfox"),
+        leader?.accessory,
       ),
-    [profile.team[0]],
+    [leader?.species, leader?.accessory],
   );
   const player = useRef(new T.Vector3(0, 0, 5));
   const keys = useRef(new Set<string>());
@@ -507,6 +522,11 @@ function Explorer({
   }, [blocked, onInteract]);
   useFrame(({ clock }, dt) => {
     dt = Math.min(dt, 0.05);
+    // R3F restarts its clock when switching back from a paused panel.
+    if (clock.elapsedTime < last.current) {
+      last.current = -1;
+      foot.current = 0;
+    }
     const k = keys.current;
     let x = blocked
       ? 0
@@ -532,6 +552,7 @@ function Explorer({
       if (
         next.length() < 16.5 &&
         !blocksLandmark(profile.region, next.x, next.z) &&
+        !((next.x - 11) ** 2 + (next.z - 4.4) ** 2 < 1.4) &&
         !((next.x - 7) ** 2 + (next.z + 3) ** 2 < 3.2) &&
         !((next.x + 6) ** 2 + (next.z + 3) ** 2 < 0.8)
       ) {
@@ -676,14 +697,20 @@ export function WorldScene({
     <Canvas
       shadows
       camera={{ position: [10, 10, 16], fov: 45 }}
+      frameloop={blocked ? "demand" : "always"}
       dpr={[1, settings.quality === "High" ? 1.75 : 1.3]}
     >
       <Environment region={profile.region} />
+      <TownScenery garden={profile.town?.garden ?? null} />
       <Explorer
         key={profile.region}
         {...{ profile, blocked, onNear, onInteract, onPosition, pet, input }}
       />
-      <Avatar index={2} position={[-3, 0, 1]} />
+      {NPCS.map((n) => (
+        <group key={n.id} name={`npc-${n.id}`}>
+          <Avatar index={n.avatar} position={n.position} />
+        </group>
+      ))}
       <Roamer
         id={
           profile.region === "canyon"
@@ -711,6 +738,7 @@ export function WorldScene({
         );
         const distance = Math.hypot(position[0] - o.p[0], position[1] - o.p[2]);
         const marker = WORLD_GUIDE.markers[o.id];
+        const npc = NPCS.find((n) => n.location === o.id);
         const opacity = Math.min(
           1,
           Math.max(
@@ -733,18 +761,22 @@ export function WorldScene({
             )}
             {!resource && !blocked && opacity > 0 && (
               <Html
-                position={[0, marker.height, 0]}
+                position={
+                  npc
+                    ? [npc.position[0] - o.p[0], 2.25, npc.position[2] - o.p[2]]
+                    : [0, marker.height, 0]
+                }
                 center
                 occlude
                 zIndexRange={[2, 0]}
                 style={{ pointerEvents: "none", opacity }}
               >
                 <div
-                  className={`world-label ${objective.target === o.id ? "objective-label" : ""}`}
+                  className={`world-label ${npc ? "npc-label" : ""} ${objective.target === o.id ? "objective-label" : ""}`}
                   data-marker={o.id}
                 >
-                  <span>{marker.icon}</span>
-                  {o.name}
+                  <span>{npc ? npcSignal(profile, npc) : marker.icon}</span>
+                  {npc ? npc.name : o.name}
                 </div>
               </Html>
             )}

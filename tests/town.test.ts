@@ -241,4 +241,26 @@ describe("village progress and durable services", () => {
     expect(authenticate(token).town?.met).toContain("wren");
     expect(authenticate(token).town?.trackedNpc).toBe("wren");
   });
+  it("links existing gathering, training and travel to village objectives", () => {
+    const token = keeper();
+    for (const resource of ["resource-0", "resource-1", "resource-2"])
+      operation(token, crypto.randomUUID(), (p) =>
+        game.mutate(p, "resource", { resource }),
+      );
+    expect(authenticate(token).town?.inventory.sunseed).toBe(5);
+    op(token, "town-claim", { npc: "tali", quest: "tali-tracks" });
+    operation(token, crypto.randomUUID(), (p) =>
+      game.mutate(p, "train", { id: p.team[0] }),
+    );
+    op(token, "town-claim", { npc: "bram", quest: "bram-basics" });
+    const p = authenticate(token);
+    p.wins = 2;
+    save(p);
+    operation(token, crypto.randomUUID(), (p) =>
+      game.mutate(p, "travel", { region: "canyon" }),
+    );
+    op(token, "town-claim", { npc: "tali", quest: "tali-reaches" });
+    expect(authenticate(token).town?.helpers).toContain("tali");
+    expect(authenticate(token).town?.stats.trained).toBe(1);
+  });
 });

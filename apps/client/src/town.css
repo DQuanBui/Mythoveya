@@ -1,0 +1,374 @@
+.npc-label::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: calc(50% - 4px);
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid #334e4a;
+}
+.town-entry {
+  margin-bottom: 22px;
+  width: 100%;
+  border-color: #a9c7b966;
+  color: #cde2cf;
+}
+.town-summary {
+  padding: 14px 0 24px;
+  color: #e4c68e;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+.town-directory {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.town-directory > button {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  text-align: left;
+  background: #ffffff04;
+}
+.town-directory h3 {
+  margin: 0 0 5px;
+  font-size: 21px;
+}
+.town-directory p {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: #b0c8c1;
+}
+.town-directory small {
+  color: #cfc6a4;
+  font-size: 11px;
+}
+.town-directory b {
+  margin-left: auto;
+  color: #ead395;
+}
+.villager-seal {
+  display: grid;
+  place-items: center;
+  flex: 0 0 48px;
+  height: 58px;
+  border-radius: 24px 24px 12px 12px;
+  background: #86a79224;
+  color: #cfe0bb;
+  border: 1px solid #c7d7ab40;
+  font:
+    28px Georgia,
+    serif;
+}
+.villager-pip,
+.villager-bram {
+  background: #d5a57122;
+  color: #e5c194;
+}
+.villager-oren,
+.villager-kael {
+  background: #9bafc72a;
+  color: #bacfe4;
+}
+.npc-heading {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 28px;
+  align-items: center;
+  padding-right: 24px;
+}
+.npc-preview {
+  height: 180px;
+  overflow: hidden;
+  border-radius: 80px 80px 18px 18px;
+  border: 1px solid #c4ccab33;
+}
+.npc-heading h2 {
+  margin: 7px 0 14px;
+}
+.npc-greeting {
+  color: #cfddcc;
+  line-height: 1.8;
+  font:
+    italic 18px/1.6 Georgia,
+    serif;
+  max-width: 580px;
+}
+.helper-badge {
+  color: #e6cf93;
+  font-size: 12px;
+}
+.town-tabs {
+  display: flex;
+  gap: 10px;
+  border-bottom: 1px solid #ffffff16;
+  margin: 25px 0;
+  padding-bottom: 12px;
+}
+.town-tabs button {
+  flex: 1;
+  background: transparent;
+  border-color: transparent;
+}
+.town-tabs button[aria-selected="true"] {
+  background: #b5caaa18;
+  border-color: #c4d2b55c;
+  color: #f0e2b9;
+}
+.dialogue-area {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.8fr) 1.2fr;
+  gap: 24px;
+  min-height: 200px;
+}
+.dialogue-topics {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.dialogue-topics button {
+  text-align: left;
+  padding: 15px;
+}
+.dialogue-reply {
+  padding: 0 20px;
+  border-left: 1px solid #b0bfa333;
+}
+.dialogue-reply p {
+  line-height: 1.8;
+  color: #ced8ca;
+}
+.town-directory-link {
+  margin-top: 28px;
+}
+.npc-first-team {
+  margin-top: 20px;
+}
+.village-missions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.village-missions article,
+.helper-card {
+  border: 1px solid #bac9ae30;
+  border-radius: 12px;
+  padding: 22px;
+  background: #b7c8a407;
+}
+.village-missions h3 {
+  margin: 5px 0 10px;
+  font-size: 23px;
+}
+.village-missions p {
+  line-height: 1.6;
+  font-size: 14px;
+}
+.village-missions progress,
+.companion-care progress {
+  width: 100%;
+  height: 6px;
+  display: block;
+  accent-color: #b6d2a4;
+  margin: 16px 0;
+}
+.village-missions small {
+  display: block;
+  font-size: 12px;
+  color: #d9cca4;
+  line-height: 1.6;
+}
+.village-missions button {
+  margin-top: 16px;
+}
+.helper-card {
+  grid-column: 1/-1;
+}
+.mission-complete {
+  opacity: 0.7;
+}
+.npc-services > button {
+  margin: 8px 8px 8px 0;
+}
+.npc-services h3 {
+  font-size: 24px;
+  margin: 10px 0;
+}
+.npc-services p {
+  line-height: 1.65;
+}
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 16px 0;
+}
+.button-row input {
+  flex: 1;
+  min-width: 170px;
+}
+.supply-bag {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 20px 0;
+}
+.supply-bag span {
+  border: 1px solid #b9caad33;
+  background: #b3c39b09;
+  border-radius: 7px;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: #cddcc4;
+}
+.supply-bag b {
+  margin-left: 8px;
+  color: #ebd6a4;
+}
+.market-stock {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.market-stock article {
+  border: 1px solid #b8c8aa30;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.market-stock h3 {
+  font-size: 21px;
+}
+.market-stock p {
+  font-size: 13px;
+  flex: 1;
+  color: #b7c9c0;
+}
+.market-stock small {
+  display: block;
+  margin: 8px 0 16px;
+  color: #dec99e;
+  font-size: 11px;
+}
+.item-symbol {
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #c7d7a818;
+  color: #e4ce99;
+  font-size: 28px;
+}
+.garden-bed,
+.craft-recipe {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  padding: 24px;
+  border: 1px solid #c9d4ac33;
+  border-radius: 14px;
+  margin: 20px 0;
+  background: linear-gradient(120deg, #9db28b14, transparent);
+}
+.garden-bed > span {
+  font-size: 54px;
+  color: #d1cb96;
+}
+.garden-bed > div,
+.craft-recipe > div {
+  flex: 1;
+}
+.companion-care {
+  margin-top: 28px;
+  border-top: 1px solid #ffffff19;
+  padding-top: 20px;
+}
+.companion-care select {
+  margin: 10px 0;
+  width: 100%;
+}
+.care-detail {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 14px 0;
+}
+.care-detail .portrait {
+  width: 82px;
+  height: 82px;
+}
+.care-detail > div {
+  flex: 1;
+}
+.care-detail p {
+  margin: 6px 0;
+  font-size: 13px;
+}
+.arena-tiers {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 20px;
+}
+.arena-tiers small {
+  letter-spacing: 0.15em;
+  color: #b5c9c0;
+}
+.npc-services .notice button {
+  margin: 10px 10px 0 0;
+}
+@media (max-width: 650px) {
+  .town-directory,
+  .village-missions,
+  .market-stock,
+  .dialogue-area {
+    grid-template-columns: 1fr;
+  }
+  .town-directory > button {
+    padding: 14px;
+  }
+  .npc-heading {
+    grid-template-columns: 80px 1fr;
+    gap: 16px;
+    padding-right: 0;
+  }
+  .npc-preview {
+    height: 120px;
+  }
+  .npc-heading h2 {
+    font-size: 27px;
+  }
+  .npc-greeting {
+    font-size: 15px;
+  }
+  .town-tabs {
+    gap: 3px;
+  }
+  .town-tabs button {
+    padding: 12px 6px;
+    font-size: 12px;
+  }
+  .dialogue-reply {
+    padding: 0;
+    border-left: 0;
+  }
+  .garden-bed,
+  .craft-recipe {
+    flex-wrap: wrap;
+    padding: 18px;
+  }
+  .garden-bed > span {
+    font-size: 38px;
+  }
+  .garden-bed > div {
+    min-width: 150px;
+  }
+  .garden-bed button,
+  .craft-recipe button {
+    width: 100%;
+  }
+}

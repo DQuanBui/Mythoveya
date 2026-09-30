@@ -138,22 +138,26 @@ export function WorldHUD({
       </aside>
       <div className="minimap" title="Area map">
         <div className="map-ring">
-          {INTERACTABLES.slice(0, 7).map((o) => (
-            <i
-              key={o.id}
-              className={o.id === objective.target ? "map-objective" : ""}
-              style={{
-                left: `${50 + o.p[0] * 2.5}%`,
-                top: `${50 + o.p[2] * 2.5}%`,
-              }}
-              title={o.name}
-              aria-label={
-                o.id === objective.target ? `Quest waypoint: ${o.name}` : o.name
-              }
-            >
-              {o.id === objective.target ? "◆" : "◇"}
-            </i>
-          ))}
+          {INTERACTABLES.filter((o) => !o.id.startsWith("resource")).map(
+            (o) => (
+              <i
+                key={o.id}
+                className={o.id === objective.target ? "map-objective" : ""}
+                style={{
+                  left: `${50 + o.p[0] * 2.5}%`,
+                  top: `${50 + o.p[2] * 2.5}%`,
+                }}
+                title={o.name}
+                aria-label={
+                  o.id === objective.target
+                    ? `Quest waypoint: ${o.name}`
+                    : o.name
+                }
+              >
+                {o.id === objective.target ? "◆" : "◇"}
+              </i>
+            ),
+          )}
           <b
             style={{
               left: `${50 + position[0] * 2.5}%`,
@@ -190,7 +194,7 @@ export function WorldHUD({
             return (
               <button
                 key={id}
-                title={byId[o.species].name}
+                title={o.nickname || byId[o.species].name}
                 onClick={() => open("formation")}
               >
                 <Portrait id={o.species} />

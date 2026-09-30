@@ -3,6 +3,7 @@ import { Component, type ReactNode } from "react";
 import App from "./App";
 import "./style.css";
 import "./world-hud.css";
+import "./town.css";
 class Boundary extends Component<{ children: ReactNode }, { error: string }> {
   state = { error: "" };
   static getDerivedStateFromError(e: Error) {

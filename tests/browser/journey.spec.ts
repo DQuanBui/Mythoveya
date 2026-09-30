@@ -49,6 +49,8 @@ test("first journey, battle, recruitment, formation, reload and settings", async
   await page.screenshot({ path: "artifacts/world.png" });
   await walkTo(page, "KeyA", "Wild encounter");
   await page.keyboard.press("KeyE");
+  await page.getByRole("tab", { name: "Services", exact: true }).click();
+  await page.getByRole("button", { name: "Begin a wild encounter" }).click();
   await expect(page.getByRole("button", { name: "Auto OFF" })).toBeVisible();
   await page.screenshot({ path: "artifacts/battle.png" });
   await page.getByRole("button", { name: "Fast OFF" }).click();

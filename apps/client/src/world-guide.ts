@@ -1,5 +1,6 @@
 import type { Profile } from "../../../packages/shared/types";
 import { REGIONS } from "../../../packages/shared/content";
+import { NPCS, townOf } from "../../../packages/shared/town";
 
 export const WORLD_GUIDE = {
   labelRange: 8,
@@ -26,6 +27,8 @@ export const WORLD_GUIDE = {
     training: { height: 1.4, icon: "⚑" },
     encounter: { height: 2.1, icon: "◇" },
     boss: { height: 3, icon: "♜" },
+    market: { height: 2.3, icon: "◇" },
+    garden: { height: 2.3, icon: "✿" },
   } as Record<string, { height: number; icon: string }>,
 };
 export type Objective = {
@@ -41,6 +44,19 @@ export function currentObjective(p: Profile): Objective {
     Number(Boolean(p.quests.guide)) +
     Number(p.wins > 0) +
     Number(Boolean(p.quests.recruit));
+  const tracked = NPCS.find((n) => n.id === p.town?.trackedNpc);
+  const mission = tracked?.missions.find(
+    (m) => !townOf(p).claims.includes(m.id),
+  );
+  if (tracked && mission)
+    return {
+      title: mission.title,
+      text: mission.description,
+      target: tracked.location,
+      action: `npc-${tracked.id}`,
+      button: `Talk to ${tracked.id === "pip" ? "Pip" : tracked.name.split(" ").at(-1)}`,
+      completed,
+    };
   if (!p.quests.guide)
     return {
       title: "Meet your first six",
