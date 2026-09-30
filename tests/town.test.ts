@@ -39,6 +39,30 @@ function keeper() {
 }
 
 describe("village progress and durable services", () => {
+  it("preserves original gathering IDs and gates outer nodes to Havenreach", () => {
+    const token = keeper();
+    operation(token, crypto.randomUUID(), (p) =>
+      game.mutate(p, "resource", { resource: "resource-8" }),
+    );
+    expect(authenticate(token).resources).toContain("haven:resource-8");
+    expect(() =>
+      operation(token, crypto.randomUUID(), (p) =>
+        game.mutate(p, "resource", { resource: "resource-8" }),
+      ),
+    ).toThrow("Already gathered");
+    const p = authenticate(token);
+    p.region = "meadow";
+    save(p);
+    expect(() =>
+      operation(token, crypto.randomUUID(), (p) =>
+        game.mutate(p, "resource", { resource: "resource-8" }),
+      ),
+    ).toThrow("Unknown resource");
+    operation(token, crypto.randomUUID(), (p) =>
+      game.mutate(p, "resource", { resource: "resource-2" }),
+    );
+    expect(authenticate(token).town?.inventory.sunseed).toBe(4);
+  });
   it("upgrades old saves additively without replacing companions, progress or currencies", () => {
     const token = keeper(),
       p = authenticate(token);

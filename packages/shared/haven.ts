@@ -252,3 +252,16 @@ export const HAVEN_WILDLIFE = [
   { species: "zippinch", point: [3, 13] as Point, radius: 0.8 },
   { species: "mossprig", point: [-13, 12] as Point, radius: 0.9 },
 ];
+export const RESOURCE_NODES = [
+  { id: "resource-0", point: [-6, 8] as Point },
+  { id: "resource-1", point: [0, 6] as Point },
+  { id: "resource-2", point: [7, 7] as Point },
+  { id: "resource-3", point: [-21, 20] as Point, haven: true },
+  { id: "resource-4", point: [-28, -4] as Point, haven: true },
+  { id: "resource-5", point: [-13, -26] as Point, haven: true },
+  { id: "resource-6", point: [21, -28] as Point, haven: true },
+  { id: "resource-7", point: [31, -3] as Point, haven: true },
+  { id: "resource-8", point: [10, 24] as Point, haven: true },
+];
+export const resourcesForRegion = (region: string) =>
+  RESOURCE_NODES.filter((n) => !n.haven || region === "haven");

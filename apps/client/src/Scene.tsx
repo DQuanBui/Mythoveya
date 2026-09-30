@@ -7,7 +7,12 @@ import { NPCS, npcSignal } from "../../../packages/shared/town";
 import { TownScenery, dressCompanion } from "./TownScenery";
 import { HavenTerrain } from "./HavenTerrain";
 import { HavenWildlife } from "./HavenWildlife";
-import { havenWalkable, HAVEN_PLACES } from "../../../packages/shared/haven";
+import {
+  havenWalkable,
+  HAVEN_PLACES,
+  RESOURCE_NODES,
+  resourcesForRegion,
+} from "../../../packages/shared/haven";
 import type { Battle, Profile } from "../../../packages/shared/types";
 import {
   animateAvatar,
@@ -473,15 +478,20 @@ export const INTERACTABLES = [
     hint: "Plant, craft & care",
     p: [-9, 0, 10],
   },
-  ...Array.from({ length: 3 }, (_, i) => ({
-    id: `resource-${i}`,
+  ...RESOURCE_NODES.map((n) => ({
+    id: n.id,
     name: "Sunseed",
     hint: "Gather resource",
-    p: i === 2 ? [7, 0, 7] : [(i - 1) * 6, 0, 8 - i * 2],
+    p: [n.point[0], 0, n.point[1]],
   })),
 ];
 export const getInteractables = (region: string) =>
-  INTERACTABLES.filter((o) => region === "haven" || !o.id.startsWith("trail-"));
+  INTERACTABLES.filter(
+    (o) =>
+      (region === "haven" || !o.id.startsWith("trail-")) &&
+      (!o.id.startsWith("resource-") ||
+        resourcesForRegion(region).some((n) => n.id === o.id)),
+  );
 function Explorer({
   profile,
   blocked,

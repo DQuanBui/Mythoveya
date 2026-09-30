@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { HAVEN_WILDLIFE, HAVEN_TREES } from "../packages/shared/haven";
+import {
+  HAVEN_WILDLIFE,
+  HAVEN_TREES,
+  resourcesForRegion,
+} from "../packages/shared/haven";
 import { byId } from "../packages/shared/content";
 import {
   HAVEN_PLACES,
@@ -12,6 +16,12 @@ import {
   pathDistance,
 } from "../packages/shared/haven";
 describe("Havenreach exploration layout", () => {
+  it("places nine gathering nodes on reachable ground without changing other regions", () => {
+    expect(resourcesForRegion("haven")).toHaveLength(9);
+    expect(resourcesForRegion("meadow")).toHaveLength(3);
+    for (const node of resourcesForRegion("haven"))
+      expect(havenWalkable(...node.point), node.id).toBe(true);
+  });
   it("uses existing species and keeps woodland off the walking routes", () => {
     expect(HAVEN_WILDLIFE.length).toBeGreaterThan(12);
     for (const resident of HAVEN_WILDLIFE)

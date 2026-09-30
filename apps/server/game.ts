@@ -16,6 +16,7 @@ import type { Battle, Owned, Profile } from "../../packages/shared/types";
 import { atomic, db, getProfile, save } from "./store";
 import { ensureTown, utcDay, utcWeek } from "../../packages/shared/town";
 import { townMutation } from "./town-game";
+import { resourcesForRegion } from "../../packages/shared/haven";
 export const pve = new Map<string, Battle>();
 export const activeHuman = new Set<string>();
 export const battleMeta = new Map<string, { region: string; boss: boolean }>();
@@ -76,7 +77,7 @@ export function mutate(p: Profile, kind: string, v: any) {
       break;
     }
     case "resource":
-      if (!/^resource-[0-2]$/.test(v.resource))
+      if (!resourcesForRegion(p.region).some((n) => n.id === v.resource))
         throw Error("Unknown resource.");
       {
         const key = `${p.region}:${v.resource}`;
