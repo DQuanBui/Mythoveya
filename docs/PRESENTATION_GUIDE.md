@@ -38,6 +38,8 @@ Sources stop after finite envelopes, disconnect on completion, and share a 40-vo
 
 ## Settings and review
 
+Village characters reuse the eight keeper rigs with idle motion and small nearby speech labels. Their directory uses lightweight illustrated initials; only the selected conversation opens a 3D portrait. The market and garden use local procedural geometry, and garden growth follows the saved planting timestamp. Equipped ribbons and bells attach to the following companion's animated rig. The exploration renderer pauses behind panels and resumes its movement timers when the panel closes.
+
 Reduced motion suppresses decorative animation and camera effects without affecting combat. Camera shake is optional and restrained. Graphics presets cap pixel ratio and reduce vegetation and effect density while keeping targeting information.
 
 The development gallery is read-only: choose a species or avatar, rotate the model, pause, change its animation state, preview skills, and test the three vocalizations. Browser checks capture representative families, all keepers, and all mythic effects. The precise automated/visual/listening evidence is recorded in `PROGRESS.md`; browser playback checks do not establish subjective audio quality.

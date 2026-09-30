@@ -6,6 +6,7 @@
 - `apps/client/src/Scene.tsx`: original floating-island scenery, buildings, ruins, vegetation, crystals, world markers, and battle presentation.
 - `apps/client/src/UltimateEffects.tsx`: ten original mythic effect compositions.
 - `apps/client/src/RegionScenery.tsx`: original region landmarks, flowers, ice, rock formations, and village buildings.
+- `apps/client/src/TownScenery.tsx`: original striped market stall, timed garden sprouts, companion ribbon, and bell. Villager portraits and idle characters reuse the eight keeper models.
 - `apps/client/src/RecruitmentStage.tsx`: original bond-shrine stage, entrance motion, and rarity accents using the actual creature models.
 - `apps/client/public/emblem.svg`: original six-point bond emblem.
 - Collection portraits are rendered from those same Three.js creature models by one on-demand renderer, then cached for the session. They are not hotlinked pictures or separate concept art.

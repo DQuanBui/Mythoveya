@@ -12,6 +12,8 @@ Mythoveya is a locally playable, browser-based 3D creature-collection RPG. Its w
 
 - **60 Wildbound:** ten species in each rarity from E to S, eight elements, twelve body families, 180 actions, and 60 passives.
 - **Eight keepers:** choose a recognizable character and change your appearance later without losing progress.
+- **Eight village friends:** meet Liora, Sella, Bram, Kael, Oren, Tali, Pip, and Wren. Explore 24 conversation topics, complete 16 missions, and unlock their daily help.
+- **Make yourself at home:** trade supplies at Pip's rotating market, grow Sunseed, craft treats, nurture friendship, name companions, and dress your following friend with a ribbon or bell.
 - **Your own six:** three front slots and three rear slots, with drag-and-drop or click-to-place formation editing.
 - **Know where to go:** a chapter tracker, objective distance, and matching gold waypoints in the world and minimap guide your first journey. Nearby labels stay readable, while resource sparkles keep the scenery clear.
 - **Explore on a smaller screen:** the quest tracker, map, wallet, team strip, and complete menu adapt to narrow screens. Drag the movement joystick and tap the interaction prompt to explore with touch.
@@ -64,10 +66,10 @@ Open **http://127.0.0.1:2567/** for the compiled build. This command serves the 
 1. Select **Begin your journey**, enter your keeper name, and choose an avatar.
 2. Choose **Emberfox**, **Ripplefin**, or **Thornhare** as your starter.
 3. Walk toward **Warden Liora** and press **E**. Accept Cindermite, Puddlepip, Mossprig, Pebblit, and Zippinch to complete your first six.
-4. Approach the **Wild encounter** marker. Use basic attacks freely; skills cost 2 energy and ultimates cost 5. Front companions protect the rear slot behind them. PvE **Auto** and **Fast** controls are optional.
+4. Approach the **Wild encounter** marker to meet **Ranger Tali**. Choose **Services → Begin a wild encounter**. Basic attacks are free; skills cost 2 energy and ultimates cost 5. Front companions protect the rear slot behind them. PvE **Auto** and **Fast** controls are optional.
 5. After winning, open **Quests** and claim your 600-diamond tutorial reward. Visit **Recruit**, make a bond, and open **Team** to save your formation.
 
-Training costs 50 gold and stores creature XP even when the account-level cap prevents an immediate level. Three species shards purchase a 2% stat upgrade, up to five upgrades. Tactical Arena ignores these shard bonuses. Stars mark favorites; there is no selling or creature deletion.
+Training costs 50 gold and stores creature XP even when the account-level cap prevents an immediate level. Three species shards purchase a 2% stat upgrade, up to five upgrades. Tactical Arena ignores these shard bonuses. Stars mark favorites; companions cannot be sold or deleted.
 
 Win more encounters to open the canyon and hollow. Each region guardian has an enhanced roster model; first-time guardian victories grant a configured A-tier companion. Boss variants are not extra collectible species.
 
@@ -85,7 +87,7 @@ Win more encounters to open the canyon and hollow. Each region guardian has an e
 
 Use **Sound & settings** on the title screen or the settings button in the world. Master, Music, Sound effects, Ambience, and Creature voices each have their own slider. Mute, reduced motion, camera shake, and graphics quality are saved in the browser. Audio starts after a deliberate click; use **Play sound test** to resume a suspended browser audio context. Background audio suspends when the tab is hidden.
 
-Low quality reduces decorative scenery and particles. Quality changes take full effect on the next scene entry. Desktop keyboard-and-mouse play is supported; touch movement controls are not included.
+Low quality reduces decorative scenery and particles. Quality changes take full effect on the next scene entry. On touch screens, drag the movement joystick and tap the interaction prompt. Desktop keyboard-and-mouse play remains the most thoroughly tested way to battle.
 
 ## Play against another keeper
 
@@ -103,6 +105,25 @@ Each PvP decision allows 20 seconds after the shared presentation window. A time
 Two local sessions demonstrate real multiplayer. Cross-internet play requires a reachable backend and a separate production hosting/account design. This project does not deploy a public service.
 
 ## Recruitment and daily adventures
+
+Open **Quests → People & missions** or **Esc → People of the reaches** to meet the village. Each character has conversations, a two-mission story, and useful services. Complete both missions to unlock that villager's daily gift. Select **Track this story** to add a village objective to your world tracker.
+
+![Meet the eight villagers and follow their stories](docs/screenshots/village.png)
+
+| Villager | Services |
+| --- | --- |
+| Warden Liora | Your first six companions, story quests, and travel |
+| Keeper Sella | Recruitment, party formation, and companion nicknames |
+| Coach Bram | Training, combat guidance, and daily computer sparring |
+| Arena Master Kael | Human arena battles, three rating tiers, and a weekly guardian bounty |
+| Archivist Oren | The complete creature journal and collection milestones |
+| Ranger Tali | Wild encounters, habitats, and gathering guidance |
+| Pip the Trader | Buy and sell supplies; equip a cosmetic ribbon or bell |
+| Gardener Wren | Plant Sunseed, harvest crops, craft treats, and feed companions |
+
+Your first garden kit contains two Sunseed. Plant one, wait **two real minutes**, and harvest three; growth continues while you are away. Two Sunseed and 10 Gold make a treat. Feeding gives 30 creature XP and 10 friendship, up to 100 friendship. Friendship and accessories do not change combat stats. Switching accessories returns the old item to your bag.
+
+Market stock and helper gifts refresh at **00:00 UTC**. Win a practice battle to claim Bram's daily 40 Gold and 10 Diamonds. Defeat a region guardian to claim Kael's weekly 70 Gold and 120 Diamonds; the bounty refreshes Monday at 00:00 UTC. Normal guardian rewards still apply.
 
 A single bond costs 100 diamonds; ten cost 1,000 and require confirmation. Base rarity rates are E 30%, D 30%, C 22%, B 12%, A 5%, and S 1%, with equal selection among the ten species in each tier.
 

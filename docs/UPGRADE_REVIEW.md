@@ -17,7 +17,7 @@ Phase 1 addresses orientation and usability before adding more destinations. The
 | Currency clarity | Names displayed with quantities; hover, keyboard-focus, and touch explanations of earning and spending | `apps/client/src/WorldHUD.tsx` |
 | Small screens | Compact quest and minimap, complete seven-entry menu, six-companion strip, drag-to-walk joystick, tappable interaction prompt | `apps/client/src/WorldHUD.tsx`, `world-hud.css`, `Scene.tsx` |
 
-The implementation is in the linked source project, rather than an additional disconnected code sample. No profile schema migration is needed.
+The implementation is in the linked source project. Phase 1 required no profile migration; Phase 2 adds village state to existing profiles without replacing their saved progression.
 
 ## Verification
 
@@ -36,7 +36,15 @@ npm run build
 
 The supplied brief ends with: “Start with Phase 1, then wait for my confirmation before Phase 2.” Phase 1 was completed and checked; the subsequent instruction to continue authorized work on Phase 2.
 
-The next substantial addition is a data-driven cast of Sella, Bram, Kael, Oren, Tali, Pip, and Wren, with conversations, missions, and useful location services. Later phases can add gathering inventories, crafting, friendship, weather, and a fuller field guide.
+Phase 2 adds a data-driven cast of Liora, Sella, Bram, Kael, Oren, Tali, Pip, and Wren, with 24 selectable conversation topics, 16 ordered missions, and daily helper rewards. Their services include a rotating market, server-timed garden, crafting, friendship, nicknames, cosmetic accessories, daily sparring, and weekly guardian bounties. These compatible additions preserve the existing six-companion combat system. Weather, evolution, larger regions, and fuller guided tutorials remain later work.
+
+The roster and mission definitions are in `packages/shared/town.ts`; authoritative transactions are in `apps/server/town-game.ts`. `TownPanels.tsx` provides conversations, missions, and services, while `TownScenery.tsx` provides the market, garden, and companion accessories. `tests/town.test.ts` checks save and economy rules; `tests/browser/town.spec.ts` follows the actual market, helper, naming, feeding, reload, planting, harvest, and crafting journey.
+
+To review this phase, open **Quests → People & missions**. Each character has Conversation, Missions, and Services tabs. Plant a Sunseed with Wren, browse Pip's stock while it grows, then return after two minutes to harvest. Claim both Pip or Wren mission rewards to unlock a daily helper. Run `npx vitest run tests/town.test.ts` and `npx playwright test tests/browser/town.spec.ts` to reproduce the focused checks.
+
+Verified captures: [village directory](screenshots/village.png), [completed missions and daily helper](screenshots/helpers.png), and [mobile garden](screenshots/garden-mobile.png).
+
+This implementation adapts some proposed services to the established rules: helpers give daily supplies, Bram teaches the existing actions through dialogue and practice, and Kael offers a weekly bounty for current guardians. Autonomous helpers, ability purchases, potions, dusk-only tracking, and a rotating exclusive boss remain incomplete. No companion-release feature was added; renaming and party management are available.
 
 Three later proposals require an explicit design choice because they change existing systems:
 
