@@ -20,7 +20,9 @@ function Resident({
     [site],
   );
   // Creature geometry and materials belong to the shared model factory.
-  useEffect(() => { model.position.copy(anchor); }, [model, anchor]);
+  useEffect(() => {
+    model.position.copy(anchor);
+  }, [model, anchor]);
   useFrame(({ camera }, dt) => {
     const distance = camera.position.distanceTo(anchor);
     model.visible = distance < (settings.quality === "Low" ? 30 : 43);

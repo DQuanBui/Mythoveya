@@ -13,6 +13,8 @@ import { Portrait } from "./portraits";
 import { WorldHUD } from "./WorldHUD";
 import { NPCS } from "../../../packages/shared/town";
 import { NpcPanel, TownDirectory } from "./TownPanels";
+import { HavenMap } from "./HavenMap";
+import { HAVEN_PLACES } from "../../../packages/shared/haven";
 import { currentObjective, type ExplorationInput } from "./world-guide";
 import {
   Appearance,
@@ -43,6 +45,7 @@ export default function App() {
     [auto, setAuto] = useState(false),
     [fast, setFast] = useState(false);
   const input = useRef<ExplorationInput>({ x: 0, z: 0 });
+  const [trail, setTrail] = useState<string | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined),
     inFlight = useRef(false);
   const notify = useCallback((message: string) => {
@@ -110,6 +113,7 @@ export default function App() {
     try {
       const result = await mutate(kind, data);
       setProfile(result.profile);
+      if (kind === "travel") setTrail(null);
       audio.cue("confirm");
       if (kind === "resource") notify("Gathered +1 Sunseed · +25 Gold");
       if (
@@ -229,7 +233,10 @@ export default function App() {
       audio.cue("interact");
       const villager = NPCS.find((n) => n.location === id);
       if (villager) setPanel(`npc-${villager.id}`);
-      else if (id === "boss") startBattle(true);
+      else if (id.startsWith("trail-")) {
+        setTrail(id.slice(6));
+        setPanel("map");
+      } else if (id === "boss") startBattle(true);
       else if (id.startsWith("resource")) {
         run("resource", { resource: id });
         audio.cue("collect");
@@ -252,7 +259,24 @@ export default function App() {
       setPanel("");
     } else setPanel(id);
   }
-  const objective = profile ? currentObjective(profile) : null;
+  const destination =
+    profile?.region === "haven"
+      ? HAVEN_PLACES.find((p) => p.id === trail)
+      : undefined;
+  const objective = profile
+    ? {
+        ...currentObjective(profile),
+        ...(destination
+          ? {
+              title: destination.name,
+              text: destination.description,
+              target: `trail-${destination.id}`,
+              action: "map",
+              button: "View walking route",
+            }
+          : {}),
+      }
+    : null;
   const onboarding = screen === "avatar" || screen === "starter";
   return (
     <main
@@ -469,7 +493,8 @@ export default function App() {
       {panel && (
         <div className="modal-backdrop">
           <section
-            className={`panel modal ${["collection", "formation", "gallery", "town"].includes(panel) || panel.startsWith("npc-") ? "wide" : ""}`}
+            key={panel}
+            className={`panel modal ${["collection", "formation", "gallery", "town", "map"].includes(panel) || panel.startsWith("npc-") ? "wide" : ""}`}
             aria-label={panel}
           >
             <button
@@ -519,13 +544,26 @@ export default function App() {
               <Recruitment profile={profile} run={run} />
             )}{" "}
             {panel === "leaderboard" && <Leaderboard />}
-            {panel === "map" && profile && (
-              <MapPanel
-                profile={profile}
-                run={run}
-                close={() => setPanel("")}
+            {panel === "map" && profile?.region === "haven" && (
+              <HavenMap
+                position={position}
+                trail={trail}
+                choose={(id) => {
+                  setTrail(id);
+                  setPanel("");
+                }}
+                regions={() => setPanel("regions")}
               />
-            )}{" "}
+            )}
+            {(panel === "regions" ||
+              (panel === "map" && profile?.region !== "haven")) &&
+              profile && (
+                <MapPanel
+                  profile={profile}
+                  run={run}
+                  close={() => setPanel("")}
+                />
+              )}{" "}
             {panel === "appearance" && profile && (
               <Appearance profile={profile} run={run} />
             )}{" "}

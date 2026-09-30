@@ -1,8 +1,12 @@
 import { useEffect, useRef, useState, type MutableRefObject } from "react";
 import { byId, REGIONS } from "../../../packages/shared/content";
 import type { Profile } from "../../../packages/shared/types";
-import { INTERACTABLES } from "./Scene";
-import { mapPercent } from "../../../packages/shared/haven";
+import { getInteractables } from "./Scene";
+import {
+  mapPercent,
+  placeAt,
+  HAVEN_PATHS,
+} from "../../../packages/shared/haven";
 import { Portrait } from "./portraits";
 import {
   WORLD_GUIDE,
@@ -32,6 +36,7 @@ export function WorldHUD({
   blocked: boolean;
 }) {
   const region = REGIONS.find((r) => r.id === profile.region) || REGIONS[0];
+  const INTERACTABLES = getInteractables(profile.region);
   const target = INTERACTABLES.find((o) => o.id === objective.target);
   const distance = target
     ? Math.round(
@@ -60,7 +65,11 @@ export function WorldHUD({
         </div>
         <div className="location">
           <span>{region.name}</span>
-          <small>{region.subtitle}</small>
+          <small>
+            {profile.region === "haven"
+              ? placeAt(position[0], position[1]).name
+              : region.subtitle}
+          </small>
         </div>
         <div className="currencies" ref={wallet}>
           {(["diamonds", "gold"] as const).map((key) => (
@@ -139,6 +148,24 @@ export function WorldHUD({
       </aside>
       <div className="minimap" title="Area map">
         <div className="map-ring">
+          {profile.region === "haven" && (
+            <svg
+              className="map-terrain"
+              viewBox="-50 -50 100 100"
+              aria-hidden="true"
+            >
+              {HAVEN_PATHS.map((p, i) => (
+                <polyline
+                  key={i}
+                  points={p.map((v) => v.join(",")).join(" ")}
+                  fill="none"
+                  stroke="#e1d3a3"
+                  strokeWidth="1"
+                />
+              ))}
+              <ellipse cx="21" cy="-5" rx="8" ry="6" fill="#94ccd0" />
+            </svg>
+          )}
           {INTERACTABLES.filter((o) => !o.id.startsWith("resource")).map(
             (o) => (
               <i

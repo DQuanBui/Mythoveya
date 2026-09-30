@@ -7,7 +7,7 @@ import { NPCS, npcSignal } from "../../../packages/shared/town";
 import { TownScenery, dressCompanion } from "./TownScenery";
 import { HavenTerrain } from "./HavenTerrain";
 import { HavenWildlife } from "./HavenWildlife";
-import { havenWalkable } from "../../../packages/shared/haven";
+import { havenWalkable, HAVEN_PLACES } from "../../../packages/shared/haven";
 import type { Battle, Profile } from "../../../packages/shared/types";
 import {
   animateAvatar,
@@ -413,6 +413,12 @@ function Environment({
   );
 }
 export const INTERACTABLES = [
+  ...HAVEN_PLACES.map((p) => ({
+    id: `trail-${p.id}`,
+    name: p.name,
+    hint: "Read the trail guide",
+    p: [p.point[0], 0, p.point[1]],
+  })),
   {
     id: "guide",
     name: "Warden Liora",
@@ -474,6 +480,8 @@ export const INTERACTABLES = [
     p: i === 2 ? [7, 0, 7] : [(i - 1) * 6, 0, 8 - i * 2],
   })),
 ];
+export const getInteractables = (region: string) =>
+  INTERACTABLES.filter((o) => region === "haven" || !o.id.startsWith("trail-"));
 function Explorer({
   profile,
   blocked,
@@ -612,7 +620,8 @@ function Explorer({
     if (clock.elapsedTime - last.current > 0.2) {
       let nearest = "";
       let dist = 3.3;
-      for (const obj of INTERACTABLES) {
+      for (const obj of getInteractables(profile.region)) {
+        if (obj.id === "trail-village") continue;
         if (
           obj.id.startsWith("resource") &&
           profile.resources.includes(`${profile.region}:${obj.id}`)
@@ -746,13 +755,13 @@ export function WorldScene({
         }
         position={[-10, 0, -7]}
       />
-      {INTERACTABLES.map((o) => {
+      {getInteractables(profile.region).map((o) => {
         const resource = o.id.startsWith("resource");
         const collected = profile.resources.includes(
           `${profile.region}:${o.id}`,
         );
         const distance = Math.hypot(position[0] - o.p[0], position[1] - o.p[2]);
-        const marker = WORLD_GUIDE.markers[o.id];
+        const marker = WORLD_GUIDE.markers[o.id] || { height: 2.2, icon: "◇" };
         const npc = NPCS.find((n) => n.location === o.id);
         const opacity = Math.min(
           1,
