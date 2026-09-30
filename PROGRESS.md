@@ -2,6 +2,12 @@
 
 ## Current playable build
 
+### Broader Havenreach - starting-island expansion
+
+Work is underway to turn the starting island into a connected village, orchard, grove, ruins, lookout, pond, and flower clearing while preserving the existing services and save format. The expansion uses shared route and habitat configuration. Three layout checks currently pass, including every trail segment, safe shoreline/bridge traversal, and regional map scaling.
+
+Planned commit milestones: world layout; expanded terrain and paths; instanced woodland; pond and bridge; exploration landmarks; habitat wildlife; local trail map; expanded gathering; movement and camera controls; browser verification and player documentation. At least ten meaningful commits will be published for this upgrade. New lands, creature tiers, and a redesigned mission system remain later work as requested.
+
 ### Village life upgrade - Phase 2
 
 The village backend now includes eight named characters, 24 conversation topics, 16 ordered missions, eight unlockable daily helpers, daily market stock, a two-minute garden, treat crafting, friendship, nicknames, cosmetic accessories, daily sparring rewards, and weekly guardian bounties. Old profiles receive additive version-2 village state; existing companions, currencies, battles, and ratings retain their rules. Gathered Sunseed now also enters the supply bag.
