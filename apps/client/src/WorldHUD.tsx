@@ -115,31 +115,43 @@ export function WorldHUD({
       </header>
       <aside className="quest-tracker">
         <div className="quest-heading">
-          <span className="eyebrow">YOUR NEXT CHAPTER</span>
-          <span className="quest-count">
-            {Math.min(3, objective.completed)}/3 steps complete
+          <span className="eyebrow">
+            {objective.target?.startsWith("trail-") ||
+            objective.target?.startsWith("porch-")
+              ? "WALKING WAYPOINT"
+              : "YOUR NEXT CHAPTER"}
           </span>
+          {!objective.target?.startsWith("trail-") &&
+            !objective.target?.startsWith("porch-") && (
+              <span className="quest-count">
+                {Math.min(3, objective.completed)}/3 steps complete
+              </span>
+            )}
         </div>
         <strong>{objective.title}</strong>
         <p>{objective.text}</p>
-        <div
-          className="chapter-progress"
-          aria-label={`${objective.completed} of 3 introductory steps complete`}
-        >
-          {["Meet Liora", "Win a battle", "Recruit"].map((label, i) => (
-            <span
-              key={label}
-              className={i < objective.completed ? "done" : ""}
-              title={label}
+        {!objective.target?.startsWith("trail-") &&
+          !objective.target?.startsWith("porch-") && (
+            <div
+              className="chapter-progress"
+              aria-label={`${objective.completed} of 3 introductory steps complete`}
             >
-              <i />
-              {label}
-            </span>
-          ))}
-        </div>
+              {["Meet Liora", "Win a battle", "Recruit"].map((label, i) => (
+                <span
+                  key={label}
+                  className={i < objective.completed ? "done" : ""}
+                  title={label}
+                >
+                  <i />
+                  {label}
+                </span>
+              ))}
+            </div>
+          )}
         {target && (
           <div className="objective-distance">
-            <span>◆</span> {target.name} <b>{distance} m</b>
+            <span>◆</span> {target.name}{" "}
+            <b>{distance <= 3 ? "Arrived" : `${distance} m`}</b>
           </div>
         )}
         <button className="text-button" onClick={() => open(objective.action)}>

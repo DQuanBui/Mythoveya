@@ -128,11 +128,10 @@ export function HavenNature() {
         m.getMatrixAt(i, matrix);
         matrix.decompose(v, q, s);
         const d = Math.hypot(camera.position.x - v.x, camera.position.z - v.z);
-        // Shorten crowns beside the camera to keep the keeper visible under trees.
-        const near = d < 6;
+        // Reduce foreground crowns in every axis so foliage cannot hide the keeper.
+        const visibility = 0.12 + 0.88 * Math.max(0, Math.min(1, (d - 7) / 8));
         const sites = m.userData.sites as TreeSite[];
-        s.setScalar(sites[i].scale);
-        s.y *= near ? 0.32 : 1;
+        s.setScalar(sites[i].scale * visibility);
         q.setFromEuler(
           new T.Euler(
             0,

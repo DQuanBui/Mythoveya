@@ -61,7 +61,9 @@ describe("village progress and durable services", () => {
     expect(after.town?.stamps).toHaveLength(6);
     expect(after.gold).toBe(before.gold + 90);
     expect(after.diamonds).toBe(before.diamonds + 50);
-    expect(after.owned).toEqual(before.owned.map(o => ({ ...o, xp: o.xp + 60 })));
+    expect(after.owned).toEqual(
+      before.owned.map((o) => ({ ...o, xp: o.xp + 60 })),
+    );
     expect(after.town?.visited).toEqual(before.town?.visited);
     expect(() => op(token, "town-visit", { id: HAVEN_HOUSES[5].id })).toThrow(
       "already collected",
