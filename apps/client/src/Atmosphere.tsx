@@ -203,7 +203,13 @@ function Fireflies({ haven }: { haven: boolean }) {
 }
 
 /** Cloud banks drifting around the floating island, plus a few birds. */
-export function SkyLife({ radius = 52 }: { radius?: number }) {
+export function SkyLife({
+  radius = 52,
+  birds: showBirds = true,
+}: {
+  radius?: number;
+  birds?: boolean;
+}) {
   const ring = useRef<T.Group>(null),
     birds = useRef<T.Group>(null);
   const clouds = useMemo(() => {
@@ -255,7 +261,7 @@ export function SkyLife({ radius = 52 }: { radius?: number }) {
     if (ring.current) ring.current.rotation.y += Math.min(dt, 0.05) * 0.006;
     const night = daylight(islandHour()).glow;
     if (birds.current) {
-      birds.current.visible = night < 0.5;
+      birds.current.visible = showBirds && night < 0.5;
       birds.current.children.forEach((b, i) => {
         const t = clock.elapsedTime * (0.16 + (i % 3) * 0.02) + i * 1.1,
           r = 16 + (i % 3) * 5;
@@ -272,7 +278,7 @@ export function SkyLife({ radius = 52 }: { radius?: number }) {
       <group ref={ring}>
         <primitive object={clouds} />
       </group>
-      <group ref={birds} name="sky-birds">
+      <group ref={birds} name="sky-birds" visible={showBirds}>
         {Array.from({ length: 6 }, (_, i) => (
           <group key={i}>
             {[-1, 1].map((s) => (
