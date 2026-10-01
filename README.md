@@ -120,6 +120,8 @@ The glowing Riftgate stands in the north lane of Havenreach village. Click it, o
 
 Chapter and dungeon victories also count toward daily wins and region unlocks.
 
+![The three Rift dungeons behind the Riftgate](docs/screenshots/riftgate-dungeons.png)
+
 ## Play against another keeper
 
 Keep the server running. Open the game in a second browser profile or a private window; regular tabs share the same guest token and therefore the same keeper.

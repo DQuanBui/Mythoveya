@@ -1,6 +1,6 @@
 # Exploring Havenreach
 
-![The village plaza, companions, and new homes](screenshots/havenreach.png)
+![The Riftgate in Havenreach village, with its hover tooltip and a strolling islander](screenshots/havenreach.png)
 
 Havenreach is the first place to learn the world at your own pace. Its village services remain together near the starting plaza, while a larger outer walking loop connects six quieter destinations.
 
