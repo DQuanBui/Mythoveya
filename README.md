@@ -18,12 +18,17 @@ Mythoveya is a locally playable, browser-based 3D creature-collection RPG. Its w
 - **Know where to go:** a chapter tracker, objective distance, and matching gold waypoints in the world and minimap guide your first journey. Nearby labels stay readable, while resource sparkles keep the scenery clear.
 - **Explore on a smaller screen:** the quest tracker, map, wallet, team strip, and complete menu adapt to narrow screens. Drag the movement joystick and tap the interaction prompt to explore with touch.
 - **Four destinations:** Havenreach, Whisperleaf Meadow, Emberglass Canyon, and Moonfrost Hollow, with resources, roaming encounters, and enhanced region guardians.
+- **A broader place to begin:** Havenreach has a connected village, orchard, grove, ruins, lookout, pond, and flower clearing. Follow the trails through woodland, cross the bridge, watch 17 additional roaming Wildbound, and gather from nine Sunseed sites.
+- **Six welcoming homes:** visit the bakery, workshop, glasshouse, orchard cottage, ranger lodge, and woodland refuge. Sign each porch visitor book for Gold and XP; collect all six stamps for 50 Diamonds. Your book survives reloads.
+- **Your own walking route:** choose a destination on the illustrated local map, follow its gold waypoint, sprint along the trails, and return to the village from the pause menu.
 - **Tactical battles:** elemental advantages, energy, cooldowns, shields, healing, status effects, delayed attacks, revivals, and a visible turn queue. Manual and automatic controls are available in PvE.
 - **A growing collection:** recruit with earned diamonds, bond with wild creatures, train companions, collect shards, and claim story and daily rewards.
 - **Meet each new bond:** watch your recruited Wildbound arrive on the 3D shrine stage, and select any result from a ten-bond reveal to meet it up close.
 - **Human arena battles:** friendly room codes and ranked matchmaking, separate Power and Tactical ratings, authoritative turns, and reconnect support.
 - **A living presentation:** articulated creatures and keepers, model-rendered portraits, eight synthesized music arrangements, elemental effects, species voices, and ten mythic ultimate recipes.
 - **Saved adventures:** SQLite stores profiles, formations, inventory, currency, pity counters, quests, completed results, and competitive ratings.
+
+Explore the [Havenreach starting-island guide](docs/STARTING_ISLAND.md) for the trail map, new homes, and visitor-book activity.
 
 This first playable version uses a compact procedural art style. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for presentation and scope limits, and [PROGRESS.md](PROGRESS.md) for the verification record.
 
@@ -65,7 +70,7 @@ Open **http://127.0.0.1:2567/** for the compiled build. This command serves the 
 
 1. Select **Begin your journey**, enter your keeper name, and choose an avatar.
 2. Choose **Emberfox**, **Ripplefin**, or **Thornhare** as your starter.
-3. Walk toward **Warden Liora** and press **E**. Accept Cindermite, Puddlepip, Mossprig, Pebblit, and Zippinch to complete your first six.
+3. Click **Warden Liora**, her name label, or the nearby interaction button. Accept Cindermite, Puddlepip, Mossprig, Pebblit, and Zippinch to complete your first six.
 4. Approach the **Wild encounter** marker to meet **Ranger Tali**. Choose **Services → Begin a wild encounter**. Basic attacks are free; skills cost 2 energy and ultimates cost 5. Front companions protect the rear slot behind them. PvE **Auto** and **Fast** controls are optional.
 5. After winning, open **Quests** and claim your 600-diamond tutorial reward. Visit **Recruit**, make a bond, and open **Team** to save your formation.
 
@@ -75,19 +80,26 @@ Win more encounters to open the canyon and hollow. Each region guardian has an e
 
 ## Controls and comfort
 
+In Havenreach, **Travel map** opens the island's local trail guide. Select a place or house and choose **Set walking waypoint**. The map shows nearby species, trails, the pond, and your position. **Travel to another region** opens the existing regional waystones. Clearing your walking waypoint restores the quest tracker.
+
 | Control | Action |
 | --- | --- |
 | WASD or arrow keys | Move your keeper |
+| Hold Shift | Sprint |
+| R | Reset the exploration camera |
 | Mouse drag | Rotate the camera |
 | Mouse wheel | Zoom |
-| E | Interact with the nearest marked object |
+| Click / tap | Open villagers, house porches, wildlife notes, labels, or gather Sunseed; the nearby action button also works |
 | Esc | Open pause menu or close a panel |
+| Esc → Return to Havenreach village | Return safely to the starting plaza while exploring Havenreach |
 | Heart beside the party | Greet your following companion |
 | Click a battle model or target selector | Choose an ability target |
 
 Use **Sound & settings** on the title screen or the settings button in the world. Master, Music, Sound effects, Ambience, and Creature voices each have their own slider. Mute, reduced motion, camera shake, and graphics quality are saved in the browser. Audio starts after a deliberate click; use **Play sound test** to resume a suspended browser audio context. Background audio suspends when the tab is hidden.
 
 Low quality reduces decorative scenery and particles. Quality changes take full effect on the next scene entry. On touch screens, drag the movement joystick and tap the interaction prompt. Desktop keyboard-and-mouse play remains the most thoroughly tested way to battle.
+
+Push the touch joystick farther to run. Trees, buildings, the pond, and the cliff edge keep your keeper on safe ground; approach the pond along the bridge. Returning from a battle keeps your current exploration position during the session. Reloading starts you at the current region's starting point, with your saved companions, inventory, and progression intact.
 
 ## Play against another keeper
 
