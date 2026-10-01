@@ -3,6 +3,7 @@ import { HavenHouses } from "./HavenHouses";
 import { HavenVillage } from "./HavenVillage";
 import { HavenTreasure } from "./HavenTreasure";
 import { Riftgate } from "./Riftgate";
+import { ModelLighting } from "./ModelLighting";
 import { HavenTownsfolk } from "./HavenTownsfolk";
 import { DayNight, SkyLife } from "./Atmosphere";
 import { WalkContext, type Walker } from "./hover";
@@ -1038,6 +1039,7 @@ export function WorldScene({
       dpr={[1, settings.quality === "High" ? 1.75 : 1.3]}
     >
       <WalkContext.Provider value={walker}>
+      <ModelLighting intensity={0.35} />
       <Environment region={profile.region} />
       {profile.region === "haven" && (
         <HavenHouses onInteract={onInteract} disabled={blocked} />
@@ -1254,6 +1256,7 @@ export function TitleScene({
   return (
     <Canvas shadows camera={{ position: [8, 5.2, 12], fov: 38 }} dpr={[1, 1.5]}>
       <RenderStats />
+      <ModelLighting intensity={0.45} />
       <Environment title />
       <group position={[2.5, 0, 2]} rotation={[0, -0.35, 0]}>
         <Avatar index={avatar} />
@@ -1287,7 +1290,8 @@ export function Preview({
       dpr={[1, 1.5]}
     >
       <color attach="background" args={["#203b41"]} />
-      <ambientLight intensity={1.8} />
+      <ModelLighting intensity={0.8} />
+      <ambientLight intensity={1.5} />
       <directionalLight position={[3, 5, 4]} intensity={3} />
       <directionalLight position={[-3, 2, -3]} color="#a7e4de" intensity={2} />
       {species ? (
@@ -1512,6 +1516,7 @@ export function BattleScene({
         phase={preview && paused ? previewPhase : undefined}
       />
       <color attach="background" args={["#75939b"]} />
+      <ModelLighting intensity={0.55} />
       <fog attach="fog" args={["#75939b", 25, 70]} />
       <ambientLight intensity={1.6} />
       <directionalLight position={[-4, 12, 6]} intensity={2.8} castShadow />

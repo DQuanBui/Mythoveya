@@ -68,6 +68,7 @@ export function DayNight({
     light.intensity = day > 0.02 ? lerp(0.6, 2.4, day) : 0.55;
     light.color.copy(day > 0.02 ? SUN : MOON).lerp(WARM_SUN, day > 0.02 ? warm : 0);
     ambient.current.intensity = lerp(0.55, 1.1, day);
+    scene.environmentIntensity = lerp(0.08, 0.35, day);
     hemi.current.intensity = lerp(0.8, 1.6, day);
     hemi.current.color.copy(HEMI_NIGHT).lerp(HEMI_DAY, day).lerp(DUSK, warm * 0.4);
     hemi.current.groundColor.copy(GROUND_NIGHT).lerp(GROUND_DAY, day);

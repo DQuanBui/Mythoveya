@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import * as T from "three";
 import { createCreature } from "./models";
+import { environmentFor } from "./ModelLighting";
 import { byId } from "../../../packages/shared/content";
 const cache = new Map<string, string>();
 let renderer: T.WebGLRenderer | undefined;
@@ -16,7 +17,9 @@ export function renderPortrait(id: string) {
     renderer.setSize(192, 192);
     renderer.setPixelRatio(1);
     scene = new T.Scene();
-    scene.add(new T.AmbientLight("#fff6dc", 2.1));
+    scene.environment = environmentFor(renderer);
+    scene.environmentIntensity = 0.7;
+    scene.add(new T.AmbientLight("#fff6dc", 1.7));
     const light = new T.DirectionalLight("#fff1d7", 3);
     light.position.set(3, 4, 5);
     scene.add(light);

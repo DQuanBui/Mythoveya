@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { ModelLighting } from "./ModelLighting";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as T from "three";
 import { byId } from "../../../packages/shared/content";
@@ -84,6 +85,7 @@ export function RecruitmentStage({ id }: { id: string }) {
       aria-label={`${byId[id].name} arrives at the bond shrine`}
     >
       <Canvas camera={{ position: [3.5, 2.3, 5.5], fov: 36 }} dpr={[1, 1.5]}>
+        <ModelLighting intensity={0.7} />
         <Entrance key={id} id={id} />
       </Canvas>
     </div>
