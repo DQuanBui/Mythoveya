@@ -1,4 +1,4 @@
-import { byId } from "./content";
+import { byId, signatureId, TIERS } from "./content";
 import { skillPower } from "./adventure";
 import type { Battle, Owned, Unit, Status } from "./types";
 export function rng(b: { seed: number }) {
@@ -10,7 +10,9 @@ export function stats(o: Owned, tactical = false) {
   const level = tactical ? 10 : o.level;
   const f =
     (1 + (level - 1) * s.growth) * (tactical ? 1 : 1 + o.upgrade * 0.02);
-  const budget = tactical ? 1 / (1 + Math.floor(s.index / 10) * 0.05) : 1;
+  const budget = tactical
+    ? 1 / (1 + TIERS.indexOf(s.tier as (typeof TIERS)[number]) * 0.05)
+    : 1;
   // Equipment never applies in Tactical Arena, matching shard upgrades.
   const g = (!tactical && o.bonus) || { hp: 0, attack: 0, defense: 0, speed: 0 };
   return {
@@ -234,6 +236,7 @@ export function act(
     s = byId[actor.species],
     a = s.actions[n],
     t = b.units.find((u) => u.id === target)!,
+    sid = signatureId(s.id),
     power = a.power * (actor.skill?.[n] ?? 1);
   const consumeBoost = n > 0 && Boolean(has(actor, "boost"));
   b.energy[side] -= a.cost;
@@ -251,19 +254,19 @@ export function act(
           )
         : [t];
   // Authored signatures select targets; all actual effects remain reusable primitives.
-  if (n > 0 && s.id === "ripplefin")
+  if (n > 0 && sid === "ripplefin")
     affected = b.units
       .filter((u) => u.side === side && u.hp > 0)
       .sort((a, b) => a.hp / a.maxHp - b.hp / b.maxHp)
       .slice(0, 2);
-  if (n > 0 && ["frostwhisk", "basalhorn", "glaciermaw"].includes(s.id))
+  if (n > 0 && ["frostwhisk", "basalhorn", "glaciermaw"].includes(sid))
     affected = b.units.filter(
       (u) =>
         u.side === side &&
         u.hp > 0 &&
-        (s.id === "frostwhisk" ? u.slot >= 3 : u.slot < 3),
+        (sid === "frostwhisk" ? u.slot >= 3 : u.slot < 3),
     );
-  if (n > 0 && ["voltwing", "flintuff", "tempestrix"].includes(s.id))
+  if (n > 0 && ["voltwing", "flintuff", "tempestrix"].includes(sid))
     affected = [
       t,
       ...b.units
@@ -272,12 +275,12 @@ export function act(
             u.side !== side &&
             u.hp > 0 &&
             u.id !== t.id &&
-            (s.id !== "flintuff" ||
+            (sid !== "flintuff" ||
               (u.slot < 3 && Math.abs(u.slot - t.slot) === 1)),
         )
-        .slice(0, s.id === "tempestrix" ? 2 : 1),
+        .slice(0, sid === "tempestrix" ? 2 : 1),
     ];
-  if (n > 0 && s.id === "aurelith") affected = [t];
+  if (n > 0 && sid === "aurelith") affected = [t];
   const beforeUnits = new Map(
     b.units.map((u) => [u.id, { hp: u.hp, shield: u.shield }]),
   );
@@ -322,7 +325,7 @@ export function act(
           u.side === side &&
           !["delay", "pierce"].includes(effect)
         ) {
-          if (s.id === "crysalune" && effect === "slow")
+          if (sid === "crysalune" && effect === "slow")
             for (const enemy of b.units.filter(
               (e) => e.side !== side && e.hp > 0,
             ))
@@ -351,10 +354,10 @@ export function act(
                 (s.passive.effect === "boost" ? 1.05 : 1),
             ),
           );
-          if (s.id === "obsidrake" && n > 0) u.shield = 0;
-          if (s.id === "emberfox" && n > 0 && u.shield > 0)
+          if (sid === "obsidrake" && n > 0) u.shield = 0;
+          if (sid === "emberfox" && n > 0 && u.shield > 0)
             dmg = Math.round(dmg * 1.5);
-          if (s.id === "murkfang" && n > 0 && has(u, "mark"))
+          if (sid === "murkfang" && n > 0 && has(u, "mark"))
             dmg = Math.round(dmg * 1.25);
           const absorbed = Math.min(u.shield, dmg);
           u.shield -= absorbed;
@@ -387,7 +390,7 @@ export function act(
           }
           if (has(u, "bank"))
             u.bank = Math.min(35, u.bank + absorbed + Math.round(dmg * 0.15));
-          if (n > 0 && s.id === "rimeowl") {
+          if (n > 0 && sid === "rimeowl") {
             b.delayed = b.delayed.filter((d) => d.actor !== u.id);
             u.statuses = u.statuses.filter((x) => x.kind !== "warning");
           }
@@ -414,7 +417,7 @@ export function act(
             u.maxHp,
             u.hp +
               Math.round(
-                actor.attack * power * (s.id === "pelagryth" ? 1.8 : 1.3),
+                actor.attack * power * (sid === "pelagryth" ? 1.8 : 1.3),
               ),
           );
         if (effect === "shield" && u.hp > 0) status(u, "shielded", 3);
@@ -437,11 +440,11 @@ export function act(
               ].includes(s.kind),
           );
         if (effect === "revive" && !u.revived) {
-          if (s.id === "aurelith" && has(actor, "reviveUsed")) continue;
+          if (sid === "aurelith" && has(actor, "reviveUsed")) continue;
           if (u.hp === 0) {
             u.hp = Math.round(u.maxHp * 0.35);
             u.revived = true;
-            if (s.id === "aurelith") status(actor, "reviveUsed", 99);
+            if (sid === "aurelith") status(actor, "reviveUsed", 99);
           } else if (u.id === actor.id) status(u, "rebirth", 99);
         }
         if (
@@ -466,7 +469,7 @@ export function act(
           status(u, effect, effect === "stun" || effect === "silence" ? 1 : 2);
           if (
             effect === "guard" &&
-            ["cragpup", "titanusk", "thaloryx"].includes(s.id)
+            ["cragpup", "titanusk", "thaloryx"].includes(sid)
           )
             has(u, "guard")!.source = actor.id;
         }
@@ -487,7 +490,7 @@ export function act(
     (x) =>
       x.kind !== "stun" &&
       x.kind !== "silence" &&
-      !(consumeBoost && x.kind === "boost" && s.id !== "raijora"),
+      !(consumeBoost && x.kind === "boost" && sid !== "raijora"),
   );
   amounts.length = 0;
   for (const u of b.units) {

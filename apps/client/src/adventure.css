@@ -315,3 +315,62 @@
     align-items: stretch;
   }
 }
+
+/* Evolution */
+.evolution-card {
+  display: grid;
+  grid-template-columns: 64px auto 64px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background:
+    linear-gradient(110deg, #f2c46b1c, transparent 60%),
+    #0f2b31a8;
+  border: 1px solid #f2c46b55;
+}
+.evolution-card .portrait {
+  width: 64px;
+  height: 64px;
+}
+.evolution-card > span {
+  font-size: 22px;
+  color: #f2c46b;
+}
+.evolution-card b,
+.evolution-card small {
+  display: block;
+}
+.evolution-card small {
+  font-size: 12px;
+  color: #d8dfcc;
+  margin-top: 3px;
+}
+.evolution-reveal {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 6px;
+  padding: 16px;
+  margin-bottom: 14px;
+  border-radius: 16px;
+  background: radial-gradient(circle, #f2c46b33, #0f2b31 70%);
+  border: 1px solid #f2c46b88;
+}
+.evolution-reveal .recruitment-stage {
+  width: 100%;
+  height: 260px;
+}
+.evolution-reveal h3 {
+  font-size: 28px;
+  margin: 0;
+}
+@media (max-width: 760px) {
+  .evolution-card {
+    grid-template-columns: 56px auto 56px;
+  }
+  .evolution-card > div,
+  .evolution-card > button {
+    grid-column: 1 / -1;
+  }
+}

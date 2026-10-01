@@ -1,4 +1,7 @@
+import { useState } from "react";
 import type { Owned, Profile } from "../../../packages/shared/types";
+import { Portrait } from "./portraits";
+import { RecruitmentStage } from "./RecruitmentStage";
 import { byId } from "../../../packages/shared/content";
 import { townOf } from "../../../packages/shared/town";
 import {
@@ -18,6 +21,7 @@ import {
   skillCost,
   skillLevels,
   skillPower,
+  evolution,
   type Gear,
 } from "../../../packages/shared/adventure";
 
@@ -28,18 +32,75 @@ export function CompanionGrowth({
   profile,
   o,
   run,
+  onEvolve,
 }: {
   profile: Profile;
   o: Owned;
   run: (kind: string, value?: any) => Promise<any>;
+  onEvolve?: (species: string) => void;
 }) {
   const s = byId[o.species],
     t = townOf(profile),
     levels = skillLevels(o),
     gear = profile.gear || [],
     total = companionBonus(profile, o);
+  const evolve = evolution(o.species),
+    [evolved, setEvolved] = useState<string | null>(null);
   return (
     <div className="growth">
+      {evolved && (
+        <div className="evolution-reveal" role="status">
+          <RecruitmentStage id={evolved} />
+          <p className="eyebrow">A BOND GROWS DEEPER</p>
+          <h3>{byId[evolved].name}</h3>
+          <p className="muted">{byId[evolved].lore}</p>
+          <button onClick={() => setEvolved(null)}>Wonderful</button>
+        </div>
+      )}
+      {evolve && (
+        <>
+          <h3>Evolution</h3>
+          <div className="evolution-card">
+            <Portrait id={o.species} />
+            <span aria-hidden="true">→</span>
+            <Portrait id={evolve.to} />
+            <div>
+              <b>{byId[evolve.to].name}</b>
+              <small>
+                {byId[evolve.to].tier}-tier · stronger stats, same signature ·
+                level {evolve.level} · {evolve.crystal} ✧ Rift crystals ·{" "}
+                {evolve.gold} Gold
+              </small>
+              <small className="muted">
+                You have {t.inventory.crystal || 0} ✧. Crystals come from chapter
+                bosses, mastery chests and the Crystal Vault (Tier II+).
+              </small>
+            </div>
+            <button
+              className="primary"
+              disabled={
+                o.level < evolve.level ||
+                (t.inventory.crystal || 0) < evolve.crystal ||
+                profile.gold < evolve.gold ||
+                profile.owned.some((x) => x.species === evolve.to)
+              }
+              onClick={async () => {
+                const r = await run("evolve", { id: o.id });
+                if (r?.species) {
+                  setEvolved(r.species);
+                  onEvolve?.(r.species);
+                }
+              }}
+            >
+              {profile.owned.some((x) => x.species === evolve.to)
+                ? "Already bonded"
+                : o.level < evolve.level
+                  ? `Reach level ${evolve.level}`
+                  : "Evolve"}
+            </button>
+          </div>
+        </>
+      )}
       <h3>Skills</h3>
       <p className="muted">
         Each level adds 10% power to damage, healing and shields. Skill tomes

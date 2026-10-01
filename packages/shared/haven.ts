@@ -310,6 +310,17 @@ export const HAVEN_WILDLIFE = [
   { species: "pebblit", point: [3, 22] as Point, radius: 1.1 },
   { species: "zippinch", point: [3, 13] as Point, radius: 0.8 },
   { species: "mossprig", point: [-13, 12] as Point, radius: 0.9 },
+  // Evolved forms and rarer residents hint at what companions can become.
+  { species: "thornstag", point: [-33, -2] as Point, radius: 0.9 },
+  { species: "luminmoth", point: [-12, -31] as Point, radius: 0.8 },
+  { species: "tidecrest", point: [17.5, -3] as Point, radius: 0.9, water: true },
+  { species: "thunderkite", point: [24, -31] as Point, radius: 1.2 },
+  { species: "bramblehop", point: [14, 23] as Point, radius: 1 },
+  { species: "hearthwaddle", point: [1, 27] as Point, radius: 0.8 },
+  { species: "pearlbloom", point: [24.5, -8.5] as Point, radius: 0.9, water: true },
+  { species: "cragmaw", point: [22, 10] as Point, radius: 1 },
+  { species: "fernibble", point: [-25, 17] as Point, radius: 1 },
+  { species: "dawnfawn", point: [6, 32] as Point, radius: 1.1 },
 ];
 export const RESOURCE_NODES = [
   { id: "resource-0", point: [-6, 8] as Point },

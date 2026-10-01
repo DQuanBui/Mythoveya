@@ -15,6 +15,7 @@ import {
 import { makeBattle, stats, act } from "../packages/shared/combat";
 import type { Battle, Owned } from "../packages/shared/types";
 import type { Mission } from "../apps/server/game";
+import { own } from "../packages/shared/economy";
 
 process.env.DB_PATH = join(
   mkdtempSync(join(tmpdir(), "mythoveya-adventure-")),
@@ -177,5 +178,84 @@ describe("companion skills and equipment", () => {
     const o = authenticate(token).owned.find((o) => o.id === p.team[0])!;
     expect(o.level).toBeGreaterThan(1);
     expect(o.level).toBeLessThanOrEqual(5);
+  });
+});
+
+describe("evolution", () => {
+  it("adds sixteen evolved forms outside the recruitment roster", async () => {
+    const { EVOLVED, SPECIES, byId: all } = await import("../packages/shared/content");
+    const { pull } = await import("../packages/shared/economy");
+    expect(EVOLVED).toHaveLength(16);
+    expect(new Set(EVOLVED.map((s) => s.id)).size).toBe(16);
+    for (const e of EVOLVED) {
+      const base = all[e.evolvedFrom!];
+      expect(base.evolvesTo).toBe(e.id);
+      expect(SPECIES.some((s) => s.id === e.id)).toBe(false);
+      expect(e.stats.attack).toBeGreaterThan(base.stats.attack);
+      expect(new Set(e.actions.map((a) => a.id)).size).toBe(3);
+    }
+    const pity = { as: 0, s: 0 };
+    for (let i = 0; i < 400; i++)
+      expect(all[pull(pity, Math.random)].evolvedFrom).toBeUndefined();
+  });
+  it("evolves with level, crystals and gold, keeping the companion's progress", () => {
+    const token = keeper(),
+      p = authenticate(token),
+      o = p.owned.find((o) => o.species === "puddlepip")!;
+    p.level = 30;
+    p.gold = 2000;
+    o.level = 9;
+    o.skills = [3, 2];
+    p.town!.inventory.crystal = 1;
+    save(p);
+    expect(() => mutate(token, "evolve", { id: o.id })).toThrow("level 10");
+    const q = authenticate(token);
+    q.owned.find((x) => x.id === o.id)!.level = 10;
+    save(q);
+    expect(() => mutate(token, "evolve", { id: o.id })).toThrow("Rift crystals");
+    const r = authenticate(token);
+    r.town!.inventory.crystal = 3;
+    save(r);
+    const result = mutate(token, "evolve", { id: o.id });
+    expect(result.value).toMatchObject({ species: "lilyreign" });
+    const after = authenticate(token),
+      evolved = after.owned.find((x) => x.id === o.id)!;
+    expect(evolved).toMatchObject({ species: "lilyreign", level: 10, skills: [3, 2] });
+    expect(after.team).toContain(o.id);
+    expect(after.town!.inventory.crystal).toBe(1);
+    expect(after.gold).toBe(2000 - 300);
+    // Bonding the base species again creates a separate companion.
+    operation(token, crypto.randomUUID(), (p) => {
+      own(p, "puddlepip");
+    });
+    const again = authenticate(token).owned.filter((x) => x.species === "puddlepip");
+    expect(again).toHaveLength(1);
+    expect(again[0].id).not.toBe(o.id);
+    expect(() =>
+      mutate(token, "evolve", { id: again[0].id }),
+    ).toThrow();
+  });
+  it("evolved forms keep their base signature in battle", () => {
+    const heal = (species: string) => {
+      const healer: Owned = { id: "h", species, level: 10, xp: 0, shards: 0, upgrade: 0, locked: false };
+      const ally = (id: string): Owned => ({ id, species: "pebblit", level: 10, xp: 0, shards: 0, upgrade: 0, locked: false });
+      const b = makeBattle("h", [[healer, ally("a"), ally("b")], [ally("e")]], "pve", 3);
+      for (const u of b.units.filter((u) => u.side === 0)) u.hp = Math.round(u.maxHp / 3);
+      b.queue = ["0:0"];
+      b.energy = [10, 10];
+      act(b, 0, 1, "0:1");
+      return b.event!.amounts.filter((a) => a.amount < 0).length;
+    };
+    expect(heal("ripplefin")).toBe(2);
+    expect(heal("tidecrest")).toBe(2);
+  });
+  it("pays Rift crystals from bosses and the Crystal Vault", () => {
+    const token = keeper(),
+      p = authenticate(token);
+    p.level = 30;
+    p.adventure = { stages: {}, chests: [], best: { vault: 0 }, dungeonDay: "2000-01-01", runs: {}, gearSeq: 0 };
+    save(p);
+    win(token, { dungeon: "vault", tier: 1 });
+    expect(authenticate(token).town!.inventory.crystal).toBe(1);
   });
 });

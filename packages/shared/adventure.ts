@@ -10,6 +10,7 @@ export type Reward = {
   tome?: number;
   dust?: number;
   elixir?: number;
+  crystal?: number;
 };
 export type Stage = {
   id: string;
@@ -158,13 +159,13 @@ export const stageById = Object.fromEntries(
 );
 export function stageFirstReward(ci: number, boss: boolean): Reward {
   return boss
-    ? { diamonds: 200 + ci * 60, gold: 250 + ci * 80, xp: 140 + ci * 30, tome: 2 + ci, dust: 6 + ci * 3 }
+    ? { diamonds: 200 + ci * 60, gold: 250 + ci * 80, xp: 140 + ci * 30, tome: 2 + ci, dust: 6 + ci * 3, crystal: 2 }
     : { diamonds: 40 + ci * 15, gold: 120 + ci * 40, xp: 80 + ci * 20, dust: 2 + ci };
 }
 export function stageReplayReward(ci: number): Reward {
   return { gold: 60 + ci * 25, xp: 50 + ci * 12, dust: 1 + Math.floor(ci / 2) };
 }
-export const CHAPTER_MASTERY: Reward = { diamonds: 120, tome: 2, elixir: 2 };
+export const CHAPTER_MASTERY: Reward = { diamonds: 120, tome: 2, elixir: 2, crystal: 2 };
 /** Stars from allies still standing: none fainted earns three. */
 export function stageStars(fainted: number) {
   return fainted === 0 ? 3 : fainted <= 2 ? 2 : 1;
@@ -216,7 +217,11 @@ export const DUNGEONS = [
 export type DungeonId = (typeof DUNGEONS)[number]["id"];
 export function dungeonReward(id: DungeonId, tier: number): Reward {
   if (id === "vault")
-    return { diamonds: [30, 45, 60, 80, 100][tier], gold: 40 + tier * 20 };
+    return {
+      diamonds: [30, 45, 60, 80, 100][tier],
+      gold: 40 + tier * 20,
+      crystal: [0, 1, 1, 2, 2][tier],
+    };
   if (id === "forge") return { dust: [3, 5, 8, 12, 16][tier], gold: 80 + tier * 40 };
   return { tome: [1, 2, 2, 3, 4][tier], elixir: [1, 1, 2, 2, 3][tier] };
 }
@@ -318,6 +323,18 @@ export const skillLevels = (o: Owned) => o.skills || [1, 1];
 export const skillPower = (level: number) => 1 + (level - 1) * 0.1;
 export const skillCost = (level: number) => ({ tome: level, gold: 100 * level });
 export const ELIXIR_XP = 250;
+/** What a companion needs to evolve: E-tier bases at level 10, D-tier at 16. */
+export function evolution(species: string) {
+  const s = byId[species];
+  if (!s?.evolvesTo) return null;
+  const late = s.tier !== "E";
+  return {
+    to: s.evolvesTo,
+    level: late ? 16 : 10,
+    crystal: late ? 4 : 2,
+    gold: late ? 800 : 300,
+  };
+}
 export const rewardText = (r: Reward) =>
   [
     r.diamonds && `${r.diamonds} Diamonds`,
@@ -327,6 +344,7 @@ export const rewardText = (r: Reward) =>
     r.tome && `${r.tome} skill tome${r.tome === 1 ? "" : "s"}`,
     r.dust && `${r.dust} forge dust`,
     r.elixir && `${r.elixir} elixir${r.elixir === 1 ? "" : "s"}`,
+    r.crystal && `${r.crystal} Rift crystal${r.crystal === 1 ? "" : "s"}`,
   ]
     .filter(Boolean)
     .join(" · ");

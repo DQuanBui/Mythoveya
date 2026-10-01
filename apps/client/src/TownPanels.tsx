@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { ALL_SPECIES } from "../../../packages/shared/content";
 import {
   NPCS,
   ITEMS,
@@ -371,7 +372,8 @@ export function NpcPanel({
           {npc.id === "oren" && (
             <>
               <h3>
-                {new Set(profile.owned.map((o) => o.species)).size} of 60
+                {new Set(profile.owned.map((o) => o.species)).size} of{" "}
+                {ALL_SPECIES.length}
                 stories discovered
               </h3>
               <p>

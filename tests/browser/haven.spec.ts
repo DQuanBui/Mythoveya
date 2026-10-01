@@ -182,7 +182,7 @@ test("explore the expanded island, cross the bridge and return safely", async ({
     };
   });
   expect(scene.trees).toBeGreaterThan(100);
-  expect(scene.wildlife).toBe(17);
+  expect(scene.wildlife).toBe(27);
   expect(scene.bridge).toBe(true);
   expect(scene.calls).toBeLessThan(1000);
   await page.keyboard.press("Escape");

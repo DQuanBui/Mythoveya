@@ -68,6 +68,7 @@ const ADVENTURE_KINDS = [
   "gear-salvage",
   "elixir",
   "chapter-chest",
+  "evolve",
 ];
 export function mutate(p: Profile, kind: string, v: any) {
   const town = ensureTown(p);

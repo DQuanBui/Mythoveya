@@ -1,10 +1,12 @@
 import type { Profile } from "../../packages/shared/types";
 import { gainXp } from "../../packages/shared/economy";
 import { ensureTown, utcDay } from "../../packages/shared/town";
+import { byId } from "../../packages/shared/content";
 import {
   CHAPTERS,
   CHAPTER_MASTERY,
   ELIXIR_XP,
+  evolution,
   GEAR_MAX_LEVEL,
   SKILL_MAX,
   gearName,
@@ -38,7 +40,7 @@ export function grantReward(p: Profile, r: Reward) {
   p.gold += r.gold || 0;
   p.diamonds += r.diamonds || 0;
   p.tokens += r.tokens || 0;
-  for (const item of ["tome", "dust", "elixir"] as const)
+  for (const item of ["tome", "dust", "elixir", "crystal"] as const)
     if (r[item]) t.inventory[item] = (t.inventory[item] || 0) + r[item]!;
   if (r.xp) gainXp(p, r.xp);
 }
@@ -115,6 +117,23 @@ export function adventureMutation(p: Profile, kind: string, v: any) {
       o.xp += ELIXIR_XP;
       gainXp(p, 0);
       return { message: `+${ELIXIR_XP} creature XP. Level ${o.level}.` };
+    }
+    case "evolve": {
+      const o = companion(),
+        e = evolution(o.species);
+      if (!e) throw Error("This companion has no evolution.");
+      const name = byId[e.to].name;
+      if (p.owned.some((x) => x.species === e.to))
+        throw Error(`You already have ${name}.`);
+      if (o.level < e.level) throw Error(`Reach level ${e.level} to evolve.`);
+      if ((t.inventory.crystal || 0) < e.crystal || p.gold < e.gold)
+        throw Error(`Evolving needs ${e.crystal} Rift crystals and ${e.gold} Gold.`);
+      t.inventory.crystal -= e.crystal;
+      p.gold -= e.gold;
+      const from = byId[o.species].name;
+      o.species = e.to;
+      t.stats.evolutions = (t.stats.evolutions || 0) + 1;
+      return { message: `${o.nickname || from} evolved into ${name}!`, species: e.to };
     }
     case "chapter-chest": {
       const c = CHAPTERS.find((c) => c.id === v.quest),

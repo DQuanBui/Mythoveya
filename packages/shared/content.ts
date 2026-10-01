@@ -220,6 +220,9 @@ export type Species = (typeof roster)[number] & {
   voice: string;
   passive: { id: string; name: string; effect: Effect; value: number };
   actions: Action[];
+  /** Evolved forms name their base species; bases name their evolution. */
+  evolvedFrom?: string;
+  evolvesTo?: string;
 };
 export const SPECIES: Species[] = roster.map((r, i) => {
   const rank = TIERS.indexOf(r.tier as (typeof TIERS)[number]);
@@ -299,7 +302,74 @@ export const SPECIES: Species[] = roster.map((r, i) => {
     ],
   };
 });
-export const byId = Object.fromEntries(SPECIES.map((s) => [s.id, s]));
+// Evolved forms are reached only by evolving a companion; they never appear
+// in recruitment, so the sixty-species roster and its odds are unchanged.
+export const EVOLUTIONS = [
+  ["cindermite", "forgebeetle", "Forgebeetle", "Armored furnace beetle with a glowing horn and basalt plates", "Furnace Bite applies a lasting burn"],
+  ["puddlepip", "lilyreign", "Lilyreign", "Crowned pond amphibian with a lily-petal crown and an orbit of droplets", "Rainfall Dew heals the weakest ally"],
+  ["mossprig", "bramblehop", "Bramblehop", "Fern-maned rabbit with blooming leaf ears and a canopy tail", "Thicket Guard grants a sturdy shield"],
+  ["pebblit", "boulderune", "Boulderune", "Mountain-backed tortoise with crystal ridges and slate plates", "Bastion Shell reduces incoming damage"],
+  ["zippinch", "thunderkite", "Thunderkite", "Storm falcon with a forked lightning crown and long tail plumes", "Thunder Dive gains a strong speed bonus"],
+  ["snowmew", "glacielynx", "Glacielynx", "Crystal-tufted lynx with icicle ears and frost-plated paws", "Frostbound Pounce temporarily slows"],
+  ["glimlet", "luminmoth", "Luminmoth", "Radiant moth with a halo above its lantern wings", "Lantern Veil cleanses one debuff"],
+  ["duskblob", "gloomwraith", "Gloomwraith", "Hooded shadow spirit trailing an orbit of ink", "Nightfall Touch briefly reduces attack"],
+  ["wickwaddle", "hearthwaddle", "Hearthwaddle", "Crested ember penguin with a candle crown and a warm feather cloak", "Kindled Light shields the weakest ally and removes one burn"],
+  ["bubbloom", "pearlbloom", "Pearlbloom", "Blooming jellyfish with petal fins and a glowing pearl crown", "Pearl Tether lowers one target's speed for one round"],
+  ["emberfox", "pyrevale", "Pyrevale", "Winged ember fox with a crown of candle flames", "Blaze Dash deals extra damage to shields"],
+  ["ripplefin", "tidecrest", "Tidecrest", "Crested river otter with a sweeping fin tail and orbiting droplets", "Tidal Current heals two injured allies"],
+  ["thornhare", "thornstag", "Thornstag", "Tall stag-hare with blooming bramble antlers and leaf garlands", "Bramble Bind lowers target speed"],
+  ["cragpup", "cragmaw", "Cragmaw", "Broad guardian hound in layered basalt armor with stone horns", "Bulwark Guard protects one ally"],
+  ["voltwing", "tempestwing", "Tempestwing", "Great storm bat with crackling wing membranes and a lightning halo", "Arc Storm chains to a second target"],
+  ["dawnfawn", "solstag", "Solstag", "Radiant young stag with a sun-disc crest and a petal mane", "Dawn Grace heals and cleanses"],
+] as const;
+export const EVOLVED: Species[] = EVOLUTIONS.map(
+  ([from, id, name, appearance, signature], k) => {
+    const base = SPECIES.find((x) => x.id === from)!,
+      rank = TIERS.indexOf(base.tier as (typeof TIERS)[number]) + 1,
+      lift = (1 + rank * 0.05 + 0.04) / (1 + (rank - 1) * 0.05);
+    const move = signature.split(
+      / (?:applies|heals|grants|reduces|gains|temporarily|cleanses|briefly|shields|lowers|deals|chains|protects)/,
+    )[0];
+    base.evolvesTo = id;
+    return {
+      ...base,
+      id,
+      name,
+      tier: TIERS[rank],
+      appearance,
+      signature,
+      evolvedFrom: from,
+      evolvesTo: undefined,
+      lore: `${appearance}. ${name} is what ${base.name} becomes when a keeper's bond runs deep.`,
+      index: SPECIES.length + k,
+      size: base.size + 0.13,
+      variant: (base.variant + 2) % 5,
+      stats: {
+        hp: Math.round(base.stats.hp * lift),
+        attack: Math.round(base.stats.attack * lift),
+        defense: Math.round(base.stats.defense * lift),
+        speed: base.stats.speed + 3,
+      },
+      portrait: `model-render:${id}`,
+      voice: `${base.family}:${SPECIES.length + k}`,
+      passive: { ...base.passive, id: `${id}-passive`, name: `${name}'s instinct`, value: 0.06 },
+      actions: base.actions.map((a, n) => ({
+        ...a,
+        id: `${id}-${n}`,
+        name:
+          n === 0
+            ? `${name} · ${base.element === "Tide" ? "Splash" : base.element === "Light" ? "Gleam" : "Strike"}`
+            : n === 1
+              ? move
+              : `${name} · Wild ${base.element}`,
+      })),
+    } as Species;
+  },
+);
+export const ALL_SPECIES = [...SPECIES, ...EVOLVED];
+export const byId = Object.fromEntries(ALL_SPECIES.map((s) => [s.id, s]));
+/** Base species whose authored signature an evolved form keeps in battle. */
+export const signatureId = (id: string) => byId[id]?.evolvedFrom ?? id;
 export const STARTERS = ["emberfox", "ripplefin", "thornhare"];
 export const COMPANIONS = [
   "cindermite",

@@ -558,6 +558,14 @@ export const ITEMS = {
     sell: 0,
     stock: 0,
   },
+  crystal: {
+    name: "Rift crystal",
+    icon: "✧",
+    description: "A shard of the rift. Companions use them to evolve.",
+    buy: 0,
+    sell: 0,
+    stock: 0,
+  },
   elixir: {
     name: "Growth elixir",
     icon: "⚱",

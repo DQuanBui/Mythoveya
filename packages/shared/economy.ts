@@ -24,8 +24,12 @@ export function own(p: Profile, species: string): Owned {
     found.shards++;
     return found;
   }
+  // An evolved companion keeps its original id, so a new bond needs a fresh one.
+  let id = `${p.id}:${species}`;
+  for (let n = 2; p.owned.some((o) => o.id === id); n++)
+    id = `${p.id}:${species}:${n}`;
   const o = {
-    id: `${p.id}:${species}`,
+    id,
     species,
     level: 1,
     xp: 0,

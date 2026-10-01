@@ -6,6 +6,7 @@ import {
   ELEMENTS,
   REGIONS,
   SPECIES,
+  ALL_SPECIES,
   TIERS,
 } from "../../../packages/shared/content";
 import {
@@ -121,7 +122,7 @@ export function Collection({
     [sort, setSort] = useState("roster"),
     [detail, setDetail] = useState<string | null>(null),
     [confirm, setConfirm] = useState(false);
-  const list = SPECIES.filter(
+  const list = ALL_SPECIES.filter(
     (s) =>
       s.name.toLowerCase().includes(query.toLowerCase()) &&
       (!tier || s.tier === tier) &&
@@ -217,7 +218,12 @@ export function Collection({
                     Upgrade · 3 shards
                   </button>
                 </div>
-                <CompanionGrowth profile={profile} o={o} run={run} />
+                <CompanionGrowth
+                  profile={profile}
+                  o={o}
+                  run={run}
+                  onEvolve={setDetail}
+                />
                 {confirm && (
                   <div className="notice">
                     Spend 3 shards for +2% stats?
@@ -233,11 +239,17 @@ export function Collection({
                   </div>
                 )}
               </>
+            ) : s.evolvedFrom ? (
+              <p className="notice">
+                An evolved form. Raise a {byId[s.evolvedFrom].name} and evolve
+                it from its journal page with Rift crystals.
+              </p>
             ) : (
               <p className="notice">
                 Find through the bond shrine
                 {s.tier <= "C" ? " or selected wild encounters" : ""}. Equal
                 chance among all ten species in its tier.
+                {s.evolvesTo ? ` Evolves into ${byId[s.evolvesTo].name}.` : ""}
               </p>
             )}
           </div>
@@ -250,7 +262,9 @@ export function Collection({
       <p className="eyebrow">THE FIELD JOURNAL</p>
       <h2>
         {training ? "Training grounds" : "Meet the Wildbound"}{" "}
-        <small>{profile.owned.length} / 60 bonded</small>
+        <small>
+          {profile.owned.length} / {ALL_SPECIES.length} bonded
+        </small>
       </h2>
       <p className="muted">Every bond begins with a little curiosity.</p>
       <div className="filters">

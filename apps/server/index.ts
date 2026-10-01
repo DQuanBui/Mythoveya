@@ -84,6 +84,7 @@ const mutation = z.object({
     "gear-salvage",
     "elixir",
     "chapter-chest",
+    "evolve",
   ]),
   species: z.string().max(32).optional(),
   count: z.union([z.literal(1), z.literal(10)]).optional(),
