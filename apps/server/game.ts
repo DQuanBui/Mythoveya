@@ -17,18 +17,63 @@ import { atomic, db, getProfile, save } from "./store";
 import { ensureTown, utcDay, utcWeek } from "../../packages/shared/town";
 import { townMutation } from "./town-game";
 import { resourcesForRegion } from "../../packages/shared/haven";
+import {
+  adventureMutation,
+  addGear,
+  ensureAdventure,
+  grantReward,
+} from "./adventure-game";
+import {
+  CHAPTERS,
+  DUNGEONS,
+  BOSS_SCALE,
+  DUNGEON_RUNS_PER_DAY,
+  enemyLevel,
+  companionBonus,
+  dungeonReward,
+  dungeonTierOpen,
+  gearName,
+  rewardText,
+  rollGear,
+  stageById,
+  stageFirstReward,
+  stageReplayReward,
+  stageStars,
+  stageUnlocked,
+  RARITIES,
+  type DungeonId,
+  type Reward,
+} from "../../packages/shared/adventure";
 export const pve = new Map<string, Battle>();
 export const activeHuman = new Set<string>();
-export const battleMeta = new Map<string, { region: string; boss: boolean }>();
+export type Mission = { stage?: string; dungeon?: string; tier?: number };
+export const battleMeta = new Map<
+  string,
+  { region: string; boss: boolean } & Mission
+>();
 const random = () => randomInt(0, 0x100000000) / 0x100000000;
 export function team(p: Profile) {
   formation({ ...p }, p.team);
-  return p.team.map((id) => structuredClone(p.owned.find((o) => o.id === id)!));
+  return p.team.map((id) => {
+    const o = structuredClone(p.owned.find((o) => o.id === id)!);
+    if (p.gear?.some((g) => g.owner === o.id)) o.bonus = companionBonus(p, o);
+    return o;
+  });
 }
+const ADVENTURE_KINDS = [
+  "skill-up",
+  "gear-equip",
+  "gear-remove",
+  "gear-upgrade",
+  "gear-salvage",
+  "elixir",
+  "chapter-chest",
+];
 export function mutate(p: Profile, kind: string, v: any) {
   const town = ensureTown(p);
   if (kind.startsWith("town-"))
     return townMutation(p, kind, v, Date.now(), random);
+  if (ADVENTURE_KINDS.includes(kind)) return adventureMutation(p, kind, v);
   switch (kind) {
     case "starter":
       if (p.owned.length) throw Error("You already chose a starter.");
@@ -154,10 +199,16 @@ export function mutate(p: Profile, kind: string, v: any) {
   }
   return null;
 }
-export function startPve(p: Profile, boss: boolean, practice = false) {
+export function startPve(
+  p: Profile,
+  boss: boolean,
+  practice = false,
+  mission: Mission = {},
+) {
   if (activeHuman.has(p.id)) throw Error("Finish your arena match first.");
   const existing = pve.get(p.id);
   if (existing && existing.winner === null) return existing;
+  if (mission.stage || mission.dungeon) return startMission(p, mission);
   const ids =
     p.region === "canyon"
       ? ["magmole", "cragpup", "voltwing", "flintuff", "cindermite", "emberfox"]
@@ -221,6 +272,114 @@ export function startPve(p: Profile, boss: boolean, practice = false) {
   battleMeta.set(b.id, { region: practice ? "practice" : p.region, boss });
   return b;
 }
+const enemyTeam = (species: string[], level: number): Owned[] =>
+  species.map((s, i) => ({
+    id: `enemy-${i}`,
+    species: s,
+    level: enemyLevel(level, s),
+    xp: 0,
+    shards: 0,
+    upgrade: 0,
+    locked: false,
+  }));
+function startMission(p: Profile, mission: Mission) {
+  if (p.team.length !== 6) throw Error("Form a team of six first.");
+  const a = ensureAdventure(p);
+  let b: Battle;
+  if (mission.stage) {
+    const stage = stageById[mission.stage];
+    if (!stage || !stageUnlocked(p, stage.id))
+      throw Error("Clear the previous stage first.");
+    b = makeBattle(
+      randomUUID(),
+      [team(p), enemyTeam(stage.enemies, stage.level)],
+      "pve",
+      randomInt(0, 10000000),
+    );
+    b.title = stage.boss?.title || `Chapter ${stage.ci + 1} · ${stage.name}`;
+    if (stage.ease)
+      for (const u of b.units.filter((u) => u.side === 1)) {
+        u.hp = u.maxHp = Math.round(u.maxHp * stage.ease);
+        u.attack = Math.round(u.attack * stage.ease);
+      }
+    if (stage.boss) {
+      const u = b.units.find(
+        (u) => u.side === 1 && u.species === stage.boss!.species,
+      )!;
+      u.hp = u.maxHp = Math.round(u.maxHp * BOSS_SCALE.hp);
+      u.attack = Math.round(u.attack * BOSS_SCALE.attack);
+      u.shield = Math.round(u.maxHp * BOSS_SCALE.shield);
+    }
+    battleMeta.set(b.id, {
+      region: CHAPTERS[stage.ci].id,
+      boss: !!stage.boss,
+      stage: stage.id,
+    });
+  } else {
+    const d = DUNGEONS.find((d) => d.id === mission.dungeon),
+      tier = mission.tier ?? 0;
+    if (!d) throw Error("Unknown dungeon.");
+    if (!dungeonTierOpen(p, tier, d.id))
+      throw Error("Clear the previous tier and raise your keeper level.");
+    if ((a.runs[d.id] || 0) >= DUNGEON_RUNS_PER_DAY)
+      throw Error("No runs left today. Dungeons reset at 00:00 UTC.");
+    b = makeBattle(
+      randomUUID(),
+      [team(p), enemyTeam([...d.enemies], d.levels[tier])],
+      "pve",
+      randomInt(0, 10000000),
+    );
+    b.title = `${d.name} · Tier ${["I", "II", "III", "IV", "V"][tier]}`;
+    const guardian = b.units[b.units.length - 1];
+    guardian.hp = guardian.maxHp = Math.round(guardian.maxHp * 1.6);
+    battleMeta.set(b.id, {
+      region: "dungeon",
+      boss: false,
+      dungeon: d.id,
+      tier,
+    });
+  }
+  pve.set(p.id, b);
+  return b;
+}
+function finishMission(p: Profile, b: Battle, meta: Mission) {
+  const a = ensureAdventure(p),
+    items: string[] = [];
+  let reward: Reward,
+    stars: number | undefined;
+  if (meta.stage) {
+    const stage = stageById[meta.stage],
+      first = !a.stages[stage.id];
+    stars = stageStars(
+      b.units.filter((u) => u.side === 0 && u.hp === 0).length,
+    );
+    reward = first
+      ? stageFirstReward(stage.ci, !!stage.boss)
+      : stageReplayReward(stage.ci);
+    a.stages[stage.id] = Math.max(a.stages[stage.id] || 0, stars);
+    if (first && stage.boss) {
+      const roll = rollGear(random, stage.ci, stage.ci >= 3 ? 2 : 1);
+      const g = addGear(p, roll.slot, roll.rarity);
+      items.push(`${RARITIES[g.rarity]} ${gearName(g)}`);
+    }
+  } else {
+    const tier = meta.tier ?? 0,
+      id = meta.dungeon as DungeonId;
+    a.runs[id] = (a.runs[id] || 0) + 1;
+    a.best[id] = Math.max(a.best[id] ?? -1, tier);
+    reward = dungeonReward(id, tier);
+    if (id === "forge")
+      for (let i = 0; i < (tier >= 3 ? 2 : 1); i++) {
+        const roll = rollGear(random, tier);
+        const g = addGear(p, roll.slot, roll.rarity);
+        items.push(`${RARITIES[g.rarity]} ${gearName(g)}`);
+      }
+  }
+  grantReward(p, reward);
+  const text = rewardText({ ...reward, gold: 0, diamonds: 0, xp: 0, tokens: 0 });
+  if (text) items.unshift(text);
+  return { items, xp: reward.xp || 0, stars };
+}
 export function finishPve(profileId: string, b: Battle) {
   if (b.winner === null) return;
   atomic(() => {
@@ -234,6 +393,32 @@ export function finishPve(profileId: string, b: Battle) {
     };
     const meta = battleMeta.get(b.id);
     const town = ensureTown(p);
+    if (meta?.stage || meta?.dungeon) {
+      let result: { items: string[]; xp: number; stars?: number } = {
+        items: [],
+        xp: 0,
+      };
+      if (b.winner === 0) {
+        p.wins++;
+        p.daily.wins++;
+        result = finishMission(p, b, meta);
+      }
+      b.rewards = {
+        gold: p.gold - before.gold,
+        diamonds: p.diamonds - before.diamonds,
+        tokens: p.tokens - before.tokens,
+        xp: result.xp,
+        newSpecies: [],
+        items: result.items,
+        stars: result.stars,
+      };
+      db.prepare("INSERT INTO matches VALUES(?,?)").run(
+        b.id,
+        JSON.stringify({ winner: b.winner, kind: "mission", profileId }),
+      );
+      save(p);
+      return;
+    }
     if (meta?.region === "practice" && b.winner === 0) town.sparWon = utcDay();
     if (meta?.boss && meta.region !== "practice" && b.winner === 0)
       town.guardianWeek = utcWeek();

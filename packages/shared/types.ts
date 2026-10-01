@@ -9,6 +9,17 @@ export type Owned = {
   nickname?: string;
   friendship?: number;
   accessory?: "ribbon" | "bell";
+  skills?: [number, number];
+  /** Battle-only equipment bonus resolved by the server; never saved. */
+  bonus?: { hp: number; attack: number; defense: number; speed: number; crit: number };
+};
+export type AdventureState = {
+  stages: Record<string, number>;
+  chests: string[];
+  best: Record<string, number>;
+  dungeonDay: string;
+  runs: Record<string, number>;
+  gearSeq: number;
 };
 export type TownState = {
   stamps?: string[];
@@ -60,6 +71,8 @@ export type Profile = {
   bond?: { species: string; chance: number; used: boolean };
   bosses: string[];
   town?: TownState;
+  adventure?: AdventureState;
+  gear?: import("./adventure").Gear[];
 };
 export type Status = {
   kind: string;
@@ -84,6 +97,8 @@ export type Unit = {
   revived: boolean;
   controlledLast: boolean;
   bank: number;
+  skill?: number[];
+  crit?: number;
 };
 export type BattleEvent = {
   id: number;
@@ -118,5 +133,7 @@ export type Battle = {
     xp: number;
     tokens: number;
     newSpecies: string[];
+    items?: string[];
+    stars?: number;
   };
 };

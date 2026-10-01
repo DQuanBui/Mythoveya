@@ -1,4 +1,5 @@
 import { byId } from "./content";
+import { skillPower } from "./adventure";
 import type { Battle, Owned, Unit, Status } from "./types";
 export function rng(b: { seed: number }) {
   b.seed = (Math.imul(b.seed, 1664525) + 1013904223) >>> 0;
@@ -10,13 +11,15 @@ export function stats(o: Owned, tactical = false) {
   const f =
     (1 + (level - 1) * s.growth) * (tactical ? 1 : 1 + o.upgrade * 0.02);
   const budget = tactical ? 1 / (1 + Math.floor(s.index / 10) * 0.05) : 1;
+  // Equipment never applies in Tactical Arena, matching shard upgrades.
+  const g = (!tactical && o.bonus) || { hp: 0, attack: 0, defense: 0, speed: 0 };
   return {
-    hp: Math.round(s.stats.hp * f * budget),
-    attack: Math.round(s.stats.attack * f * budget),
-    defense: Math.round(s.stats.defense * f * budget),
-    speed: Math.round(
-      s.stats.speed * (s.passive.effect === "haste" ? 1.05 : 1),
-    ),
+    hp: Math.round(s.stats.hp * f * budget * (1 + g.hp)),
+    attack: Math.round(s.stats.attack * f * budget * (1 + g.attack)),
+    defense: Math.round(s.stats.defense * f * budget * (1 + g.defense)),
+    speed:
+      Math.round(s.stats.speed * (s.passive.effect === "haste" ? 1.05 : 1)) +
+      g.speed,
   };
 }
 export const power = (o: Owned) => {
@@ -50,10 +53,18 @@ export function makeBattle(
     id,
     units: teams.flatMap((t, side) =>
       t.map((o, slot) => {
-        const s = stats(o, mode === "tactical");
+        const tactical = mode === "tactical";
+        const s = stats(o, tactical);
         const p = byId[o.species].passive;
+        const levels = o.skills || [1, 1];
         return {
           ...s,
+          ...(tactical
+            ? {}
+            : {
+                skill: [1, skillPower(levels[0]), skillPower(levels[1])],
+                crit: 0.1 + (o.bonus?.crit || 0),
+              }),
           maxHp: s.hp,
           id: `${side}:${slot}`,
           species: o.species,
@@ -135,7 +146,8 @@ function nextRound(b: Battle) {
       for (const victim of delayedTargets) {
         const before = victim.hp;
         const damage = Math.round(
-          (a.attack * skill.power * 100) / (100 + victim.defense),
+          (a.attack * skill.power * (a.skill?.[d.action] ?? 1) * 100) /
+            (100 + victim.defense),
         );
         const absorbed = Math.min(victim.shield, damage);
         victim.shield -= absorbed;
@@ -221,7 +233,8 @@ export function act(
   const actor = legal(b, side, n, target),
     s = byId[actor.species],
     a = s.actions[n],
-    t = b.units.find((u) => u.id === target)!;
+    t = b.units.find((u) => u.id === target)!,
+    power = a.power * (actor.skill?.[n] ?? 1);
   const consumeBoost = n > 0 && Boolean(has(actor, "boost"));
   b.energy[side] -= a.cost;
   actor.cooldowns[n] = a.cooldown;
@@ -318,11 +331,11 @@ export function act(
         }
         if (effect === "stun" && a.effects.includes("delay")) continue;
         if (effect === "damage" && !a.effects.includes("delay") && u.hp > 0) {
-          const crit = rng(b) < 0.1 ? 1.5 : 1;
+          const crit = rng(b) < (actor.crit ?? 0.1) ? 1.5 : 1;
           let dmg = Math.max(
             1,
             Math.round(
-              ((actor.attack * a.power * 100) /
+              ((actor.attack * power * 100) /
                 (100 +
                   (a.effects.includes("pierce")
                     ? u.defense * 0.4
@@ -401,14 +414,14 @@ export function act(
             u.maxHp,
             u.hp +
               Math.round(
-                actor.attack * a.power * (s.id === "pelagryth" ? 1.8 : 1.3),
+                actor.attack * power * (s.id === "pelagryth" ? 1.8 : 1.3),
               ),
           );
         if (effect === "shield" && u.hp > 0) status(u, "shielded", 3);
         if (effect === "shield" && u.hp > 0)
           u.shield = Math.min(
             Math.round(u.maxHp * 0.6),
-            u.shield + Math.round(actor.attack * a.power),
+            u.shield + Math.round(actor.attack * power),
           );
         if (effect === "cleanse")
           u.statuses = u.statuses.filter(

@@ -77,6 +77,13 @@ const mutation = z.object({
     "town-track",
     "town-cache",
     "town-fish",
+    "skill-up",
+    "gear-equip",
+    "gear-remove",
+    "gear-upgrade",
+    "gear-salvage",
+    "elixir",
+    "chapter-chest",
   ]),
   species: z.string().max(32).optional(),
   count: z.union([z.literal(1), z.literal(10)]).optional(),
@@ -90,6 +97,7 @@ const mutation = z.object({
   item: z.string().max(20).optional(),
   nickname: z.string().max(20).optional(),
   success: z.boolean().optional(),
+  slot: z.number().int().min(1).max(2).optional(),
 });
 app.post("/api/mutate", (req, res) => {
   const v = mutation.parse(req.body);
@@ -105,9 +113,18 @@ app.post("/api/battle/start", (req, res) => {
     .object({
       boss: z.boolean().default(false),
       practice: z.boolean().default(false),
+      stage: z.string().max(10).optional(),
+      dungeon: z.string().max(10).optional(),
+      tier: z.number().int().min(0).max(4).optional(),
     })
     .parse(req.body);
-  res.json(startPve(p, v.boss, v.practice));
+  res.json(
+    startPve(p, v.boss, v.practice, {
+      stage: v.stage,
+      dungeon: v.dungeon,
+      tier: v.tier,
+    }),
+  );
 });
 app.post("/api/battle/act", (req, res) => {
   const p = authenticate(token(req));
