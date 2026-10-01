@@ -169,7 +169,7 @@
 }
 .dungeon-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
   gap: 14px;
 }
 .dungeon-grid > .small-print {
@@ -490,5 +490,56 @@
   }
   .event-mission button {
     grid-column: 1 / -1;
+  }
+}
+
+/* Rift Tower */
+.tower-layout {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  gap: 22px;
+  align-items: start;
+}
+.tower-shaft {
+  display: grid;
+  gap: 4px;
+  margin-top: 10px;
+}
+.tower-shaft span {
+  padding: 7px 10px;
+  border-radius: 6px;
+  background: #0f2b31a8;
+  border: 1px solid #c6d2b42b;
+  font-size: 12px;
+  color: #c9d3c0;
+}
+.tower-shaft span.cleared {
+  opacity: 0.5;
+}
+.tower-shaft span.warden {
+  color: #f3dc9f;
+}
+.tower-shaft span.current {
+  border-color: #b9a6f0;
+  box-shadow: 0 0 12px #9a86c466;
+  color: #fff4d6;
+}
+.tower-floor .stage-enemies {
+  margin: 14px 0 10px;
+}
+.tower-milestones {
+  display: grid;
+  gap: 6px;
+  margin-top: 16px;
+  font-size: 12px;
+  color: #d8dfcc;
+}
+.tower-milestones b {
+  color: #f3dc9f;
+  margin-right: 6px;
+}
+@media (max-width: 760px) {
+  .tower-layout {
+    grid-template-columns: 1fr;
   }
 }

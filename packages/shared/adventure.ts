@@ -39,6 +39,9 @@ const RECOMMENDED = [
   [12, 13, 14, 16],
   [18, 19, 20, 22],
   [24, 25, 27, 29],
+  [31, 32, 33, 35],
+  [35, 36, 37, 38],
+  [38, 39, 40, 40],
 ];
 const chapter = (
   n: number,
@@ -147,6 +150,54 @@ export const CHAPTERS: Chapter[] = [
     ],
     { species: "nyxavorn", title: "Nyxavorn Unbound" },
   ),
+  chapter(
+    6,
+    "The Sunken Archive",
+    "Beneath the cloud sea",
+    "With the rift calmed, an old library rises from the deep sky-water. Its keeper will not share what the first Riftkeepers wrote.",
+    "#5f9fb3",
+    [35, 50, 40, 34],
+    ["Drowned stacks", "Ink tides", "The silent reading room", "Pelagryth, Keeper of Pages"],
+    [
+      ["coralisk", "abysshell", "inkmantle", "ripplefin", "nocturnyx", "leviacrest"],
+      ["leviacrest", "abysshell", "murkfang", "chimewing", "inkmantle", "coralisk"],
+      ["thaloryx", "leviacrest", "inkmantle", "umbrawyrm", "abysshell", "chimewing"],
+      ["thaloryx", "pelagryth", "leviacrest", "abysshell", "inkmantle", "umbrawyrm"],
+    ],
+    { species: "pelagryth", title: "Pelagryth, Keeper of Pages" },
+  ),
+  chapter(
+    7,
+    "Skyforge Peaks",
+    "The highest mountains",
+    "The archive's maps lead up the Skyforge, where storms hammer the mountains into shape and a titan guards the anvil.",
+    "#b49d7c",
+    [38, 38, 39, 38],
+    ["Stormbreak trail", "The anvil cliffs", "Thunderhead pass", "Orogantis of the Anvil"],
+    [
+      ["basalhorn", "titanusk", "tempestrix", "raijora", "obsidrake", "cindervault"],
+      ["titanusk", "cindervault", "raijora", "zephyreon", "obsidrake", "pyroclast"],
+      ["orogantis", "titanusk", "zephyreon", "raijora", "ignivara", "tempestrix"],
+      ["titanusk", "orogantis", "zephyreon", "solkarath", "raijora", "cindervault"],
+    ],
+    { species: "orogantis", title: "Orogantis of the Anvil" },
+  ),
+  chapter(
+    8,
+    "The Starlit Throne",
+    "Above every island",
+    "At the top of the sky waits the first Riftkeeper's companion, who has guarded the reaches alone for a thousand years.",
+    "#e6cf95",
+    [54, 47, 60, 51],
+    ["Stairway of stars", "Garden of comets", "The empty court", "Aurelith, the First Light"],
+    [
+      ["auroriel", "halovelle", "solmane", "everbloom", "crysalune", "iskavelle"],
+      ["everbloom", "auroriel", "vortalyx", "halovelle", "nyxavorn", "solkarath"],
+      ["thaloryx", "everbloom", "iskavelle", "vortalyx", "auroriel", "solkarath"],
+      ["orogantis", "aurelith", "solkarath", "everbloom", "vortalyx", "iskavelle"],
+    ],
+    { species: "aurelith", title: "Aurelith, the First Light" },
+  ),
 ];
 // Rarer species appear at lower levels so every stage stays fair for a growing team.
 const TIER_OFFSET: Record<string, number> = { E: 0, D: 1, C: 3, B: 5, A: 7, S: 9 };
@@ -213,6 +264,16 @@ export const DUNGEONS = [
     levels: [6, 12, 19, 26, 32],
     enemies: ["mossprig", "fernibble", "thornhare", "floraclaw", "solmane", "orchivyra"],
   },
+  {
+    id: "grotto",
+    name: "Tidal Grotto",
+    reward: "Gold and Rift crystals",
+    description:
+      "A glowing sea cave beneath the Driftshore. Tide spirits hoard gold and rift shards from the deep.",
+    color: "#6cc0c9",
+    levels: [4, 10, 15, 21, 27],
+    enemies: ["puddlepip", "bubbloom", "coralisk", "ripplefin", "abysshell", "leviacrest"],
+  },
 ] as const;
 export type DungeonId = (typeof DUNGEONS)[number]["id"];
 export function dungeonReward(id: DungeonId, tier: number): Reward {
@@ -223,6 +284,8 @@ export function dungeonReward(id: DungeonId, tier: number): Reward {
       crystal: [0, 1, 1, 2, 2][tier],
     };
   if (id === "forge") return { dust: [3, 5, 8, 12, 16][tier], gold: 80 + tier * 40 };
+  if (id === "grotto")
+    return { gold: [150, 220, 300, 400, 520][tier], crystal: [1, 1, 2, 2, 3][tier] };
   return { tome: [1, 2, 2, 3, 4][tier], elixir: [1, 1, 2, 2, 3][tier] };
 }
 export function dungeonTierOpen(p: Profile, tier: number, id: string) {
@@ -315,6 +378,44 @@ export function rollGear(random: () => number, tier: number, minRarity = 0) {
     slot: GEAR_SLOTS[Math.min(2, Math.floor(random() * 3))],
     rarity: Math.max(minRarity, rarity),
   };
+}
+
+// The Rift Tower: sixty floors, climbed at your own pace. Every fifth floor has a boss.
+export const TOWER_FLOORS = 60;
+const TOWER_POOL = [
+  ["pebblit", "cindermite", "puddlepip", "mossprig", "zippinch", "snowmew"],
+  ["cragpup", "emberfox", "ripplefin", "thornhare", "voltwing", "frostwhisk"],
+  ["magmole", "coralisk", "floraclaw", "basalhorn", "nimbuskit", "rimeowl"],
+  ["abysshell", "pyroclast", "briarhart", "obsidrake", "tempestrix", "glaciermaw"],
+  ["titanusk", "ignivara", "leviacrest", "sylvarion", "raijora", "crysalune"],
+  ["thaloryx", "solkarath", "everbloom", "orogantis", "zephyreon", "vortalyx"],
+];
+// Base enemy levels per floor, calibrated by simulated battles (starter six to
+// floor 20, an evolved late-game team after) and smoothed to rise steadily.
+const TOWER_LEVELS = [
+  2, 2, 3, 3, 3, 5, 7, 7, 7, 7, 7, 8, 9, 9, 9, 11, 11, 11, 12, 12, 14, 16, 18,
+  20, 22, 24, 26, 26, 28, 28, 28, 28, 28, 28, 28, 30, 32, 32, 32, 32, 34, 34, 34,
+  36, 36, 37, 38, 38, 38, 38, 38, 38, 40, 42, 42, 42, 42, 42, 44, 44,
+];
+export function towerFloor(floor: number) {
+  const band = Math.min(5, Math.floor((floor - 1) / 10)),
+    pool = TOWER_POOL[band],
+    shift = floor % 6,
+    enemies = pool.map((_, i) => pool[(i + shift) % 6]),
+    boss = floor % 5 === 0;
+  return {
+    floor,
+    enemies,
+    level: TOWER_LEVELS[Math.max(0, Math.min(TOWER_FLOORS, floor) - 1)],
+    recommended: Math.min(40, Math.round(floor * 0.66) + 1),
+    boss: boss ? enemies[1] : undefined,
+  };
+}
+export function towerReward(floor: number): Reward & { gear?: number } {
+  if (floor % 10 === 0)
+    return { diamonds: 100, crystal: 2, gold: 200 + floor * 10, gear: floor >= 40 ? 3 : 2 };
+  if (floor % 5 === 0) return { diamonds: 50, crystal: 1, gold: 150 + floor * 8 };
+  return { gold: 60 + floor * 6, dust: 1 + Math.floor(floor / 15) };
 }
 
 // Skills (action II) and ultimates (action III) level from 1 to 5.

@@ -210,7 +210,7 @@ export default function App() {
         practice,
         ...adventure,
       });
-      mission.current = !!(adventure.stage || adventure.dungeon);
+      mission.current = !!(adventure.stage || adventure.dungeon || adventure.tower);
       setBattle(b);
       setPanel("");
       setAuto(false);

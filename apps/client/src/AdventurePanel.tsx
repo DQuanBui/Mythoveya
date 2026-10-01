@@ -14,11 +14,20 @@ import {
   stageFirstReward,
   stageReplayReward,
   stageUnlocked,
+  RARITIES,
+  TOWER_FLOORS,
+  towerFloor,
+  towerReward,
 } from "../../../packages/shared/adventure";
 import { utcDay } from "../../../packages/shared/town";
 import { Portrait } from "./portraits";
 
-export type MissionStart = { stage?: string; dungeon?: string; tier?: number };
+export type MissionStart = {
+  stage?: string;
+  dungeon?: string;
+  tier?: number;
+  tower?: number;
+};
 const ROMAN = ["I", "II", "III", "IV", "V"];
 
 export function AdventurePanel({
@@ -36,7 +45,7 @@ export function AdventurePanel({
     0,
     CHAPTERS.findIndex((c) => !stars[c.stages[3].id]),
   );
-  const [tab, setTab] = useState<"story" | "dungeons">("story"),
+  const [tab, setTab] = useState<"story" | "dungeons" | "tower">("story"),
     [chapter, setChapter] = useState(current === -1 ? 0 : current);
   const c = CHAPTERS[chapter],
     total = c.stages.reduce((n, s) => n + (stars[s.id] || 0), 0);
@@ -62,8 +71,18 @@ export function AdventurePanel({
         >
           ◇ Rift dungeons
         </button>
+        <button
+          role="tab"
+          aria-selected={tab === "tower"}
+          className={tab === "tower" ? "selected" : ""}
+          onClick={() => setTab("tower")}
+        >
+          ♜ Rift Tower
+        </button>
       </div>
-      {tab === "story" ? (
+      {tab === "tower" ? (
+        <Tower profile={profile} begin={begin} />
+      ) : tab === "story" ? (
         <div className="story-layout">
           <nav className="chapter-list" aria-label="Chapters">
             {CHAPTERS.map((ch, i) => {
@@ -181,6 +200,84 @@ export function AdventurePanel({
           </p>
         </div>
       )}
+    </div>
+  );
+}
+
+function Tower({
+  profile,
+  begin,
+}: {
+  profile: Profile;
+  begin: (mission: MissionStart) => void;
+}) {
+  const best = profile.adventure?.tower || 0,
+    done = best >= TOWER_FLOORS,
+    floor = towerFloor(Math.min(TOWER_FLOORS, best + 1)),
+    reward = towerReward(floor.floor),
+    text = (r: ReturnType<typeof towerReward>) =>
+      [rewardText(r), r.gear ? `${RARITIES[r.gear]} equipment` : ""]
+        .filter(Boolean)
+        .join(" · ");
+  const milestones = Array.from({ length: 4 }, (_, i) => (Math.floor(best / 5) + i + 1) * 5).filter(
+    (f) => f <= TOWER_FLOORS,
+  );
+  return (
+    <div className="tower-layout">
+      <section className="tower-climb" aria-label="Tower progress">
+        <p className="eyebrow">
+          {best}/{TOWER_FLOORS} FLOORS CLEARED
+        </p>
+        <div className="tower-shaft" aria-hidden="true">
+          {Array.from({ length: 12 }, (_, i) => {
+            // A window of twelve floors around the next climb, never below floor 1.
+            const f = Math.min(TOWER_FLOORS, Math.max(12, best + 7)) - i;
+            return (
+              <span
+                key={i}
+                className={`${f <= best ? "cleared" : ""} ${f === best + 1 ? "current" : ""} ${f % 5 === 0 ? "warden" : ""}`}
+              >
+                {f % 5 === 0 ? "♜" : ""} {f}
+              </span>
+            );
+          })}
+        </div>
+      </section>
+      <section className="chapter-detail tower-floor" style={{ "--chapter": "#9a86c4" } as React.CSSProperties}>
+        <p className="eyebrow">THE RIFT TOWER · CLIMB AT YOUR OWN PACE</p>
+        <h3>{done ? "You stand atop the Rift Tower." : `Floor ${floor.floor}${floor.boss ? " · Warden" : ""}`}</h3>
+        <p className="muted">
+          Sixty floors with no daily limit. Each floor pays once; every fifth
+          floor holds a warden, and every tenth guarantees equipment.
+          Recommended team level {floor.recommended}.
+        </p>
+        {!done && (
+          <>
+            <div className="stage-enemies">
+              {floor.enemies.map((e, k) => (
+                <span key={k} className={floor.boss === e ? "boss" : ""} title={byId[e].name}>
+                  <Portrait id={e} />
+                </span>
+              ))}
+            </div>
+            <p className="stage-reward">First clear: {text(reward)}</p>
+            <button
+              className="primary"
+              disabled={profile.team.length !== 6}
+              onClick={() => begin({ tower: floor.floor })}
+            >
+              Climb to floor {floor.floor}
+            </button>
+          </>
+        )}
+        <div className="tower-milestones">
+          {milestones.map((f) => (
+            <span key={f}>
+              <b>Floor {f}</b> {text(towerReward(f))}
+            </span>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

@@ -51,7 +51,7 @@ describe("story chapters", () => {
     const token = keeper(),
       before = authenticate(token);
     // At the level cap, level-up bonuses cannot blur stage rewards.
-    before.level = 30;
+    before.level = 40;
     save(before);
     expect(stageUnlocked(before, "c1-1")).toBe(true);
     expect(stageUnlocked(before, "c1-2")).toBe(false);
@@ -202,7 +202,7 @@ describe("evolution", () => {
     const token = keeper(),
       p = authenticate(token),
       o = p.owned.find((o) => o.species === "puddlepip")!;
-    p.level = 30;
+    p.level = 40;
     p.gold = 2000;
     o.level = 9;
     o.skills = [3, 2];
@@ -252,10 +252,57 @@ describe("evolution", () => {
   it("pays Rift crystals from bosses and the Crystal Vault", () => {
     const token = keeper(),
       p = authenticate(token);
-    p.level = 30;
+    p.level = 40;
     p.adventure = { stages: {}, chests: [], best: { vault: 0 }, dungeonDay: "2000-01-01", runs: {}, gearSeq: 0 };
     save(p);
     win(token, { dungeon: "vault", tier: 1 });
     expect(authenticate(token).town!.inventory.crystal).toBe(1);
+  });
+});
+
+describe("expanded adventure", () => {
+  it("climbs the Rift Tower in order and pays each floor once", () => {
+    const token = keeper(),
+      p = authenticate(token);
+    p.level = 40;
+    save(p);
+    expect(() => game.startPve(authenticate(token), false, false, { tower: 2 })).toThrow("floor 1 is next");
+    for (let f = 1; f <= 10; f++) win(token, { tower: f });
+    const after = authenticate(token);
+    expect(after.adventure!.tower).toBe(10);
+    expect(after.gear!.some((g) => g.rarity === 2)).toBe(true);
+    expect(() => game.startPve(after, false, false, { tower: 10 })).toThrow("floor 11 is next");
+    const warden = game.startPve(after, false, false, { tower: 15 - 4 });
+    expect(warden.title).toContain("Floor 11");
+    game.pve.delete(after.id);
+  });
+  it("tower levels rise steadily and every fifth floor has a warden", async () => {
+    const { towerFloor, TOWER_FLOORS } = await import("../packages/shared/adventure");
+    let last = 0;
+    for (let f = 1; f <= TOWER_FLOORS; f++) {
+      const t = towerFloor(f);
+      expect(t.level).toBeGreaterThanOrEqual(last);
+      expect(!!t.boss).toBe(f % 5 === 0);
+      last = t.level;
+    }
+  });
+  it("opens chapters six to eight after Heart of the Rift and caps keepers at level 40", async () => {
+    const { LEVEL_CAP, gainXp } = await import("../packages/shared/economy");
+    expect(CHAPTERS).toHaveLength(8);
+    const token = keeper(),
+      p = authenticate(token);
+    expect(stageUnlocked(p, "c6-1")).toBe(false);
+    p.adventure = { stages: { "c5-4": 3 }, chests: [], best: {}, dungeonDay: "2000-01-01", runs: {}, gearSeq: 0 };
+    expect(stageUnlocked(p, "c6-1")).toBe(true);
+    gainXp(p, 10_000_000);
+    expect(p.level).toBe(LEVEL_CAP);
+  });
+  it("rewards Gold and Rift crystals from the Tidal Grotto", () => {
+    const token = keeper(),
+      before = authenticate(token);
+    win(token, { dungeon: "grotto", tier: 0 });
+    const after = authenticate(token);
+    expect(after.town!.inventory.crystal).toBe(1);
+    expect(after.gold).toBeGreaterThanOrEqual(before.gold + 150);
   });
 });

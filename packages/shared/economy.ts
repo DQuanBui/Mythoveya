@@ -40,12 +40,13 @@ export function own(p: Profile, species: string): Owned {
   p.owned.push(o);
   return o;
 }
+export const LEVEL_CAP = 40;
 export function xpNeeded(level: number) {
   return 60 + level * 30;
 }
 export function gainXp(p: Profile, xp: number) {
   p.xp += xp;
-  while (p.level < 30 && p.xp >= xpNeeded(p.level)) {
+  while (p.level < LEVEL_CAP && p.xp >= xpNeeded(p.level)) {
     p.xp -= xpNeeded(p.level);
     p.level++;
     p.diamonds += 50;

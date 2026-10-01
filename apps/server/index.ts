@@ -120,6 +120,7 @@ app.post("/api/battle/start", (req, res) => {
       stage: z.string().max(10).optional(),
       dungeon: z.string().max(10).optional(),
       tier: z.number().int().min(0).max(4).optional(),
+      tower: z.number().int().min(1).max(60).optional(),
     })
     .parse(req.body);
   res.json(
@@ -127,6 +128,7 @@ app.post("/api/battle/start", (req, res) => {
       stage: v.stage,
       dungeon: v.dungeon,
       tier: v.tier,
+      tower: v.tower,
     }),
   );
 });

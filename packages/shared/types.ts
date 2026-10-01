@@ -20,6 +20,8 @@ export type AdventureState = {
   dungeonDay: string;
   runs: Record<string, number>;
   gearSeq: number;
+  /** Highest Rift Tower floor cleared. */
+  tower?: number;
 };
 export type TownState = {
   stamps?: string[];

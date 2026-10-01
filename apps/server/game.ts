@@ -42,13 +42,22 @@ import {
   stageReplayReward,
   stageStars,
   stageUnlocked,
+  towerFloor,
+  towerReward,
+  GEAR_SLOTS,
+  TOWER_FLOORS,
   RARITIES,
   type DungeonId,
   type Reward,
 } from "../../packages/shared/adventure";
 export const pve = new Map<string, Battle>();
 export const activeHuman = new Set<string>();
-export type Mission = { stage?: string; dungeon?: string; tier?: number };
+export type Mission = {
+  stage?: string;
+  dungeon?: string;
+  tier?: number;
+  tower?: number;
+};
 export const battleMeta = new Map<
   string,
   { region: string; boss: boolean } & Mission
@@ -221,7 +230,8 @@ export function startPve(
   if (activeHuman.has(p.id)) throw Error("Finish your arena match first.");
   const existing = pve.get(p.id);
   if (existing && existing.winner === null) return existing;
-  if (mission.stage || mission.dungeon) return startMission(p, mission);
+  if (mission.stage || mission.dungeon || mission.tower)
+    return startMission(p, mission);
   const ids =
     p.region === "canyon"
       ? ["magmole", "cragpup", "voltwing", "flintuff", "cindermite", "emberfox"]
@@ -299,7 +309,27 @@ function startMission(p: Profile, mission: Mission) {
   if (p.team.length !== 6) throw Error("Form a team of six first.");
   const a = ensureAdventure(p);
   let b: Battle;
-  if (mission.stage) {
+  if (mission.tower) {
+    const floor = mission.tower,
+      next = (a.tower || 0) + 1;
+    if (floor > TOWER_FLOORS) throw Error("The Rift Tower has sixty floors.");
+    if (floor !== next) throw Error(`Climb in order: floor ${next} is next.`);
+    const t = towerFloor(floor);
+    b = makeBattle(
+      randomUUID(),
+      [team(p), enemyTeam(t.enemies, t.level)],
+      "pve",
+      randomInt(0, 10000000),
+    );
+    b.title = `Rift Tower · Floor ${floor}${t.boss ? " · Warden" : ""}`;
+    if (t.boss) {
+      const u = b.units.find((u) => u.side === 1 && u.species === t.boss)!;
+      u.hp = u.maxHp = Math.round(u.maxHp * BOSS_SCALE.hp);
+      u.attack = Math.round(u.attack * BOSS_SCALE.attack);
+      u.shield = Math.round(u.maxHp * BOSS_SCALE.shield);
+    }
+    battleMeta.set(b.id, { region: "tower", boss: !!t.boss, tower: floor });
+  } else if (mission.stage) {
     const stage = stageById[mission.stage];
     if (!stage || !stageUnlocked(p, stage.id))
       throw Error("Clear the previous stage first.");
@@ -360,7 +390,15 @@ function finishMission(p: Profile, b: Battle, meta: Mission) {
     items: string[] = [];
   let reward: Reward,
     stars: number | undefined;
-  if (meta.stage) {
+  if (meta.tower) {
+    const { gear, ...rest } = towerReward(meta.tower);
+    a.tower = Math.max(a.tower || 0, meta.tower);
+    reward = rest;
+    if (gear) {
+      const g = addGear(p, GEAR_SLOTS[Math.floor(random() * 3) % 3], gear);
+      items.push(`${RARITIES[g.rarity]} ${gearName(g)}`);
+    }
+  } else if (meta.stage) {
     const stage = stageById[meta.stage],
       first = !a.stages[stage.id];
     stars = stageStars(
@@ -406,7 +444,7 @@ export function finishPve(profileId: string, b: Battle) {
     };
     const meta = battleMeta.get(b.id);
     const town = ensureTown(p);
-    if (meta?.stage || meta?.dungeon) {
+    if (meta?.stage || meta?.dungeon || meta?.tower) {
       let result: { items: string[]; xp: number; stars?: number } = {
         items: [],
         xp: 0,
@@ -419,7 +457,7 @@ export function finishPve(profileId: string, b: Battle) {
         if (meta.stage) {
           track(p, "stages");
           track(p, "stars", result.stars || 0);
-        } else track(p, "dungeons");
+        } else if (meta.dungeon) track(p, "dungeons");
       }
       b.rewards = {
         gold: p.gold - before.gold,
