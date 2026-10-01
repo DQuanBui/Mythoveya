@@ -219,3 +219,229 @@ button.world-label:hover {
     grid-template-columns: 1fr;
   }
 }
+
+/* Cursor tooltip for clickable things in the world */
+.hover-tip {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 40;
+  display: grid;
+  gap: 2px;
+  max-width: 230px;
+  padding: 7px 11px 8px;
+  border: 1px solid #e3d6ab66;
+  border-radius: 7px;
+  background: #16343ce8;
+  box-shadow: 0 6px 18px #0f272a3d;
+  color: #fff4d6;
+  pointer-events: none;
+  will-change: transform;
+}
+.hover-tip[hidden] {
+  display: none;
+}
+.hover-tip strong {
+  font:
+    15px Georgia,
+    serif;
+}
+.hover-tip small {
+  font-size: 11px;
+  color: #d3dcc4;
+}
+.world-hud .time-chip {
+  display: inline-block;
+  margin-top: 5px;
+  padding: 2px 9px;
+  border-radius: 20px;
+  background: #15353d99;
+  font-style: normal;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: #f2e2b4;
+  text-shadow: none;
+}
+.world-hud .time-chip span {
+  color: #ffe0a0;
+}
+
+/* Fishing */
+.fishing-water {
+  position: relative;
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  min-height: 130px;
+  margin: 20px 0 14px;
+  padding: 20px;
+  border-radius: 14px;
+  background:
+    radial-gradient(ellipse at 50% 120%, #8fc6c455, transparent 60%),
+    linear-gradient(#2e5d64, #1d424a);
+  border: 1px solid #9fcfc844;
+  text-align: center;
+}
+.fishing-water strong {
+  font:
+    20px Georgia,
+    serif;
+}
+.fishing-water .catch {
+  color: #f3dc9f;
+  font-size: 14px;
+}
+.bobber {
+  width: 16px;
+  height: 22px;
+  border-radius: 50% 50% 45% 45%;
+  background: linear-gradient(#e0705e 50%, #f6efe0 50%);
+  box-shadow: 0 6px 0 -3px #a8d6d066;
+}
+.fishing-water.waiting .bobber {
+  animation: bob 1.4s ease-in-out infinite;
+}
+.fishing-water.bite .bobber {
+  animation: bite 0.25s ease-in-out infinite;
+}
+.fishing-water.ready .bobber,
+.fishing-water.result .bobber {
+  opacity: 0.45;
+}
+@keyframes bob {
+  50% {
+    transform: translateY(4px);
+  }
+}
+@keyframes bite {
+  50% {
+    transform: translateY(9px) rotate(8deg);
+  }
+}
+.reel-meter {
+  position: relative;
+  height: 26px;
+  border-radius: 13px;
+  background: #102b31;
+  border: 1px solid #c7d4b544;
+  overflow: hidden;
+  cursor: pointer;
+}
+.reel-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(#f2d58f, #d7ae5d);
+  opacity: 0.85;
+}
+.reel-meter b {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  width: 4px;
+  margin-left: -2px;
+  border-radius: 2px;
+  background: #fff8e6;
+  box-shadow: 0 0 8px #fff;
+}
+.fishing .button-row {
+  margin-top: 16px;
+}
+.fish-log {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+.fish-log span {
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: #ffffff10;
+  font-size: 12px;
+}
+.fish-log b {
+  color: #f3dc9f;
+  margin-left: 4px;
+}
+
+/* Skyglass cache notes on the island map */
+.cache-notes {
+  margin: 4px 0 18px;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: #ffffff0c;
+  border: 1px solid #a9e3d633;
+}
+.cache-notes h3 {
+  margin: 0 0 6px;
+  font-size: 19px;
+}
+.cache-notes ul {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 18px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.cache-notes li {
+  display: flex;
+  gap: 9px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #d8dfcc;
+}
+.cache-notes li span {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #a9e3d622;
+  color: #bdf0e4;
+  font-size: 11px;
+}
+.cache-notes li.found {
+  color: #f3dc9f;
+}
+.cache-notes li.found span {
+  background: #f3dc9f33;
+  color: #ffe9b0;
+}
+
+/* Controls reference in the pause menu */
+.controls-guide {
+  margin-top: 18px;
+  border-top: 1px solid #c6d2b433;
+  padding-top: 12px;
+}
+.controls-guide summary {
+  cursor: pointer;
+  color: #f0d9a4;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+.controls-guide dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 16px;
+  margin: 12px 0 0;
+  font-size: 13px;
+}
+.controls-guide dt {
+  color: #f3e4bd;
+}
+.controls-guide dd {
+  margin: 0;
+  color: #c9d3c0;
+}
+@media (max-width: 700px) {
+  .cache-notes ul {
+    grid-template-columns: 1fr;
+  }
+}
+.world-hud .location .time-chip {
+  display: table;
+  margin: 6px auto 0;
+}

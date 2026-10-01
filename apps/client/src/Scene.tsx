@@ -1,6 +1,14 @@
 import { WorldInteraction } from "./WorldInteraction";
 import { HavenHouses } from "./HavenHouses";
-import { useMemo, useRef, useEffect, useState } from "react";
+import { HavenVillage } from "./HavenVillage";
+import { HavenTreasure } from "./HavenTreasure";
+import { Riftgate } from "./Riftgate";
+import { HavenTownsfolk } from "./HavenTownsfolk";
+import { DayNight, SkyLife } from "./Atmosphere";
+import { WalkContext, type Walker } from "./hover";
+import { worldFocus } from "./village-materials";
+import { buildGrid, findPath, type WalkGrid } from "../../../packages/shared/pathfind";
+import { useMemo, useRef, useEffect, useState, useCallback } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Stars } from "@react-three/drei";
 import * as T from "three";
@@ -17,7 +25,11 @@ import {
   RESOURCE_NODES,
   resourcesForRegion,
   HAVEN,
+  FISHING_SPOT,
+  HAVEN_CACHES,
+  HAVEN_RIFTGATE,
   slideStep,
+  type Point,
 } from "../../../packages/shared/haven";
 import type { Battle, Profile } from "../../../packages/shared/types";
 import {
@@ -231,6 +243,13 @@ function Environment({
   region?: string;
   title?: boolean;
 }) {
+  const sky = title
+    ? "#94b5b6"
+    : region === "hollow"
+      ? "#9fbacb"
+      : region === "canyon"
+        ? "#bb9b8d"
+        : "#9bbeb5";
   const r = REGIONS.find((r) => r.id === region) || REGIONS[0];
   const canyon = region === "canyon",
     snow = region === "hollow";
@@ -253,27 +272,31 @@ function Environment({
   );
   return (
     <>
-      <color
-        attach="background"
-        args={[
-          title ? "#94b5b6" : snow ? "#9fbacb" : canyon ? "#bb9b8d" : "#9bbeb5",
-        ]}
-      />
-      <fog attach="fog" args={[title ? "#94b5b6" : r.color, 28, 95]} />
-      <ambientLight intensity={1.1} />
-      <hemisphereLight args={["#f4ead1", "#3e6f69", 1.6]} />
-      <directionalLight
-        position={[-9, 18, 8]}
-        color="#fff0ce"
-        intensity={2.4}
-        castShadow
-        shadow-mapSize={[1024, 1024]}
-        shadow-camera-left={-22}
-        shadow-camera-right={22}
-        shadow-camera-top={22}
-        shadow-camera-bottom={-22}
-        shadow-bias={-0.001}
-      />
+      <color attach="background" args={[sky]} />
+      <fog attach="fog" args={[title ? "#94b5b6" : r.color, 28, expanded ? 110 : 95]} />
+      {title ? (
+        <>
+          <ambientLight intensity={1.1} />
+          <hemisphereLight args={["#f4ead1", "#3e6f69", 1.6]} />
+          <directionalLight
+            position={[-9, 18, 8]}
+            color="#fff0ce"
+            intensity={2.4}
+            castShadow
+            shadow-mapSize={[1024, 1024]}
+            shadow-camera-left={-22}
+            shadow-camera-right={22}
+            shadow-camera-top={22}
+            shadow-camera-bottom={-22}
+            shadow-bias={-0.001}
+          />
+        </>
+      ) : (
+        <>
+          <DayNight sky={sky} fog={r.color} haven={region === "haven"} />
+          <SkyLife radius={expanded ? 54 : 26} />
+        </>
+      )}
       {expanded ? (
         <HavenTerrain />
       ) : (
@@ -358,7 +381,7 @@ function Environment({
         <Island position={[4, 14, -62]} scale={1.8} />
         <Island position={[-38, 2, -10]} scale={0.6} />
       </group>
-      <mesh position={[-23, 26, -60]}>
+      <mesh name="sky-orb" position={[-23, 26, -60]}>
         <sphereGeometry args={[5, 32, 24]} />
         <meshBasicMaterial color="#f6e6bb" />
       </mesh>
@@ -410,15 +433,18 @@ function Environment({
           />
         </mesh>
       </group>
-      <Stars
-        radius={40}
-        depth={20}
-        count={settings.quality === "Low" ? 50 : 160}
-        factor={1.2}
-        saturation={0}
-        fade
-        speed={0.2}
-      />
+      <group name="night-stars" visible={title}>
+        <Stars
+          radius={expanded ? 70 : 40}
+          depth={20}
+          count={settings.quality === "Low" ? 80 : 260}
+          factor={expanded ? 2.4 : 1.2}
+          saturation={0}
+          fade
+          speed={0.2}
+        />
+      </group>
+      {expanded && <HavenVillage />}
       <RegionScenery region={region} />
     </>
   );
@@ -490,6 +516,22 @@ export const INTERACTABLES = [
     hint: "Plant, craft & care",
     p: [-9, 0, 10],
   },
+  {
+    id: "riftgate",
+    name: "The Riftgate",
+    hint: "Story chapters & daily dungeons",
+    p: [
+      HAVEN_RIFTGATE.point[0] + Math.sin(HAVEN_RIFTGATE.rotation) * 1.2,
+      0,
+      HAVEN_RIFTGATE.point[1] + Math.cos(HAVEN_RIFTGATE.rotation) * 1.2,
+    ],
+  },
+  {
+    id: "fishing",
+    name: "Willowmere dock",
+    hint: "Cast a line & catch fish",
+    p: [FISHING_SPOT[0], 0, FISHING_SPOT[1]],
+  },
   ...RESOURCE_NODES.map((n) => ({
     id: n.id,
     name: "Sunseed",
@@ -501,10 +543,27 @@ export const getInteractables = (region: string) =>
   INTERACTABLES.filter(
     (o) =>
       (region === "haven" ||
-        (!o.id.startsWith("trail-") && !o.id.startsWith("porch-"))) &&
+        (!o.id.startsWith("trail-") &&
+          !o.id.startsWith("porch-") &&
+          o.id !== "fishing" &&
+          o.id !== "riftgate")) &&
       (!o.id.startsWith("resource-") ||
         resourcesForRegion(region).some((n) => n.id === o.id)),
   );
+const grids = new Map<string, WalkGrid>();
+const markerMaterial = new T.MeshBasicMaterial({
+  color: "#ffe6ad",
+  transparent: true,
+  opacity: 0.9,
+  depthWrite: false,
+});
+type Route = {
+  points: Point[];
+  target: Point;
+  reach: number;
+  activate?: () => void;
+  stuck: number;
+};
 function Explorer({
   profile,
   blocked,
@@ -514,6 +573,7 @@ function Explorer({
   pet,
   input,
   spawn,
+  walker,
 }: {
   profile: Profile;
   blocked: boolean;
@@ -523,6 +583,7 @@ function Explorer({
   pet: boolean;
   input: MutableRefObject<ExplorationInput>;
   spawn: number[];
+  walker: MutableRefObject<Walker>;
 }) {
   const avatar = useMemo(() => createAvatar(profile.avatar), [profile.avatar]);
   const leader = profile.owned.find((o) => o.id === profile.team[0]);
@@ -543,23 +604,66 @@ function Explorer({
   const last = useRef(0);
   const foot = useRef(0);
   const follow = useRef(new T.Vector3(spawn[0] - 1, 0, spawn[1] + 1.5));
+  const route = useRef<Route | null>(null),
+    marker = useRef<T.Group>(null);
   const resetSeen = useRef(input.current.resetCamera || 0),
     homeSeen = useRef(input.current.returnHome || 0);
   const recenter = () => {
+    const c = controls.current;
+    // Spend any leftover orbit momentum first so the reset holds still.
+    if (c) {
+      c.enableDamping = false;
+      c.update();
+    }
     camera.position.set(player.current.x + 10, 10, player.current.z + 11);
-    if (controls.current) {
-      controls.current.target.set(player.current.x, 1, player.current.z);
-      controls.current.update();
+    if (c) {
+      c.target.set(player.current.x, 1, player.current.z);
+      c.update();
+      c.enableDamping = true;
     }
   };
-  const allowed = (x: number, z: number) =>
-    (profile.region === "haven"
-      ? havenWalkable(x, z)
-      : Math.hypot(x, z) < 16.5) &&
-    !blocksLandmark(profile.region, x, z) &&
-    !((x - 11) ** 2 + (z - 4.4) ** 2 < 1.4) &&
-    !((x - 7) ** 2 + (z + 3) ** 2 < 3.2) &&
-    !((x + 6) ** 2 + (z + 3) ** 2 < 0.8);
+  const allowed = useCallback(
+    (x: number, z: number) =>
+      (profile.region === "haven"
+        ? havenWalkable(x, z)
+        : Math.hypot(x, z) < 16.5) &&
+      !blocksLandmark(profile.region, x, z) &&
+      !((x - 11) ** 2 + (z - 4.4) ** 2 < 1.4) &&
+      !((x - 7) ** 2 + (z + 3) ** 2 < 3.2) &&
+      !((x + 6) ** 2 + (z + 3) ** 2 < 0.8),
+    [profile.region],
+  );
+  // Click-to-walk: path around obstacles, then act once within reach.
+  useEffect(() => {
+    walker.current = {
+      go(target, reach = 0.3, activate) {
+        const from: Point = [player.current.x, player.current.z];
+        if (
+          activate &&
+          Math.hypot(target[0] - from[0], target[1] - from[1]) <= reach
+        ) {
+          route.current = null;
+          activate();
+          return;
+        }
+        let grid = grids.get(profile.region);
+        if (!grid) {
+          grid = buildGrid(allowed, profile.region === "haven" ? 46 : 18);
+          grids.set(profile.region, grid);
+        }
+        const points = findPath(grid, from, target, allowed);
+        if (!points?.length) {
+          route.current = null;
+          audio.cue("error");
+          return;
+        }
+        route.current = { points, target, reach, activate, stuck: 0 };
+      },
+    };
+  }, [walker, allowed, profile.region]);
+  useEffect(() => {
+    if (blocked) route.current = null;
+  }, [blocked]);
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (
@@ -582,7 +686,7 @@ function Explorer({
     };
   }, [blocked, onInteract]);
   useFrame(({ clock }, dt) => {
-    dt = Math.min(dt, 0.05);
+    dt = Math.min(dt, 0.1);
     // R3F restarts its clock when switching back from a paused panel.
     if (clock.elapsedTime < last.current) {
       last.current = -1;
@@ -595,6 +699,7 @@ function Explorer({
     }
     if ((input.current.returnHome || 0) !== homeSeen.current) {
       homeSeen.current = input.current.returnHome || 0;
+      route.current = null;
       player.current.set(0, 0, 5);
       follow.current.set(-1, 0, 6.5);
       recenter();
@@ -610,16 +715,19 @@ function Explorer({
       : input.current.z +
         Number(k.has("KeyS") || k.has("ArrowDown")) -
         Number(k.has("KeyW") || k.has("ArrowUp"));
-    const moving = !!(x || z);
-    const sprinting =
+    const steering = !!(x || z);
+    if (steering || blocked) route.current = null;
+    const shift =
       !blocked &&
       (input.current.sprint || k.has("ShiftLeft") || k.has("ShiftRight"));
-    if (moving) {
+    let v: T.Vector3 | null = null,
+      sprinting = shift;
+    if (steering) {
       const yaw = Math.atan2(
         camera.position.x - player.current.x,
         camera.position.z - player.current.z,
       );
-      const v = new T.Vector3(x, 0, z)
+      v = new T.Vector3(x, 0, z)
         .normalize()
         .applyAxisAngle(new T.Vector3(0, 1, 0), yaw)
         .multiplyScalar(
@@ -627,6 +735,51 @@ function Explorer({
             (sprinting ? HAVEN.sprintSpeed : HAVEN.walkSpeed) *
             Math.min(1, Math.hypot(x, z)),
         );
+    } else if (route.current) {
+      const r = route.current,
+        px = player.current.x,
+        pz = player.current.z;
+      if (
+        r.activate &&
+        Math.hypot(r.target[0] - px, r.target[1] - pz) <= r.reach
+      ) {
+        route.current = null;
+        r.activate();
+      } else {
+        if (
+          r.points.length > 1 &&
+          Math.hypot(r.points[0][0] - px, r.points[0][1] - pz) < 0.25
+        )
+          r.points.shift();
+        const [gx, gz] = r.points[0],
+          length = Math.hypot(gx - px, gz - pz);
+        if (length < 0.25) {
+          route.current = null;
+          if (
+            r.activate &&
+            Math.hypot(r.target[0] - px, r.target[1] - pz) <= r.reach + 2
+          )
+            r.activate();
+        } else {
+          let remaining = length;
+          for (let i = 1; i < r.points.length; i++)
+            remaining += Math.hypot(
+              r.points[i][0] - r.points[i - 1][0],
+              r.points[i][1] - r.points[i - 1][1],
+            );
+          // Long walks break into a run, like holding Shift.
+          sprinting = shift || remaining > 9;
+          v = new T.Vector3(gx - px, 0, gz - pz).multiplyScalar(
+            Math.min(
+              length,
+              dt * (sprinting ? HAVEN.sprintSpeed : HAVEN.walkSpeed),
+            ) / length,
+          );
+        }
+      }
+    }
+    const moving = !!v;
+    if (v) {
       const [nx, nz] = slideStep(
         player.current.x,
         player.current.z,
@@ -634,11 +787,24 @@ function Explorer({
         v.z,
         allowed,
       );
+      const r = route.current;
+      if (r) {
+        const moved = Math.hypot(nx - player.current.x, nz - player.current.z);
+        r.stuck = moved < v.length() * 0.2 ? r.stuck + dt : 0;
+        if (r.stuck > 0.6) {
+          route.current = null;
+          if (
+            r.activate &&
+            Math.hypot(r.target[0] - nx, r.target[1] - nz) <= r.reach + 2
+          )
+            r.activate();
+        }
+      }
       camera.position.x += nx - player.current.x;
       camera.position.z += nz - player.current.z;
       player.current.set(nx, 0, nz);
       avatar.rotation.y = Math.atan2(v.x, v.z);
-      if (clock.elapsedTime - foot.current > 0.32) {
+      if (clock.elapsedTime - foot.current > (sprinting ? 0.27 : 0.32)) {
         audio.cue(
           profile.region === "hollow"
             ? "snowStep"
@@ -647,6 +813,18 @@ function Explorer({
               : "grass",
         );
         foot.current = clock.elapsedTime;
+      }
+    }
+    worldFocus.set(player.current.x, 0, player.current.z);
+    if (marker.current) {
+      const r = route.current;
+      marker.current.visible = !!r && !r.activate;
+      if (r) {
+        const [ex, ez] = r.points[r.points.length - 1];
+        marker.current.position.set(ex, 0.06, ez);
+        marker.current.scale.setScalar(
+          settings.reduced ? 1 : 1 + Math.sin(clock.elapsedTime * 6) * 0.08,
+        );
       }
     }
     avatar.position.x = player.current.x;
@@ -716,6 +894,54 @@ function Explorer({
     <>
       <primitive object={avatar} />
       <primitive object={companion} />
+      <group ref={marker} visible={false} name="walk-marker">
+        <mesh rotation={[-Math.PI / 2, 0, 0]} material={markerMaterial}>
+          <ringGeometry args={[0.32, 0.42, 32]} />
+        </mesh>
+        <mesh
+          position={[0, 0.55, 0]}
+          rotation={[Math.PI, 0, 0]}
+          material={markerMaterial}
+        >
+          <coneGeometry args={[0.13, 0.3, 4]} />
+        </mesh>
+      </group>
+      <mesh
+        name="walk-ground"
+        rotation={[-Math.PI / 2, 0, 0]}
+        position={[0, 0.005, 0]}
+        onClick={(e) => {
+          if (blocked || e.delta >= 6) return;
+          e.stopPropagation();
+          // Small pickups are easy to miss: a click right beside one still counts.
+          const found = profile.town?.caches || [];
+          const pickup = [
+            ...getInteractables(profile.region)
+              .filter(
+                (o) =>
+                  o.id.startsWith("resource") &&
+                  !profile.resources.includes(`${profile.region}:${o.id}`),
+              )
+              .map((o) => ({ id: o.id, x: o.p[0], z: o.p[2], reach: 2.4 })),
+            ...(profile.region === "haven" ? HAVEN_CACHES : [])
+              .filter((c) => !found.includes(c.id))
+              .map((c) => ({
+                id: `cache-${c.id}`,
+                x: c.point[0],
+                z: c.point[1],
+                reach: 2.6,
+              })),
+          ].find((o) => Math.hypot(o.x - e.point.x, o.z - e.point.z) < 1.1);
+          if (pickup)
+            walker.current.go([pickup.x, pickup.z], pickup.reach, () =>
+              onInteract(pickup.id),
+            );
+          else walker.current.go([e.point.x, e.point.z]);
+        }}
+      >
+        <planeGeometry args={[130, 130]} />
+        <meshBasicMaterial visible={false} />
+      </mesh>
       <OrbitControls
         ref={controls}
         enablePan={false}
@@ -733,11 +959,15 @@ function Roamer({
   position,
   activate,
   disabled,
+  title,
+  hint,
 }: {
   id: string;
   activate: () => void;
   disabled: boolean;
   position: [number, number, number];
+  title: string;
+  hint: string;
 }) {
   const ref = useRef<T.Group>(null);
   const lastCall = useRef(0);
@@ -763,7 +993,12 @@ function Roamer({
   });
   return (
     <group ref={ref} position={position}>
-      <WorldInteraction activate={activate} disabled={disabled}>
+      <WorldInteraction
+        activate={activate}
+        disabled={disabled}
+        title={title}
+        hint={hint}
+      >
         <Creature id={id} state="walk" />
       </WorldInteraction>
     </group>
@@ -791,6 +1026,7 @@ export function WorldScene({
   input: MutableRefObject<ExplorationInput>;
 }) {
   const initialPosition = useMemo(() => position, [profile.region]);
+  const walker = useRef<Walker>({ go: (_t, _r, act) => act?.() });
   return (
     <Canvas
       shadows
@@ -801,9 +1037,23 @@ export function WorldScene({
       frameloop={blocked ? "demand" : "always"}
       dpr={[1, settings.quality === "High" ? 1.75 : 1.3]}
     >
+      <WalkContext.Provider value={walker}>
       <Environment region={profile.region} />
       {profile.region === "haven" && (
         <HavenHouses onInteract={onInteract} disabled={blocked} />
+      )}
+      {profile.region === "haven" && (
+        <Riftgate onInteract={onInteract} disabled={blocked} />
+      )}
+      {profile.region === "haven" && (
+        <HavenTownsfolk onInteract={onInteract} disabled={blocked} />
+      )}
+      {profile.region === "haven" && (
+        <HavenTreasure
+          found={profile.town?.caches || []}
+          disabled={blocked}
+          onInteract={onInteract}
+        />
       )}
       {profile.region === "haven" && (
         <HavenWildlife onInteract={onInteract} disabled={blocked} />
@@ -813,12 +1063,15 @@ export function WorldScene({
         key={profile.region}
         spawn={initialPosition}
         {...{ profile, blocked, onNear, onInteract, onPosition, pet, input }}
+        walker={walker}
       />
       {NPCS.map((n) => (
         <WorldInteraction
           key={n.id}
           name={`npc-${n.id}`}
           disabled={blocked}
+          title={n.name}
+          hint={`${n.role} · Click to talk`}
           activate={() => onInteract(n.location)}
         >
           <Avatar index={n.avatar} position={n.position} />
@@ -834,6 +1087,8 @@ export function WorldScene({
         }
         activate={() => onInteract("encounter")}
         disabled={blocked}
+        title="Wild encounter"
+        hint="Click to meet Ranger Tali"
         position={[-6, 0, 6]}
       />
       <Roamer
@@ -846,6 +1101,8 @@ export function WorldScene({
         }
         activate={() => onInteract("boss")}
         disabled={blocked}
+        title="Region guardian"
+        hint="Click to challenge the guardian"
         position={[-10, 0, -7]}
       />
       {getInteractables(profile.region).map((o) => {
@@ -871,7 +1128,16 @@ export function WorldScene({
             position={o.p as [number, number, number]}
             activate={() => onInteract(o.id)}
             disabled={blocked || (resource && collected)}
+            title={o.name}
+            hint={resource ? "Click to gather" : o.hint}
+            reach={resource ? 2.4 : 5.5}
           >
+            {o.id === "fishing" && (
+              <mesh position={[0, 0.45, -0.2]}>
+                <boxGeometry args={[1.7, 0.9, 1.6]} />
+                <meshBasicMaterial visible={false} />
+              </mesh>
+            )}
             {resource && (
               <>
                 <Crystal
@@ -902,7 +1168,11 @@ export function WorldScene({
                   style={{ pointerEvents: "auto", opacity }}
                 >
                   <button
-                    onClick={() => onInteract(o.id)}
+                    onClick={() =>
+                      walker.current.go([o.p[0], o.p[2]], 5.5, () =>
+                        onInteract(o.id),
+                      )
+                    }
                     className={`world-label ${npc ? "npc-label" : ""} ${objective.target === o.id ? "objective-label" : ""}`}
                     data-marker={o.id}
                   >
@@ -915,6 +1185,7 @@ export function WorldScene({
           </WorldInteraction>
         );
       })}
+      </WalkContext.Provider>
     </Canvas>
   );
 }

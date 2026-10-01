@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { CompanionGrowth } from "./CompanionGrowth";
 import {
   AVATARS,
   byId,
@@ -61,7 +62,7 @@ export function SettingsPanel() {
         )}
       </div>
       <div className="settings-grid">
-        {(["mute", "reduced", "shake"] as const).map((key) => (
+        {(["mute", "reduced", "shake", "daynight"] as const).map((key) => (
           <label className="toggle" key={key}>
             <input
               type="checkbox"
@@ -216,6 +217,7 @@ export function Collection({
                     Upgrade · 3 shards
                   </button>
                 </div>
+                <CompanionGrowth profile={profile} o={o} run={run} />
                 {confirm && (
                   <div className="notice">
                     Spend 3 shards for +2% stats?

@@ -8,6 +8,9 @@ import {
   HAVEN_PATHS,
 } from "../../../packages/shared/haven";
 import { Portrait } from "./portraits";
+import { useHover } from "./hover";
+import { islandHour, timeLabel } from "./daytime";
+import { settings } from "./audio";
 import {
   WORLD_GUIDE,
   type Objective,
@@ -44,6 +47,8 @@ export function WorldHUD({
       )
     : 0;
   const nearest = INTERACTABLES.find((o) => o.id === near);
+  const touch = useCoarsePointer();
+  const time = timeLabel(islandHour());
   const [currency, setCurrency] = useState("");
   const wallet = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -54,7 +59,11 @@ export function WorldHUD({
     return () => window.removeEventListener("pointerdown", close);
   }, []);
   return (
-    <div className="world-hud" aria-label="Exploration interface">
+    <div
+      className="world-hud"
+      aria-label="Exploration interface"
+      data-near={near}
+    >
       <header className="hud-top">
         <div className="keeper-badge">
           <img src="/emblem.svg" alt="" />
@@ -70,6 +79,12 @@ export function WorldHUD({
               ? placeAt(position[0], position[1]).name
               : region.subtitle}
           </small>
+          {settings.daynight && (
+            <em className="time-chip" title="Island time">
+              <span aria-hidden="true">{time.icon}</span> {time.phase} ·{" "}
+              {time.clock}
+            </em>
+          )}
         </div>
         <div className="currencies" ref={wallet}>
           {(["diamonds", "gold"] as const).map((key) => (
@@ -211,22 +226,18 @@ export function WorldHUD({
         <span>N · {region.name.toUpperCase()}</span>
         <button onClick={() => open("map")}>Travel map</button>
       </div>
-      <div className="interaction-zone">
-        {nearest && (
+      {touch && nearest && (
+        <div className="interaction-zone">
           <button className="interact" onClick={() => interact(near)}>
-            <kbd>Click</kbd>
+            <kbd>Tap</kbd>
             <span>
               {nearest.name}
               <small>{nearest.hint}</small>
             </span>
           </button>
-        )}
-        <div className="controls-hint">
-          WASD · Move <span>Shift · Sprint</span>
-          <span>R · Camera</span> Drag · Look · Scroll · Zoom{" "}
-          <span>Esc · Pause</span>
         </div>
-      </div>
+      )}
+      {!touch && <HoverTip blocked={blocked} />}
       <TouchPad input={input} blocked={blocked} />
       <div className="world-dock">
         <div className="companion-strip" aria-label="Your six companions">
@@ -255,6 +266,7 @@ export function WorldHUD({
         <nav className="world-nav" aria-label="Game menu">
           {[
             ["quests", "⌑", "Quests"],
+            ["adventure", "✧", "Adventure"],
             ["collection", "✦", "Journal"],
             ["formation", "⚑", "Team"],
             ["recruit", "◇", "Recruit"],
@@ -273,6 +285,41 @@ export function WorldHUD({
   );
 }
 
+function useCoarsePointer() {
+  const query = "(pointer: coarse)";
+  const [coarse, setCoarse] = useState(() => matchMedia(query).matches);
+  useEffect(() => {
+    const media = matchMedia(query),
+      change = () => setCoarse(media.matches);
+    media.addEventListener("change", change);
+    return () => media.removeEventListener("change", change);
+  }, []);
+  return coarse;
+}
+// A small label that follows the mouse over clickable things in the world.
+function HoverTip({ blocked }: { blocked: boolean }) {
+  const hover = useHover(),
+    tip = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const move = (e: PointerEvent) => {
+      if (tip.current)
+        tip.current.style.transform = `translate(${Math.min(e.clientX + 18, innerWidth - 240)}px, ${e.clientY + 20}px)`;
+    };
+    window.addEventListener("pointermove", move);
+    return () => window.removeEventListener("pointermove", move);
+  }, []);
+  return (
+    <div
+      ref={tip}
+      className="hover-tip"
+      hidden={!hover || blocked}
+      aria-hidden="true"
+    >
+      <strong>{hover?.title}</strong>
+      <small>{hover?.hint}</small>
+    </div>
+  );
+}
 function TouchPad({
   input,
   blocked,

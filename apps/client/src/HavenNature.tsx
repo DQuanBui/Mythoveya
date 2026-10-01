@@ -8,6 +8,10 @@ import {
   inPond,
   pathDistance,
   seeded,
+  blockedByStructure,
+  HAVEN_HOUSES,
+  HAVEN_PLACES,
+  RESOURCE_NODES,
 } from "../../../packages/shared/haven";
 import { settings } from "./audio";
 
@@ -100,9 +104,10 @@ export function HavenNature() {
       ),
     ];
   }, []);
+  const extras = useMemo(() => undergrowth(), []);
   useEffect(
     () => () => {
-      meshes.forEach((m) => {
+      [...meshes, ...extras].forEach((m) => {
         m.geometry.dispose();
         (m.material as T.Material).dispose();
         m.dispose();
@@ -149,9 +154,90 @@ export function HavenNature() {
   });
   return (
     <group ref={group} name="haven-woodland">
-      {meshes.map((m) => (
+      {[...meshes, ...extras].map((m) => (
         <primitive key={m.name} object={m} />
       ))}
     </group>
   );
+}
+// Bushes soften trail edges and yards; mushrooms dot the shaded grove.
+function undergrowth() {
+  const random = seeded(913),
+    bushes: { x: number; z: number; s: number }[] = [],
+    shrooms: { x: number; z: number; s: number }[] = [];
+  const target = settings.quality === "Low" ? 70 : 170;
+  for (let i = 0; i < 4000 && bushes.length < target; i++) {
+    const x = (random() - 0.5) * 84,
+      z = (random() - 0.5) * 84,
+      d = pathDistance(x, z);
+    if (
+      d < 1.75 ||
+      d > 3.4 ||
+      !onIsland(x, z, 2.5) ||
+      inPond(x, z, 0.8) ||
+      Math.hypot(x, z - 2) < 9 ||
+      blockedByStructure(x, z, 0.5) ||
+      HAVEN_HOUSES.some((h) => Math.hypot(x - h.point[0], z - h.point[1]) < 3.6) ||
+      HAVEN_PLACES.some((p) => Math.hypot(x - p.point[0], z - p.point[1]) < 3) ||
+      RESOURCE_NODES.some((p) => Math.hypot(x - p.point[0], z - p.point[1]) < 1.8) ||
+      bushes.some((b) => Math.hypot(b.x - x, b.z - z) < 1.6)
+    )
+      continue;
+    bushes.push({ x, z, s: 0.45 + random() * 0.45 });
+  }
+  for (let i = 0; i < 600 && shrooms.length < 46; i++) {
+    const x = -40 + random() * 26,
+      z = -26 + random() * 36;
+    if (!onIsland(x, z, 2.5) || pathDistance(x, z) < 1.6) continue;
+    shrooms.push({ x, z, s: 0.6 + random() * 0.7 });
+  }
+  const o = new T.Object3D(),
+    c = new T.Color();
+  const make = (
+    geometry: T.BufferGeometry,
+    sites: { x: number; z: number; s: number }[],
+    name: string,
+    place: (site: { x: number; z: number; s: number }, i: number) => string,
+  ) => {
+    const mesh = new T.InstancedMesh(
+      geometry,
+      new T.MeshStandardMaterial({ flatShading: true, roughness: 1 }),
+      sites.length,
+    );
+    sites.forEach((site, i) => {
+      c.set(place(site, i));
+      o.updateMatrix();
+      mesh.setMatrixAt(i, o.matrix);
+      mesh.setColorAt(i, c);
+    });
+    mesh.name = name;
+    mesh.castShadow = name === "haven-bush" && settings.quality === "High";
+    mesh.receiveShadow = true;
+    mesh.computeBoundingSphere();
+    return mesh;
+  };
+  return [
+    make(new T.IcosahedronGeometry(1, settings.quality === "High" ? 1 : 0), bushes, "haven-bush", (b, i) => {
+      o.position.set(b.x, b.s * 0.55, b.z);
+      o.rotation.set(0, i, 0);
+      o.scale.set(b.s * 1.15, b.s * 0.8, b.s);
+      return ["#86a77b", "#94b384", "#7a9d78", "#a2b98a"][i % 4];
+    }),
+    make(new T.CylinderGeometry(0.05, 0.07, 0.28, 5), shrooms, "haven-mushroom-stem", (m) => {
+      o.position.set(m.x, 0.14 * m.s, m.z);
+      o.rotation.set(0, 0, 0);
+      o.scale.setScalar(m.s);
+      return "#efe6d2";
+    }),
+    make(
+      new T.SphereGeometry(0.16, 7, 4, 0, Math.PI * 2, 0, Math.PI / 2),
+      shrooms,
+      "haven-mushroom-cap",
+      (m, i) => {
+        o.position.set(m.x, 0.26 * m.s, m.z);
+        o.scale.set(m.s, m.s * 0.8, m.s);
+        return i % 3 ? "#c8645a" : "#c9a06a";
+      },
+    ),
+  ];
 }

@@ -360,7 +360,6 @@ export const COTTAGE_SIZE: Record<CottageStyle, { w: number; d: number }> = {
 };
 export const HAVEN_COTTAGES = (
   [
-    ["willow", [2.5, -13.5], "tall", "#a9705e", "#e6d3b3", "#5f7f7a"],
     ["thistle", [17.5, 8.5], "cottage", "#6f8f8c", "#dccdac", "#9a6b55"],
     ["lark", [-1.5, -20], "long", "#8e6f87", "#e3d6bc", "#5e7488"],
     ["fern", [-20.5, -4.5], "cottage", "#7d8f62", "#d2c3a0", "#8c5f50"],
@@ -380,6 +379,11 @@ export const HAVEN_COTTAGES = (
   rotation: facePath(point[0], point[1]),
 }));
 export const HAVEN_WINDMILL = { point: [-0.5, 23] as Point };
+// The Riftgate opens story chapters and daily dungeons.
+export const HAVEN_RIFTGATE = {
+  point: [2.5, -13.5] as Point,
+  rotation: facePath(2.5, -13.5),
+};
 export const HAVEN_WELL = { point: [-2, 15.5] as Point };
 export const HAVEN_CAMPFIRE = { point: [3.5, 29.5] as Point };
 
@@ -419,7 +423,7 @@ function lampSites(): Point[] {
           HAVEN_COTTAGES.some(
             (h) => Math.hypot(x - h.point[0], z - h.point[1]) < 4,
           ) ||
-          [HAVEN_WINDMILL, HAVEN_WELL, HAVEN_CAMPFIRE].some(
+          [HAVEN_WINDMILL, HAVEN_WELL, HAVEN_CAMPFIRE, HAVEN_RIFTGATE].some(
             (p) => Math.hypot(x - p.point[0], z - p.point[1]) < 3.5,
           ) ||
           HAVEN_PLACES.some(
@@ -450,6 +454,14 @@ export const HAVEN_STRUCTURES: Structure[] = [
     hw: COTTAGE_SIZE[c.style].w / 2 + 0.6,
     hd: COTTAGE_SIZE[c.style].d / 2 + 0.75,
   })),
+  {
+    kind: "riftgate",
+    x: HAVEN_RIFTGATE.point[0],
+    z: HAVEN_RIFTGATE.point[1],
+    rotation: HAVEN_RIFTGATE.rotation,
+    hw: 2.3,
+    hd: 0.9,
+  },
   {
     kind: "windmill",
     x: HAVEN_WINDMILL.point[0],

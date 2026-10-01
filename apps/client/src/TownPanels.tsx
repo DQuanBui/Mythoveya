@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
   NPCS,
   ITEMS,
+  FISH,
   townOf,
   missionProgress,
   npcSignal,
@@ -487,7 +488,13 @@ function Market({
         })}
       </div>
       <div className="button-row">
-        {(["sunseed", "treat"] as const).map((id) => (
+        {(
+          [
+            "sunseed",
+            "treat",
+            ...FISH.filter((f) => t.inventory[f] > 0),
+          ] as const
+        ).map((id) => (
           <button
             key={id}
             disabled={waiting || !(t.inventory[id] > 0)}

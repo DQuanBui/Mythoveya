@@ -1,0 +1,317 @@
+/* The Riftgate: story chapters and daily dungeons */
+.adventure-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 18px 0 20px;
+}
+.adventure-tabs button {
+  padding: 10px 16px;
+  border-radius: 20px;
+}
+.adventure-tabs button.selected,
+.chapter-list button.selected,
+.tier-row button.selected {
+  color: #fff4d6;
+  box-shadow: inset 0 0 0 1px #e8d39c55;
+}
+.story-layout {
+  display: grid;
+  grid-template-columns: 230px 1fr;
+  gap: 22px;
+  align-items: start;
+}
+.chapter-list {
+  display: grid;
+  gap: 8px;
+}
+.chapter-list button {
+  display: grid;
+  gap: 3px;
+  text-align: left;
+  padding: 12px 14px;
+  border-left: 4px solid var(--chapter);
+}
+.chapter-list button small {
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  opacity: 0.75;
+}
+.chapter-list button span {
+  font-size: 11px;
+  opacity: 0.8;
+}
+.chapter-list button.locked {
+  opacity: 0.55;
+}
+.chapter-detail {
+  padding: 20px 22px;
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 100% 0, color-mix(in srgb, var(--chapter) 28%, transparent), transparent 55%),
+    #ffffff08;
+  border: 1px solid color-mix(in srgb, var(--chapter) 45%, transparent);
+}
+.chapter-detail h3 {
+  font-size: 28px;
+  margin: 6px 0 8px;
+}
+.stage-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 18px 0;
+}
+.stage {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 12px;
+  background: #0f2b31a8;
+  border: 1px solid #c6d2b42b;
+}
+.stage.boss-stage {
+  grid-column: 1 / -1;
+  border-color: #f2c46b88;
+  background:
+    linear-gradient(120deg, #4a2f4a66, transparent 60%),
+    #0f2b31c4;
+}
+.stage.locked {
+  opacity: 0.6;
+}
+.stage-head {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+.stage-head b {
+  display: block;
+  font-size: 15px;
+}
+.stage-head small {
+  font-size: 11px;
+  color: #c9d3c0;
+}
+.stage-number {
+  display: grid;
+  place-items: center;
+  min-width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--chapter) 40%, #102b31);
+  font-size: 12px;
+  font-weight: 700;
+}
+.boss-stage .stage-number {
+  background: #f2c46b;
+  color: #3a2a20;
+  font-size: 18px;
+}
+.stars i,
+.result-stars i {
+  font-style: normal;
+  color: #ffffff33;
+  font-size: 16px;
+}
+.stars i.on,
+.result-stars i.on {
+  color: #f6d27a;
+  text-shadow: 0 0 8px #f6d27a88;
+}
+.result-stars i {
+  font-size: 34px;
+  margin: 0 4px;
+}
+.result-items {
+  color: #f3dc9f;
+}
+.stage-enemies {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.stage-enemies span {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #ffffff10;
+}
+.stage-enemies span.boss {
+  width: 56px;
+  height: 56px;
+  outline: 2px solid #f2c46b;
+}
+.stage-enemies .portrait {
+  width: 100%;
+  height: 100%;
+}
+.stage-reward {
+  font-size: 12px;
+  color: #f0dcaa;
+  margin: 0;
+}
+.mastery {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #f2c46b14;
+  font-size: 13px;
+}
+.small-print {
+  font-size: 12px;
+  margin-top: 12px;
+}
+.dungeon-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+.dungeon-grid > .small-print {
+  grid-column: 1 / -1;
+}
+.dungeon {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 16px;
+  background:
+    linear-gradient(170deg, color-mix(in srgb, var(--dungeon) 30%, transparent), transparent 55%),
+    #0f2b31c4;
+  border: 1px solid color-mix(in srgb, var(--dungeon) 50%, transparent);
+}
+.dungeon h3 {
+  font-size: 23px;
+  margin: 0;
+}
+.dungeon .muted {
+  flex: 1;
+  font-size: 13px;
+}
+.dungeon-art {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px;
+  border-radius: 12px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--dungeon) 35%, transparent), transparent 70%);
+}
+.dungeon-art .portrait {
+  width: 58px;
+  height: 58px;
+}
+.tier-row {
+  display: flex;
+  gap: 5px;
+}
+.tier-row button {
+  flex: 1;
+  padding: 7px 0;
+  font-size: 12px;
+}
+
+/* Companion growth in the field journal */
+.growth h3 {
+  margin: 22px 0 6px;
+}
+.growth-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  margin: 8px 0;
+  border-radius: 10px;
+  background: #ffffff0b;
+}
+.growth-row b,
+.growth-row small {
+  display: block;
+}
+.growth-row small {
+  font-size: 12px;
+  color: #c9d3c0;
+}
+.pips {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+}
+.pips i {
+  width: 16px;
+  height: 5px;
+  border-radius: 3px;
+  background: #ffffff22;
+}
+.pips i.on {
+  background: #8fe0cf;
+}
+.gear-slots {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.gear-slot {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 12px;
+  background: #0f2b31a8;
+  border: 1px solid #c6d2b42b;
+}
+.gear-slot header {
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: #f0d9a4;
+}
+.gear-slot header span {
+  margin-right: 6px;
+}
+.gear-item {
+  display: grid;
+  gap: 4px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  border-left: 3px solid var(--rarity);
+  background: #ffffff0c;
+}
+.gear-item b {
+  color: var(--rarity);
+  font-size: 13px;
+}
+.gear-item small {
+  font-size: 11px;
+  color: #c9d3c0;
+}
+.gear-item.worn {
+  background: color-mix(in srgb, var(--rarity) 14%, transparent);
+}
+.gear-item .button-row {
+  gap: 6px;
+}
+.gear-item .button-row button {
+  padding: 6px 9px;
+  font-size: 11px;
+}
+@media (max-width: 760px) {
+  .story-layout,
+  .stage-list,
+  .dungeon-grid,
+  .gear-slots {
+    grid-template-columns: 1fr;
+  }
+  .chapter-list {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+  .growth-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

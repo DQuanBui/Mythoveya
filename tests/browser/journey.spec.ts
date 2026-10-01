@@ -1,32 +1,34 @@
 import { test, expect, type Page } from "@playwright/test";
-async function walkTo(page: Page, key: string, label: string) {
-  await expect(page.locator(".interact")).toBeVisible();
+// Walk with the keyboard until the HUD reports the marker as nearby.
+async function walkTo(page: Page, key: string, id: string) {
+  // The scene is ready once spawn-side markers report as nearby.
+  await expect(page.locator(".world-hud")).toHaveAttribute("data-near", /.+/);
   // Stop inside the browser when the marker appears. Repeated driver round trips
   // can hold a key too long on a busy GPU and walk past a valid interaction.
   await page.evaluate(
-    ({ key, label }) =>
+    ({ key, id }) =>
       new Promise<void>((resolve, reject) => {
         const started = performance.now();
         document.body.dispatchEvent(
           new KeyboardEvent("keydown", { code: key, bubbles: true }),
         );
         const timer = setInterval(() => {
-          const arrived = document
-            .querySelector(".interact")
-            ?.textContent?.includes(label);
+          const arrived =
+            (document.querySelector(".world-hud") as HTMLElement)?.dataset
+              .near === id;
           if (arrived || performance.now() - started > 20000) {
             document.body.dispatchEvent(
               new KeyboardEvent("keyup", { code: key, bubbles: true }),
             );
             clearInterval(timer);
             if (arrived) resolve();
-            else reject(new Error(`Did not reach ${label}`));
+            else reject(new Error(`Did not reach ${id}`));
           }
         }, 30);
       }),
-    { key, label },
+    { key, id },
   );
-  await expect(page.locator(".interact")).toContainText(label);
+  await expect(page.locator(".world-hud")).toHaveAttribute("data-near", id);
 }
 async function newKeeper(page: Page, name: string) {
   await page.goto("/");
@@ -35,8 +37,8 @@ async function newKeeper(page: Page, name: string) {
   await page.getByRole("button", { name: "Choose this keeper" }).click();
   await page.getByRole("button", { name: "Begin with Emberfox" }).click();
   await expect(page.locator(".keeper-badge")).toContainText(name);
-  await walkTo(page, "KeyW", "Warden Liora");
-  await page.locator(".interact").click();
+  await walkTo(page, "KeyW", "guide");
+  await page.locator('.world-label[data-marker="guide"]').click();
   await page.getByRole("button", { name: "Accept companions & quest" }).click();
   await expect(page.locator(".companion-strip .portrait")).toHaveCount(6);
 }
@@ -47,8 +49,8 @@ test("first journey, battle, recruitment, formation, reload and settings", async
   page.on("pageerror", (e) => errors.push(e.message));
   await newKeeper(page, "Meadow Keeper");
   await page.screenshot({ path: "artifacts/world.png" });
-  await walkTo(page, "KeyA", "Wild encounter");
-  await page.locator(".interact").click();
+  await walkTo(page, "KeyA", "encounter");
+  await page.locator('.world-label[data-marker="encounter"]').click();
   await page.getByRole("tab", { name: "Services", exact: true }).click();
   await page.getByRole("button", { name: "Begin a wild encounter" }).click();
   await expect(page.getByRole("button", { name: "Auto OFF" })).toBeVisible();

@@ -10,6 +10,7 @@ export type Settings = {
   reduced: boolean;
   shake: boolean;
   quality: string;
+  daynight: boolean;
 };
 export const defaults: Settings = {
   master: 0.6,
@@ -21,6 +22,7 @@ export const defaults: Settings = {
   reduced: false,
   shake: false,
   quality: "Medium",
+  daynight: true,
 };
 function storedSettings() {
   try {

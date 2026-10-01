@@ -8,6 +8,11 @@ import {
   HAVEN_POND,
   edgeRadius,
   placeAt,
+  HAVEN_CACHES,
+  HAVEN_COTTAGES,
+  HAVEN_DOCK,
+  HAVEN_WINDMILL,
+  COTTAGE_SIZE,
 } from "../../../packages/shared/haven";
 import { Portrait } from "./portraits";
 const destinations = [
@@ -22,11 +27,13 @@ const destinations = [
 ];
 export function HavenMap({
   position,
+  caches,
   trail,
   choose,
   regions,
 }: {
   position: number[];
+  caches: string[];
   trail: string | null;
   choose: (id: string | null) => void;
   regions: () => void;
@@ -87,6 +94,34 @@ export function HavenMap({
               fill="#88bec4"
             />
             <path d="M12 -5 H30" stroke="#ba9872" strokeWidth="1.5" />
+            <rect
+              x={HAVEN_DOCK.x - HAVEN_DOCK.halfWidth}
+              y={HAVEN_DOCK.z0}
+              width={HAVEN_DOCK.halfWidth * 2}
+              height={HAVEN_DOCK.z1 - HAVEN_DOCK.z0}
+              fill="#ba9872"
+            />
+            {HAVEN_COTTAGES.map((c) => (
+              <rect
+                key={c.id}
+                x={-COTTAGE_SIZE[c.style].w / 2}
+                y={-COTTAGE_SIZE[c.style].d / 2}
+                width={COTTAGE_SIZE[c.style].w}
+                height={COTTAGE_SIZE[c.style].d}
+                fill={c.roof}
+                stroke="#f1e6c8"
+                strokeWidth=".3"
+                transform={`translate(${c.point[0]} ${c.point[1]}) rotate(${(-c.rotation * 180) / Math.PI})`}
+              />
+            ))}
+            <g
+              transform={`translate(${HAVEN_WINDMILL.point[0]} ${HAVEN_WINDMILL.point[1]})`}
+              stroke="#f1e6c8"
+              strokeWidth=".6"
+            >
+              <circle r="1.4" fill="#e6dccb" />
+              <path d="M-2.6 -2.6 L2.6 2.6 M2.6 -2.6 L-2.6 2.6" />
+            </g>
             {destinations.map((p) => (
               <g
                 key={p.id}
@@ -171,6 +206,26 @@ export function HavenMap({
           </div>
         </div>
       </div>
+      <section className="cache-notes" aria-label="Skyglass caches">
+        <h3>
+          Skyglass caches · {caches.length}/{HAVEN_CACHES.length} found
+        </h3>
+        <p className="muted">
+          Eight glowing caches are hidden away from the trails. Follow the
+          notes, look for a sparkle, and click a cache to open it. Find them
+          all for 100 bonus Diamonds.
+        </p>
+        <ul>
+          {HAVEN_CACHES.map((c) => (
+            <li key={c.id} className={caches.includes(c.id) ? "found" : ""}>
+              <span aria-hidden="true">
+                {caches.includes(c.id) ? "✦" : "?"}
+              </span>
+              {caches.includes(c.id) ? c.name : c.clue}
+            </li>
+          ))}
+        </ul>
+      </section>
       <button className="text-button" onClick={regions}>
         Travel to another region →
       </button>

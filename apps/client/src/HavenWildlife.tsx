@@ -5,6 +5,7 @@ import * as T from "three";
 import { HAVEN_WILDLIFE, havenWalkable } from "../../../packages/shared/haven";
 import { createCreature, animateCreature } from "./models";
 import { audio, settings } from "./audio";
+import { byId } from "../../../packages/shared/content";
 
 function Resident({
   site,
@@ -30,7 +31,9 @@ function Resident({
   }, [model, anchor]);
   useFrame(({ camera }, dt) => {
     const distance = camera.position.distanceTo(anchor);
-    model.visible = distance < (settings.quality === "Low" ? 30 : 43);
+    model.visible =
+      distance <
+      (settings.quality === "Low" ? 26 : settings.quality === "High" ? 43 : 36);
     if (!model.visible) return;
     time.current += Math.min(dt, 0.05);
     const t = time.current,
@@ -62,6 +65,9 @@ function Resident({
     <WorldInteraction
       name={`habitat-${site.species}-${index}`}
       disabled={disabled}
+      title={byId[site.species].name}
+      hint="Wild companion · Click to observe"
+      reach={7}
       activate={() => onInteract(`observe-${site.species}`)}
     >
       <primitive object={model} />

@@ -238,7 +238,16 @@ export function BattleUI({
               : battle.winner === 0
                 ? battle.mode === "practice"
                   ? "Practice complete · no rewards or rating changes"
-                  : `${battle.title || "Encounter"} complete · ${battle.rewards?.gold || 0} gold · ${battle.rewards?.xp || 0} XP · ${battle.rewards?.tokens || 0} bond token · ${battle.rewards?.diamonds || 0} diamonds`
+                  : [
+                      `${battle.title || "Encounter"} complete`,
+                      battle.rewards?.gold && `${battle.rewards.gold} gold`,
+                      battle.rewards?.xp && `${battle.rewards.xp} XP`,
+                      battle.rewards?.tokens &&
+                        `${battle.rewards.tokens} bond token${battle.rewards.tokens === 1 ? "" : "s"}`,
+                      battle.rewards?.diamonds && `${battle.rewards.diamonds} diamonds`,
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")
                 : "Your companions have recovered. Try another formation or train before returning."}
           </p>
           {rating && (
@@ -246,6 +255,20 @@ export function BattleUI({
               Rating {rating.before} → {rating.after} (
               {rating.after - rating.before >= 0 ? "+" : ""}
               {rating.after - rating.before})
+            </p>
+          )}
+          {!!battle.rewards?.stars && (
+            <p className="result-stars" aria-label={`${battle.rewards.stars} of 3 stars`}>
+              {[0, 1, 2].map((n) => (
+                <i key={n} className={n < battle.rewards!.stars! ? "on" : ""}>
+                  ★
+                </i>
+              ))}
+            </p>
+          )}
+          {!!battle.rewards?.items?.length && (
+            <p className="result-items">
+              {battle.rewards.items.join(" · ")}
             </p>
           )}
           {!!battle.rewards?.newSpecies.length && (

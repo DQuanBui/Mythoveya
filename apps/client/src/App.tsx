@@ -15,6 +15,9 @@ import { NPCS } from "../../../packages/shared/town";
 import { NpcPanel, TownDirectory } from "./TownPanels";
 import { HavenMap } from "./HavenMap";
 import { HouseVisit } from "./HavenHouses";
+import { FishingPanel } from "./FishingPanel";
+import { TOWNSFOLK } from "./HavenTownsfolk";
+import { AdventurePanel, type MissionStart } from "./AdventurePanel";
 import { HAVEN_PLACES, HAVEN_HOUSES } from "../../../packages/shared/haven";
 import { currentObjective, type ExplorationInput } from "./world-guide";
 import {
@@ -46,6 +49,7 @@ export default function App() {
     [auto, setAuto] = useState(false),
     [fast, setFast] = useState(false);
   const input = useRef<ExplorationInput>({ x: 0, z: 0 });
+  const mission = useRef(false);
   const [trail, setTrail] = useState<string | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined),
     inFlight = useRef(false);
@@ -123,7 +127,8 @@ export default function App() {
       if (
         kind.startsWith("town-") &&
         result.value?.message &&
-        kind !== "town-talk"
+        kind !== "town-talk" &&
+        kind !== "town-fish"
       )
         notify(result.value.message);
       if (["formation", "train", "upgrade", "avatar"].includes(kind))
@@ -188,14 +193,23 @@ export default function App() {
     setProfile(p);
     if (p.owned.length) setScreen("world");
   }
-  async function startBattle(boss = false, practice = false) {
+  async function startBattle(
+    boss = false,
+    practice = false,
+    adventure: MissionStart = {},
+  ) {
     if (!profile || profile.team.length !== 6) {
       notify("Meet Warden Liora to form your first team of six.");
       return;
     }
     setBusy(true);
     try {
-      const b = await api<Battle>("battle/start", { boss, practice });
+      const b = await api<Battle>("battle/start", {
+        boss,
+        practice,
+        ...adventure,
+      });
+      mission.current = !!(adventure.stage || adventure.dungeon);
       setBattle(b);
       setPanel("");
       setAuto(false);
@@ -244,6 +258,21 @@ export default function App() {
       else if (id.startsWith("resource")) {
         run("resource", { resource: id });
         audio.cue("collect");
+      } else if (id === "riftgate") setPanel("adventure");
+      else if (id.startsWith("folk-")) {
+        const folk = TOWNSFOLK[Number(id.slice(5))];
+        if (folk)
+          notify(
+            `${folk.name}: “${folk.lines[Math.floor(Math.random() * folk.lines.length)]}”`,
+          );
+      }
+      else if (id.startsWith("cache-")) {
+        if (profile?.town?.caches?.includes(id.slice(6)))
+          notify("You already found this Skyglass cache.");
+        else {
+          audio.cue("collect");
+          run("town-cache", { id: id.slice(6) });
+        }
       } else if (id === "arena") {
         if (profile?.team.length !== 6)
           notify("Meet Liora first to form a team of six.");
@@ -482,7 +511,14 @@ export default function App() {
             refresh();
             setScreen("world");
             setBattle(null);
-            setPanel(profile?.bond && !profile.bond.used ? "bond" : "quests");
+            setPanel(
+              mission.current
+                ? "adventure"
+                : profile?.bond && !profile.bond.used
+                  ? "bond"
+                  : "quests",
+            );
+            mission.current = false;
           }}
         />
       )}
@@ -501,7 +537,7 @@ export default function App() {
         <div className="modal-backdrop">
           <section
             key={panel}
-            className={`panel modal ${["collection", "formation", "gallery", "town", "map"].includes(panel) || panel.startsWith("npc-") ? "wide" : ""}`}
+            className={`panel modal ${["collection", "formation", "gallery", "town", "map", "adventure", "training"].includes(panel) || panel.startsWith("npc-") ? "wide" : ""}`}
             aria-label={panel}
           >
             <button
@@ -515,6 +551,16 @@ export default function App() {
               ×
             </button>
             {panel === "settings" && <SettingsPanel />}
+            {panel === "adventure" && profile && (
+              <AdventurePanel
+                profile={profile}
+                run={run}
+                begin={(m) => startBattle(false, false, m)}
+              />
+            )}
+            {panel === "fishing" && profile && (
+              <FishingPanel profile={profile} run={run} />
+            )}
             {panel.startsWith("porch-") && profile && (
               <HouseVisit id={panel.slice(6)} profile={profile} run={run} />
             )}
@@ -583,6 +629,7 @@ export default function App() {
             {panel === "map" && profile?.region === "haven" && (
               <HavenMap
                 position={position}
+                caches={profile.town?.caches || []}
                 trail={trail}
                 choose={(id) => {
                   setTrail(id);
@@ -732,6 +779,23 @@ export default function App() {
                     Return to title
                   </button>
                 </div>
+                <details className="controls-guide">
+                  <summary>Controls</summary>
+                  <dl>
+                    <dt>Click the ground</dt>
+                    <dd>Walk there along the trails</dd>
+                    <dt>Click a person, home or object</dt>
+                    <dd>Walk over and interact</dd>
+                    <dt>WASD / arrows</dt>
+                    <dd>Move directly · hold Shift to sprint</dd>
+                    <dt>Drag · scroll</dt>
+                    <dd>Turn the camera · zoom</dd>
+                    <dt>R</dt>
+                    <dd>Reset the camera</dd>
+                    <dt>Esc</dt>
+                    <dd>Pause or close a panel</dd>
+                  </dl>
+                </details>
               </>
             )}
           </section>

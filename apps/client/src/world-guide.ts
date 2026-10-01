@@ -1,6 +1,7 @@
 import type { Profile } from "../../../packages/shared/types";
 import { REGIONS } from "../../../packages/shared/content";
 import { NPCS, townOf } from "../../../packages/shared/town";
+import { CHAPTERS } from "../../../packages/shared/adventure";
 
 export const WORLD_GUIDE = {
   labelRange: 8,
@@ -29,6 +30,8 @@ export const WORLD_GUIDE = {
     boss: { height: 3, icon: "♜" },
     market: { height: 2.3, icon: "◇" },
     garden: { height: 2.3, icon: "✿" },
+    riftgate: { height: 7.2, icon: "✧" },
+    fishing: { height: 1.8, icon: "≈" },
   } as Record<string, { height: number; icon: string }>,
 };
 export type Objective = {
@@ -92,6 +95,23 @@ export function currentObjective(p: Profile): Objective {
       button: "Visit the shrine",
       completed,
     };
+  const chapter = CHAPTERS.findIndex(
+    (c) => !p.adventure?.stages[c.stages[3].id],
+  );
+  if (chapter >= 0 && p.level >= CHAPTERS[chapter].stages[0].recommended - 2) {
+    const c = CHAPTERS[chapter],
+      stage = c.stages.find((s) => !p.adventure?.stages[s.id])!;
+    return {
+      title: `Chapter ${chapter + 1}: ${c.name}`,
+      text: stage.boss
+        ? `${stage.boss.title} waits beyond the Riftgate.`
+        : `Step through the Riftgate and clear “${stage.name}”.`,
+      target: p.region === "haven" ? "riftgate" : undefined,
+      action: "adventure",
+      button: "Open the Riftgate",
+      completed,
+    };
+  }
   const next = REGIONS.find((r) => r.unlock > p.wins);
   if (next)
     return {

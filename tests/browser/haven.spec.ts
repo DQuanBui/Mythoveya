@@ -122,8 +122,13 @@ test("explore the expanded island, cross the bridge and return safely", async ({
   ]);
   await expect(page.locator(".location small")).toHaveText("Sunpetal Clearing");
   await page.screenshot({ path: "artifacts/haven-clearing.png" });
-  await expect(page.locator(".interact")).toContainText("Sunseed");
-  await page.locator(".interact").click();
+  await expect(page.locator(".world-hud")).toHaveAttribute(
+    "data-near",
+    "resource-8",
+  );
+  // No instruction strip or prompt card sits under the keeper on desktop.
+  await expect(page.locator(".interact, .controls-hint")).toHaveCount(0);
+  await clickWorld(page, [10, 0.25, 24]);
   await expect(page.getByRole("status")).toContainText("+1 Sunseed");
   await walkRoute(page, [
     [22, 17],
@@ -197,6 +202,26 @@ test("explore the expanded island, cross the bridge and return safely", async ({
   expect(errors).toEqual([]);
 });
 async function clickWorld(page: Page, point: number[], drag = false) {
+  // Orbit damping keeps turning briefly after a drag or reset; wait until still.
+  await expect
+    .poll(
+      () =>
+        page.evaluate(async () => {
+          const url = performance
+            .getEntriesByType("resource")
+            .map((r) => r.name)
+            .find((n) => n.includes("@react-three_fiber.js"))!;
+          const { _roots } = await import(/* @vite-ignore */ url);
+          const { camera } = _roots
+            .get(document.querySelector(".scene canvas"))
+            .store.getState();
+          const a = camera.position.clone();
+          await new Promise((r) => setTimeout(r, 150));
+          return a.distanceTo(camera.position);
+        }),
+      { timeout: 15000 },
+    )
+    .toBeLessThan(0.005);
   const pixel = await page.evaluate(async (point) => {
     const url = performance
       .getEntriesByType("resource")
@@ -226,7 +251,7 @@ async function clickWorld(page: Page, point: number[], drag = false) {
 test("mouse picking opens villagers, gathers seeds, and saves a house visitor stamp", async ({
   page,
 }) => {
-  test.setTimeout(180000);
+  test.setTimeout(360000);
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("/");
@@ -305,5 +330,143 @@ test("mouse picking opens villagers, gathers seeds, and saves a house visitor st
       ).town.stamps,
   );
   expect(stamps).toEqual(["workshop"]);
+  expect(errors).toEqual([]);
+});
+
+test("click-to-walk reaches a hidden cache, shows hover help, and fishes at the dock", async ({
+  page,
+}) => {
+  test.setTimeout(240000);
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.goto("/");
+  await page.evaluate(async () => {
+    const post = (data: unknown, path: string, token = "") =>
+      fetch("/api/" + path, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+        body: JSON.stringify(data),
+      }).then((r) => r.json());
+    const g = await post({ name: "Cache Seeker", avatar: 2 }, "guest");
+    localStorage.setItem("mythoveya-session", g.token);
+    for (const data of [
+      { kind: "starter", species: "emberfox" },
+      { kind: "guide" },
+    ])
+      await post(
+        { ...data, requestId: crypto.randomUUID() },
+        "mutate",
+        g.token,
+      );
+  });
+  await page.reload();
+  await page.getByRole("button", { name: "Continue your journey" }).click();
+  await expect(page.locator(".keeper-badge")).toContainText("Cache Seeker");
+  await page.waitForTimeout(800);
+  const position = () =>
+    page
+      .locator(".map-ring b")
+      .evaluate((dot: HTMLElement) => [
+        parseFloat(dot.style.left) - 50,
+        parseFloat(dot.style.top) - 50,
+      ]);
+  // A ground click plans a route; the keeper walks there without keys.
+  await clickWorld(page, [2.5, 0, 1.5]);
+  await expect
+    .poll(async () => (await position())[1], { timeout: 15000 })
+    .toBeLessThan(2.5);
+  await expect(page.locator(".modal")).toHaveCount(0);
+  await walkRoute(page, [
+    [3, 4],
+    [0, -9],
+    [8, -9],
+  ]);
+  await page.keyboard.press("KeyR");
+  await page.waitForTimeout(400);
+  const project = (point: number[]) =>
+    page.evaluate(async (point) => {
+      const url = performance
+        .getEntriesByType("resource")
+        .map((r) => r.name)
+        .find((n) => n.includes("@react-three_fiber.js"))!;
+      const { _roots } = await import(/* @vite-ignore */ url);
+      const canvas = document.querySelector(".scene canvas")!;
+      const { camera } = _roots.get(canvas).store.getState();
+      const v = camera.position.clone().set(...point).project(camera);
+      const box = canvas.getBoundingClientRect();
+      return {
+        x: box.left + ((v.x + 1) * box.width) / 2,
+        y: box.top + ((1 - v.y) * box.height) / 2,
+      };
+    }, point);
+  // Walk into the woods by clicking the ground, then hover and open the cache.
+  await page.waitForTimeout(1500);
+  const woods = await project([10.5, 0, -15.5]);
+  await page.mouse.click(woods.x, woods.y);
+  await expect
+    .poll(async () => (await position())[1], { timeout: 20000 })
+    .toBeLessThan(-14);
+  await page.waitForTimeout(1500);
+  await page.keyboard.press("KeyR");
+  await page.waitForTimeout(1500);
+  const cache = await project([12.5, 0.3, -20]);
+  // An islander may stroll past; nudge the pointer until the cache is under it.
+  await expect
+    .poll(
+      async () => {
+        await page.mouse.move(cache.x + Math.random() * 6 - 3, cache.y);
+        await page.waitForTimeout(400);
+        return page.locator(".hover-tip:not([hidden])").textContent();
+      },
+      { timeout: 20000 },
+    )
+    .toContain("Skyglass cache");
+  await page.mouse.click(cache.x, cache.y);
+  await expect(page.getByRole("status")).toContainText("Quiet woods cache", {
+    timeout: 20000,
+  });
+  await page.getByRole("button", { name: "Travel map", exact: true }).click();
+  await expect(page.locator(".cache-notes")).toContainText("1/8 found");
+  await page.getByLabel("Close panel").click();
+  await page.keyboard.press("Escape");
+  await page
+    .getByRole("button", { name: "Return to Havenreach village" })
+    .click();
+  await walkRoute(page, [
+    [0, 11],
+    [5, 10],
+    [14, 11],
+    [22, 17],
+    [29, 4],
+  ]);
+  await page.keyboard.press("KeyR");
+  await page.waitForTimeout(1500);
+  const dock = await project([25, 0.45, -1.4]);
+  await page.mouse.click(dock.x, dock.y);
+  await expect(page.getByRole("heading", { name: "Cast a line." })).toBeVisible({
+    timeout: 30000,
+  });
+  await page.getByRole("button", { name: /Cast your line/ }).click();
+  await expect(page.locator(".fishing-water")).toContainText("A bite!", {
+    timeout: 8000,
+  });
+  await page.getByRole("button", { name: /Reel in/ }).click();
+  await expect(page.locator(".fishing")).toContainText("7 of 8 casts left");
+  const town = await page.evaluate(
+    async () =>
+      (
+        await fetch("/api/profile", {
+          headers: {
+            Authorization:
+              "Bearer " + localStorage.getItem("mythoveya-session"),
+          },
+        }).then((r) => r.json())
+      ).town,
+  );
+  expect(town.caches).toEqual(["hidden-woods"]);
+  expect(town.fishing.casts).toBe(1);
   expect(errors).toEqual([]);
 });
