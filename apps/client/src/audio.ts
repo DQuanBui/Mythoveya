@@ -47,6 +47,41 @@ class AudioEngine {
   last = new Map<string, number>();
   musicGain?: GainNode;
   ambientBeat = 0;
+  rainGain?: GainNode;
+  windGain?: GainNode;
+  /** Looping rain and mist-wind beds on the ambience bus, faded by weather amount. */
+  weather(rain: number, mist: number) {
+    if (!this.ctx) return;
+    const c = this.ctx;
+    const bed = (low: number, high: number) => {
+      const len = c.sampleRate * 2,
+        buffer = c.createBuffer(1, len, c.sampleRate),
+        data = buffer.getChannelData(0);
+      for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+      const src = c.createBufferSource(),
+        hp = c.createBiquadFilter(),
+        lp = c.createBiquadFilter(),
+        gain = c.createGain();
+      src.buffer = buffer;
+      src.loop = true;
+      hp.type = "highpass";
+      hp.frequency.value = low;
+      lp.type = "lowpass";
+      lp.frequency.value = high;
+      gain.gain.value = 0;
+      src.connect(hp).connect(lp).connect(gain).connect(this.buses.ambience);
+      src.start();
+      return gain;
+    };
+    this.rainGain ||= bed(700, 5200);
+    this.windGain ||= bed(80, 420);
+    this.rainGain.gain.setTargetAtTime(rain * 0.32, c.currentTime, 1.2);
+    this.windGain.gain.setTargetAtTime(
+      mist * (0.16 + Math.sin(c.currentTime * 0.4) * 0.05),
+      c.currentTime,
+      1.5,
+    );
+  }
   async unlock() {
     if (!this.ctx) {
       this.ctx = new AudioContext();

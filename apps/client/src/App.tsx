@@ -16,6 +16,7 @@ import { NpcPanel, TownDirectory } from "./TownPanels";
 import { HavenMap } from "./HavenMap";
 import { HouseVisit } from "./HavenHouses";
 import { FishingPanel } from "./FishingPanel";
+import { weatherFx } from "./Weather";
 import { EventsPanel } from "./EventsPanel";
 import { TOWNSFOLK } from "./HavenTownsfolk";
 import { AdventurePanel, type MissionStart } from "./AdventurePanel";
@@ -98,6 +99,17 @@ export default function App() {
             : "title",
     );
   }, [screen, profile?.region]);
+  useEffect(() => {
+    // Rain and mist ambience follow the blended weather while exploring.
+    const t = setInterval(
+      () =>
+        screen === "world"
+          ? audio.weather(weatherFx.rain, weatherFx.mist)
+          : audio.weather(0, 0),
+      500,
+    );
+    return () => clearInterval(t);
+  }, [screen]);
   useEffect(() => {
     if (
       screen !== "battle" ||

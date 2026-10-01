@@ -9,6 +9,8 @@ import {
 } from "../../../packages/shared/haven";
 import { Portrait } from "./portraits";
 import { useHover } from "./hover";
+import { currentWeather } from "./Weather";
+import { WEATHER_INFO } from "../../../packages/shared/weather";
 import { eventsReady } from "../../../packages/shared/events";
 import { utcDay } from "../../../packages/shared/town";
 import { islandHour, timeLabel } from "./daytime";
@@ -51,6 +53,7 @@ export function WorldHUD({
   const nearest = INTERACTABLES.find((o) => o.id === near);
   const touch = useCoarsePointer();
   const time = timeLabel(islandHour());
+  const weather = currentWeather(profile.region);
   const [currency, setCurrency] = useState("");
   const wallet = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -87,6 +90,16 @@ export function WorldHUD({
               {time.clock}
             </em>
           )}
+          <em
+            className="time-chip weather-chip"
+            title={WEATHER_INFO[weather].perk}
+            data-weather={weather}
+          >
+            <span aria-hidden="true">{WEATHER_INFO[weather].icon}</span>{" "}
+            {profile.region === "hollow" && weather === "rain"
+              ? "Snow"
+              : WEATHER_INFO[weather].name}
+          </em>
         </div>
         <div className="currencies" ref={wallet}>
           {(["diamonds", "gold"] as const).map((key) => (

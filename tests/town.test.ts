@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { townMutation } from "../apps/server/town-game";
 import { HAVEN_HOUSES, HAVEN_CACHES } from "../packages/shared/haven";
+import { weatherAt, WEATHER_SPELL_MS } from "../packages/shared/weather";
 import {
   NPCS,
   ensureTown,
@@ -123,7 +124,7 @@ describe("village progress and durable services", () => {
     expect(p.town?.fishing).toMatchObject({ casts: 4, caught: 3 });
     for (let i = 4; i < FISHING_CASTS_PER_DAY; i++) fish(false, 0.5);
     expect(() => fish(true, 0.5)).toThrow("resting");
-    expect(fish(true, 0.5, now + 86400000)).toMatchObject({ fish: "minnow" });
+    expect(fish(true, 0.2, now + 86400000)).toMatchObject({ fish: "minnow" });
     op(token, "town-sell", { item: "skyfin" });
     expect(authenticate(token).gold).toBe(p.gold + 45);
     expect(() => op(token, "town-buy", { item: "skyfin" })).toThrow(
@@ -238,8 +239,10 @@ describe("village progress and durable services", () => {
     expect(tomorrow.profile.gold).toBe(0);
   });
   it("persists garden timestamps and prevents early, repeated or duplicate harvests", () => {
-    const token = keeper(),
-      now = Date.now();
+    // Rain speeds growth, so pin this check to a dry spell.
+    let now = Date.now();
+    while (weatherAt(now).weather === "rain") now += WEATHER_SPELL_MS;
+    const token = keeper();
     op(token, "town-plant", {}, now);
     const saved = authenticate(token);
     expect(saved.town?.garden?.readyAt).toBe(now + GARDEN_GROW_MS);

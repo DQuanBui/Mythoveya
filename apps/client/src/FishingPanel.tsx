@@ -8,6 +8,7 @@ import {
   utcDay,
 } from "../../../packages/shared/town";
 import { audio, settings } from "./audio";
+import { weatherAt } from "../../../packages/shared/weather";
 
 type Phase = "ready" | "waiting" | "bite" | "result";
 
@@ -21,7 +22,8 @@ export function FishingPanel({
 }) {
   const t = townOf(profile),
     today = t.fishing?.date === utcDay() ? t.fishing : null,
-    left = FISHING_CASTS_PER_DAY - (today?.casts || 0);
+    left = FISHING_CASTS_PER_DAY - (today?.casts || 0),
+    rain = weatherAt().weather === "rain";
   const [phase, setPhase] = useState<Phase>("ready"),
     [zone, setZone] = useState({ start: 0.4, width: 0.22 }),
     [marker, setMarker] = useState(0),
@@ -98,6 +100,11 @@ export function FishingPanel({
         Sell your catch at Pip's market. {left} of {FISHING_CASTS_PER_DAY}{" "}
         casts left today.
       </p>
+      {rain && (
+        <p className="weather-note">
+          ☂ It's raining: rare fish are rising, so Skyfin bite about twice as often.
+        </p>
+      )}
       <div className={`fishing-water ${phase}`} aria-live="polite">
         <span className="bobber" aria-hidden="true" />
         <strong>

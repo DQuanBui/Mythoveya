@@ -4,6 +4,7 @@ import * as T from "three";
 import { HAVEN_CACHES } from "../../../packages/shared/haven";
 import { WorldInteraction } from "./WorldInteraction";
 import { settings } from "./audio";
+import { weatherFx } from "./Weather";
 
 const wood = new T.MeshStandardMaterial({ color: "#8b6542", flatShading: true }),
   trim = new T.MeshStandardMaterial({
@@ -43,7 +44,10 @@ function Cache({
       lid.current.rotation.x += (target - lid.current.rotation.x) * 0.12;
     }
     if (sparkle.current) {
-      const near = Math.hypot(camera.position.x - point[0], camera.position.z - point[1]) < 26;
+      // Mist makes the caches' glimmer carry farther.
+      const near =
+        Math.hypot(camera.position.x - point[0], camera.position.z - point[1]) <
+        26 + weatherFx.mist * 22;
       sparkle.current.visible = !open && near;
       if (sparkle.current.visible && !settings.reduced) {
         sparkle.current.rotation.y = clock.elapsedTime * 1.4;

@@ -6,6 +6,7 @@ import {
 } from "../../packages/shared/haven";
 import { gainXp } from "../../packages/shared/economy";
 import { track } from "../../packages/shared/events";
+import { fishWeights, weatherAt, RAIN_GROWTH } from "../../packages/shared/weather";
 import {
   NPCS,
   ITEMS,
@@ -16,7 +17,6 @@ import {
   utcWeek,
   GARDEN_GROW_MS,
   FISH,
-  FISH_WEIGHTS,
   FISHING_CASTS_PER_DAY,
   type ItemId,
   type TownReward,
@@ -115,10 +115,12 @@ export function townMutation(
       t.fishing.casts++;
       if (!v.success)
         return { message: "The fish slipped away. Try again!", fish: null };
+      // Rain brings rare fish closer to the surface.
+      const weights = fishWeights(weatherAt(now).weather);
       let roll = random(),
         fish: (typeof FISH)[number] = "minnow";
       for (const id of FISH) {
-        roll -= FISH_WEIGHTS[id];
+        roll -= weights[id];
         if (roll < 0) {
           fish = id;
           break;
@@ -128,7 +130,10 @@ export function townMutation(
       track(p, "fish");
       t.inventory[fish] = (t.inventory[fish] || 0) + 1;
       bump("fish");
-      return { message: `You caught a ${ITEMS[fish].name}!`, fish };
+      return {
+        message: `You caught a ${ITEMS[fish].name}!${weatherAt(now).weather === "rain" && fish === "skyfin" ? " The rain drew it up." : ""}`,
+        fish,
+      };
     }
     case "town-talk": {
       const n = npc();
@@ -197,9 +202,13 @@ export function townMutation(
       if (t.garden) throw Error("Harvest the current crop first.");
       if (!(t.inventory.sunseed > 0)) throw Error("You need one Sunseed.");
       t.inventory.sunseed--;
-      t.garden = { plantedAt: now, readyAt: now + GARDEN_GROW_MS };
+      const rain = weatherAt(now).weather === "rain",
+        grow = Math.round(GARDEN_GROW_MS * (rain ? RAIN_GROWTH : 1));
+      t.garden = { plantedAt: now, readyAt: now + grow };
       return {
-        message: "Planted a Sunseed. Your crop will be ready in two minutes.",
+        message: rain
+          ? "Planted a Sunseed in the rain. It will be ready in about a minute."
+          : "Planted a Sunseed. Your crop will be ready in two minutes.",
       };
     }
     case "town-harvest": {

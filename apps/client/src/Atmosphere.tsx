@@ -5,6 +5,9 @@ import { settings } from "./audio";
 import { daylight, islandHour } from "./daytime";
 import { setNightGlow, worldFocus } from "./village-materials";
 import { seeded } from "../../../packages/shared/haven";
+import { weatherFx } from "./Weather";
+const STORM = new T.Color("#8b9ba3"),
+  MIST = new T.Color("#cfd8d6");
 
 const NIGHT_SKY = new T.Color("#22314d"),
   NIGHT_FOG = new T.Color("#2a3b57"),
@@ -34,7 +37,8 @@ export function DayNight({
     hemi = useRef<T.HemisphereLight>(null),
     lights = useRef<T.Group>(null),
     last = useRef(-1),
-    named = useRef<{ stars?: T.Object3D; orb?: T.Mesh } | null>(null);
+    named = useRef<{ stars?: T.Object3D; orb?: T.Mesh } | null>(null),
+    fogBase = useRef<{ near: number; far: number } | null>(null);
   // Point lights cost every lit pixel, so they exist only after dark.
   const [night, setNight] = useState(false);
   const daySky = useMemo(() => new T.Color(sky), [sky]),
@@ -65,23 +69,39 @@ export function DayNight({
     if (Math.abs(clock.elapsedTime - last.current) < 0.25) return;
     last.current = clock.elapsedTime;
     const warm = twilight * 0.65;
-    light.intensity = day > 0.02 ? lerp(0.6, 2.4, day) : 0.55;
+    // Cloud cover dims the sun and softens shadows; mist and rain pull the fog in.
+    const cover = Math.min(1, weatherFx.rain * 0.55 + weatherFx.mist * 0.3);
+    light.intensity = (day > 0.02 ? lerp(0.6, 2.4, day) : 0.55) * (1 - cover);
     light.color.copy(day > 0.02 ? SUN : MOON).lerp(WARM_SUN, day > 0.02 ? warm : 0);
-    ambient.current.intensity = lerp(0.55, 1.1, day);
+    ambient.current.intensity = lerp(0.55, 1.1, day) * (1 - cover * 0.3);
     scene.environmentIntensity = lerp(0.08, 0.35, day);
-    hemi.current.intensity = lerp(0.8, 1.6, day);
+    hemi.current.intensity = lerp(0.8, 1.6, day) * (1 - cover * 0.35);
     hemi.current.color.copy(HEMI_NIGHT).lerp(HEMI_DAY, day).lerp(DUSK, warm * 0.4);
     hemi.current.groundColor.copy(GROUND_NIGHT).lerp(GROUND_DAY, day);
     if (scene.background instanceof T.Color)
-      scene.background.copy(c.copy(NIGHT_SKY).lerp(daySky, day).lerp(DUSK, warm * 0.55));
-    if (scene.fog) scene.fog.color.copy(c.copy(NIGHT_FOG).lerp(dayFog, day).lerp(DUSK, warm * 0.5));
+      scene.background.copy(
+        c.copy(NIGHT_SKY).lerp(daySky, day).lerp(DUSK, warm * 0.55)
+          .lerp(STORM, weatherFx.rain * 0.55 * Math.max(0.3, day))
+          .lerp(MIST, weatherFx.mist * 0.45 * day),
+      );
+    if (scene.fog instanceof T.Fog) {
+      scene.fog.color.copy(
+        c.copy(NIGHT_FOG).lerp(dayFog, day).lerp(DUSK, warm * 0.5)
+          .lerp(STORM, weatherFx.rain * 0.55 * Math.max(0.3, day))
+          .lerp(MIST, weatherFx.mist * 0.55 * day),
+      );
+      fogBase.current ||= { near: scene.fog.near, far: scene.fog.far };
+      scene.fog.near = fogBase.current.near * (1 - weatherFx.mist * 0.7 - weatherFx.rain * 0.35);
+      // Keep at least ~55 m of visibility so exploring stays comfortable.
+      scene.fog.far = Math.max(55, fogBase.current.far * (1 - weatherFx.mist * 0.45 - weatherFx.rain * 0.25));
+    }
     setNightGlow(glow);
     named.current ||= {
       stars: scene.getObjectByName("night-stars"),
       orb: scene.getObjectByName("sky-orb") as T.Mesh | undefined,
     };
     const { stars, orb } = named.current;
-    if (stars) stars.visible = glow > 0.3;
+    if (stars) stars.visible = glow > 0.3 && cover < 0.3;
     if (orb) (orb.material as T.MeshBasicMaterial).color.set(glow > 0.6 ? "#e4ebf6" : "#f6e6bb");
     if (glow > 0.35 !== night) setNight(glow > 0.35);
     lights.current?.children.forEach((l, i) => {

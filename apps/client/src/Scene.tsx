@@ -2,6 +2,7 @@ import { WorldInteraction } from "./WorldInteraction";
 import { HavenHouses } from "./HavenHouses";
 import { HavenVillage } from "./HavenVillage";
 import { HavenBirds } from "./HavenBirds";
+import { WeatherEffects } from "./Weather";
 import { HavenTreasure } from "./HavenTreasure";
 import { Riftgate } from "./Riftgate";
 import { ModelLighting } from "./ModelLighting";
@@ -297,6 +298,7 @@ function Environment({
         <>
           <DayNight sky={sky} fog={r.color} haven={region === "haven"} />
           <SkyLife radius={expanded ? 54 : 26} birds={!expanded} />
+          <WeatherEffects region={region} />
         </>
       )}
       {expanded ? (

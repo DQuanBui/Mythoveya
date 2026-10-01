@@ -445,3 +445,21 @@ button.world-label:hover {
   display: table;
   margin: 6px auto 0;
 }
+.world-hud .location .weather-chip {
+  margin-top: 4px;
+}
+.world-hud .weather-chip[data-weather="rain"] span {
+  color: #a9d8ee;
+}
+.world-hud .weather-chip[data-weather="mist"] span {
+  color: #dfe8e6;
+}
+.weather-note {
+  margin: 8px 0 0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #a9d8ee1f;
+  border: 1px solid #a9d8ee55;
+  color: #d8eef6;
+  font-size: 13px;
+}
