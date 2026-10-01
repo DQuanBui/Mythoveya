@@ -75,6 +75,8 @@ const mutation = z.object({
     "town-spar",
     "town-weekly",
     "town-track",
+    "town-cache",
+    "town-fish",
   ]),
   species: z.string().max(32).optional(),
   count: z.union([z.literal(1), z.literal(10)]).optional(),
@@ -87,6 +89,7 @@ const mutation = z.object({
   npc: z.string().max(20).optional(),
   item: z.string().max(20).optional(),
   nickname: z.string().max(20).optional(),
+  success: z.boolean().optional(),
 });
 app.post("/api/mutate", (req, res) => {
   const v = mutation.parse(req.body);

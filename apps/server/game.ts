@@ -27,7 +27,8 @@ export function team(p: Profile) {
 }
 export function mutate(p: Profile, kind: string, v: any) {
   const town = ensureTown(p);
-  if (kind.startsWith("town-")) return townMutation(p, kind, v);
+  if (kind.startsWith("town-"))
+    return townMutation(p, kind, v, Date.now(), random);
   switch (kind) {
     case "starter":
       if (p.owned.length) throw Error("You already chose a starter.");

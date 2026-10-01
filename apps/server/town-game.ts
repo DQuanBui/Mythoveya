@@ -1,5 +1,9 @@
 import type { Profile } from "../../packages/shared/types";
-import { HAVEN_HOUSES } from "../../packages/shared/haven";
+import {
+  HAVEN_HOUSES,
+  HAVEN_CACHES,
+  CACHE_COMPLETION_DIAMONDS,
+} from "../../packages/shared/haven";
 import { gainXp } from "../../packages/shared/economy";
 import {
   NPCS,
@@ -10,6 +14,9 @@ import {
   utcDay,
   utcWeek,
   GARDEN_GROW_MS,
+  FISH,
+  FISH_WEIGHTS,
+  FISHING_CASTS_PER_DAY,
   type ItemId,
   type TownReward,
 } from "../../packages/shared/town";
@@ -28,6 +35,7 @@ export function townMutation(
   kind: string,
   v: any,
   now = Date.now(),
+  random = Math.random,
 ) {
   const t = ensureTown(p, now),
     today = utcDay(now);
@@ -61,6 +69,63 @@ export function townMutation(
           ? "All six stamps! Your visitor book earned 50 Diamonds."
           : `${house.name}: visitor stamp, 15 Gold and 10 keeper XP.`,
       };
+    }
+    case "town-cache": {
+      const cache = HAVEN_CACHES.find((c) => c.id === v.id);
+      if (!cache || p.region !== "haven")
+        throw Error("Search for Skyglass caches in Havenreach.");
+      if (t.caches!.includes(cache.id))
+        throw Error("This cache is already open.");
+      t.caches!.push(cache.id);
+      const complete = HAVEN_CACHES.every((c) => t.caches!.includes(c.id));
+      grant(p, {
+        ...cache.reward,
+        diamonds:
+          (cache.reward.diamonds || 0) +
+          (complete ? CACHE_COMPLETION_DIAMONDS : 0),
+      });
+      const found = Object.entries(cache.reward)
+        .map(([k, n]) =>
+          k === "sunseed"
+            ? `${n} Sunseed`
+            : k === "treat"
+              ? `${n} treat${n === 1 ? "" : "s"}`
+              : k === "tokens"
+                ? `${n} bond token${n === 1 ? "" : "s"}`
+                : k === "xp"
+                  ? `${n} keeper XP`
+                  : `${n} ${k[0].toUpperCase()}${k.slice(1)}`,
+        )
+        .join(", ");
+      return {
+        message: complete
+          ? `Every Skyglass cache found! ${found}, plus ${CACHE_COMPLETION_DIAMONDS} bonus Diamonds.`
+          : `${cache.name}: ${found}. (${t.caches!.length}/${HAVEN_CACHES.length})`,
+      };
+    }
+    case "town-fish": {
+      if (p.region !== "haven")
+        throw Error("Fish from the Willowmere dock in Havenreach.");
+      if (t.fishing?.date !== today)
+        t.fishing = { date: today, casts: 0, caught: 0 };
+      if (t.fishing.casts >= FISHING_CASTS_PER_DAY)
+        throw Error("The fish are resting. Come back after 00:00 UTC.");
+      t.fishing.casts++;
+      if (!v.success)
+        return { message: "The fish slipped away. Try again!", fish: null };
+      let roll = random(),
+        fish: (typeof FISH)[number] = "minnow";
+      for (const id of FISH) {
+        roll -= FISH_WEIGHTS[id];
+        if (roll < 0) {
+          fish = id;
+          break;
+        }
+      }
+      t.fishing.caught++;
+      t.inventory[fish] = (t.inventory[fish] || 0) + 1;
+      bump("fish");
+      return { message: `You caught a ${ITEMS[fish].name}!`, fish };
     }
     case "town-talk": {
       const n = npc();

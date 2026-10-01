@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { townMutation } from "../apps/server/town-game";
-import { HAVEN_HOUSES } from "../packages/shared/haven";
+import { HAVEN_HOUSES, HAVEN_CACHES } from "../packages/shared/haven";
 import {
   NPCS,
   ensureTown,
@@ -12,6 +12,7 @@ import {
   utcWeek,
   dailyStock,
   GARDEN_GROW_MS,
+  FISHING_CASTS_PER_DAY,
 } from "../packages/shared/town";
 
 process.env.DB_PATH = join(
@@ -72,6 +73,61 @@ describe("village progress and durable services", () => {
     save(after);
     expect(() => op(token, "town-visit", { id: HAVEN_HOUSES[0].id })).toThrow(
       "Visit a house",
+    );
+  });
+  it("opens each Skyglass cache once and pays the completion bonus once", () => {
+    const token = keeper(),
+      before = authenticate(token);
+    delete before.town!.caches;
+    save(before);
+    const requestId = crypto.randomUUID();
+    op(token, "town-cache", { id: "cloudfall" }, Date.now(), requestId);
+    op(token, "town-cache", { id: "cloudfall" }, Date.now(), requestId);
+    expect(authenticate(token).town?.caches).toEqual(["cloudfall"]);
+    expect(authenticate(token).diamonds).toBe(before.diamonds + 40);
+    expect(() => op(token, "town-cache", { id: "cloudfall" })).toThrow(
+      "already open",
+    );
+    expect(() => op(token, "town-cache", { id: "fake" })).toThrow(
+      "Skyglass caches",
+    );
+    for (const c of HAVEN_CACHES.filter((c) => c.id !== "cloudfall"))
+      op(token, "town-cache", { id: c.id });
+    const after = authenticate(token),
+      sum = (k: "gold" | "diamonds" | "tokens") =>
+        HAVEN_CACHES.reduce((n, c) => n + (c.reward[k] || 0), 0);
+    expect(after.town?.caches).toHaveLength(HAVEN_CACHES.length);
+    expect(after.diamonds).toBe(before.diamonds + sum("diamonds") + 100);
+    expect(after.gold).toBe(before.gold + sum("gold"));
+    expect(after.tokens).toBe(before.tokens + sum("tokens"));
+    after.region = "canyon";
+    after.town!.caches = [];
+    save(after);
+    expect(() => op(token, "town-cache", { id: "cloudfall" })).toThrow(
+      "Skyglass caches",
+    );
+  });
+  it("limits daily fishing casts and stores only successful catches", () => {
+    const token = keeper(),
+      now = Date.now(),
+      fish = (success: boolean, roll: number, at = now) =>
+        operation(token, crypto.randomUUID(), (p) =>
+          townMutation(p, "town-fish", { success }, at, () => roll),
+        ).value;
+    expect(fish(false, 0.1)).toMatchObject({ fish: null });
+    expect(fish(true, 0.1)).toMatchObject({ fish: "minnow" });
+    expect(fish(true, 0.6)).toMatchObject({ fish: "carp" });
+    expect(fish(true, 0.95)).toMatchObject({ fish: "skyfin" });
+    const p = authenticate(token);
+    expect(p.town?.inventory).toMatchObject({ minnow: 1, carp: 1, skyfin: 1 });
+    expect(p.town?.fishing).toMatchObject({ casts: 4, caught: 3 });
+    for (let i = 4; i < FISHING_CASTS_PER_DAY; i++) fish(false, 0.5);
+    expect(() => fish(true, 0.5)).toThrow("resting");
+    expect(fish(true, 0.5, now + 86400000)).toMatchObject({ fish: "minnow" });
+    op(token, "town-sell", { item: "skyfin" });
+    expect(authenticate(token).gold).toBe(p.gold + 45);
+    expect(() => op(token, "town-buy", { item: "skyfin" })).toThrow(
+      "not in today's stock",
     );
   });
   it("preserves original gathering IDs and gates outer nodes to Havenreach", () => {

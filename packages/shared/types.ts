@@ -12,6 +12,8 @@ export type Owned = {
 };
 export type TownState = {
   stamps?: string[];
+  caches?: string[];
+  fishing?: { date: string; casts: number; caught: number };
   trackedNpc?: string;
   inventory: Record<string, number>;
   met: string[];

@@ -526,7 +526,34 @@ export const ITEMS = {
     sell: 0,
     stock: 1,
   },
+  minnow: {
+    name: "Willow minnow",
+    icon: "≈",
+    description: "A quick silver fish from Willowmere. Pip buys it.",
+    buy: 0,
+    sell: 8,
+    stock: 0,
+  },
+  carp: {
+    name: "Glimmer carp",
+    icon: "◒",
+    description: "A golden-scaled carp that shines in the shallows.",
+    buy: 0,
+    sell: 18,
+    stock: 0,
+  },
+  skyfin: {
+    name: "Skyfin",
+    icon: "✶",
+    description: "A rare fish that leaps toward the clouds. Worth a lot.",
+    buy: 0,
+    sell: 45,
+    stock: 0,
+  },
 };
+export const FISH = ["minnow", "carp", "skyfin"] as const;
+export const FISH_WEIGHTS = { minnow: 0.55, carp: 0.33, skyfin: 0.12 };
+export const FISHING_CASTS_PER_DAY = 8;
 export type ItemId = keyof typeof ITEMS;
 export const GARDEN_GROW_MS = 120000;
 export const utcDay = (now = Date.now()) =>
@@ -540,6 +567,7 @@ export function utcWeek(now = Date.now()) {
 export function defaultTown(region = "haven", now = Date.now()): TownState {
   return {
     stamps: [],
+    caches: [],
     inventory: { sunseed: 2, treat: 0, ribbon: 0, bell: 0 },
     met: [],
     claims: [],
@@ -555,6 +583,7 @@ export const townOf = (p: Profile) => p.town || defaultTown(p.region);
 export function ensureTown(p: Profile, now = Date.now()) {
   p.town ||= defaultTown(p.region, now);
   p.town.stamps ||= [];
+  p.town.caches ||= [];
   p.version = Math.max(p.version, 2);
   if (p.town.stock.date !== utcDay(now))
     p.town.stock = { date: utcDay(now), bought: {} };
