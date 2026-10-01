@@ -72,6 +72,7 @@ export type Profile = {
   bosses: string[];
   town?: TownState;
   adventure?: AdventureState;
+  events?: import("./events").EventState;
   gear?: import("./adventure").Gear[];
 };
 export type Status = {

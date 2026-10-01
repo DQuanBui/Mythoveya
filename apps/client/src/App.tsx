@@ -16,6 +16,7 @@ import { NpcPanel, TownDirectory } from "./TownPanels";
 import { HavenMap } from "./HavenMap";
 import { HouseVisit } from "./HavenHouses";
 import { FishingPanel } from "./FishingPanel";
+import { EventsPanel } from "./EventsPanel";
 import { TOWNSFOLK } from "./HavenTownsfolk";
 import { AdventurePanel, type MissionStart } from "./AdventurePanel";
 import { HAVEN_PLACES, HAVEN_HOUSES } from "../../../packages/shared/haven";
@@ -537,7 +538,7 @@ export default function App() {
         <div className="modal-backdrop">
           <section
             key={panel}
-            className={`panel modal ${["collection", "formation", "gallery", "town", "map", "adventure", "training"].includes(panel) || panel.startsWith("npc-") ? "wide" : ""}`}
+            className={`panel modal ${["collection", "formation", "gallery", "town", "map", "adventure", "training", "events"].includes(panel) || panel.startsWith("npc-") ? "wide" : ""}`}
             aria-label={panel}
           >
             <button
@@ -557,6 +558,9 @@ export default function App() {
                 run={run}
                 begin={(m) => startBattle(false, false, m)}
               />
+            )}
+            {panel === "events" && profile && (
+              <EventsPanel profile={profile} run={run} />
             )}
             {panel === "fishing" && profile && (
               <FishingPanel profile={profile} run={run} />

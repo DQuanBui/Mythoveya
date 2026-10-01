@@ -17,6 +17,8 @@ import { atomic, db, getProfile, save } from "./store";
 import { ensureTown, utcDay, utcWeek } from "../../packages/shared/town";
 import { townMutation } from "./town-game";
 import { resourcesForRegion } from "../../packages/shared/haven";
+import { track } from "../../packages/shared/events";
+import { eventMutation } from "./events-game";
 import {
   adventureMutation,
   addGear,
@@ -74,7 +76,14 @@ export function mutate(p: Profile, kind: string, v: any) {
   const town = ensureTown(p);
   if (kind.startsWith("town-"))
     return townMutation(p, kind, v, Date.now(), random);
-  if (ADVENTURE_KINDS.includes(kind)) return adventureMutation(p, kind, v);
+  if (ADVENTURE_KINDS.includes(kind)) {
+    const value = adventureMutation(p, kind, v);
+    if (kind === "gear-upgrade") track(p, "forge");
+    if (kind === "evolve") track(p, "evolve");
+    return value;
+  }
+  if (["login-claim", "event-claim", "event-chest"].includes(kind))
+    return eventMutation(p, kind, v, Date.now(), random);
   switch (kind) {
     case "starter":
       if (p.owned.length) throw Error("You already chose a starter.");
@@ -101,6 +110,7 @@ export function mutate(p: Profile, kind: string, v: any) {
         result.push({ species, duplicate });
       }
       p.quests.recruit = 1;
+      track(p, "recruits", count);
       return result;
     }
     case "formation":
@@ -133,6 +143,7 @@ export function mutate(p: Profile, kind: string, v: any) {
         p.daily.resources++;
         p.gold += 25;
         p.quests.resources = (p.quests.resources || 0) + 1;
+        track(p, "resources");
         town.inventory.sunseed = (town.inventory.sunseed || 0) + 1;
       }
       break;
@@ -144,6 +155,7 @@ export function mutate(p: Profile, kind: string, v: any) {
       o.xp += 60;
       gainXp(p, 10);
       p.daily.train++;
+      track(p, "train");
       town.stats.trained = (town.stats.trained || 0) + 1;
       break;
     }
@@ -402,7 +414,12 @@ export function finishPve(profileId: string, b: Battle) {
       if (b.winner === 0) {
         p.wins++;
         p.daily.wins++;
+        track(p, "wins");
         result = finishMission(p, b, meta);
+        if (meta.stage) {
+          track(p, "stages");
+          track(p, "stars", result.stars || 0);
+        } else track(p, "dungeons");
       }
       b.rewards = {
         gold: p.gold - before.gold,
@@ -424,6 +441,7 @@ export function finishPve(profileId: string, b: Battle) {
     if (meta?.boss && meta.region !== "practice" && b.winner === 0)
       town.guardianWeek = utcWeek();
     if (meta?.region !== "practice" && b.winner === 0) {
+      track(p, "wins");
       p.wins++;
       p.daily.wins++;
       p.gold += 80;

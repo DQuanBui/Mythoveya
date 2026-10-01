@@ -374,3 +374,121 @@
     grid-column: 1 / -1;
   }
 }
+
+/* Events: login calendar and missions */
+.events-button {
+  position: relative;
+}
+.ready-dot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #f37b5f;
+  box-shadow: 0 0 0 2px #15353d;
+}
+.login-grid {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 8px;
+  margin: 16px 0;
+}
+.login-day {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  padding: 8px 4px;
+  border-radius: 10px;
+  background: #0f2b31a8;
+  border: 1px solid #c6d2b42b;
+  text-align: center;
+  min-height: 92px;
+}
+.login-day small {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: #c9d3c0;
+}
+.login-day span {
+  font-size: 20px;
+  color: #f3dc9f;
+}
+.login-day em {
+  font-style: normal;
+  font-size: 9.5px;
+  line-height: 1.25;
+  color: #d8dfcc;
+}
+.login-day.milestone {
+  border-color: #f2c46b88;
+  background: linear-gradient(170deg, #f2c46b26, #0f2b31a8 60%);
+}
+.login-day.claimed {
+  opacity: 0.5;
+}
+.login-day.claimed span {
+  color: #8fe0cf;
+}
+.login-day.today {
+  border-color: #8fe0cf;
+  box-shadow: 0 0 0 2px #8fe0cf55, 0 0 18px #8fe0cf44;
+}
+.mission-list {
+  display: grid;
+  gap: 8px;
+  margin: 14px 0;
+}
+.event-mission {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 14px;
+  align-items: center;
+  padding: 11px 14px;
+  border-radius: 10px;
+  background: #0f2b31a8;
+  border: 1px solid #c6d2b42b;
+}
+.event-mission b,
+.event-mission small {
+  display: block;
+}
+.event-mission small {
+  font-size: 12px;
+  color: #f0dcaa;
+  margin: 2px 0 6px;
+}
+.event-mission .progress {
+  display: block;
+  height: 5px;
+  border-radius: 3px;
+  background: #ffffff1c;
+  overflow: hidden;
+}
+.event-mission .progress i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #8fe0cf, #f3dc9f);
+}
+.event-mission .count {
+  font-size: 13px;
+  color: #c9d3c0;
+}
+.event-mission.done {
+  border-color: #f2c46b88;
+}
+.event-mission.taken {
+  opacity: 0.55;
+}
+@media (max-width: 760px) {
+  .login-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+  .event-mission {
+    grid-template-columns: 1fr auto;
+  }
+  .event-mission button {
+    grid-column: 1 / -1;
+  }
+}

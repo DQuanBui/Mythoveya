@@ -1,4 +1,5 @@
 import { Room, Client } from "@colyseus/core";
+import { track } from "../../packages/shared/events";
 import { z } from "zod";
 import { randomInt } from "node:crypto";
 import { act, autoAction, elo, makeBattle } from "../../packages/shared/combat";
@@ -159,6 +160,7 @@ export class ArenaRoom extends Room {
       }
       for (const p of ps) {
         p.quests.arena = 1;
+        track(p, "arena");
         save(p);
       }
       db.prepare("INSERT INTO matches VALUES(?,?)").run(

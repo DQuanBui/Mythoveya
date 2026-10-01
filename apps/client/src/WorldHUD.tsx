@@ -9,6 +9,8 @@ import {
 } from "../../../packages/shared/haven";
 import { Portrait } from "./portraits";
 import { useHover } from "./hover";
+import { eventsReady } from "../../../packages/shared/events";
+import { utcDay } from "../../../packages/shared/town";
 import { islandHour, timeLabel } from "./daytime";
 import { settings } from "./audio";
 import {
@@ -123,6 +125,14 @@ export function WorldHUD({
               )}
             </div>
           ))}
+          <button
+            className="events-button"
+            aria-label="Events and missions"
+            title="Events: login gifts, weekly and monthly missions"
+            onClick={() => open("events")}
+          >
+            ❖{eventsReady(profile, utcDay()) && <i className="ready-dot" />}
+          </button>
           <button aria-label="Open settings" onClick={() => open("settings")}>
             ☷
           </button>

@@ -5,6 +5,7 @@ import {
   CACHE_COMPLETION_DIAMONDS,
 } from "../../packages/shared/haven";
 import { gainXp } from "../../packages/shared/economy";
+import { track } from "../../packages/shared/events";
 import {
   NPCS,
   ITEMS,
@@ -77,6 +78,7 @@ export function townMutation(
       if (t.caches!.includes(cache.id))
         throw Error("This cache is already open.");
       t.caches!.push(cache.id);
+      track(p, "caches");
       const complete = HAVEN_CACHES.every((c) => t.caches!.includes(c.id));
       grant(p, {
         ...cache.reward,
@@ -123,6 +125,7 @@ export function townMutation(
         }
       }
       t.fishing.caught++;
+      track(p, "fish");
       t.inventory[fish] = (t.inventory[fish] || 0) + 1;
       bump("fish");
       return { message: `You caught a ${ITEMS[fish].name}!`, fish };
