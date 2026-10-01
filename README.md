@@ -16,11 +16,17 @@ Mythoveya is a locally playable, browser-based 3D creature-collection RPG. Its w
 - **Make yourself at home:** trade supplies at Pip's rotating market, grow Sunseed, craft treats, nurture friendship, name companions, and dress your following friend with a ribbon or bell.
 - **Your own six:** three front slots and three rear slots, with drag-and-drop or click-to-place formation editing.
 - **Know where to go:** a chapter tracker, objective distance, and matching gold waypoints in the world and minimap guide your first journey. Nearby labels stay readable, while resource sparkles keep the scenery clear.
-- **Explore on a smaller screen:** the quest tracker, map, wallet, team strip, and complete menu adapt to narrow screens. Drag the movement joystick and tap the interaction prompt to explore with touch.
+- **Explore on a smaller screen:** the quest tracker, map, wallet, team strip, and complete menu adapt to narrow screens. Drag the movement joystick, tap the ground or an object, or tap the nearby action button.
 - **Four destinations:** Havenreach, Whisperleaf Meadow, Emberglass Canyon, and Moonfrost Hollow, with resources, roaming encounters, and enhanced region guardians.
 - **A broader place to begin:** Havenreach has a connected village, orchard, grove, ruins, lookout, pond, and flower clearing. Follow the trails through woodland, cross the bridge, watch 17 additional roaming Wildbound, and gather from nine Sunseed sites.
 - **Six welcoming homes:** visit the bakery, workshop, glasshouse, orchard cottage, ranger lodge, and woodland refuge. Sign each porch visitor book for Gold and XP; collect all six stamps for 50 Diamonds. Your book survives reloads.
 - **Your own walking route:** choose a destination on the illustrated local map, follow its gold waypoint, sprint along the trails, and return to the village from the pause menu.
+- **Point and click:** click the ground to walk there along the trails, or click a villager, home, crystal, or cache and your keeper walks over and interacts. Hover anything clickable for a ring and a short tooltip.
+- **A living village:** timber cottages, a windmill, a well, lamp-lit trails, festival bunting, chimney smoke, drifting clouds, birds, and six islanders who stroll the paths by day and go home at night.
+- **Day and night:** an 18-minute island day with dawn, dusk, moonlight, glowing windows and lamps, a crackling campfire, and fireflies. It can be turned off in settings.
+- **Treasure and fishing:** find eight hidden Skyglass caches using clues on the map, and fish from the Willowmere dock in a timing mini-game. Pip buys your catch.
+- **The Riftgate:** five story chapters with twenty stages and a boss at the end of each, plus three daily dungeons: the Crystal Vault for Diamonds, the Ember Forge for equipment, and the Grove of Insight for skill tomes.
+- **Grow every companion:** level skills and ultimates to 5, equip a weapon, armor, and charm, forge them up to +10, and use growth elixirs.
 - **Tactical battles:** elemental advantages, energy, cooldowns, shields, healing, status effects, delayed attacks, revivals, and a visible turn queue. Manual and automatic controls are available in PvE.
 - **A growing collection:** recruit with earned diamonds, bond with wild creatures, train companions, collect shards, and claim story and daily rewards.
 - **Meet each new bond:** watch your recruited Wildbound arrive on the 3D shrine stage, and select any result from a ten-bond reveal to meet it up close.
@@ -70,9 +76,10 @@ Open **http://127.0.0.1:2567/** for the compiled build. This command serves the 
 
 1. Select **Begin your journey**, enter your keeper name, and choose an avatar.
 2. Choose **Emberfox**, **Ripplefin**, or **Thornhare** as your starter.
-3. Click **Warden Liora**, her name label, or the nearby interaction button. Accept Cindermite, Puddlepip, Mossprig, Pebblit, and Zippinch to complete your first six.
+3. Click **Warden Liora** or her name label; your keeper walks over. Accept Cindermite, Puddlepip, Mossprig, Pebblit, and Zippinch to complete your first six.
 4. Approach the **Wild encounter** marker to meet **Ranger Tali**. Choose **Services → Begin a wild encounter**. Basic attacks are free; skills cost 2 energy and ultimates cost 5. Front companions protect the rear slot behind them. PvE **Auto** and **Fast** controls are optional.
 5. After winning, open **Quests** and claim your 600-diamond tutorial reward. Visit **Recruit**, make a bond, and open **Team** to save your formation.
+6. Click the glowing **Riftgate** north of the plaza and begin **Chapter 1 · Rustling paths**. Check the **Crystal Vault** every day for recruiting Diamonds.
 
 Training costs 50 gold and stores creature XP even when the account-level cap prevents an immediate level. Three species shards purchase a 2% stat upgrade, up to five upgrades. Tactical Arena ignores these shard bonuses. Stars mark favorites; companions cannot be sold or deleted.
 
@@ -84,12 +91,13 @@ In Havenreach, **Travel map** opens the island's local trail guide. Select a pla
 
 | Control | Action |
 | --- | --- |
-| WASD or arrow keys | Move your keeper |
+| Click the ground | Walk there along the trails |
+| Click a person, home, or object | Walk over and interact; hover to see what it is |
+| WASD or arrow keys | Move your keeper directly |
 | Hold Shift | Sprint |
 | R | Reset the exploration camera |
 | Mouse drag | Rotate the camera |
 | Mouse wheel | Zoom |
-| Click / tap | Open villagers, house porches, wildlife notes, labels, or gather Sunseed; the nearby action button also works |
 | Esc | Open pause menu or close a panel |
 | Esc → Return to Havenreach village | Return safely to the starting plaza while exploring Havenreach |
 | Heart beside the party | Greet your following companion |
@@ -100,6 +108,17 @@ Use **Sound & settings** on the title screen or the settings button in the world
 Low quality reduces decorative scenery and particles. Quality changes take full effect on the next scene entry. On touch screens, drag the movement joystick and tap the interaction prompt. Desktop keyboard-and-mouse play remains the most thoroughly tested way to battle.
 
 Push the touch joystick farther to run. Trees, buildings, the pond, and the cliff edge keep your keeper on safe ground; approach the pond along the bridge. Returning from a battle keeps your current exploration position during the session. Reloading starts you at the current region's starting point, with your saved companions, inventory, and progression intact.
+
+## The Riftgate: chapters, dungeons, and growth
+
+The glowing Riftgate stands in the north lane of Havenreach village. Click it, or choose **Adventure** in the menu bar.
+
+- **Story chapters:** The Restless Grove, Embers Beneath, Tides of the Sky, The Frozen Choir, and Heart of the Rift. Each chapter has three stages and a boss. A first clear pays Diamonds, Gold, XP, and forge dust. Bosses also give skill tomes and a piece of equipment. Stars depend on how many companions faint: none for three stars, up to two for two. Earn all twelve stars in a chapter to open its mastery chest. Each stage shows a recommended team level. The opening stages are gentle enough for a brand-new team.
+- **Rift dungeons:** three victories per dungeon each day, resetting at 00:00 UTC. Clear a tier to open the next one, up to Tier V. The Crystal Vault pays 30–100 Diamonds a run, the Ember Forge drops equipment and forge dust, and the Grove of Insight gives skill tomes and growth elixirs.
+- **Skills:** open a companion in the **Journal**. Each skill or ultimate level costs tomes and Gold and adds 10% power to its damage, healing, and shields.
+- **Equipment:** weapons raise attack, armor raises HP and defense, and charms raise speed and critical chance. Rarities run from Common to Legendary. Forge with dust and Gold up to +10, or salvage spare pieces for dust. Equipment and skill levels apply to story, dungeons, wild encounters, and Power Arena. Tactical Arena ignores them, as it ignores shard upgrades.
+
+Chapter and dungeon victories also count toward daily wins and region unlocks.
 
 ## Play against another keeper
 
@@ -185,4 +204,4 @@ In `npm run dev`, press **Esc → Asset gallery** to inspect species, keeper mod
 
 Add or balance creatures in `packages/shared/roster.json` and `content.ts`; avatars and regions also live in `content.ts`. Economy curves and pity rules live in `economy.ts`. Server reward and quest configuration lives in `apps/server/game.ts`. Keep species IDs stable to preserve existing collections.
 
-Next development priorities are individual creature-art refinement, richer region layouts and stories, deeper balance playtesting, and a dedicated listening pass on the synthesized score. Longer-term ideas include evolution, sanctuaries, cooperative guardians, and additional chapters.
+Next development priorities are individual creature-art refinement, richer layouts for the other regions, chapter cutscenes and dialogue, deeper balance playtesting with manual play, and a dedicated listening pass on the synthesized score. Longer-term ideas include evolution, sanctuaries, cooperative guardians, and more chapters.

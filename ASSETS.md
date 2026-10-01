@@ -9,6 +9,9 @@
 - `apps/client/src/TownScenery.tsx`: original striped market stall, timed garden sprouts, companion ribbon, and bell. Villager portraits and idle characters reuse the eight keeper models.
 - `HavenTerrain.tsx`, `HavenNature.tsx`, `HavenWater.tsx`, and `HavenLandmarks.tsx`: local island geometry, instanced woodland and ground cover, pond/bridge, ruins, orchard, and lookout. `HavenWildlife.tsx` animates existing creature models and simple butterflies. `HavenMap.tsx` draws its map directly from the shared layout, without external map images or fonts.
 - `apps/client/src/HavenHouses.tsx`: six original procedural homes, flower boxes, lanterns, fences, and porch visitor-book presentation.
+- `apps/client/src/HavenVillage.tsx` and `village-kit.ts`: original timber cottages, windmill, well, dock, rowboat, campfire, trail lamps, festival bunting, and chimney smoke, merged into a few vertex-colored meshes.
+- `apps/client/src/Atmosphere.tsx`: the day/night lighting cycle, moonlight, fireflies (a canvas-drawn glow sprite), drifting clouds, and birds.
+- `apps/client/src/Riftgate.tsx`: the Riftgate portal, including its swirling GLSL portal shader. `HavenTreasure.tsx`: Skyglass caches. `HavenTownsfolk.tsx`: strolling islanders built from the existing keeper models.
 - `apps/client/src/RecruitmentStage.tsx`: original bond-shrine stage, entrance motion, and rarity accents using the actual creature models.
 - `apps/client/public/emblem.svg`: original six-point bond emblem.
 - Collection portraits are rendered from those same Three.js creature models by one on-demand renderer, then cached for the session. They are not hotlinked pictures or separate concept art.
