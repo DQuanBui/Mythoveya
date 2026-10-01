@@ -63,6 +63,23 @@ export const battleMeta = new Map<
   { region: string; boss: boolean } & Mission
 >();
 const random = () => randomInt(0, 0x100000000) / 0x100000000;
+/** Consumes pending Apothecary tonics and adds their bonus to a battle team. */
+function applyBuffs(p: Profile, six: Owned[]) {
+  const t = ensureTown(p),
+    used: string[] = [];
+  for (const buff of ["vigor", "swift"] as const) {
+    if (!((t.buffs?.[buff] || 0) > 0)) continue;
+    t.buffs![buff]--;
+    used.push(buff);
+    for (const o of six) {
+      o.bonus ||= { hp: 0, attack: 0, defense: 0, speed: 0, crit: 0 };
+      if (buff === "vigor") o.bonus.hp += 0.1;
+      else o.bonus.speed += Math.round(byId[o.species].stats.speed * 0.08);
+    }
+  }
+  if (used.length) save(p);
+  return used;
+}
 export function team(p: Profile) {
   formation({ ...p }, p.team);
   return p.team.map((id) => {
@@ -263,7 +280,7 @@ export function startPve(
   }));
   const b = makeBattle(
     randomUUID(),
-    [team(p), enemy],
+    [practice ? team(p) : buffed(p), enemy],
     practice ? "practice" : "pve",
     randomInt(0, 10000000),
   );
@@ -305,6 +322,11 @@ const enemyTeam = (species: string[], level: number): Owned[] =>
     upgrade: 0,
     locked: false,
   }));
+const buffed = (p: Profile) => {
+  const six = team(p);
+  applyBuffs(p, six);
+  return six;
+};
 function startMission(p: Profile, mission: Mission) {
   if (p.team.length !== 6) throw Error("Form a team of six first.");
   const a = ensureAdventure(p);
@@ -317,7 +339,7 @@ function startMission(p: Profile, mission: Mission) {
     const t = towerFloor(floor);
     b = makeBattle(
       randomUUID(),
-      [team(p), enemyTeam(t.enemies, t.level)],
+      [buffed(p), enemyTeam(t.enemies, t.level)],
       "pve",
       randomInt(0, 10000000),
     );
@@ -335,7 +357,7 @@ function startMission(p: Profile, mission: Mission) {
       throw Error("Clear the previous stage first.");
     b = makeBattle(
       randomUUID(),
-      [team(p), enemyTeam(stage.enemies, stage.level)],
+      [buffed(p), enemyTeam(stage.enemies, stage.level)],
       "pve",
       randomInt(0, 10000000),
     );
@@ -368,7 +390,7 @@ function startMission(p: Profile, mission: Mission) {
       throw Error("No runs left today. Dungeons reset at 00:00 UTC.");
     b = makeBattle(
       randomUUID(),
-      [team(p), enemyTeam([...d.enemies], d.levels[tier])],
+      [buffed(p), enemyTeam([...d.enemies], d.levels[tier])],
       "pve",
       randomInt(0, 10000000),
     );

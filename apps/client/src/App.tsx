@@ -13,14 +13,14 @@ import { Portrait } from "./portraits";
 import { WorldHUD } from "./WorldHUD";
 import { NPCS } from "../../../packages/shared/town";
 import { NpcPanel, TownDirectory } from "./TownPanels";
-import { HavenMap } from "./HavenMap";
+import { HavenMap, MAP_DESTINATIONS } from "./HavenMap";
 import { HouseVisit } from "./HavenHouses";
 import { FishingPanel } from "./FishingPanel";
+import { ShopPanel } from "./ShopPanel";
 import { weatherFx } from "./Weather";
 import { EventsPanel } from "./EventsPanel";
 import { TOWNSFOLK } from "./HavenTownsfolk";
 import { AdventurePanel, type MissionStart } from "./AdventurePanel";
-import { HAVEN_PLACES, HAVEN_HOUSES } from "../../../packages/shared/haven";
 import { currentObjective, type ExplorationInput } from "./world-guide";
 import {
   Appearance,
@@ -307,8 +307,7 @@ export default function App() {
   }
   const destination =
     profile?.region === "haven"
-      ? HAVEN_PLACES.find((p) => p.id === trail) ||
-        HAVEN_HOUSES.find((h) => `porch-${h.id}` === trail)
+      ? MAP_DESTINATIONS.find((p) => p.id === trail)
       : undefined;
   const objective = profile
     ? {
@@ -317,9 +316,11 @@ export default function App() {
           ? {
               title: destination.name,
               text: destination.description,
-              target: trail?.startsWith("porch-")
-                ? trail
-                : `trail-${destination.id}`,
+              target:
+                trail?.startsWith("porch-") || trail === "smith" || trail === "apothecary"
+                  ? trail
+                  : `trail-${destination.id}`,
+              waypoint: true,
               action: "map",
               button: "View walking route",
             }
@@ -550,7 +551,7 @@ export default function App() {
         <div className="modal-backdrop">
           <section
             key={panel}
-            className={`panel modal ${["collection", "formation", "gallery", "town", "map", "adventure", "training", "events"].includes(panel) || panel.startsWith("npc-") ? "wide" : ""}`}
+            className={`panel modal ${["collection", "formation", "gallery", "town", "map", "adventure", "training", "events", "smith", "apothecary"].includes(panel) || panel.startsWith("npc-") ? "wide" : ""}`}
             aria-label={panel}
           >
             <button
@@ -573,6 +574,9 @@ export default function App() {
             )}
             {panel === "events" && profile && (
               <EventsPanel profile={profile} run={run} />
+            )}
+            {(panel === "smith" || panel === "apothecary") && profile && (
+              <ShopPanel shop={panel} profile={profile} run={run} />
             )}
             {panel === "fishing" && profile && (
               <FishingPanel profile={profile} run={run} />

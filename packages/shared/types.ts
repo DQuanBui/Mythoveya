@@ -26,6 +26,10 @@ export type AdventureState = {
 export type TownState = {
   stamps?: string[];
   caches?: string[];
+  shopDay?: string;
+  shopBought?: Record<string, number>;
+  /** Pending one-battle tonics from the Apothecary. */
+  buffs?: Record<string, number>;
   fishing?: { date: string; casts: number; caught: number };
   trackedNpc?: string;
   inventory: Record<string, number>;

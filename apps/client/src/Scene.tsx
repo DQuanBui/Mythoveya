@@ -7,6 +7,7 @@ import { HavenTreasure } from "./HavenTreasure";
 import { Riftgate } from "./Riftgate";
 import { ModelLighting } from "./ModelLighting";
 import { HavenTownsfolk } from "./HavenTownsfolk";
+import { HavenShops } from "./HavenShops";
 import { DayNight, SkyLife } from "./Atmosphere";
 import { WalkContext, type Walker } from "./hover";
 import { worldFocus } from "./village-materials";
@@ -31,6 +32,7 @@ import {
   FISHING_SPOT,
   HAVEN_CACHES,
   HAVEN_RIFTGATE,
+  shopFront,
   slideStep,
   type Point,
 } from "../../../packages/shared/haven";
@@ -522,6 +524,18 @@ export const INTERACTABLES = [
     p: [-9, 0, 10],
   },
   {
+    id: "smith",
+    name: "Ironbloom Smithy",
+    hint: "Gear and forge dust",
+    p: [shopFront("smith")[0], 0, shopFront("smith")[1]],
+  },
+  {
+    id: "apothecary",
+    name: "Willowroot Apothecary",
+    hint: "Elixirs, tomes and tonics",
+    p: [shopFront("apothecary")[0], 0, shopFront("apothecary")[1]],
+  },
+  {
     id: "riftgate",
     name: "The Riftgate",
     hint: "Story chapters & daily dungeons",
@@ -550,8 +564,7 @@ export const getInteractables = (region: string) =>
       (region === "haven" ||
         (!o.id.startsWith("trail-") &&
           !o.id.startsWith("porch-") &&
-          o.id !== "fishing" &&
-          o.id !== "riftgate")) &&
+          !["fishing", "riftgate", "smith", "apothecary"].includes(o.id))) &&
       (!o.id.startsWith("resource-") ||
         resourcesForRegion(region).some((n) => n.id === o.id)),
   );
@@ -669,6 +682,17 @@ function Explorer({
   useEffect(() => {
     if (blocked) route.current = null;
   }, [blocked]);
+  useEffect(() => {
+    // Plan the walk grid once the scene has settled, so the first click is instant.
+    const t = setTimeout(() => {
+      if (!grids.has(profile.region))
+        grids.set(
+          profile.region,
+          buildGrid(allowed, profile.region === "haven" ? 46 : 18),
+        );
+    }, 1500);
+    return () => clearTimeout(t);
+  }, [allowed, profile.region]);
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (
@@ -1053,6 +1077,9 @@ export function WorldScene({
       )}
       {profile.region === "haven" && (
         <HavenTownsfolk onInteract={onInteract} disabled={blocked} />
+      )}
+      {profile.region === "haven" && (
+        <HavenShops onInteract={onInteract} disabled={blocked} />
       )}
       {profile.region === "haven" && (
         <HavenTreasure

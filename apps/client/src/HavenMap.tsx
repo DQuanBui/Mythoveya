@@ -8,6 +8,7 @@ import {
   HAVEN_POND,
   edgeRadius,
   placeAt,
+  shopFront,
   HAVEN_CACHES,
   HAVEN_COTTAGES,
   HAVEN_DOCK,
@@ -15,8 +16,18 @@ import {
   COTTAGE_SIZE,
 } from "../../../packages/shared/haven";
 import { Portrait } from "./portraits";
-const destinations = [
+import { SHOPS } from "../../../packages/shared/shops";
+export const MAP_DESTINATIONS = [
   ...HAVEN_PLACES,
+  ...(["smith", "apothecary"] as const).map((id) => ({
+    id,
+    name: SHOPS[id].name,
+    short: id === "smith" ? "Smithy" : "Apothecary",
+    point: shopFront(id),
+    color: "#e6cf95",
+    description: SHOPS[id].greeting,
+    species: [] as string[],
+  })),
   ...HAVEN_HOUSES.map((h) => ({
     ...h,
     id: `porch-${h.id}`,
@@ -41,7 +52,7 @@ export function HavenMap({
   const [selected, setSelected] = useState(
     trail || placeAt(position[0], position[1]).id,
   );
-  const place = destinations.find((p) => p.id === selected) || HAVEN_PLACES[0];
+  const place = MAP_DESTINATIONS.find((p) => p.id === selected) || HAVEN_PLACES[0];
   const coast = Array.from({ length: 96 }, (_, i) => {
     const a = (i / 96) * Math.PI * 2;
     return `${Math.cos(a) * edgeRadius(a)},${Math.sin(a) * edgeRadius(a)}`;
@@ -122,7 +133,7 @@ export function HavenMap({
               <circle r="1.4" fill="#e6dccb" />
               <path d="M-2.6 -2.6 L2.6 2.6 M2.6 -2.6 L-2.6 2.6" />
             </g>
-            {destinations.map((p) => (
+            {MAP_DESTINATIONS.map((p) => (
               <g
                 key={p.id}
                 role="button"
@@ -194,7 +205,7 @@ export function HavenMap({
             <button onClick={() => choose(null)}>Clear walking waypoint</button>
           )}
           <div className="haven-destinations">
-            {destinations.map((p) => (
+            {MAP_DESTINATIONS.map((p) => (
               <button
                 key={p.id}
                 className={selected === p.id ? "selected" : ""}

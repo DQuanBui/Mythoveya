@@ -6,6 +6,9 @@ import {
 } from "../../packages/shared/haven";
 import { gainXp } from "../../packages/shared/economy";
 import { track } from "../../packages/shared/events";
+import { BUFFS, SHOPS, shopStock, type ShopId } from "../../packages/shared/shops";
+import { addGear } from "./adventure-game";
+import { RARITIES, gearName } from "../../packages/shared/adventure";
 import { fishWeights, weatherAt, RAIN_GROWTH } from "../../packages/shared/weather";
 import {
   NPCS,
@@ -69,6 +72,42 @@ export function townMutation(
         message: complete
           ? "All six stamps! Your visitor book earned 50 Diamonds."
           : `${house.name}: visitor stamp, 15 Gold and 10 keeper XP.`,
+      };
+    }
+    case "town-shop": {
+      if (!Object.hasOwn(SHOPS, v.quest)) throw Error("Unknown shop.");
+      const shop = v.quest as ShopId,
+        offer = shopStock(shop, now).find((o) => o.id === v.item);
+      if (!offer) throw Error("That item is not in today's stock.");
+      if (t.shopDay !== today) {
+        t.shopDay = today;
+        t.shopBought = {};
+      }
+      const key = `${shop}:${offer.id}`,
+        bought = t.shopBought![key] || 0;
+      if (bought >= offer.limit) throw Error("Sold out for today. New stock arrives at 00:00 UTC.");
+      if (p.gold < offer.gold) throw Error("Not enough Gold.");
+      for (const [item, n] of Object.entries(offer.needs || {}))
+        if ((t.inventory[item] || 0) < n)
+          throw Error(`Needs ${n} ${ITEMS[item as ItemId]?.name || item}.`);
+      p.gold -= offer.gold;
+      for (const [item, n] of Object.entries(offer.needs || {})) t.inventory[item] -= n;
+      t.shopBought![key] = bought + 1;
+      const g = offer.gives;
+      if (g.item) t.inventory[g.item] = (t.inventory[g.item] || 0) + (g.count || 1);
+      if (g.buff) {
+        t.buffs ||= {};
+        t.buffs[g.buff] = (t.buffs[g.buff] || 0) + 1;
+      }
+      let name = offer.name;
+      if (g.gear) {
+        const piece = addGear(p, g.gear.slot, g.gear.rarity);
+        name = `${RARITIES[piece.rarity]} ${gearName(piece)}`;
+      }
+      return {
+        message: g.buff
+          ? `${name} ready: ${BUFFS[g.buff].text}.`
+          : `Bought ${name}.`,
       };
     }
     case "town-cache": {

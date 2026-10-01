@@ -85,6 +85,7 @@ const mutation = z.object({
     "elixir",
     "chapter-chest",
     "evolve",
+    "town-shop",
     "login-claim",
     "event-claim",
     "event-chest",

@@ -154,13 +154,11 @@ export function WorldHUD({
       <aside className="quest-tracker">
         <div className="quest-heading">
           <span className="eyebrow">
-            {objective.target?.startsWith("trail-") ||
-            objective.target?.startsWith("porch-")
+            {objective.waypoint
               ? "WALKING WAYPOINT"
               : "YOUR NEXT CHAPTER"}
           </span>
-          {!objective.target?.startsWith("trail-") &&
-            !objective.target?.startsWith("porch-") && (
+          {!objective.waypoint && (
               <span className="quest-count">
                 {Math.min(3, objective.completed)}/3 steps complete
               </span>
@@ -168,8 +166,7 @@ export function WorldHUD({
         </div>
         <strong>{objective.title}</strong>
         <p>{objective.text}</p>
-        {!objective.target?.startsWith("trail-") &&
-          !objective.target?.startsWith("porch-") && (
+        {!objective.waypoint && (
             <div
               className="chapter-progress"
               aria-label={`${objective.completed} of 3 introductory steps complete`}

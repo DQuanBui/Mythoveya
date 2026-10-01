@@ -31,6 +31,8 @@ export const WORLD_GUIDE = {
     market: { height: 2.3, icon: "◇" },
     garden: { height: 2.3, icon: "✿" },
     riftgate: { height: 7.2, icon: "✧" },
+    smith: { height: 2.6, icon: "⚒" },
+    apothecary: { height: 2.6, icon: "⚗" },
     fishing: { height: 1.8, icon: "≈" },
   } as Record<string, { height: number; icon: string }>,
 };
@@ -41,6 +43,8 @@ export type Objective = {
   action: string;
   button: string;
   completed: number;
+  /** True while following a walking waypoint set on the local map. */
+  waypoint?: boolean;
 };
 export function currentObjective(p: Profile): Objective {
   const completed =

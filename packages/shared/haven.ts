@@ -250,7 +250,7 @@ export function havenWalkable(x: number, z: number) {
     !HAVEN_LANDMARK_OBSTACLES.some(
       (o) => Math.hypot(x - o.x, z - o.z) < o.radius,
     ) &&
-    !HAVEN_TREES.some(
+    !(treesNear ||= bucketed(HAVEN_TREES, (t) => [t.x, t.z]))(x, z).some(
       (t) => Math.hypot(x - t.x, z - t.z) < 0.3 * t.scale + 0.24,
     )
   );
@@ -379,6 +379,10 @@ export const HAVEN_COTTAGES = (
     ["moss", [-11, -18.5], "cottage", "#5f7a90", "#d6c8a8", "#a0704f"],
     ["amber", [-22, 4], "cottage", "#c08b5c", "#e2d2b4", "#62806f"],
     ["heron", [-19, -12.5], "tall", "#6a7f8a", "#d9cbad", "#9b5d52"],
+    ["rowan", [-24, 11], "cottage", "#9a6f5a", "#e4d4b6", "#5d7a72"],
+    ["poppy", [-16.5, 22.5], "tall", "#b5675f", "#ecdcc0", "#5f7e8a"],
+    ["sparrow", [18, -22], "long", "#6f8a7e", "#dccfb0", "#8e5f55"],
+    ["tidewood", [23.5, 20.5], "cottage", "#5d8295", "#e2d8bf", "#a06e50"],
   ] as const
 ).map(([id, point, style, roof, wall, shutter]) => ({
   id,
@@ -397,6 +401,16 @@ export const HAVEN_RIFTGATE = {
 };
 export const HAVEN_WELL = { point: [-2, 15.5] as Point };
 export const HAVEN_CAMPFIRE = { point: [3.5, 29.5] as Point };
+
+// Town shops with working counters; doors face the nearest trail.
+export const HAVEN_SHOPS = [
+  { id: "smith", point: [8.5, -14.5] as Point, hw: 2.8, hd: 2.8 },
+  { id: "apothecary", point: [-16, -1.5] as Point, hw: 2.5, hd: 2.5 },
+].map((s) => ({ ...s, rotation: facePath(s.point[0], s.point[1]) }));
+export const shopFront = (id: string): Point => {
+  const s = HAVEN_SHOPS.find((x) => x.id === id)!;
+  return [s.point[0] + Math.sin(s.rotation) * (s.hd + 1.1), s.point[1] + Math.cos(s.rotation) * (s.hd + 1.1)];
+};
 
 // Every solid village prop is an oriented rectangle in local space.
 export type Structure = {
@@ -434,7 +448,7 @@ function lampSites(): Point[] {
           HAVEN_COTTAGES.some(
             (h) => Math.hypot(x - h.point[0], z - h.point[1]) < 4,
           ) ||
-          [HAVEN_WINDMILL, HAVEN_WELL, HAVEN_CAMPFIRE, HAVEN_RIFTGATE].some(
+          [HAVEN_WINDMILL, HAVEN_WELL, HAVEN_CAMPFIRE, HAVEN_RIFTGATE, ...HAVEN_SHOPS].some(
             (p) => Math.hypot(x - p.point[0], z - p.point[1]) < 3.5,
           ) ||
           HAVEN_PLACES.some(
@@ -464,6 +478,14 @@ export const HAVEN_STRUCTURES: Structure[] = [
     rotation: c.rotation,
     hw: COTTAGE_SIZE[c.style].w / 2 + 0.6,
     hd: COTTAGE_SIZE[c.style].d / 2 + 0.75,
+  })),
+  ...HAVEN_SHOPS.map((s) => ({
+    kind: `shop-${s.id}`,
+    x: s.point[0],
+    z: s.point[1],
+    rotation: s.rotation,
+    hw: s.hw,
+    hd: s.hd,
   })),
   {
     kind: "riftgate",
@@ -506,8 +528,29 @@ export const HAVEN_STRUCTURES: Structure[] = [
     hd: 0.2,
   })),
 ];
+// Coarse spatial buckets keep collision checks cheap for pathfinding grids.
+const BUCKET = 6;
+function bucketed<T>(items: T[], at: (t: T) => Point) {
+  const map = new Map<string, T[]>();
+  for (const item of items) {
+    const [x, z] = at(item),
+      bx = Math.floor(x / BUCKET),
+      bz = Math.floor(z / BUCKET);
+    for (let i = -1; i <= 1; i++)
+      for (let j = -1; j <= 1; j++) {
+        const key = `${bx + i},${bz + j}`;
+        if (!map.has(key)) map.set(key, []);
+        map.get(key)!.push(item);
+      }
+  }
+  return (x: number, z: number) =>
+    map.get(`${Math.floor(x / BUCKET)},${Math.floor(z / BUCKET)}`) || [];
+}
+let structuresNear: ((x: number, z: number) => Structure[]) | null = null;
+let treesNear: ((x: number, z: number) => TreeSite[]) | null = null;
 export function blockedByStructure(x: number, z: number, pad = 0) {
-  return HAVEN_STRUCTURES.some((s) => {
+  structuresNear ||= bucketed(HAVEN_STRUCTURES, (s) => [s.x, s.z]);
+  return structuresNear(x, z).some((s) => {
     const dx = x - s.x,
       dz = z - s.z;
     if (Math.abs(dx) > 5 + pad || Math.abs(dz) > 5 + pad) return false;

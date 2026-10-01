@@ -376,7 +376,7 @@ function Campfire() {
   );
 }
 
-function ChimneySmoke({ points }: { points: T.Vector3[] }) {
+export function ChimneySmoke({ points }: { points: T.Vector3[] }) {
   const per = settings.quality === "Low" ? 2 : 4;
   const mesh = useMemo(() => {
     const m = new T.InstancedMesh(

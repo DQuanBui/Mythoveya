@@ -15,14 +15,22 @@ export function buildGrid(
 ): WalkGrid {
   const size = Math.ceil((extent * 2) / cell),
     open = new Uint8Array(size * size);
+  // A cell is open only if its centre and four near-edge points are walkable,
+  // so thin props such as lamp posts can never hide between two open centres.
+  const r = cell * 0.44;
   for (let gz = 0; gz < size; gz++)
-    for (let gx = 0; gx < size; gx++)
-      open[gz * size + gx] = allowed(
-        -extent + (gx + 0.5) * cell,
-        -extent + (gz + 0.5) * cell,
-      )
-        ? 1
-        : 0;
+    for (let gx = 0; gx < size; gx++) {
+      const x = -extent + (gx + 0.5) * cell,
+        z = -extent + (gz + 0.5) * cell;
+      open[gz * size + gx] =
+        allowed(x, z) &&
+        allowed(x + r, z) &&
+        allowed(x - r, z) &&
+        allowed(x, z + r) &&
+        allowed(x, z - r)
+          ? 1
+          : 0;
+    }
   return { extent, cell, size, open };
 }
 const toCell = (g: WalkGrid, v: number) =>

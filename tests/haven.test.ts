@@ -14,6 +14,8 @@ import {
   RESOURCE_NODES,
   blockedByStructure,
   onDock,
+  HAVEN_SHOPS,
+  shopFront,
 } from "../packages/shared/haven";
 import { buildGrid, findPath, lineClear } from "../packages/shared/pathfind";
 import {
@@ -101,6 +103,7 @@ describe("Havenreach exploration layout", () => {
     const grid = buildGrid(havenWalkable, 46),
       spawn: [number, number] = [0, 5];
     const targets = [
+      ...HAVEN_SHOPS.map((s) => shopFront(s.id)),
       ...HAVEN_CACHES.map((c) => c.point),
       ...HAVEN_HOUSES.map(houseDoor),
       FISHING_SPOT,
