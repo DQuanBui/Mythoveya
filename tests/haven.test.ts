@@ -7,6 +7,16 @@ import {
 } from "../packages/shared/haven";
 import { byId } from "../packages/shared/content";
 import {
+  HAVEN_CACHES,
+  HAVEN_COTTAGES,
+  HAVEN_LAMPS,
+  FISHING_SPOT,
+  RESOURCE_NODES,
+  blockedByStructure,
+  onDock,
+} from "../packages/shared/haven";
+import { buildGrid, findPath, lineClear } from "../packages/shared/pathfind";
+import {
   HAVEN_PLACES,
   HAVEN_PATHS,
   havenWalkable,
@@ -72,5 +82,42 @@ describe("Havenreach exploration layout", () => {
     expect(mapPercent(40, "haven")).toBe(90);
     expect(mapPercent(10, "canyon")).toBe(75);
     expect(pathDistance(-22, 22)).toBe(0);
+  });
+  it("keeps the new village buildings and lamps off trails, doors and gathering sites", () => {
+    expect(HAVEN_COTTAGES.length).toBeGreaterThanOrEqual(8);
+    expect(HAVEN_LAMPS.length).toBeGreaterThan(10);
+    for (const c of HAVEN_COTTAGES) {
+      expect(havenWalkable(...c.point), c.id).toBe(false);
+      expect(pathDistance(...c.point), c.id).toBeGreaterThan(3);
+    }
+    for (const h of HAVEN_HOUSES)
+      expect(blockedByStructure(...houseDoor(h), 0.5), h.id).toBe(false);
+    for (const n of RESOURCE_NODES)
+      expect(blockedByStructure(...n.point, 0.8), n.id).toBe(false);
+    expect(onDock(...FISHING_SPOT)).toBe(true);
+    expect(havenWalkable(...FISHING_SPOT)).toBe(true);
+  });
+  it("finds a walkable click-to-walk route to every cache, porch and the dock", () => {
+    const grid = buildGrid(havenWalkable, 46),
+      spawn: [number, number] = [0, 5];
+    const targets = [
+      ...HAVEN_CACHES.map((c) => c.point),
+      ...HAVEN_HOUSES.map(houseDoor),
+      FISHING_SPOT,
+    ];
+    for (const target of targets) {
+      const route = findPath(grid, spawn, target, havenWalkable);
+      expect(route, String(target)).toBeTruthy();
+      let from = spawn;
+      for (const point of route!) {
+        expect(lineClear(from, point, havenWalkable), String(point)).toBe(true);
+        from = point;
+      }
+      expect(Math.hypot(from[0] - target[0], from[1] - target[1])).toBeLessThan(0.5);
+    }
+    // Clicking the water ends at the nearest dry ground.
+    const shore = findPath(grid, [15, -5], [21, -1.5], havenWalkable)!;
+    expect(havenWalkable(...shore.at(-1)!)).toBe(true);
+    expect(findPath(grid, spawn, [80, 80], havenWalkable)).toBeNull();
   });
 });
