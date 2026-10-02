@@ -9,7 +9,7 @@ const path = process.env.DB_PATH || "data/mythoveya.sqlite";
 mkdirSync(dirname(path), { recursive: true });
 export const db = new DatabaseSync(path);
 db.exec(
-  "PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON; CREATE TABLE IF NOT EXISTS profiles(id TEXT PRIMARY KEY, token TEXT UNIQUE NOT NULL, data TEXT NOT NULL); CREATE TABLE IF NOT EXISTS operations(profile TEXT, id TEXT, result TEXT, PRIMARY KEY(profile,id)); CREATE TABLE IF NOT EXISTS matches(id TEXT PRIMARY KEY, result TEXT NOT NULL); PRAGMA user_version=1;",
+  "PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON; CREATE TABLE IF NOT EXISTS profiles(id TEXT PRIMARY KEY, token TEXT UNIQUE NOT NULL, data TEXT NOT NULL); CREATE TABLE IF NOT EXISTS operations(profile TEXT, id TEXT, result TEXT, PRIMARY KEY(profile,id)); CREATE TABLE IF NOT EXISTS matches(id TEXT PRIMARY KEY, result TEXT NOT NULL); CREATE TABLE IF NOT EXISTS festival_runs(day TEXT, activity TEXT, profile TEXT, name TEXT, score INTEGER NOT NULL, data TEXT NOT NULL, PRIMARY KEY(day, activity, profile)); PRAGMA user_version=1;",
 );
 const hash = (token: string) =>
   createHash("sha256").update(token).digest("hex");
@@ -107,6 +107,39 @@ export function operation(
     );
     return result;
   });
+}
+/** Keeps each keeper's best festival run for the day and for all time. */
+export function recordRun(
+  day: string,
+  activity: string,
+  p: Profile,
+  score: number,
+  lowerIsBetter: boolean,
+  data: unknown,
+) {
+  for (const key of [day, "all"]) {
+    const row = db
+      .prepare("SELECT score FROM festival_runs WHERE day=? AND activity=? AND profile=?")
+      .get(key, activity, p.id) as { score: number } | undefined;
+    if (row && (lowerIsBetter ? row.score <= score : row.score >= score)) continue;
+    db.prepare("INSERT OR REPLACE INTO festival_runs VALUES(?,?,?,?,?,?)").run(
+      key,
+      activity,
+      p.id,
+      p.name,
+      score,
+      JSON.stringify(data),
+    );
+  }
+}
+export function topRuns(day: string, activity: string, lowerIsBetter: boolean, limit = 10) {
+  return (
+    db
+      .prepare(
+        `SELECT profile, name, score, data FROM festival_runs WHERE day=? AND activity=? ORDER BY score ${lowerIsBetter ? "ASC" : "DESC"} LIMIT ?`,
+      )
+      .all(day, activity, limit) as { profile: string; name: string; score: number; data: string }[]
+  ).map((r) => ({ ...r, data: JSON.parse(r.data) }));
 }
 export function allProfiles() {
   return (

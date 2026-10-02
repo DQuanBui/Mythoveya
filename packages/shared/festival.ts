@@ -17,6 +17,8 @@ export type FestivalState = {
   outfit?: string;
   week: string;
   bought: Record<string, number>;
+  /** The game in progress, so a run can't claim to be faster than real time. */
+  started?: { activity: string; at: number };
 };
 export const defaultFestival = (now = Date.now()): FestivalState => ({
   tickets: 0,

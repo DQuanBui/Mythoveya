@@ -100,7 +100,7 @@ const ADVENTURE_KINDS = [
   "chapter-chest",
   "evolve",
 ];
-export function mutate(p: Profile, kind: string, v: any) {
+export function mutate(p: Profile, kind: string, v: any, now = Date.now()) {
   const town = ensureTown(p);
   if (kind.startsWith("town-"))
     return townMutation(p, kind, v, Date.now(), random);
@@ -110,8 +110,8 @@ export function mutate(p: Profile, kind: string, v: any) {
     if (kind === "evolve") track(p, "evolve");
     return value;
   }
-  if (ISLAND_KINDS.includes(kind)) return islandMutation(p, kind, v);
-  if (FESTIVAL_KINDS.includes(kind)) return festivalMutation(p, kind, v);
+  if (ISLAND_KINDS.includes(kind)) return islandMutation(p, kind, v, now);
+  if (FESTIVAL_KINDS.includes(kind)) return festivalMutation(p, kind, v, now);
   if (["login-claim", "event-claim", "event-chest"].includes(kind))
     return eventMutation(p, kind, v, Date.now(), random);
   switch (kind) {

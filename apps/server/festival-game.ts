@@ -10,8 +10,35 @@ import {
   huntSpots,
 } from "../../packages/shared/festival";
 import { defaultHome } from "../../packages/shared/islands";
+import {
+  ACTIVITIES,
+  COURSE,
+  MAX_PRESSES,
+  RACE,
+  TICKET_PLAYS,
+  courseObstacles,
+  featuredActivity,
+  formatScore,
+  raceBonus,
+  racePads,
+  runTickets,
+  simulateCourse,
+  simulateRace,
+  type Activity,
+} from "../../packages/shared/festival-games";
+import { recordRun, topRuns } from "./store";
 
-export const FESTIVAL_KINDS = ["fest-greet", "fest-hunt", "fest-buy", "fest-outfit"];
+/** Runs played on the festival island: race and course for now. */
+const PLAYABLE: Activity[] = ["race", "course"];
+function inputsOf(v: any, max: number) {
+  const list = v.inputs;
+  if (!Array.isArray(list) || list.length > MAX_PRESSES) throw Error("That run could not be read.");
+  for (const n of list)
+    if (!Number.isInteger(n) || Math.abs(n) > max || n === 0) throw Error("That run could not be read.");
+  return list as number[];
+}
+
+export const FESTIVAL_KINDS = ["fest-greet", "fest-hunt", "fest-buy", "fest-outfit", "fest-start", "fest-run"];
 export function festivalMutation(p: Profile, kind: string, v: any, now = Date.now()) {
   if (!p.owned.length) throw Error("Choose your first companion.");
   const f = festivalOf(p, now);
@@ -69,6 +96,58 @@ export function festivalMutation(p: Profile, kind: string, v: any, now = Date.no
               : entry.kind === "accessory"
                 ? `${entry.name} added. Equip it from a companion's journal page.`
                 : `${entry.name} added to your bag.`,
+      };
+    }
+    case "fest-start": {
+      if (p.island !== "festival") throw Error("Festival games are played on Lanternfair Isle.");
+      if (!PLAYABLE.includes(v.quest)) throw Error("Choose a festival game.");
+      f.started = { activity: v.quest, at: now };
+      return {};
+    }
+    case "fest-run": {
+      const activity = v.quest as Activity;
+      if (!PLAYABLE.includes(activity)) throw Error("Choose a festival game.");
+      if (f.started?.activity !== activity) throw Error("Start the game at its gate first.");
+      let score: number, detail: { time?: number; misses?: number }, data: Record<string, unknown>;
+      const keeper = { avatar: p.avatar, outfit: f.outfit };
+      if (activity === "race") {
+        const o = p.owned.find((o) => o.id === v.id);
+        if (!o) throw Error("Choose a companion to race.");
+        const inputs = inputsOf(v, RACE.maxMs),
+          bonus = raceBonus(o),
+          result = simulateRace(inputs, racePads(f.day), bonus);
+        score = result.time;
+        detail = result;
+        data = { inputs, bonus, species: o.species, ...keeper };
+      } else {
+        const inputs = inputsOf(v, COURSE.maxMs),
+          result = simulateCourse(inputs, courseObstacles(f.day));
+        score = result.time;
+        detail = result;
+        data = { inputs, ...keeper };
+      }
+      // A run can't be scored faster than the time that has passed since its start.
+      if (now - f.started.at < score - 2000) throw Error("That run finished faster than the clock allows.");
+      delete f.started;
+      let tickets = 0;
+      if ((f.plays[activity] || 0) < TICKET_PLAYS) {
+        f.plays[activity] = (f.plays[activity] || 0) + 1;
+        tickets = runTickets(activity, detail) * (featuredActivity(f.day) === activity ? 2 : 1);
+        f.tickets += tickets;
+      }
+      const lower = ACTIVITIES[activity].lowerIsBetter,
+        best = f.best[activity],
+        personal = best === undefined || (lower ? score < best : score > best);
+      if (personal) f.best[activity] = score;
+      recordRun(f.day, activity, p, score, lower, data);
+      const rank = topRuns(f.day, activity, lower, 50).findIndex((r) => r.profile === p.id) + 1;
+      return {
+        message: `${ACTIVITIES[activity].name}: ${formatScore(activity, score)}${personal ? " · personal best!" : ""}${tickets ? ` · +${tickets} tickets` : ""}`,
+        score,
+        tickets,
+        personal,
+        rank,
+        ...detail,
       };
     }
     case "fest-outfit": {

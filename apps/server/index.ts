@@ -4,7 +4,9 @@ import { Server } from "@colyseus/core";
 import { WebSocketTransport } from "@colyseus/ws-transport";
 import { z } from "zod";
 import { resolve } from "node:path";
-import { allProfiles, authenticate, createProfile, operation } from "./store";
+import { allProfiles, authenticate, createProfile, operation, topRuns } from "./store";
+import { utcDay } from "../../packages/shared/town";
+import { ACTIVITIES, featuredActivity } from "../../packages/shared/festival-games";
 import { mutate, pve, pveAction, ranking, startPve } from "./game";
 import { ArenaRoom } from "./rooms";
 const app = express();
@@ -103,6 +105,8 @@ const mutation = z.object({
     "fest-hunt",
     "fest-buy",
     "fest-outfit",
+    "fest-start",
+    "fest-run",
   ]),
   species: z.string().max(32).optional(),
   count: z.union([z.literal(1), z.literal(10)]).optional(),
@@ -120,10 +124,28 @@ const mutation = z.object({
   x: z.number().min(-40).max(40).optional(),
   z: z.number().min(-40).max(40).optional(),
   rot: z.number().int().min(0).max(3).optional(),
+  inputs: z.array(z.number().int()).max(400).optional(),
 });
 app.post("/api/mutate", (req, res) => {
   const v = mutation.parse(req.body);
   res.json(operation(token(req), v.requestId, (p) => mutate(p, v.kind, v)));
+});
+app.get("/api/festival", (req, res) => {
+  authenticate(token(req));
+  const activity = z.enum(["race", "course", "fishing"]).parse(req.query.activity);
+  const day = utcDay(),
+    lower = ACTIVITIES[activity].lowerIsBetter;
+  const strip = (rows: ReturnType<typeof topRuns>) =>
+    rows.map((r, i) => ({ rank: i + 1, profile: r.profile, name: r.name, score: r.score }));
+  const today = topRuns(day, activity, lower, 10);
+  res.json({
+    day,
+    featured: featuredActivity(day),
+    today: strip(today),
+    allTime: strip(topRuns("all", activity, lower, 10)),
+    // The three best runs today, replayed as ghosts.
+    ghosts: today.slice(0, 3).map((r) => ({ profile: r.profile, name: r.name, score: r.score, ...r.data })),
+  });
 });
 app.get("/api/battle", (req, res) => {
   const p = authenticate(token(req));
