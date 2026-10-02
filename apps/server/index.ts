@@ -89,6 +89,16 @@ const mutation = z.object({
     "login-claim",
     "event-claim",
     "event-chest",
+    "island-travel",
+    "home-place",
+    "home-move",
+    "home-remove",
+    "home-expand",
+    "home-house",
+    "home-assign",
+    "home-unassign",
+    "home-collect",
+    "home-pet",
   ]),
   species: z.string().max(32).optional(),
   count: z.union([z.literal(1), z.literal(10)]).optional(),
@@ -103,6 +113,9 @@ const mutation = z.object({
   nickname: z.string().max(20).optional(),
   success: z.boolean().optional(),
   slot: z.number().int().min(1).max(2).optional(),
+  x: z.number().min(-40).max(40).optional(),
+  z: z.number().min(-40).max(40).optional(),
+  rot: z.number().int().min(0).max(3).optional(),
 });
 app.post("/api/mutate", (req, res) => {
   const v = mutation.parse(req.body);

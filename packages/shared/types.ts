@@ -80,6 +80,9 @@ export type Profile = {
   adventure?: AdventureState;
   events?: import("./events").EventState;
   gear?: import("./adventure").Gear[];
+  /** Set while visiting an island by Skyferry; the home region stays in `region`. */
+  island?: import("./islands").IslandId;
+  home?: import("./islands").HomeState;
 };
 export type Status = {
   kind: string;

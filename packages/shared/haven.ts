@@ -231,6 +231,13 @@ export const HAVEN_PATHS: Point[][] = [
     [29, 4],
     [25, 2.6],
   ],
+  // Skyferry: from the meadow down to the dock on the southern cliff.
+  [
+    [8, 26],
+    [10, 31.5],
+    [5.5, 36.5],
+    [-1, 38.5],
+  ],
   // Driftshore: from the east loop down to the beach and the lighthouse.
   [
     [29, 4],
@@ -258,6 +265,11 @@ export const SUMMIT_HEIGHT = 14.2;
 export const LAGOON = { x: 36.5, z: 41, rx: 12, rz: 9 };
 export const PIER = { x: 36.5, z0: 30.5, z1: 37.5, halfWidth: 0.85 };
 export const LIGHTHOUSE = { point: [46, 33.5] as Point };
+/** The Skyferry dock: the landing on the cliff, its deck angled south-west so the moored ferry stays in view. */
+export const SKYFERRY = {
+  point: [-1, 38.5] as Point,
+  heading: -Math.PI / 4,
+};
 const PEAKS = [
   { x: -42, z: -50, h: 14.6, r: 11 },
   { x: -48, z: -34, h: 10, r: 9 },

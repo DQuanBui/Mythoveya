@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import { RAIN_GROWTH, weatherAt } from "../../packages/shared/weather";
 async function profile(page: Page) {
   return page.evaluate(async () =>
     fetch("/api/profile", {
@@ -69,7 +70,11 @@ test("village missions, market, gardening and companion care persist", async ({
     page.getByRole("button", { name: "Growing", exact: false }),
   ).toBeDisabled();
   const planted = (await profile(page)).town.garden;
-  expect(planted.readyAt - planted.plantedAt).toBe(120000);
+  // Rain grows crops faster, so the expected time follows the weather at planting.
+  const rain = weatherAt(planted.plantedAt).weather === "rain";
+  expect(planted.readyAt - planted.plantedAt).toBe(
+    Math.round(120000 * (rain ? RAIN_GROWTH : 1)),
+  );
   await directory(page);
   await villager(page, "Pip the Trader");
   await page.getByRole("button", { name: "Buy Sunseed", exact: true }).click();

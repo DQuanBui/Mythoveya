@@ -35,6 +35,7 @@ export const WORLD_GUIDE = {
     apothecary: { height: 2.6, icon: "⚗" },
     fishing: { height: 1.8, icon: "≈" },
     pierfishing: { height: 1.8, icon: "≈" },
+    skyferry: { height: 3.4, icon: "⛵" },
   } as Record<string, { height: number; icon: string }>,
 };
 export type Objective = {

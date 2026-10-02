@@ -34,6 +34,17 @@ import {
   SettingsPanel,
 } from "./Panels";
 import { Arena, BattleUI } from "./Arena";
+import { IslandScene, type Placing } from "./HomeIsland";
+import { HomePanel, SkyferryPanel } from "./HomePanel";
+import { SKYFERRY } from "../../../packages/shared/haven";
+import {
+  catalogEntry,
+  defaultHome,
+  homeRadius,
+  islandArrival,
+} from "../../../packages/shared/islands";
+/** Where you step off the ferry in Havenreach: just inland from the dock gate. */
+const FERRY_LANDING: number[] = [SKYFERRY.point[0] * 0.95, SKYFERRY.point[1] * 0.95];
 export default function App() {
   const [screen, setScreen] = useState("title"),
     [profile, setProfile] = useState<Profile | null>(null),
@@ -49,7 +60,9 @@ export default function App() {
     [pet, setPet] = useState(false),
     [battle, setBattle] = useState<Battle | null>(null),
     [auto, setAuto] = useState(false),
-    [fast, setFast] = useState(false);
+    [fast, setFast] = useState(false),
+    [placing, setPlacing] = useState<Placing | null>(null),
+    [homeFocus, setHomeFocus] = useState<string | undefined>();
   const input = useRef<ExplorationInput>({ x: 0, z: 0 });
   const mission = useRef(false);
   const [trail, setTrail] = useState<string | null>(null);
@@ -80,14 +93,17 @@ export default function App() {
   }, []);
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
+      if (e.code === "KeyQ" && placing && !panel)
+        setPlacing({ ...placing, rot: (placing.rot + 1) % 4 });
       if (e.code === "Escape") {
-        if (screen === "world") setPanel((p) => (p ? "" : "pause"));
+        if (placing && !panel) setPlacing(null);
+        else if (screen === "world") setPanel((p) => (p ? "" : "pause"));
         else if (panel) setPanel("");
       }
     };
     window.addEventListener("keydown", key);
     return () => window.removeEventListener("keydown", key);
-  }, [screen, panel]);
+  }, [screen, panel, placing]);
   useEffect(() => {
     audio.location(
       screen === "battle"
@@ -95,10 +111,12 @@ export default function App() {
         : screen === "arena"
           ? "arena"
           : screen === "world"
-            ? profile?.region || "haven"
+            ? profile?.island
+              ? "meadow"
+              : profile?.region || "haven"
             : "title",
     );
-  }, [screen, profile?.region]);
+  }, [screen, profile?.region, profile?.island]);
   useEffect(() => {
     // Rain and mist ambience follow the blended weather while exploring.
     const t = setInterval(
@@ -135,10 +153,21 @@ export default function App() {
         setTrail(null);
         setPosition([0, 5]);
       }
+      if (kind === "island-travel") {
+        // Set the arrival point in the same render that swaps the scene.
+        setTrail(null);
+        setPlacing(null);
+        setPanel("");
+        setPosition(
+          data.region === "haven"
+            ? FERRY_LANDING
+            : islandArrival("home", homeRadius(result.profile.home || defaultHome())),
+        );
+      }
       audio.cue("confirm");
       if (kind === "resource") notify("Gathered +1 Sunseed · +25 Gold");
       if (
-        kind.startsWith("town-") &&
+        (kind.startsWith("town-") || kind.startsWith("home-") || kind.startsWith("island-")) &&
         result.value?.message &&
         kind !== "town-talk" &&
         kind !== "town-fish"
@@ -272,6 +301,17 @@ export default function App() {
         run("resource", { resource: id });
         audio.cue("collect");
       } else if (id === "riftgate") setPanel("adventure");
+      else if (id === "skyferry" || id === "home-ferry") setPanel("skyferry");
+      else if (id === "home-house") {
+        setHomeFocus(undefined);
+        setPanel("home");
+      } else if (id.startsWith("habitat-")) {
+        setHomeFocus(id.slice(8));
+        setPanel("home");
+      } else if (id.startsWith("pet-")) {
+        audio.cue("pet");
+        run("home-pet", { id: id.slice(4) });
+      }
       else if (id === "pierfishing") setPanel("fishing");
       else if (id.startsWith("folk-")) {
         const folk = TOWNSFOLK[Number(id.slice(5))];
@@ -481,17 +521,40 @@ export default function App() {
       {screen === "world" && profile && (
         <>
           <div className="scene full">
-            <WorldScene
-              profile={profile}
-              blocked={!!panel}
-              onNear={setNear}
-              onInteract={interact}
-              onPosition={(x, z) => setPosition([x, z])}
-              pet={pet}
-              position={position}
-              objective={objective!}
-              input={input}
-            />
+            {profile.island === "home" ? (
+              <IslandScene
+                profile={profile}
+                blocked={!!panel}
+                onNear={setNear}
+                onInteract={interact}
+                onPosition={(x, z) => setPosition([x, z])}
+                pet={pet}
+                input={input}
+                placing={placing}
+                onPlace={async (x, z) => {
+                  if (!placing) return;
+                  const done = placing.uid
+                    ? await run("home-move", { id: placing.uid, x, z, rot: placing.rot })
+                    : await run("home-place", { item: placing.kind, x, z, rot: placing.rot });
+                  if (done) {
+                    audio.cue("collect");
+                    setPlacing(null);
+                  }
+                }}
+              />
+            ) : (
+              <WorldScene
+                profile={profile}
+                blocked={!!panel}
+                onNear={setNear}
+                onInteract={interact}
+                onPosition={(x, z) => setPosition([x, z])}
+                pet={pet}
+                position={position}
+                objective={objective!}
+                input={input}
+              />
+            )}
           </div>
           <WorldHUD
             profile={profile}
@@ -502,6 +565,7 @@ export default function App() {
             interact={interact}
             input={input}
             blocked={!!panel}
+            placing={!!placing}
             greet={() => {
               setPet(true);
               audio.voice(
@@ -512,6 +576,22 @@ export default function App() {
               setTimeout(() => setPet(false), 1800);
             }}
           />
+          {placing && !panel && (
+            <div className="placement-bar" role="toolbar" aria-label="Placing a piece">
+              <strong>
+                {placing.uid ? "Moving" : "Placing"} {catalogEntry(placing.kind)?.name}
+              </strong>
+              <small>Click your land to set it down.</small>
+              <button
+                onClick={() => setPlacing({ ...placing, rot: (placing.rot + 1) % 4 })}
+              >
+                ⟳ Rotate <kbd>Q</kbd>
+              </button>
+              <button onClick={() => setPlacing(null)}>
+                Cancel <kbd>Esc</kbd>
+              </button>
+            </div>
+          )}
         </>
       )}
       {screen === "battle" && battle && (
@@ -552,7 +632,7 @@ export default function App() {
         <div className="modal-backdrop">
           <section
             key={panel}
-            className={`panel modal ${["collection", "formation", "gallery", "town", "map", "adventure", "training", "events", "smith", "apothecary"].includes(panel) || panel.startsWith("npc-") ? "wide" : ""}`}
+            className={`panel modal ${["collection", "formation", "gallery", "town", "map", "adventure", "training", "events", "smith", "apothecary", "home", "skyferry"].includes(panel) || panel.startsWith("npc-") ? "wide" : ""}`}
             aria-label={panel}
           >
             <button
@@ -566,6 +646,20 @@ export default function App() {
               ×
             </button>
             {panel === "settings" && <SettingsPanel />}
+            {panel === "home" && profile && (
+              <HomePanel
+                profile={profile}
+                run={run}
+                focus={homeFocus}
+                place={(p) => {
+                  setPlacing(p);
+                  setPanel("");
+                }}
+              />
+            )}
+            {panel === "skyferry" && profile && (
+              <SkyferryPanel profile={profile} run={run} />
+            )}
             {panel === "adventure" && profile && (
               <AdventurePanel
                 profile={profile}
@@ -774,7 +868,13 @@ export default function App() {
                   >
                     Reset exploration camera
                   </button>
-                  {profile?.region === "haven" && (
+                  {profile?.island ? (
+                    <button
+                      onClick={() => run("island-travel", { region: "haven" })}
+                    >
+                      Sail back to Havenreach
+                    </button>
+                  ) : profile?.region === "haven" && (
                     <button
                       onClick={() => {
                         input.current.returnHome =

@@ -9,6 +9,7 @@ import {
   edgeRadius,
   placeAt,
   shopFront,
+  SKYFERRY,
   HAVEN_CACHES,
   HAVEN_COTTAGES,
   HAVEN_DOCK,
@@ -31,6 +32,15 @@ export const MAP_DESTINATIONS = [
     description: SHOPS[id].greeting,
     species: [] as string[],
   })),
+  {
+    id: "skyferry",
+    name: "Skyferry dock",
+    short: "Skyferry",
+    point: SKYFERRY.point,
+    color: "#b7d4dc",
+    description: "Ferries leave for your home island whenever you are ready, and always bring you back here.",
+    species: [] as string[],
+  },
   ...HAVEN_HOUSES.map((h) => ({
     ...h,
     id: `porch-${h.id}`,

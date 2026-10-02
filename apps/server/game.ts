@@ -19,6 +19,7 @@ import { townMutation } from "./town-game";
 import { resourcesForRegion } from "../../packages/shared/haven";
 import { track } from "../../packages/shared/events";
 import { eventMutation } from "./events-game";
+import { islandMutation, ISLAND_KINDS } from "./island-game";
 import {
   adventureMutation,
   addGear,
@@ -108,6 +109,7 @@ export function mutate(p: Profile, kind: string, v: any) {
     if (kind === "evolve") track(p, "evolve");
     return value;
   }
+  if (ISLAND_KINDS.includes(kind)) return islandMutation(p, kind, v);
   if (["login-claim", "event-claim", "event-chest"].includes(kind))
     return eventMutation(p, kind, v, Date.now(), random);
   switch (kind) {
@@ -208,6 +210,7 @@ export function mutate(p: Profile, kind: string, v: any) {
       if (!r || p.wins < r.unlock)
         throw Error("Win more encounters to unlock this region.");
       p.region = r.id;
+      delete p.island;
       if (!town.visited.includes(r.id)) town.visited.push(r.id);
       break;
     }

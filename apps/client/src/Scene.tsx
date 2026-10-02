@@ -3,6 +3,7 @@ import { HavenHouses } from "./HavenHouses";
 import { HavenVillage } from "./HavenVillage";
 import { HavenBirds } from "./HavenBirds";
 import { HavenFrontier } from "./HavenFrontier";
+import { SkyferryDock } from "./Skyferry";
 import { WeatherEffects } from "./Weather";
 import { HavenTreasure } from "./HavenTreasure";
 import { Riftgate } from "./Riftgate";
@@ -36,6 +37,7 @@ import {
   shopFront,
   groundHeight,
   PIER,
+  SKYFERRY,
   slideStep,
   type Point,
 } from "../../../packages/shared/haven";
@@ -550,6 +552,12 @@ export const INTERACTABLES = [
     ],
   },
   {
+    id: "skyferry",
+    name: "Skyferry dock",
+    hint: "Sail to your home island",
+    p: [SKYFERRY.point[0], 0, SKYFERRY.point[1]],
+  },
+  {
     id: "pierfishing",
     name: "Driftshore pier",
     hint: "Cast into the sky-sea lagoon",
@@ -576,7 +584,7 @@ export const getInteractables = (region: string) =>
       (region === "haven" ||
         (!o.id.startsWith("trail-") &&
           !o.id.startsWith("porch-") &&
-          !["fishing", "pierfishing", "riftgate", "smith", "apothecary"].includes(o.id))) &&
+          !["fishing", "pierfishing", "riftgate", "smith", "apothecary", "skyferry"].includes(o.id))) &&
       (!o.id.startsWith("resource-") ||
         resourcesForRegion(region).some((n) => n.id === o.id)),
   );
@@ -612,6 +620,15 @@ const markerMaterial = new T.MeshBasicMaterial({
   opacity: 0.9,
   depthWrite: false,
 });
+/** A walkable place other than a region: an island visited by Skyferry. */
+export type WalkArea = {
+  /** Changes whenever walkability changes, so the path grid is rebuilt. */
+  key: string;
+  allowed: (x: number, z: number) => boolean;
+  extent: number;
+  points: { id: string; p: number[] }[];
+  home: Point;
+};
 type Route = {
   points: Point[];
   target: Point;
@@ -619,7 +636,7 @@ type Route = {
   activate?: () => void;
   stuck: number;
 };
-function Explorer({
+export function Explorer({
   profile,
   blocked,
   onNear,
@@ -629,7 +646,9 @@ function Explorer({
   input,
   spawn,
   walker,
+  area,
 }: {
+  area?: WalkArea;
   profile: Profile;
   blocked: boolean;
   onNear: (id: string) => void;
@@ -681,8 +700,13 @@ function Explorer({
       c.enableDamping = true;
     }
   };
-  const ground = useMemo(() => groundFor(profile.region), [profile.region]);
-  const allowed = useCallback(
+  const ground = useMemo(
+    () => (area ? () => 0 : groundFor(profile.region)),
+    [profile.region, !!area],
+  );
+  const zone = area?.key ?? profile.region,
+    extent = area?.extent ?? (profile.region === "haven" ? 78 : 18);
+  const regionAllowed = useCallback(
     (x: number, z: number) =>
       (profile.region === "haven"
         ? havenWalkable(x, z)
@@ -693,6 +717,7 @@ function Explorer({
       !((x + 6) ** 2 + (z + 3) ** 2 < 0.8),
     [profile.region],
   );
+  const allowed = area?.allowed ?? regionAllowed;
   // Click-to-walk: path around obstacles, then act once within reach.
   useEffect(() => {
     walker.current = {
@@ -706,10 +731,10 @@ function Explorer({
           activate();
           return;
         }
-        let grid = grids.get(profile.region);
+        let grid = grids.get(zone);
         if (!grid) {
-          grid = buildGrid(allowed, profile.region === "haven" ? 78 : 18);
-          grids.set(profile.region, grid);
+          grid = buildGrid(allowed, extent);
+          grids.set(zone, grid);
         }
         const points = findPath(grid, from, target, allowed);
         if (!points?.length) {
@@ -720,21 +745,17 @@ function Explorer({
         route.current = { points, target, reach, activate, stuck: 0 };
       },
     };
-  }, [walker, allowed, profile.region]);
+  }, [walker, allowed, zone, extent]);
   useEffect(() => {
     if (blocked) route.current = null;
   }, [blocked]);
   useEffect(() => {
     // Plan the walk grid once the scene has settled, so the first click is instant.
     const t = setTimeout(() => {
-      if (!grids.has(profile.region))
-        grids.set(
-          profile.region,
-          buildGrid(allowed, profile.region === "haven" ? 78 : 18),
-        );
+      if (!grids.has(zone)) grids.set(zone, buildGrid(allowed, extent));
     }, 1500);
     return () => clearTimeout(t);
-  }, [allowed, profile.region]);
+  }, [allowed, zone, extent]);
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (
@@ -771,8 +792,9 @@ function Explorer({
     if ((input.current.returnHome || 0) !== homeSeen.current) {
       homeSeen.current = input.current.returnHome || 0;
       route.current = null;
-      player.current.set(0, 0, 5);
-      follow.current.set(-1, 0, 6.5);
+      const [hx, hz] = area?.home ?? [0, 5];
+      player.current.set(hx, 0, hz);
+      follow.current.set(hx - 1, 0, hz + 1.5);
       recenter();
       last.current = -1;
     }
@@ -941,7 +963,7 @@ function Explorer({
     if (clock.elapsedTime - last.current > 0.2) {
       let nearest = "";
       let dist = 3.3;
-      for (const obj of getInteractables(profile.region)) {
+      for (const obj of area?.points ?? getInteractables(profile.region)) {
         if (obj.id === "trail-village") continue;
         if (
           obj.id.startsWith("resource") &&
@@ -992,7 +1014,7 @@ function Explorer({
           const hit = terrainHit(e.ray, ground) || e.point;
           // Small pickups are easy to miss: a click right beside one still counts.
           const found = profile.town?.caches || [];
-          const pickup = [
+          const pickup = (area ? [] : [
             ...getInteractables(profile.region)
               .filter(
                 (o) =>
@@ -1008,7 +1030,7 @@ function Explorer({
                 z: c.point[1],
                 reach: 2.6,
               })),
-          ].find((o) => Math.hypot(o.x - hit.x, o.z - hit.z) < 1.1);
+          ]).find((o) => Math.hypot(o.x - hit.x, o.z - hit.z) < 1.1);
           if (pickup)
             walker.current.go([pickup.x, pickup.z], pickup.reach, () =>
               onInteract(pickup.id),
@@ -1213,6 +1235,9 @@ export function WorldScene({
             hint={resource ? "Click to gather" : o.hint}
             reach={resource ? 2.4 : 5.5}
           >
+            {o.id === "skyferry" && (
+              <SkyferryDock position={[0, 0, 0]} heading={SKYFERRY.heading} />
+            )}
             {(o.id === "fishing" || o.id === "pierfishing") && (
               <mesh position={[0, 0.45, -0.2]}>
                 <boxGeometry args={[1.7, 0.9, 1.6]} />

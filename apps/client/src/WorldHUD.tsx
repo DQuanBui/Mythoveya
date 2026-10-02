@@ -14,6 +14,15 @@ import { WEATHER_INFO } from "../../../packages/shared/weather";
 import { eventsReady } from "../../../packages/shared/events";
 import { utcDay } from "../../../packages/shared/town";
 import { islandHour, timeLabel } from "./daytime";
+import { homeInteractables } from "./HomeIsland";
+import {
+  HOUSE_LEVELS,
+  ISLANDS,
+  catalogEntry,
+  defaultHome,
+  habitatStored,
+  homeRadius,
+} from "../../../packages/shared/islands";
 import { settings } from "./audio";
 import {
   WORLD_GUIDE,
@@ -31,7 +40,9 @@ export function WorldHUD({
   greet,
   input,
   blocked,
+  placing = false,
 }: {
+  placing?: boolean;
   profile: Profile;
   position: number[];
   near: string;
@@ -43,7 +54,24 @@ export function WorldHUD({
   blocked: boolean;
 }) {
   const region = REGIONS.find((r) => r.id === profile.region) || REGIONS[0];
-  const INTERACTABLES = getInteractables(profile.region);
+  const home = profile.island === "home" ? profile.home || defaultHome() : null;
+  const INTERACTABLES = home
+    ? homeInteractables(home)
+    : getInteractables(profile.region);
+  // The island minimap spans the land plus a little sky around it.
+  const span = home ? homeRadius(home) + 3 : 0;
+  const pct = (v: number) =>
+    home ? 50 + (v / span) * 50 : mapPercent(v, profile.region);
+  const stored = home
+    ? home.items.reduce(
+        (n, i) =>
+          n +
+          (catalogEntry(i.kind)?.type === "habitat"
+            ? habitatStored(profile, home, i)
+            : 0),
+        0,
+      )
+    : 0;
   const target = INTERACTABLES.find((o) => o.id === objective.target);
   const distance = target
     ? Math.round(
@@ -78,9 +106,11 @@ export function WorldHUD({
           </div>
         </div>
         <div className="location">
-          <span>{region.name}</span>
+          <span>{home ? ISLANDS.home.name : region.name}</span>
           <small>
-            {profile.region === "haven"
+            {home
+              ? HOUSE_LEVELS[home.house].name
+              : profile.region === "haven"
               ? placeAt(position[0], position[1]).name
               : region.subtitle}
           </small>
@@ -151,7 +181,31 @@ export function WorldHUD({
           </button>
         </div>
       </header>
-      <aside className="quest-tracker">
+      {home && (
+        <aside className="quest-tracker island-card" hidden={placing}>
+          <div className="quest-heading">
+            <span className="eyebrow">YOUR ISLAND</span>
+          </div>
+          <strong>{ISLANDS.home.name}</strong>
+          <p>
+            {home.items.length
+              ? `${plural(home.items.length, "piece")} placed · ${plural(Object.values(home.residents).flat().length, "companion")} living here.`
+              : "Open the house ledger to place your first habitat or decoration."}
+          </p>
+          {stored > 0 && (
+            <div className="objective-distance">
+              <span>◉</span> Habitats <b>{stored} Gold ready</b>
+            </div>
+          )}
+          <button className="text-button" onClick={() => open("home")}>
+            Build & manage →
+          </button>
+          <button className="text-button" onClick={() => open("skyferry")}>
+            Skyferry to Havenreach →
+          </button>
+        </aside>
+      )}
+      <aside className="quest-tracker" hidden={!!home}>
         <div className="quest-heading">
           <span className="eyebrow">
             {objective.waypoint
@@ -195,7 +249,28 @@ export function WorldHUD({
       </aside>
       <div className="minimap" title="Area map">
         <div className="map-ring">
-          {profile.region === "haven" && (
+          {home && (
+            <svg
+              className="map-terrain"
+              viewBox={`${-span} ${-span} ${span * 2} ${span * 2}`}
+              aria-hidden="true"
+            >
+              <circle r={homeRadius(home)} fill="#8fb48766" />
+              <rect x={-homeRadius(home)} y="-1" width={homeRadius(home) - 3} height="2" fill="#e1d3a3" />
+              <rect x="-3" y="-3" width="6" height="6" fill="#e9d8b8" />
+              {home.items.map((i) => (
+                <rect
+                  key={i.uid}
+                  x={i.x - 1}
+                  y={i.z - 1}
+                  width="2"
+                  height="2"
+                  fill={catalogEntry(i.kind)?.type === "habitat" ? "#e1c38a" : "#86a96f"}
+                />
+              ))}
+            </svg>
+          )}
+          {profile.region === "haven" && !home && (
             <svg
               className="map-terrain"
               viewBox="-78 -78 156 156"
@@ -221,8 +296,8 @@ export function WorldHUD({
                 key={o.id}
                 className={o.id === objective.target ? "map-objective" : ""}
                 style={{
-                  left: `${mapPercent(o.p[0], profile.region)}%`,
-                  top: `${mapPercent(o.p[2], profile.region)}%`,
+                  left: `${pct(o.p[0])}%`,
+                  top: `${pct(o.p[2])}%`,
                 }}
                 title={o.name}
                 aria-label={
@@ -237,16 +312,18 @@ export function WorldHUD({
           )}
           <b
             style={{
-              left: `${mapPercent(position[0], profile.region)}%`,
-              top: `${mapPercent(position[1], profile.region)}%`,
+              left: `${pct(position[0])}%`,
+              top: `${pct(position[1])}%`,
             }}
             title="Your position"
           >
             ▲
           </b>
         </div>
-        <span>N · {region.name.toUpperCase()}</span>
-        <button onClick={() => open("map")}>Travel map</button>
+        <span>N · {(home ? ISLANDS.home.name : region.name).toUpperCase()}</span>
+        <button onClick={() => open(home ? "skyferry" : "map")}>
+          {home ? "Skyferry" : "Travel map"}
+        </button>
       </div>
       {touch && nearest && (
         <div className="interaction-zone">
@@ -296,7 +373,10 @@ export function WorldHUD({
             ["leaderboard", "♜", "Rankings"],
             ["map", "⌖", "World"],
           ].map(([id, icon, label]) => (
-            <button key={id} onClick={() => open(id)}>
+            <button
+              key={id}
+              onClick={() => open(home && id === "map" ? "skyferry" : id)}
+            >
               <span>{icon}</span>
               {label}
             </button>
@@ -307,6 +387,7 @@ export function WorldHUD({
   );
 }
 
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
 function useCoarsePointer() {
   const query = "(pointer: coarse)";
   const [coarse, setCoarse] = useState(() => matchMedia(query).matches);

@@ -99,7 +99,7 @@ test("explore the expanded island, cross the bridge and return safely", async ({
   await page.screenshot({ path: "artifacts/haven-village.png" });
   await page.getByRole("button", { name: "Travel map", exact: true }).click();
   await expect(page.getByLabel("Havenreach trail map")).toBeVisible();
-  await expect(page.locator(".haven-destinations button")).toHaveCount(17);
+  await expect(page.locator(".haven-destinations button")).toHaveCount(18);
   await page
     .getByRole("button", { name: "Select Sunpetal Clearing", exact: true })
     .click();
