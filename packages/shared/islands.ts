@@ -22,7 +22,7 @@ export const ISLANDS: Record<
   },
 };
 /** Islands the Skyferry currently sails to. */
-export const OPEN_ISLANDS: IslandId[] = ["home"];
+export const OPEN_ISLANDS: IslandId[] = ["home", "festival"];
 export const isIsland = (region: string): region is IslandId =>
   region === "home" || region === "festival";
 export const islandUnlocked = (p: Profile, id: IslandId) =>

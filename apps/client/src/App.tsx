@@ -36,6 +36,9 @@ import {
 import { Arena, BattleUI } from "./Arena";
 import { IslandScene, type Placing } from "./HomeIsland";
 import { HomePanel, SkyferryPanel } from "./HomePanel";
+import { FestivalScene } from "./FestivalIsland";
+import { FestivalPanel, type FestivalTab } from "./FestivalPanel";
+import { FESTIVAL_RADIUS } from "../../../packages/shared/festival";
 import { SKYFERRY } from "../../../packages/shared/haven";
 import {
   catalogEntry,
@@ -62,7 +65,8 @@ export default function App() {
     [auto, setAuto] = useState(false),
     [fast, setFast] = useState(false),
     [placing, setPlacing] = useState<Placing | null>(null),
-    [homeFocus, setHomeFocus] = useState<string | undefined>();
+    [homeFocus, setHomeFocus] = useState<string | undefined>(),
+    [festTab, setFestTab] = useState<FestivalTab>("today");
   const input = useRef<ExplorationInput>({ x: 0, z: 0 });
   const mission = useRef(false);
   const [trail, setTrail] = useState<string | null>(null);
@@ -161,7 +165,9 @@ export default function App() {
         setPosition(
           data.region === "haven"
             ? FERRY_LANDING
-            : islandArrival("home", homeRadius(result.profile.home || defaultHome())),
+            : data.region === "festival"
+              ? islandArrival("festival", FESTIVAL_RADIUS)
+              : islandArrival("home", homeRadius(result.profile.home || defaultHome())),
         );
       }
       audio.cue("confirm");
@@ -301,7 +307,15 @@ export default function App() {
         run("resource", { resource: id });
         audio.cue("collect");
       } else if (id === "riftgate") setPanel("adventure");
-      else if (id === "skyferry" || id === "home-ferry") setPanel("skyferry");
+      else if (id === "skyferry" || id === "home-ferry" || id === "fest-ferry")
+        setPanel("skyferry");
+      else if (id === "fest-board" || id === "fest-shop") {
+        setFestTab(id === "fest-shop" ? "shop" : "today");
+        setPanel("festival");
+      } else if (id.startsWith("fest-lantern-")) {
+        audio.cue("collect");
+        run("fest-hunt", { id: id.slice(13) });
+      }
       else if (id === "home-house") {
         setHomeFocus(undefined);
         setPanel("home");
@@ -521,7 +535,17 @@ export default function App() {
       {screen === "world" && profile && (
         <>
           <div className="scene full">
-            {profile.island === "home" ? (
+            {profile.island === "festival" ? (
+              <FestivalScene
+                profile={profile}
+                blocked={!!panel}
+                onNear={setNear}
+                onInteract={interact}
+                onPosition={(x, z) => setPosition([x, z])}
+                pet={pet}
+                input={input}
+              />
+            ) : profile.island === "home" ? (
               <IslandScene
                 profile={profile}
                 blocked={!!panel}
@@ -632,7 +656,7 @@ export default function App() {
         <div className="modal-backdrop">
           <section
             key={panel}
-            className={`panel modal ${["collection", "formation", "gallery", "town", "map", "adventure", "training", "events", "smith", "apothecary", "home", "skyferry"].includes(panel) || panel.startsWith("npc-") ? "wide" : ""}`}
+            className={`panel modal ${["collection", "formation", "gallery", "town", "map", "adventure", "training", "events", "smith", "apothecary", "home", "skyferry", "festival"].includes(panel) || panel.startsWith("npc-") ? "wide" : ""}`}
             aria-label={panel}
           >
             <button
@@ -656,6 +680,9 @@ export default function App() {
                   setPanel("");
                 }}
               />
+            )}
+            {panel === "festival" && profile && (
+              <FestivalPanel profile={profile} run={run} tab={festTab} />
             )}
             {panel === "skyferry" && profile && (
               <SkyferryPanel profile={profile} run={run} />

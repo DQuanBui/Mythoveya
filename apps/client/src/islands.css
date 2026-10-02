@@ -190,3 +190,46 @@
 .quest-tracker[hidden] {
   display: none;
 }
+.festival-panel .supply-bag {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin: 10px 0 0;
+  font-size: 13px;
+}
+.festival-greeting {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+.hunt-clues ol {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0;
+  display: grid;
+  gap: 6px;
+}
+.hunt-clues li {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #b8c8aa30;
+}
+.hunt-clues li span {
+  color: #f2d593;
+  margin-right: 6px;
+}
+.hunt-clues li.done {
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+.festival-shop-section {
+  margin-bottom: 22px;
+}
+.festival-shop-section > h3 {
+  margin: 0 0 10px;
+}
+.festival-panel article.here {
+  border-color: #f3d8a4b8;
+}

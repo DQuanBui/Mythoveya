@@ -125,3 +125,74 @@ test("sail to the home island, build, reload and sail back", async ({ page }) =>
   expect(Math.hypot(hx + 0.95, hz - 36.6)).toBeLessThan(1.5);
   expect(errors).toEqual([]);
 });
+
+test("Lanternfair opens after a win: welcome tickets, an outfit and a reload", async ({ page }) => {
+  test.setTimeout(240000);
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.goto("/");
+  const id = await page.evaluate(async () => {
+    const post = (data: unknown, path: string, token = "") =>
+      fetch("/api/" + path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+        body: JSON.stringify(data),
+      }).then((r) => r.json());
+    const g = await post({ name: "Fair Visitor", avatar: 5 }, "guest");
+    localStorage.setItem("mythoveya-session", g.token);
+    for (const data of [{ kind: "starter", species: "emberfox" }, { kind: "guide" }])
+      await post({ ...data, requestId: crypto.randomUUID() }, "mutate", g.token);
+    return g.profile.id as string;
+  });
+  // Before any win the server refuses the festival ferry.
+  const refused = await page.evaluate(async () => {
+    const r = await fetch("/api/mutate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("mythoveya-session"),
+      },
+      body: JSON.stringify({ kind: "island-travel", region: "festival", requestId: crypto.randomUUID() }),
+    });
+    return r.status;
+  });
+  expect(refused).toBeGreaterThanOrEqual(400);
+  // Record a win and some tickets directly in the save, as a battle and the hunt would.
+  const { DatabaseSync } = await import("node:sqlite");
+  const db = new DatabaseSync("data/browser-tests.sqlite");
+  const row = db.prepare("SELECT data FROM profiles WHERE id=?").get(id) as { data: string };
+  const data = JSON.parse(row.data);
+  data.wins = 1;
+  data.festival = { tickets: 40, day: "", hunt: [], plays: {}, best: {}, outfits: [], week: "", bought: {} };
+  db.prepare("UPDATE profiles SET data=? WHERE id=?").run(JSON.stringify(data), id);
+  db.close();
+  await page.reload();
+  await page.getByRole("button", { name: "Continue your journey" }).click();
+  await expect(page.locator(".keeper-badge")).toContainText("Fair Visitor");
+  await page.waitForTimeout(1500);
+  await walkTo(page, 1, 35.5);
+  await page.locator('[data-marker="skyferry"]').click();
+  await page.locator('[data-destination="festival"] button').click();
+  await expect(page.locator(".location")).toContainText("Lanternfair Isle");
+  await page.getByRole("button", { name: "Festival board →" }).click();
+  await page.getByRole("button", { name: /Collect 2 welcome tickets/ }).click();
+  await expect(page.locator("[data-tickets]")).toHaveText("42");
+  await page.getByRole("tab", { name: "✦ Ticket booth" }).click();
+  await page.locator('[data-shop="wreath"] button').click();
+  await expect(page.locator("[data-tickets]")).toHaveText("17");
+  await page.getByRole("tab", { name: "♔ Wardrobe" }).click();
+  await page.locator('[data-outfit="wreath"] button').click();
+  await expect(page.locator('[data-outfit="wreath"]')).toContainText("Wearing now");
+  await page.reload();
+  await page.getByRole("button", { name: "Continue your journey" }).click();
+  await expect(page.locator(".location")).toContainText("Lanternfair Isle");
+  const festival = await page.evaluate(async () => {
+    const r = await fetch("/api/profile", {
+      headers: { Authorization: "Bearer " + localStorage.getItem("mythoveya-session") },
+    });
+    return (await r.json()).festival;
+  });
+  expect(festival.outfit).toBe("wreath");
+  expect(festival.tickets).toBe(17);
+  expect(errors).toEqual([]);
+});

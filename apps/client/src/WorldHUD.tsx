@@ -15,6 +15,13 @@ import { eventsReady } from "../../../packages/shared/events";
 import { utcDay } from "../../../packages/shared/town";
 import { islandHour, timeLabel } from "./daytime";
 import { homeInteractables } from "./HomeIsland";
+import { festivalInteractables } from "./FestivalIsland";
+import {
+  FESTIVAL_RADIUS,
+  FESTIVAL_TRACK,
+  FESTIVAL_POND,
+  HUNT_DAILY,
+} from "../../../packages/shared/festival";
 import {
   HOUSE_LEVELS,
   ISLANDS,
@@ -55,13 +62,24 @@ export function WorldHUD({
 }) {
   const region = REGIONS.find((r) => r.id === profile.region) || REGIONS[0];
   const home = profile.island === "home" ? profile.home || defaultHome() : null;
+  const fair = profile.island === "festival";
   const INTERACTABLES = home
     ? homeInteractables(home)
-    : getInteractables(profile.region);
-  // The island minimap spans the land plus a little sky around it.
-  const span = home ? homeRadius(home) + 3 : 0;
+    : fair
+      ? festivalInteractables(profile)
+      : getInteractables(profile.region);
+  // Island minimaps span the land plus a little sky around it.
+  const span = home ? homeRadius(home) + 3 : fair ? FESTIVAL_RADIUS + 3 : 0;
   const pct = (v: number) =>
-    home ? 50 + (v / span) * 50 : mapPercent(v, profile.region);
+    span ? 50 + (v / span) * 50 : mapPercent(v, profile.region);
+  const tickets = profile.festival?.tickets || 0,
+    lanterns =
+      profile.festival?.day === utcDay() ? profile.festival.hunt.length : 0;
+  const placeName = home
+    ? ISLANDS.home.name
+    : fair
+      ? ISLANDS.festival.name
+      : region.name;
   const stored = home
     ? home.items.reduce(
         (n, i) =>
@@ -106,11 +124,13 @@ export function WorldHUD({
           </div>
         </div>
         <div className="location">
-          <span>{home ? ISLANDS.home.name : region.name}</span>
+          <span>{placeName}</span>
           <small>
             {home
               ? HOUSE_LEVELS[home.house].name
-              : profile.region === "haven"
+              : fair
+                ? `${tickets} festival tickets`
+                : profile.region === "haven"
               ? placeAt(position[0], position[1]).name
               : region.subtitle}
           </small>
@@ -205,7 +225,31 @@ export function WorldHUD({
           </button>
         </aside>
       )}
-      <aside className="quest-tracker" hidden={!!home}>
+      {fair && (
+        <aside className="quest-tracker island-card">
+          <div className="quest-heading">
+            <span className="eyebrow">THE FESTIVAL</span>
+          </div>
+          <strong>{ISLANDS.festival.name}</strong>
+          <p>
+            Find today's hidden lanterns, try the attractions and spend your
+            tickets at the booth.
+          </p>
+          <div className="objective-distance">
+            <span>✦</span> {tickets} tickets{" "}
+            <b>
+              {lanterns}/{HUNT_DAILY} lanterns
+            </b>
+          </div>
+          <button className="text-button" onClick={() => open("festival")}>
+            Festival board →
+          </button>
+          <button className="text-button" onClick={() => open("skyferry")}>
+            Skyferry to Havenreach →
+          </button>
+        </aside>
+      )}
+      <aside className="quest-tracker" hidden={!!home || fair}>
         <div className="quest-heading">
           <span className="eyebrow">
             {objective.waypoint
@@ -270,7 +314,34 @@ export function WorldHUD({
               ))}
             </svg>
           )}
-          {profile.region === "haven" && !home && (
+          {fair && (
+            <svg
+              className="map-terrain"
+              viewBox={`${-span} ${-span} ${span * 2} ${span * 2}`}
+              aria-hidden="true"
+            >
+              <circle r={FESTIVAL_RADIUS} fill="#a9c98f66" />
+              <ellipse
+                cx={FESTIVAL_TRACK.x}
+                cy={FESTIVAL_TRACK.z}
+                rx={FESTIVAL_TRACK.rx}
+                ry={FESTIVAL_TRACK.rz}
+                fill="none"
+                stroke="#c99a72"
+                strokeWidth="2"
+              />
+              <ellipse
+                cx={FESTIVAL_POND.x}
+                cy={FESTIVAL_POND.z}
+                rx={FESTIVAL_POND.rx}
+                ry={FESTIVAL_POND.rz}
+                fill="#94ccd0"
+              />
+              <circle r="6" fill="#e3d5b0" />
+              <rect x={-FESTIVAL_RADIUS} y="-1" width={FESTIVAL_RADIUS - 6} height="2" fill="#e3d5b0" />
+            </svg>
+          )}
+          {profile.region === "haven" && !home && !fair && (
             <svg
               className="map-terrain"
               viewBox="-78 -78 156 156"
@@ -320,9 +391,9 @@ export function WorldHUD({
             ▲
           </b>
         </div>
-        <span>N · {(home ? ISLANDS.home.name : region.name).toUpperCase()}</span>
-        <button onClick={() => open(home ? "skyferry" : "map")}>
-          {home ? "Skyferry" : "Travel map"}
+        <span>N · {placeName.toUpperCase()}</span>
+        <button onClick={() => open(span ? "skyferry" : "map")}>
+          {span ? "Skyferry" : "Travel map"}
         </button>
       </div>
       {touch && nearest && (
@@ -375,7 +446,7 @@ export function WorldHUD({
           ].map(([id, icon, label]) => (
             <button
               key={id}
-              onClick={() => open(home && id === "map" ? "skyferry" : id)}
+              onClick={() => open(span && id === "map" ? "skyferry" : id)}
             >
               <span>{icon}</span>
               {label}
