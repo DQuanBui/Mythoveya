@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import { ALL_SPECIES } from "../../packages/shared/content";
 // Walk with the keyboard until the HUD reports the marker as nearby.
 async function walkTo(page: Page, key: string, id: string) {
   // The scene is ready once spawn-side markers report as nearby.
@@ -93,7 +94,8 @@ test("first journey, battle, recruitment, formation, reload and settings", async
     .locator(".world-nav")
     .getByRole("button", { name: "Journal" })
     .click();
-  await expect(page.locator(".creature-card")).toHaveCount(60);
+  // Sixty recruitable species plus sixteen evolved forms.
+  await expect(page.locator(".creature-card")).toHaveCount(ALL_SPECIES.length);
   await page.screenshot({ path: "artifacts/collection.png" });
   await page.getByLabel("Close panel").click();
   const before = await page.evaluate(async () =>

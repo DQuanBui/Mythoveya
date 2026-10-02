@@ -5,12 +5,13 @@ import { AVATARS, byId } from "../../../packages/shared/content";
 
 // Smooth, rounded primitives give creatures and keepers a clean, soft finish.
 const geometry = {
-  orb: new T.SphereGeometry(1, 22, 16),
-  smooth: new T.SphereGeometry(1, 16, 12),
-  cone: new T.ConeGeometry(1, 1, 12),
-  box: new RoundedBoxGeometry(1, 1, 1, 2, 0.18),
-  ring: new T.TorusGeometry(1, 0.055, 8, 48),
-  capsule: new T.CapsuleGeometry(0.5, 1, 6, 12),
+  // Resolution is tuned so a whole creature stays near 3-4k triangles.
+  orb: new T.SphereGeometry(1, 14, 10),
+  smooth: new T.SphereGeometry(1, 10, 8),
+  cone: new T.ConeGeometry(1, 1, 9),
+  box: new RoundedBoxGeometry(1, 1, 1, 1, 0.18),
+  ring: new T.TorusGeometry(1, 0.055, 6, 32),
+  capsule: new T.CapsuleGeometry(0.5, 1, 3, 9),
 };
 type Kind = keyof typeof geometry;
 const materials = new Map<string, T.MeshStandardMaterial>();
@@ -585,7 +586,10 @@ export function animateAvatar(
     head.rotation.y = walk || reduced ? 0 : Math.sin(t * 0.7 + g.userData.index) * 0.18;
     head.rotation.x = walk ? 0.05 : Math.sin(t * 0.9 + g.userData.index) * 0.04;
   }
-  g.position.y = walk
-    ? Math.abs(Math.sin(t * 8)) * 0.035
-    : Math.sin(t * 2) * 0.008 * (reduced ? 0.2 : 1);
+  // The walking bob rides on top of whatever ground the keeper stands on.
+  g.position.y =
+    (g.userData.groundY || 0) +
+    (walk
+      ? Math.abs(Math.sin(t * 8)) * 0.035
+      : Math.sin(t * 2) * 0.008 * (reduced ? 0.2 : 1));
 }

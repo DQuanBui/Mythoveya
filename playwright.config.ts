@@ -11,6 +11,15 @@ export default defineConfig({
     screenshot: "only-on-failure",
     video: "on",
     trace: "retain-on-failure",
+    // Render with the real GPU when one is available; software WebGL is far
+    // slower than any player's machine and makes 3D checks unrepresentative.
+    launchOptions: {
+      args: [
+        "--ignore-gpu-blocklist",
+        "--enable-gpu",
+        ...(process.platform === "win32" ? ["--use-angle=d3d11"] : []),
+      ],
+    },
   },
   webServer: {
     command: "npm run dev",

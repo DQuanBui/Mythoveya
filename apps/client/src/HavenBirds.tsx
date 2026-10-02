@@ -89,10 +89,10 @@ export function HavenBirds() {
       m.frustumCulled = false;
       return m;
     };
-    const wing = new T.SphereGeometry(1, 10, 6).translate(1, 0, 0);
+    const wing = new T.SphereGeometry(1, 7, 4).translate(1, 0, 0);
     return {
-      body: make(new T.SphereGeometry(1, 14, 10), "bird-body"),
-      head: make(new T.SphereGeometry(1, 12, 8), "bird-head"),
+      body: make(new T.SphereGeometry(1, 9, 6), "bird-body"),
+      head: make(new T.SphereGeometry(1, 8, 6), "bird-head"),
       beak: make(new T.ConeGeometry(1, 1, 6).rotateX(Math.PI / 2), "bird-beak"),
       left: make(wing, "bird-wing-left"),
       right: make(wing.clone(), "bird-wing-right"),
