@@ -26,7 +26,7 @@
 }
 .haven-chart text {
   font:
-    2.6px Georgia,
+    3.9px Georgia,
     serif;
   fill: #fff4d5;
   paint-order: stroke;
@@ -35,7 +35,7 @@
   pointer-events: none;
 }
 .haven-chart .chart-north {
-  font-size: 3px;
+  font-size: 4.5px;
   stroke: none;
 }
 .chart-legend {

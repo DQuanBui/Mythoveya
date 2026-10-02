@@ -27,8 +27,9 @@ async function walkRoute(page: Page, points: number[][]) {
       const start = performance.now();
       const timer = setInterval(() => {
         const dot = document.querySelector(".map-ring b") as HTMLElement;
-        const x = parseFloat(dot.style.left) - 50,
-          z = parseFloat(dot.style.top) - 50;
+        // The minimap spans ±78 m (HAVEN.extent) across 0–100%.
+        const x = ((parseFloat(dot.style.left) - 50) * 78) / 50,
+          z = ((parseFloat(dot.style.top) - 50) * 78) / 50;
         const [tx, tz] = points[index],
           dx = tx - x,
           dz = tz - z,
@@ -98,7 +99,7 @@ test("explore the expanded island, cross the bridge and return safely", async ({
   await page.screenshot({ path: "artifacts/haven-village.png" });
   await page.getByRole("button", { name: "Travel map", exact: true }).click();
   await expect(page.getByLabel("Havenreach trail map")).toBeVisible();
-  await expect(page.locator(".haven-destinations button")).toHaveCount(15);
+  await expect(page.locator(".haven-destinations button")).toHaveCount(17);
   await page
     .getByRole("button", { name: "Select Sunpetal Clearing", exact: true })
     .click();
@@ -145,7 +146,7 @@ test("explore the expanded island, cross the bridge and return safely", async ({
   await page.waitForTimeout(300);
   const z = await page
     .locator(".map-ring b")
-    .evaluate((dot: HTMLElement) => parseFloat(dot.style.top) - 50);
+    .evaluate((dot: HTMLElement) => ((parseFloat(dot.style.top) - 50) * 78) / 50);
   expect(z).toBeLessThan(-3.6);
   await walkRoute(page, [
     [30, -5],
@@ -182,7 +183,7 @@ test("explore the expanded island, cross the bridge and return safely", async ({
     };
   });
   expect(scene.trees).toBeGreaterThan(100);
-  expect(scene.wildlife).toBe(27);
+  expect(scene.wildlife).toBe(33);
   expect(scene.bridge).toBe(true);
   expect(scene.calls).toBeLessThan(1000);
   await page.keyboard.press("Escape");
@@ -191,7 +192,7 @@ test("explore the expanded island, cross the bridge and return safely", async ({
     .click();
   await expect
     .poll(() => page.locator(".map-ring b").getAttribute("style"))
-    .toBe("left: 50%; top: 55%;");
+    .toBe("left: 50%; top: 53.2051%;");
   await page.keyboard.press("KeyR");
   await expect(page.locator(".location small")).toHaveText(
     "Havenreach Village",
@@ -370,8 +371,8 @@ test("click-to-walk reaches a hidden cache, shows hover help, and fishes at the 
     page
       .locator(".map-ring b")
       .evaluate((dot: HTMLElement) => [
-        parseFloat(dot.style.left) - 50,
-        parseFloat(dot.style.top) - 50,
+        ((parseFloat(dot.style.left) - 50) * 78) / 50,
+        ((parseFloat(dot.style.top) - 50) * 78) / 50,
       ]);
   // A ground click plans a route; the keeper walks there without keys.
   await clickWorld(page, [2.5, 0, 1.5]);
@@ -404,7 +405,7 @@ test("click-to-walk reaches a hidden cache, shows hover help, and fishes at the 
     }, point);
   // Walk into the woods by clicking the ground, then hover and open the cache.
   await page.waitForTimeout(1500);
-  const woods = await project([10.5, 0, -15.5]);
+  const woods = await project([13.5, 0, -17]);
   await page.mouse.click(woods.x, woods.y);
   await expect
     .poll(async () => (await position())[1], { timeout: 20000 })

@@ -9,6 +9,9 @@ import {
   pathDistance,
   seeded,
   blockedByStructure,
+  groundHeight,
+  inLagoon,
+  slopeAt,
   HAVEN_HOUSES,
   HAVEN_PLACES,
   RESOURCE_NODES,
@@ -31,13 +34,14 @@ function makeInstances(
     const tree = part === "trunk" || part === "crown" || part === "pine";
     o.position.set(
       s.x,
-      part === "trunk"
+      groundHeight(s.x, s.z) +
+      (part === "trunk"
         ? 1.5 * s.scale
         : tree
           ? 3.6 * s.scale
           : part === "grass"
             ? 0.16
-            : 0.16,
+            : 0.16),
       s.z,
     );
     o.rotation.set(0, i * 2.4, 0);
@@ -73,13 +77,16 @@ export function HavenNature() {
     const trees = FOREST;
     const random = seeded(156),
       scatter: TreeSite[] = [];
-    for (let i = 0; i < (settings.quality === "Low" ? 240 : 650); i++) {
-      const x = (random() - 0.5) * 86,
-        z = (random() - 0.5) * 86;
+    for (let i = 0; i < (settings.quality === "Low" ? 480 : 1300); i++) {
+      const x = (random() - 0.5) * 152,
+        z = (random() - 0.5) * 152;
       if (
         onIsland(x, z, 2) &&
         Math.hypot(x, z) > 12 &&
         !inPond(x, z, 1) &&
+        !inLagoon(x, z, 4) &&
+        groundHeight(x, z) < 10.5 &&
+        (Math.hypot(x, z) < 44 || slopeAt(x, z) < 1) &&
         pathDistance(x, z) > 1.6
       )
         scatter.push({ x, z, scale: random(), pine: false });
@@ -165,12 +172,14 @@ function undergrowth() {
   const random = seeded(913),
     bushes: { x: number; z: number; s: number }[] = [],
     shrooms: { x: number; z: number; s: number }[] = [];
-  const target = settings.quality === "Low" ? 70 : 170;
-  for (let i = 0; i < 4000 && bushes.length < target; i++) {
-    const x = (random() - 0.5) * 84,
-      z = (random() - 0.5) * 84,
+  const target = settings.quality === "Low" ? 110 : 260;
+  for (let i = 0; i < 8000 && bushes.length < target; i++) {
+    const x = (random() - 0.5) * 150,
+      z = (random() - 0.5) * 150,
       d = pathDistance(x, z);
     if (
+      inLagoon(x, z, 3) ||
+      groundHeight(x, z) > 9 ||
       d < 1.75 ||
       d > 3.4 ||
       !onIsland(x, z, 2.5) ||
@@ -218,13 +227,13 @@ function undergrowth() {
   };
   return [
     make(new T.IcosahedronGeometry(1, settings.quality === "High" ? 1 : 0), bushes, "haven-bush", (b, i) => {
-      o.position.set(b.x, b.s * 0.55, b.z);
+      o.position.set(b.x, groundHeight(b.x, b.z) + b.s * 0.55, b.z);
       o.rotation.set(0, i, 0);
       o.scale.set(b.s * 1.15, b.s * 0.8, b.s);
       return ["#86a77b", "#94b384", "#7a9d78", "#a2b98a"][i % 4];
     }),
     make(new T.CylinderGeometry(0.05, 0.07, 0.28, 5), shrooms, "haven-mushroom-stem", (m) => {
-      o.position.set(m.x, 0.14 * m.s, m.z);
+      o.position.set(m.x, groundHeight(m.x, m.z) + 0.14 * m.s, m.z);
       o.rotation.set(0, 0, 0);
       o.scale.setScalar(m.s);
       return "#efe6d2";
@@ -234,7 +243,7 @@ function undergrowth() {
       shrooms,
       "haven-mushroom-cap",
       (m, i) => {
-        o.position.set(m.x, 0.26 * m.s, m.z);
+        o.position.set(m.x, groundHeight(m.x, m.z) + 0.26 * m.s, m.z);
         o.scale.set(m.s, m.s * 0.8, m.s);
         return i % 3 ? "#c8645a" : "#c9a06a";
       },

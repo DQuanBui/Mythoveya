@@ -2,7 +2,7 @@ import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as T from "three";
 import { settings } from "./audio";
-import { HAVEN_POND } from "../../../packages/shared/haven";
+import { HAVEN_POND, edgeRadius } from "../../../packages/shared/haven";
 
 export function HavenWater() {
   const ripples = useRef<T.Group>(null),
@@ -146,7 +146,11 @@ export function HavenWater() {
           </group>
         ))}
       </group>
-      <group name="cloudfall" position={[45.7, 0, 9.5]} rotation={[0, 0.2, 0]}>
+      <group
+        name="cloudfall"
+        position={[Math.cos(0.2) * (edgeRadius(0.2) + 0.6), 0, Math.sin(0.2) * (edgeRadius(0.2) + 0.6)]}
+        rotation={[0, 0.2, 0]}
+      >
         <mesh position={[0, -4, 0]}>
           <boxGeometry args={[2.8, 8, 0.2]} />
           <meshStandardMaterial

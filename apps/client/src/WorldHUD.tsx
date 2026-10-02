@@ -198,7 +198,7 @@ export function WorldHUD({
           {profile.region === "haven" && (
             <svg
               className="map-terrain"
-              viewBox="-50 -50 100 100"
+              viewBox="-78 -78 156 156"
               aria-hidden="true"
             >
               {HAVEN_PATHS.map((p, i) => (
@@ -211,6 +211,8 @@ export function WorldHUD({
                 />
               ))}
               <ellipse cx="21" cy="-5" rx="8" ry="6" fill="#94ccd0" />
+              <ellipse cx="36.5" cy="41" rx="12" ry="9" fill="#94ccd0" />
+              <path d="M-48 -42 L-42 -56 L-36 -42 Z M-53 -29 L-48 -38 L-43 -29 Z" fill="#9aa39a" />
             </svg>
           )}
           {INTERACTABLES.filter((o) => !o.id.startsWith("resource")).map(

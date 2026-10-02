@@ -13,6 +13,9 @@ import {
   HAVEN_COTTAGES,
   HAVEN_DOCK,
   HAVEN_WINDMILL,
+  LAGOON,
+  PIER,
+  LIGHTHOUSE,
   COTTAGE_SIZE,
 } from "../../../packages/shared/haven";
 import { Portrait } from "./portraits";
@@ -68,7 +71,7 @@ export function HavenMap({
       <div className="haven-map-layout">
         <div className="haven-chart">
           <svg
-            viewBox="-50 -50 100 100"
+            viewBox="-78 -78 156 156"
             role="group"
             aria-label="Havenreach trail map"
           >
@@ -93,10 +96,36 @@ export function HavenMap({
                 points={p.map((v) => v.join(",")).join(" ")}
                 fill="none"
                 stroke="#e6d5ad"
-                strokeWidth="1.1"
+                strokeWidth="1.5"
                 strokeLinejoin="round"
               />
             ))}
+            {/* Highcrag peaks and the Driftshore lagoon, pier and lighthouse. */}
+            {[
+              [-42, -50, 6],
+              [-48, -34, 4.5],
+              [-28, -56, 4],
+              [-56, -50, 3.5],
+            ].map(([x, y, r]) => (
+              <path
+                key={`${x}`}
+                d={`M${x - r} ${y + r * 0.7} L${x} ${y - r} L${x + r} ${y + r * 0.7} Z`}
+                fill="#9aa39a"
+                stroke="#e8ece6"
+                strokeWidth=".5"
+              />
+            ))}
+            <ellipse
+              cx={LAGOON.x}
+              cy={LAGOON.z}
+              rx={LAGOON.rx}
+              ry={LAGOON.rz}
+              fill="#7cc0c4"
+              stroke="#e8d6a6"
+              strokeWidth="2.4"
+            />
+            <rect x={PIER.x - 0.9} y={PIER.z0} width="1.8" height={PIER.z1 - PIER.z0} fill="#ba9872" />
+            <circle cx={LIGHTHOUSE.point[0]} cy={LIGHTHOUSE.point[1]} r="1.6" fill="#d4614f" stroke="#f1ece0" strokeWidth=".5" />
             <ellipse
               cx={HAVEN_POND.x}
               cy={HAVEN_POND.z}
@@ -151,21 +180,21 @@ export function HavenMap({
                 <circle
                   cx={p.point[0]}
                   cy={p.point[1]}
-                  r={selected === p.id ? 3.1 : 2.3}
+                  r={selected === p.id ? 4.4 : 3.2}
                   fill={selected === p.id ? "#f4deb0" : "#294d4b"}
                   stroke="#f4e2ba"
                   strokeWidth=".5"
                 />
-                <text x={p.point[0]} y={p.point[1] - 4.4} textAnchor="middle">
+                <text x={p.point[0]} y={p.point[1] - 5.6} textAnchor="middle">
                   {p.id.startsWith("porch-") ? "House" : p.short}
                 </text>
               </g>
             ))}
             <g transform={`translate(${position[0]} ${position[1]})`}>
-              <circle r="1.2" fill="#fff9e8" />
-              <circle r="2" fill="none" stroke="#fff9e8" strokeWidth=".3" />
+              <circle r="1.7" fill="#fff9e8" />
+              <circle r="2.9" fill="none" stroke="#fff9e8" strokeWidth=".45" />
             </g>
-            <text x="-43" y="-43" className="chart-north">
+            <text x="-70" y="-70" className="chart-north">
               N ↑
             </text>
           </svg>

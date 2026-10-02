@@ -2,6 +2,7 @@ import { WorldInteraction } from "./WorldInteraction";
 import { HavenHouses } from "./HavenHouses";
 import { HavenVillage } from "./HavenVillage";
 import { HavenBirds } from "./HavenBirds";
+import { HavenFrontier } from "./HavenFrontier";
 import { WeatherEffects } from "./Weather";
 import { HavenTreasure } from "./HavenTreasure";
 import { Riftgate } from "./Riftgate";
@@ -33,6 +34,8 @@ import {
   HAVEN_CACHES,
   HAVEN_RIFTGATE,
   shopFront,
+  groundHeight,
+  PIER,
   slideStep,
   type Point,
 } from "../../../packages/shared/haven";
@@ -452,6 +455,7 @@ function Environment({
       </group>
       {expanded && <HavenVillage />}
       {expanded && <HavenBirds />}
+      {expanded && <HavenFrontier />}
       <RegionScenery region={region} />
     </>
   );
@@ -546,6 +550,12 @@ export const INTERACTABLES = [
     ],
   },
   {
+    id: "pierfishing",
+    name: "Driftshore pier",
+    hint: "Cast into the sky-sea lagoon",
+    p: [PIER.x, 0, PIER.z1 - 0.6],
+  },
+  {
     id: "fishing",
     name: "Willowmere dock",
     hint: "Cast a line & catch fish",
@@ -558,17 +568,44 @@ export const INTERACTABLES = [
     p: [n.point[0], 0, n.point[1]],
   })),
 ];
+// Interaction points sit on the terrain (only Havenreach has elevation).
+for (const o of INTERACTABLES) o.p[1] = groundHeight(o.p[0], o.p[2]);
 export const getInteractables = (region: string) =>
   INTERACTABLES.filter(
     (o) =>
       (region === "haven" ||
         (!o.id.startsWith("trail-") &&
           !o.id.startsWith("porch-") &&
-          !["fishing", "riftgate", "smith", "apothecary"].includes(o.id))) &&
+          !["fishing", "pierfishing", "riftgate", "smith", "apothecary"].includes(o.id))) &&
       (!o.id.startsWith("resource-") ||
         resourcesForRegion(region).some((n) => n.id === o.id)),
   );
 const grids = new Map<string, WalkGrid>();
+/** Ground height for a region; only Havenreach has elevation. */
+const groundFor = (region: string) =>
+  region === "haven" ? groundHeight : () => 0;
+/** Where a click ray meets the terrain, found by marching then bisecting. */
+function terrainHit(ray: T.Ray, ground: (x: number, z: number) => number) {
+  const p = new T.Vector3();
+  let prev = 0;
+  for (let t = 0.5; t < 260; t += 0.5) {
+    ray.at(t, p);
+    if (p.y <= ground(p.x, p.z)) {
+      let lo = prev,
+        hi = t;
+      for (let i = 0; i < 12; i++) {
+        const mid = (lo + hi) / 2;
+        ray.at(mid, p);
+        if (p.y <= ground(p.x, p.z)) hi = mid;
+        else lo = mid;
+      }
+      ray.at(hi, p);
+      return p;
+    }
+    prev = t;
+  }
+  return null;
+}
 const markerMaterial = new T.MeshBasicMaterial({
   color: "#ffe6ad",
   transparent: true,
@@ -633,13 +670,18 @@ function Explorer({
       c.enableDamping = false;
       c.update();
     }
-    camera.position.set(player.current.x + 10, 10, player.current.z + 11);
+    camera.position.set(
+      player.current.x + 10,
+      10 + player.current.y,
+      player.current.z + 11,
+    );
     if (c) {
-      c.target.set(player.current.x, 1, player.current.z);
+      c.target.set(player.current.x, 1 + player.current.y, player.current.z);
       c.update();
       c.enableDamping = true;
     }
   };
+  const ground = useMemo(() => groundFor(profile.region), [profile.region]);
   const allowed = useCallback(
     (x: number, z: number) =>
       (profile.region === "haven"
@@ -666,7 +708,7 @@ function Explorer({
         }
         let grid = grids.get(profile.region);
         if (!grid) {
-          grid = buildGrid(allowed, profile.region === "haven" ? 46 : 18);
+          grid = buildGrid(allowed, profile.region === "haven" ? 78 : 18);
           grids.set(profile.region, grid);
         }
         const points = findPath(grid, from, target, allowed);
@@ -688,7 +730,7 @@ function Explorer({
       if (!grids.has(profile.region))
         grids.set(
           profile.region,
-          buildGrid(allowed, profile.region === "haven" ? 46 : 18),
+          buildGrid(allowed, profile.region === "haven" ? 78 : 18),
         );
     }, 1500);
     return () => clearTimeout(t);
@@ -829,9 +871,12 @@ function Explorer({
             r.activate();
         }
       }
+      // Climbing raises the keeper and lifts the camera by the same amount.
+      const ny = ground(nx, nz);
       camera.position.x += nx - player.current.x;
+      camera.position.y += ny - player.current.y;
       camera.position.z += nz - player.current.z;
-      player.current.set(nx, 0, nz);
+      player.current.set(nx, ny, nz);
       avatar.rotation.y = Math.atan2(v.x, v.z);
       if (clock.elapsedTime - foot.current > (sprinting ? 0.27 : 0.32)) {
         audio.cue(
@@ -844,13 +889,13 @@ function Explorer({
         foot.current = clock.elapsedTime;
       }
     }
-    worldFocus.set(player.current.x, 0, player.current.z);
+    worldFocus.set(player.current.x, player.current.y, player.current.z);
     if (marker.current) {
       const r = route.current;
       marker.current.visible = !!r && !r.activate;
       if (r) {
         const [ex, ez] = r.points[r.points.length - 1];
-        marker.current.position.set(ex, 0.06, ez);
+        marker.current.position.set(ex, ground(ex, ez) + 0.06, ez);
         marker.current.scale.setScalar(
           settings.reduced ? 1 : 1 + Math.sin(clock.elapsedTime * 6) * 0.08,
         );
@@ -858,6 +903,7 @@ function Explorer({
     }
     avatar.position.x = player.current.x;
     avatar.position.z = player.current.z;
+    avatar.userData.groundY = player.current.y;
     animateAvatar(avatar, clock.elapsedTime, moving, pet, settings.reduced);
     const delta = player.current.clone().sub(follow.current);
     const following = delta.length() > 1.6;
@@ -872,7 +918,7 @@ function Explorer({
           delta.z,
           allowed,
         );
-        follow.current.set(fx, 0, fz);
+        follow.current.set(fx, ground(fx, fz), fz);
       }
     }
     companion.position.copy(follow.current);
@@ -889,7 +935,7 @@ function Explorer({
     );
     if (controls.current)
       controls.current.target.lerp(
-        new T.Vector3(player.current.x, 1, player.current.z),
+        new T.Vector3(player.current.x, 1 + player.current.y, player.current.z),
         1 - Math.exp(-dt * 8),
       );
     if (clock.elapsedTime - last.current > 0.2) {
@@ -942,6 +988,8 @@ function Explorer({
         onClick={(e) => {
           if (blocked || e.delta >= 6) return;
           e.stopPropagation();
+          // On slopes the ray meets the terrain before this flat catch-plane.
+          const hit = terrainHit(e.ray, ground) || e.point;
           // Small pickups are easy to miss: a click right beside one still counts.
           const found = profile.town?.caches || [];
           const pickup = [
@@ -960,15 +1008,15 @@ function Explorer({
                 z: c.point[1],
                 reach: 2.6,
               })),
-          ].find((o) => Math.hypot(o.x - e.point.x, o.z - e.point.z) < 1.1);
+          ].find((o) => Math.hypot(o.x - hit.x, o.z - hit.z) < 1.1);
           if (pickup)
             walker.current.go([pickup.x, pickup.z], pickup.reach, () =>
               onInteract(pickup.id),
             );
-          else walker.current.go([e.point.x, e.point.z]);
+          else walker.current.go([hit.x, hit.z]);
         }}
       >
-        <planeGeometry args={[130, 130]} />
+        <planeGeometry args={[180, 180]} />
         <meshBasicMaterial visible={false} />
       </mesh>
       <OrbitControls
@@ -1165,7 +1213,7 @@ export function WorldScene({
             hint={resource ? "Click to gather" : o.hint}
             reach={resource ? 2.4 : 5.5}
           >
-            {o.id === "fishing" && (
+            {(o.id === "fishing" || o.id === "pierfishing") && (
               <mesh position={[0, 0.45, -0.2]}>
                 <boxGeometry args={[1.7, 0.9, 1.6]} />
                 <meshBasicMaterial visible={false} />

@@ -2,7 +2,11 @@ import { WorldInteraction } from "./WorldInteraction";
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as T from "three";
-import { HAVEN_WILDLIFE, havenWalkable } from "../../../packages/shared/haven";
+import {
+  HAVEN_WILDLIFE,
+  havenWalkable,
+  groundHeight,
+} from "../../../packages/shared/haven";
 import { createCreature, animateCreature } from "./models";
 import { audio, settings } from "./audio";
 import { byId } from "../../../packages/shared/content";
@@ -49,7 +53,9 @@ function Resident({
         model.position.z = z;
       }
     }
-    model.position.y = site.water ? 0.08 : 0;
+    model.position.y = site.water
+      ? 0.08
+      : groundHeight(model.position.x, model.position.z);
     animateCreature(model, t, walking ? "walk" : "idle", 0, settings.reduced);
     if (t - lastVoice.current > 24 + index && distance < 14) {
       audio.voice(

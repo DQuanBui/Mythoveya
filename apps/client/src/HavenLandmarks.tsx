@@ -3,6 +3,7 @@ import * as T from "three";
 import {
   HAVEN_PLACES,
   HAVEN_LANDMARK_OBSTACLES,
+  groundHeight,
 } from "../../../packages/shared/haven";
 function Bench({
   x,
@@ -145,7 +146,11 @@ export function HavenLandmarks() {
         <group
           key={p.id}
           name={`trail-sign-${p.id}`}
-          position={[p.point[0] + 2.2, 0, p.point[1] + 2.3]}
+          position={[
+            p.point[0] + 2.2,
+            groundHeight(p.point[0] + 2.2, p.point[1] + 2.3),
+            p.point[1] + 2.3,
+          ]}
         >
           <mesh position={[0, 0.85, 0]} castShadow>
             <cylinderGeometry args={[0.06, 0.09, 1.7, 5]} />

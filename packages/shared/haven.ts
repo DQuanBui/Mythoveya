@@ -61,7 +61,7 @@ export const houseDoor = (h: (typeof HAVEN_HOUSES)[number]): Point => [
   h.point[1] + 2.5,
 ];
 export const HAVEN = {
-  extent: 50,
+  extent: 78,
   spawn: [0, 5] as Point,
   walkSpeed: 4,
   sprintSpeed: 6.7,
@@ -134,6 +134,26 @@ export const HAVEN_PLACES = [
     description:
       "A bright picnic clearing, flowers, and butterflies near the village trail.",
     species: ["thornhare", "cindermite"],
+  },
+  {
+    id: "driftshore",
+    name: "Driftshore Beach",
+    short: "Driftshore",
+    point: [36, 29.5] as Point,
+    color: "#e8d6a6",
+    description:
+      "Warm sand, a sky-sea lagoon, a lighthouse and a pier where the big fish bite.",
+    species: ["bubbloom", "coralisk"],
+  },
+  {
+    id: "summit",
+    name: "Highcrag Summit",
+    short: "Summit",
+    point: [-42, -50] as Point,
+    color: "#c9d2d8",
+    description:
+      "Climb the switchback trail above the pines for the widest view on the island.",
+    species: ["cragpup", "voltwing"],
   },
 ] as const;
 export const HAVEN_PATHS: Point[][] = [
@@ -211,6 +231,38 @@ export const HAVEN_PATHS: Point[][] = [
     [29, 4],
     [25, 2.6],
   ],
+  // Driftshore: from the east loop down to the beach and the lighthouse.
+  [
+    [29, 4],
+    [34, 14],
+    [36, 24],
+    [36, 29.5],
+    [41, 29.5],
+    [43.5, 30.5],
+  ],
+  // Highcrag: switchbacks from the ruins trail up to the summit lookout.
+  [
+    [-23, -19],
+    [-30, -31],
+    [-36, -36],
+    [-44, -38],
+    [-47, -45],
+    [-42, -50],
+  ],
+];
+/** Heights along the Highcrag trail, matching its points above. */
+export const MOUNTAIN_TRAIL_HEIGHTS = [0, 0, 2.5, 6.5, 10.5, 14.2];
+export const SUMMIT: Point = [-42, -50];
+export const SUMMIT_HEIGHT = 14.2;
+// Driftshore lagoon: a sky-sea bay ringed by sand, with a pier to fish from.
+export const LAGOON = { x: 36.5, z: 41, rx: 12, rz: 9 };
+export const PIER = { x: 36.5, z0: 30.5, z1: 37.5, halfWidth: 0.85 };
+export const LIGHTHOUSE = { point: [46, 33.5] as Point };
+const PEAKS = [
+  { x: -42, z: -50, h: 14.6, r: 11 },
+  { x: -48, z: -34, h: 10, r: 9 },
+  { x: -28, z: -56, h: 9, r: 9 },
+  { x: -56, z: -50, h: 8, r: 8 },
 ];
 export const HAVEN_POND = { x: 21, z: -5, rx: 8, rz: 6, bridgeHalfWidth: 1.25 };
 // The fishing dock reaches from the south shore into Willowmere.
@@ -220,8 +272,91 @@ export function onDock(x: number, z: number) {
   const d = HAVEN_DOCK;
   return Math.abs(x - d.x) < d.halfWidth && z > d.z0 && z < d.z1;
 }
+const lobe = (angle: number, centre: number, width: number, amount: number) => {
+  const d = Math.atan2(Math.sin(angle - centre), Math.cos(angle - centre));
+  return amount * Math.exp(-((d / width) ** 2));
+};
+/** The coastline: the original island plus the Driftshore (SE) and Highcrag (NW) lobes. */
 export function edgeRadius(angle: number) {
-  return 44 + Math.sin(angle * 3) * 2 + Math.cos(angle * 5) * 1.5;
+  return (
+    44 +
+    Math.sin(angle * 3) * 2 +
+    Math.cos(angle * 5) * 1.5 +
+    lobe(angle, 0.85, 0.42, 26) +
+    lobe(angle, -2.2, 0.5, 30)
+  );
+}
+export function lagoonDistance(x: number, z: number) {
+  return Math.hypot((x - LAGOON.x) / LAGOON.rx, (z - LAGOON.z) / LAGOON.rz);
+}
+export const inLagoon = (x: number, z: number, margin = 0) =>
+  lagoonDistance(x, z) < 1 + margin / LAGOON.rz;
+export const onPier = (x: number, z: number) =>
+  Math.abs(x - PIER.x) < PIER.halfWidth && z > PIER.z0 && z < PIER.z1;
+function trailInfo(x: number, z: number) {
+  const path = HAVEN_PATHS[HAVEN_PATHS.length - 1];
+  let best = Infinity,
+    h = 0;
+  for (let i = 1; i < path.length; i++) {
+    const [ax, az] = path[i - 1],
+      [bx, bz] = path[i],
+      dx = bx - ax,
+      dz = bz - az,
+      len = dx * dx + dz * dz,
+      t = Math.max(0, Math.min(1, ((x - ax) * dx + (z - az) * dz) / len)),
+      d = Math.hypot(x - ax - t * dx, z - az - t * dz);
+    if (d < best) {
+      best = d;
+      h = MOUNTAIN_TRAIL_HEIGHTS[i - 1] * (1 - t) + MOUNTAIN_TRAIL_HEIGHTS[i] * t;
+    }
+  }
+  return { d: best, h };
+}
+const smooth = (a: number, b: number, v: number) => {
+  const t = Math.max(0, Math.min(1, (v - a) / (b - a)));
+  return t * t * (3 - 2 * t);
+};
+/** Natural mountain surface before the trail is carved in. */
+function mountain(x: number, z: number) {
+  const r = Math.hypot(x, z);
+  if (r < 44) return 0;
+  let h = 0;
+  for (const p of PEAKS) h = Math.max(h, p.h * Math.exp(-(((x - p.x) ** 2 + (z - p.z) ** 2) / (p.r * p.r))));
+  h += (Math.sin(x * 0.45) * Math.cos(z * 0.37) + 1) * 0.35 * Math.min(1, h / 3);
+  return h * smooth(44, 50, r);
+}
+/** Ground height everywhere on Havenreach; the original island stays at 0. */
+export function groundHeight(x: number, z: number) {
+  const e = lagoonDistance(x, z);
+  if (e < 1) return -1.3 * Math.pow(1 - e, 0.6);
+  const natural = mountain(x, z);
+  if (natural === 0 && Math.hypot(x, z) < 44) return 0;
+  // A flat summit plateau for the lookout.
+  const top = Math.hypot(x - SUMMIT[0], z - SUMMIT[1]);
+  if (top < 5.2) return SUMMIT_HEIGHT + (natural - SUMMIT_HEIGHT) * smooth(3.6, 5.2, top);
+  const t = trailInfo(x, z);
+  if (t.d > 3.6) return natural;
+  // The trail is a gently graded shelf blended into the slope beside it.
+  return t.h + (natural - t.h) * smooth(1.5, 3.6, t.d);
+}
+export function slopeAt(x: number, z: number) {
+  const e = 0.35;
+  return (
+    Math.hypot(
+      groundHeight(x + e, z) - groundHeight(x - e, z),
+      groundHeight(x, z + e) - groundHeight(x, z - e),
+    ) /
+    (2 * e)
+  );
+}
+/** Steep faces are blocked; the carved trail is always walkable. */
+export function climbable(x: number, z: number) {
+  if (Math.hypot(x, z) < 44 && !inLagoon(x, z, 2)) return true;
+  return (
+    trailInfo(x, z).d < 1.6 ||
+    Math.hypot(x - SUMMIT[0], z - SUMMIT[1]) < 3.6 ||
+    slopeAt(x, z) < 0.62
+  );
 }
 export function onIsland(x: number, z: number, margin = 1.4) {
   return Math.hypot(x, z) < edgeRadius(Math.atan2(z, x)) - margin;
@@ -243,6 +378,8 @@ export function havenWalkable(x: number, z: number) {
   return (
     onIsland(x, z) &&
     (!inPond(x, z, 0.35) || onBridge(x, z) || onDock(x, z)) &&
+    (!inLagoon(x, z, 0.4) || onPier(x, z)) &&
+    climbable(x, z) &&
     !HAVEN_HOUSES.some(
       (h) => Math.abs(x - h.point[0]) < 1.9 && Math.abs(z - h.point[1]) < 1.8,
     ) &&
@@ -265,11 +402,14 @@ export function segmentDistance(x: number, z: number, a: Point, b: Point) {
   return Math.hypot(x - a[0] - t * dx, z - a[1] - t * dz);
 }
 export function pathDistance(x: number, z: number) {
-  return Math.min(
-    ...HAVEN_PATHS.flatMap((path) =>
-      path.slice(1).map((b, i) => segmentDistance(x, z, path[i], b)),
-    ),
-  );
+  // A plain loop: this runs tens of thousands of times while building the island.
+  let best = Infinity;
+  for (const path of HAVEN_PATHS)
+    for (let i = 1; i < path.length; i++) {
+      const d = segmentDistance(x, z, path[i - 1], path[i]);
+      if (d < best) best = d;
+    }
+  return best;
 }
 export function placeAt(x: number, z: number) {
   return HAVEN_PLACES.reduce(
@@ -321,6 +461,13 @@ export const HAVEN_WILDLIFE = [
   { species: "cragmaw", point: [22, 10] as Point, radius: 1 },
   { species: "fernibble", point: [-25, 17] as Point, radius: 1 },
   { species: "dawnfawn", point: [6, 32] as Point, radius: 1.1 },
+  // Driftshore and Highcrag residents.
+  { species: "bubbloom", point: [33, 44] as Point, radius: 1.2, water: true },
+  { species: "pearlbloom", point: [41, 43] as Point, radius: 1, water: true },
+  { species: "coralisk", point: [44, 29] as Point, radius: 0.7 },
+  { species: "puddlepip", point: [29, 31] as Point, radius: 0.8 },
+  { species: "cragpup", point: [-33, -33] as Point, radius: 0.6 },
+  { species: "glimlet", point: [-41, -51] as Point, radius: 0.6 },
 ];
 export const RESOURCE_NODES = [
   { id: "resource-0", point: [-6, 8] as Point },
@@ -488,6 +635,14 @@ export const HAVEN_STRUCTURES: Structure[] = [
     hd: s.hd,
   })),
   {
+    kind: "lighthouse",
+    x: LIGHTHOUSE.point[0],
+    z: LIGHTHOUSE.point[1],
+    rotation: 0,
+    hw: 1.9,
+    hd: 1.9,
+  },
+  {
     kind: "riftgate",
     x: HAVEN_RIFTGATE.point[0],
     z: HAVEN_RIFTGATE.point[1],
@@ -642,10 +797,13 @@ export type TreeSite = { x: number; z: number; scale: number; pine: boolean };
 export function forestSites(): TreeSite[] {
   const random = seeded(8315),
     sites: TreeSite[] = [];
-  for (let i = 0; i < 900; i++) {
-    const x = (random() - 0.5) * 90,
-      z = (random() - 0.5) * 90;
+  for (let i = 0; i < 2400; i++) {
+    const x = (random() - 0.5) * 152,
+      z = (random() - 0.5) * 152;
     if (
+      inLagoon(x, z, 6) ||
+      groundHeight(x, z) > 10 ||
+      (Math.hypot(x, z) >= 44 && slopeAt(x, z) > 1.1) ||
       !onIsland(x, z, 3) ||
       Math.hypot(x, z) < 14 ||
       inPond(x, z, 2) ||

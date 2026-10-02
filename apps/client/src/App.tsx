@@ -272,6 +272,7 @@ export default function App() {
         run("resource", { resource: id });
         audio.cue("collect");
       } else if (id === "riftgate") setPanel("adventure");
+      else if (id === "pierfishing") setPanel("fishing");
       else if (id.startsWith("folk-")) {
         const folk = TOWNSFOLK[Number(id.slice(5))];
         if (folk)

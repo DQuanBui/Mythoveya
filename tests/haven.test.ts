@@ -81,7 +81,7 @@ describe("Havenreach exploration layout", () => {
   });
   it("maps enlarged coordinates and preserves smaller regional maps", () => {
     expect(mapPercent(0, "haven")).toBe(50);
-    expect(mapPercent(40, "haven")).toBe(90);
+    expect(mapPercent(78, "haven")).toBe(100);
     expect(mapPercent(10, "canyon")).toBe(75);
     expect(pathDistance(-22, 22)).toBe(0);
   });
