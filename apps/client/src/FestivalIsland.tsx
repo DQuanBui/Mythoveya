@@ -36,6 +36,8 @@ export function festivalInteractables(profile: Profile) {
     { id: "fest-ferry", name: "Skyferry", hint: "Sail back to Havenreach", p: [islandDock(R)[0], 0, 0] },
     { id: "fest-board", name: "Festival board", hint: "Today's activities and the lantern hunt", p: [P.board[0] - 1.2, 0, P.board[1]] },
     { id: "fest-shop", name: "Ticket booth", hint: "Spend festival tickets", p: [P.shop[0] - 1.2, 0, P.shop[1]] },
+    { id: "fest-race", name: "Sprint Stakes", hint: "Race your companion", p: [P.race[0], 0, P.race[1] + 1.5] },
+    { id: "fest-course", name: "Hop Hollow course", hint: "Run the obstacle lane", p: [P.course[0] - 1.5, 0, P.course[1] + 1] },
     ...huntSpots(utcDay())
       .filter((s) => !found.includes(s.id))
       .map((s) => ({ id: `fest-lantern-${s.id}`, name: "Hidden lantern", hint: "Click to collect", p: [s.point[0], 0, s.point[1]] })),
@@ -594,8 +596,38 @@ export function FestivalScene({
         >
           <SkyferryDock position={[0, 0, 0]} heading={-Math.PI / 2} />
         </WorldInteraction>
+        <WorldInteraction
+          name="interactable-fest-race"
+          position={[P.race[0], 0, P.race[1] - 0.5]}
+          title="Sprint Stakes"
+          hint="Race your companion for tickets"
+          disabled={blocked}
+          approach={[points["fest-race"][0], points["fest-race"][2]]}
+          activate={() => onInteract("fest-race")}
+        >
+          <mesh position={[0, 1.4, 0]}>
+            <boxGeometry args={[3.8, 2.8, 0.6]} />
+            <meshBasicMaterial visible={false} />
+          </mesh>
+        </WorldInteraction>
+        <WorldInteraction
+          name="interactable-fest-course"
+          position={[15, 0, -6.5]}
+          title="Hop Hollow course"
+          hint="Jump and slide for tickets"
+          disabled={blocked}
+          approach={[points["fest-course"][0], points["fest-course"][2]]}
+          activate={() => onInteract("fest-course")}
+        >
+          <mesh position={[0, 0.5, 0]}>
+            <boxGeometry args={[9, 1, 3]} />
+            <meshBasicMaterial visible={false} />
+          </mesh>
+        </WorldInteraction>
         {!blocked && (
           <>
+            <Label position={[P.race[0], 3.4, P.race[1] - 0.5]} icon="➶" text="Sprint Stakes" id="fest-race" onClick={go("fest-race", points["fest-race"])} />
+            <Label position={[14, 2, -6.5]} icon="⤴" text="Hop Hollow course" id="fest-course" onClick={go("fest-course", points["fest-course"])} />
             <Label position={[islandDock(R)[0], 3.4, 0]} icon="⛵" text="Skyferry" id="fest-ferry" onClick={go("fest-ferry", points["fest-ferry"])} />
             <Label position={[P.board[0], 3.2, P.board[1]]} icon="❖" text="Festival board" id="fest-board" onClick={go("fest-board", points["fest-board"])} />
             <Label position={[P.shop[0], 3.6, P.shop[1]]} icon="✦" text="Ticket booth" id="fest-shop" onClick={go("fest-shop", points["fest-shop"])} />

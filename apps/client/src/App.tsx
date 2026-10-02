@@ -38,6 +38,7 @@ import { IslandScene, type Placing } from "./HomeIsland";
 import { HomePanel, SkyferryPanel } from "./HomePanel";
 import { FestivalScene } from "./FestivalIsland";
 import { FestivalPanel, type FestivalTab } from "./FestivalPanel";
+import { FestivalGame } from "./FestivalGames";
 import { FESTIVAL_RADIUS } from "../../../packages/shared/festival";
 import { SKYFERRY } from "../../../packages/shared/haven";
 import {
@@ -66,7 +67,8 @@ export default function App() {
     [fast, setFast] = useState(false),
     [placing, setPlacing] = useState<Placing | null>(null),
     [homeFocus, setHomeFocus] = useState<string | undefined>(),
-    [festTab, setFestTab] = useState<FestivalTab>("today");
+    [festTab, setFestTab] = useState<FestivalTab>("today"),
+    [fairGame, setFairGame] = useState<"race" | "course">("race");
   const input = useRef<ExplorationInput>({ x: 0, z: 0 });
   const mission = useRef(false);
   const [trail, setTrail] = useState<string | null>(null);
@@ -112,7 +114,7 @@ export default function App() {
     audio.location(
       screen === "battle"
         ? "battle"
-        : screen === "arena"
+        : screen === "arena" || screen === "fair-game"
           ? "arena"
           : screen === "world"
             ? profile?.island
@@ -312,6 +314,10 @@ export default function App() {
       else if (id === "fest-board" || id === "fest-shop") {
         setFestTab(id === "fest-shop" ? "shop" : "today");
         setPanel("festival");
+      } else if (id === "fest-race" || id === "fest-course") {
+        setFairGame(id === "fest-race" ? "race" : "course");
+        setPanel("");
+        setScreen("fair-game");
       } else if (id.startsWith("fest-lantern-")) {
         audio.cue("collect");
         run("fest-hunt", { id: id.slice(13) });
@@ -641,6 +647,17 @@ export default function App() {
           }}
         />
       )}
+      {screen === "fair-game" && profile && (
+        <FestivalGame
+          profile={profile}
+          activity={fairGame}
+          run={run}
+          exit={() => {
+            setScreen("world");
+            refresh();
+          }}
+        />
+      )}
       {screen === "arena" && profile && (
         <Arena
           profile={profile}
@@ -682,7 +699,16 @@ export default function App() {
               />
             )}
             {panel === "festival" && profile && (
-              <FestivalPanel profile={profile} run={run} tab={festTab} />
+              <FestivalPanel
+                profile={profile}
+                run={run}
+                tab={festTab}
+                play={(game) => {
+                  setFairGame(game);
+                  setPanel("");
+                  setScreen("fair-game");
+                }}
+              />
             )}
             {panel === "skyferry" && profile && (
               <SkyferryPanel profile={profile} run={run} />

@@ -233,3 +233,196 @@
 .festival-panel article.here {
   border-color: #f3d8a4b8;
 }
+/* Festival games: lobby, live play HUD and results */
+.fest-game-lobby {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  background: radial-gradient(circle at 50% 30%, #2c5560, #112e36);
+  overflow: auto;
+  z-index: 20;
+}
+.fest-game-lobby .panel {
+  position: relative;
+  max-width: 920px;
+  width: 100%;
+}
+.fest-boards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 18px 0;
+}
+.fest-board {
+  border: 1px solid #b8c8aa30;
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.fest-board h3 {
+  margin: 0 0 8px;
+}
+.fest-board ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+.fest-board li {
+  display: grid;
+  grid-template-columns: 26px 1fr auto;
+  gap: 8px;
+  font-size: 13px;
+  padding: 3px 6px;
+  border-radius: 6px;
+}
+.fest-board li span {
+  color: #f2d593;
+}
+.fest-board li.mine {
+  background: #e8d39c22;
+}
+.fest-result {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 14px;
+  margin: 14px 0;
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 1px solid #f3d8a4b8;
+  background: #e8d39c14;
+}
+.fest-result strong {
+  font-size: 30px;
+  color: #ffe9bb;
+}
+.fest-result small {
+  width: 100%;
+  color: var(--muted);
+}
+.race-pick {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0 0;
+}
+.race-pick button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px;
+  border-radius: 10px;
+}
+.race-pick button.selected {
+  box-shadow: inset 0 0 0 2px #f3d8a4;
+}
+.race-pick img {
+  width: 44px;
+  height: 44px;
+}
+.fest-game {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: #a7c7cf;
+}
+.fest-hud {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+}
+.fest-timer {
+  font-size: 34px;
+  font-weight: 600;
+  color: #fff8e6;
+  text-shadow: 0 2px 8px #17342d88;
+}
+.fest-meta,
+.racer-names {
+  font-size: 13px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: #173840cc;
+}
+.racer-names {
+  display: flex;
+  gap: 10px;
+}
+.racer-names .mine {
+  color: #ffe9bb;
+}
+.stamina {
+  position: relative;
+  width: 280px;
+  height: 18px;
+  border-radius: 9px;
+  background: #173840cc;
+  overflow: hidden;
+}
+.stamina i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: linear-gradient(90deg, #6fbf9b, #b6e39a);
+}
+.stamina.pad i {
+  background: linear-gradient(90deg, #f2c75e, #ffe49a);
+}
+.stamina span {
+  position: relative;
+  display: block;
+  text-align: center;
+  font-size: 11px;
+  line-height: 18px;
+  color: #10282d;
+  font-weight: 600;
+}
+.fest-count {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 120px;
+  font-weight: 700;
+  color: #fff8e6;
+  text-shadow: 0 6px 20px #17342d88;
+  pointer-events: none;
+}
+.fest-controls {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 14px;
+}
+.fest-controls button {
+  min-width: 150px;
+  padding: 16px 22px;
+  font-size: 18px;
+  touch-action: manipulation;
+}
+.fest-controls kbd {
+  margin-left: 8px;
+  font-size: 11px;
+}
+.fest-activities {
+  margin-bottom: 18px;
+}
+@media (max-width: 720px) {
+  .fest-boards {
+    grid-template-columns: 1fr;
+  }
+  .stamina {
+    width: 200px;
+  }
+}

@@ -11,6 +11,12 @@ import {
   type ShopEntry,
 } from "../../../packages/shared/festival";
 import { utcDay, utcWeek } from "../../../packages/shared/town";
+import {
+  ACTIVITIES,
+  TICKET_PLAYS,
+  featuredActivity,
+  formatScore,
+} from "../../../packages/shared/festival-games";
 
 type Run = (kind: string, value?: any) => Promise<any>;
 export type FestivalTab = "today" | "shop" | "wardrobe";
@@ -22,7 +28,17 @@ const SECTIONS: [ShopEntry["kind"], string][] = [
 ];
 
 /** Lanternfair's board and ticket booth. */
-export function FestivalPanel({ profile, run, tab: initial }: { profile: Profile; run: Run; tab: FestivalTab }) {
+export function FestivalPanel({
+  profile,
+  run,
+  tab: initial,
+  play,
+}: {
+  profile: Profile;
+  run: Run;
+  tab: FestivalTab;
+  play: (activity: "race" | "course") => void;
+}) {
   const [tab, setTab] = useState<FestivalTab>(initial);
   const today = utcDay(),
     f = profile.festival || defaultFestival(),
@@ -66,6 +82,29 @@ export function FestivalPanel({ profile, run, tab: initial }: { profile: Profile
               {greeted ? "Welcome tickets collected" : `Collect ${GREETING_TICKETS} welcome tickets`}
             </button>
           </div>
+          <section className="fest-activities">
+            <h3>Festival games</h3>
+            <div className="market-stock">
+              {(["race", "course"] as const).map((id) => {
+                const a = ACTIVITIES[id],
+                  played = fresh ? f.plays[id] || 0 : 0,
+                  best = f.best[id];
+                return (
+                  <article key={id} data-game={id} className={featuredActivity(today) === id ? "here" : ""}>
+                    <span className="item-symbol">{a.icon}</span>
+                    <h3>{a.name}</h3>
+                    <p>{a.blurb}</p>
+                    <small>
+                      {featuredActivity(today) === id ? "Featured today · double tickets · " : ""}
+                      {Math.max(0, TICKET_PLAYS - played)} ticket runs left
+                      {best !== undefined ? ` · best ${formatScore(id, best)}` : ""}
+                    </small>
+                    <button onClick={() => play(id)}>Play →</button>
+                  </article>
+                );
+              })}
+            </div>
+          </section>
           <section className="hunt-clues">
             <h3>The lantern hunt</h3>
             <p className="muted">
