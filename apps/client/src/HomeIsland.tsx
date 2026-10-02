@@ -182,6 +182,40 @@ function decorGeometry(kind: string): Built {
       k.add(SHAPES.CYL, "#a8dbe2", [0, 1.56, 0], [0.48, 0.04, 0.48]);
       k.add(SHAPES.BALL, "#cfeef0", [0, 1.75, 0], [0.12, 0.25, 0.12]);
       break;
+    case "lantern-arch":
+      for (const x of [-1.3, 1.3]) k.add(SHAPES.CYL6, "#6d5847", [x, 1.2, 0], [0.08, 2.4, 0.08]);
+      for (let i = 0; i <= 8; i++) {
+        const a = (i / 8) * Math.PI;
+        k.box("#6d5847", [Math.cos(a) * 1.3, 2.4 + Math.sin(a) * 0.5, 0], [0.1, 0.1, 0.1]);
+        if (i % 2) {
+          k.box("#5d4a3a", [Math.cos(a) * 1.3, 2.2 + Math.sin(a) * 0.5, 0], [0.015, 0.3, 0.015]);
+          glow.add(SHAPES.BALL, "#fff", [Math.cos(a) * 1.3, 2.0 + Math.sin(a) * 0.5, 0], [0.13, 0.17, 0.13]);
+        }
+      }
+      break;
+    case "balloon-cart":
+      k.box("#d9674f", [0, 0.55, 0], [1.4, 0.6, 0.9]);
+      k.box("#f3e3b5", [0, 0.88, 0], [1.5, 0.06, 1]);
+      for (const x of [-0.5, 0.5]) k.add(SHAPES.CYL, "#5d4a3a", [x, 0.22, 0.48], [0.22, 0.06, 0.22], [Math.PI / 2, 0, 0]);
+      k.add(SHAPES.CYL6, "#6d5847", [0.55, 1.4, -0.3], [0.03, 1.1, 0.03]);
+      for (let i = 0; i < 5; i++)
+        k.add(SHAPES.BALL, ["#e98aa0", "#f2c75e", "#5fa7bb", "#9bc27a", "#b49be0"][i], [0.55 + Math.cos(i * 1.3) * 0.3, 2.2 + (i % 2) * 0.3, -0.3 + Math.sin(i * 1.3) * 0.3], [0.24, 0.3, 0.24]);
+      break;
+    case "festival-tent":
+      for (let j = 0; j < 8; j++) k.add(SHAPES.CONE4, j % 2 ? "#f3e3b5" : "#5fa7bb", [0, 1.1, 0], [1.4, 2.2, 1.4], [0, (j / 8) * Math.PI * 2, 0]);
+      k.add(SHAPES.CYL6, "#6d5847", [0, 2.5, 0], [0.04, 0.7, 0.04]);
+      k.box("#d9674f", [0.18, 2.7, 0], [0.32, 0.18, 0.02]);
+      break;
+    case "mini-carousel":
+      k.add(SHAPES.CYL, "#efe4cc", [0, 0.1, 0], [1.4, 0.2, 1.4]);
+      k.add(SHAPES.CYL6, "#e3bd56", [0, 1.1, 0], [0.1, 2, 0.1]);
+      k.add(SHAPES.CONE, "#d9674f", [0, 2.4, 0], [1.55, 0.7, 1.55]);
+      for (let i = 0; i < 4; i++) {
+        const a = (i / 4) * Math.PI * 2;
+        k.add(SHAPES.CYL6, "#e3bd56", [Math.cos(a) * 1, 1.1, Math.sin(a) * 1], [0.025, 2, 0.025]);
+        k.add(SHAPES.BALL, ["#f3e3b5", "#9bc27a", "#5fa7bb", "#e98aa0"][i], [Math.cos(a) * 1, 0.7, Math.sin(a) * 1], [0.24, 0.2, 0.32]);
+      }
+      break;
     case "statue":
       k.box("#b8b2a2", [0, 0.35, 0], [1.3, 0.7, 1.3]);
       k.add(SHAPES.BALL, "#cfc8b6", [0, 1.15, 0], [0.45, 0.42, 0.4]);

@@ -68,9 +68,10 @@ export function HomePanel({
       </div>
       {tab === "build" && (
         <div className="market-stock home-catalog">
-          {CATALOG.filter((c) => !c.tickets).map((c) => {
+          {CATALOG.filter((c) => !c.tickets || (home.stash?.[c.kind] || 0) > 0).map((c) => {
             const full = count(c.type) >= (c.type === "habitat" ? house.habitats : house.decor),
-              locked = home.house < c.house;
+              locked = home.house < c.house,
+              stash = home.stash?.[c.kind] || 0;
             return (
               <article key={c.kind} className={c.type === "habitat" ? "habitat-card" : ""}>
                 <span className="item-symbol">{c.icon}</span>
@@ -78,9 +79,13 @@ export function HomePanel({
                 <p>
                   {c.type === "habitat"
                     ? `Home for up to ${HABITAT_CAPACITY} companions. ${c.element} companions earn half again as much Gold here.`
-                    : `A ${c.w}×${c.d} decoration for your island.`}
+                    : c.tickets
+                      ? `A ${c.w}×${c.d} festival piece from Lanternfair.`
+                      : `A ${c.w}×${c.d} decoration for your island.`}
                 </p>
-                <small>{c.gold} Gold · {c.w}×{c.d} m</small>
+                <small>
+                  {c.tickets ? `${stash} ready to place` : `${c.gold} Gold`} · {c.w}×{c.d} m
+                </small>
                 <button
                   disabled={locked || full || profile.gold < c.gold}
                   onClick={() => place({ kind: c.kind, rot: 0 })}
@@ -112,7 +117,7 @@ export function HomePanel({
                   </small>
                   <button onClick={() => place({ kind: item.kind, uid: item.uid, rot: item.rot })}>Move</button>
                   <button onClick={() => run("home-remove", { id: item.uid })}>
-                    Pack away · +{Math.floor(e.gold / 2)} Gold
+                    {e.tickets ? "Pack away" : `Pack away · +${Math.floor(e.gold / 2)} Gold`}
                   </button>
                 </li>
               );
