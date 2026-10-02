@@ -3,6 +3,7 @@ import { ALL_SPECIES } from "../../../packages/shared/content";
 import {
   NPCS,
   ITEMS,
+  ACCESSORIES,
   FISH,
   townOf,
   missionProgress,
@@ -646,7 +647,13 @@ function CompanionCare({
         </div>
       ) : accessories ? (
         <div className="button-row">
-          {(["ribbon", "bell"] as const).map((item) => (
+          {ACCESSORIES.filter(
+            (item) =>
+              item === "ribbon" ||
+              item === "bell" ||
+              o.accessory === item ||
+              t.inventory[item] > 0,
+          ).map((item) => (
             <button
               key={item}
               disabled={o.accessory === item || !(t.inventory[item] > 0)}

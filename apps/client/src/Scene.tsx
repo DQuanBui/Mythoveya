@@ -20,7 +20,7 @@ import { OrbitControls, Html, Stars } from "@react-three/drei";
 import * as T from "three";
 import { byId, REGIONS } from "../../../packages/shared/content";
 import { NPCS, npcSignal } from "../../../packages/shared/town";
-import { TownScenery, dressCompanion } from "./TownScenery";
+import { TownScenery, dressCompanion, dressKeeper } from "./TownScenery";
 import { HavenTerrain } from "./HavenTerrain";
 import { HavenWildlife } from "./HavenWildlife";
 import {
@@ -659,7 +659,11 @@ export function Explorer({
   spawn: number[];
   walker: MutableRefObject<Walker>;
 }) {
-  const avatar = useMemo(() => createAvatar(profile.avatar), [profile.avatar]);
+  const outfit = profile.festival?.outfit;
+  const avatar = useMemo(
+    () => dressKeeper(createAvatar(profile.avatar), outfit),
+    [profile.avatar, outfit],
+  );
   const leader = profile.owned.find((o) => o.id === profile.team[0]);
   const companion = useMemo(
     () =>
