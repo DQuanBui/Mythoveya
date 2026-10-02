@@ -21,6 +21,7 @@ import {
   GARDEN_GROW_MS,
   FISH,
   FISHING_CASTS_PER_DAY,
+  ACCESSORIES,
   type ItemId,
   type TownReward,
 } from "../../packages/shared/town";
@@ -299,7 +300,7 @@ export function townMutation(
     case "town-equip": {
       const o = companion(),
         accessory = v.item;
-      if (!["none", "ribbon", "bell"].includes(accessory))
+      if (accessory !== "none" && !ACCESSORIES.includes(accessory))
         throw Error("Choose a companion accessory.");
       if (o.accessory === accessory || (!o.accessory && accessory === "none"))
         return { message: "Already wearing that look." };

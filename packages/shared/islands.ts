@@ -1,6 +1,7 @@
 // Islands reached by Skyferry, and the rules for building on the Home island.
 import { byId, TIERS } from "./content";
 import type { Owned, Profile } from "./types";
+import { FESTIVAL_RADIUS } from "./festival";
 
 export type IslandId = "home" | "festival";
 export const ISLANDS: Record<
@@ -30,7 +31,7 @@ export const unlockHint = (id: IslandId) =>
   id === "home" ? "Choose your first companion." : "Win your first battle.";
 /** Where you step off the Skyferry; each island's dock is on its west shore. */
 export const islandArrival = (id: IslandId, radius: number): [number, number] =>
-  id === "home" ? [-(radius - 3), 0] : [-21, 0];
+  id === "home" ? [-(radius - 3), 0] : [-(FESTIVAL_RADIUS - 3), 0];
 /** The landward end of an island's Skyferry dock. */
 export const islandDock = (radius: number): [number, number] => [-(radius - 1.5), 0];
 
@@ -44,6 +45,8 @@ export type HomeState = {
   /** Habitat uid → time its stored income was last emptied. */
   collected: Record<string, number>;
   seq: number;
+  /** Festival decorations bought with tickets and not yet placed. */
+  stash?: Record<string, number>;
   /** Companions greeted today; each greeting is a small friendship gain. */
   petted?: { day: string; ids: string[] };
 };
@@ -103,6 +106,10 @@ export const CATALOG: CatalogEntry[] = [
   decor("windchime", "Wind chime post", "♪", 1, 1, 150, 1),
   decor("fountain", "Stone fountain", "⛲", 3, 3, 600, 2),
   decor("statue", "Wildbound statue", "♜", 2, 2, 900, 3),
+  { ...decor("lantern-arch", "Lantern arch", "∩", 3, 1, 0), tickets: 30 },
+  { ...decor("balloon-cart", "Balloon cart", "◍", 2, 2, 0), tickets: 40 },
+  { ...decor("festival-tent", "Striped tent", "⛺", 3, 3, 0), tickets: 55 },
+  { ...decor("mini-carousel", "Little carousel", "✺", 3, 3, 0), tickets: 80 },
   habitat("Flame", "Ember hearth", 500, 0),
   habitat("Tide", "Tide pool", 500, 0),
   habitat("Grove", "Grove glade", 500, 0),

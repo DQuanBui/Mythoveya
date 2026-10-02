@@ -8,7 +8,7 @@ export type Owned = {
   locked: boolean;
   nickname?: string;
   friendship?: number;
-  accessory?: "ribbon" | "bell";
+  accessory?: import("./town").Accessory;
   skills?: [number, number];
   /** Battle-only equipment bonus resolved by the server; never saved. */
   bonus?: { hp: number; attack: number; defense: number; speed: number; crit: number };
@@ -83,6 +83,7 @@ export type Profile = {
   /** Set while visiting an island by Skyferry; the home region stays in `region`. */
   island?: import("./islands").IslandId;
   home?: import("./islands").HomeState;
+  festival?: import("./festival").FestivalState;
 };
 export type Status = {
   kind: string;

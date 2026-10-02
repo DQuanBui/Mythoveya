@@ -407,7 +407,7 @@ export function createCreature(id: string) {
       part(rig, "cone", light, [side * 0.3, 0.8, -1.2], [0.15, 0.9, 0.14], [Math.PI / 2, 0, side * 0.5]);
   consolidate(rig, `creature:${id}`);
   g.scale.setScalar(s.size);
-  g.userData = { rig, limbs, wings, tails, family: s.family, index: s.index };
+  g.userData = { rig, limbs, wings, tails, family: s.family, index: s.index, headAt: [headY, headZ] };
   return g;
 }
 export type Motion =

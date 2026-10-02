@@ -2,33 +2,149 @@ import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as T from "three";
 import type { TownState } from "../../../packages/shared/types";
+import type { Accessory } from "../../../packages/shared/town";
 import { settings } from "./audio";
 
-export function dressCompanion(model: T.Group, accessory?: "ribbon" | "bell") {
+const ACCESSORY_COLORS: Record<Accessory, string> = {
+  ribbon: "#77b4a1",
+  bell: "#e1bb67",
+  crown: "#e8c45e",
+  scarf: "#d9674f",
+  flower: "#f09ab4",
+};
+export function dressCompanion(model: T.Group, accessory?: Accessory) {
   if (!accessory) return model;
   const adornment = new T.Group();
   adornment.name = "companion-accessory";
   const material = new T.MeshStandardMaterial({
-    color: accessory === "bell" ? "#e1bb67" : "#77b4a1",
+    color: ACCESSORY_COLORS[accessory],
     roughness: 0.45,
-    metalness: accessory === "bell" ? 0.5 : 0,
+    metalness: accessory === "bell" || accessory === "crown" ? 0.5 : 0,
   });
+  // Neck pieces sit at the chest; head pieces sit on top of the head.
+  const [headY, headZ] = (model.userData.headAt as [number, number]) || [1.12, 0.48];
   if (accessory === "bell") {
     const bell = new T.Mesh(new T.SphereGeometry(0.13, 10, 8), material);
     adornment.add(bell);
     const loop = new T.Mesh(new T.TorusGeometry(0.07, 0.018, 5, 12), material);
     loop.position.y = 0.13;
     adornment.add(loop);
-  } else {
+    adornment.position.set(0, 0.65, 0.55);
+  } else if (accessory === "ribbon") {
     for (const side of [-1, 1]) {
       const wing = new T.Mesh(new T.ConeGeometry(0.15, 0.22, 4), material);
       wing.rotation.z = (side * Math.PI) / 2;
       wing.position.x = side * 0.11;
       adornment.add(wing);
     }
+    adornment.position.set(0, 0.65, 0.55);
+  } else if (accessory === "scarf") {
+    const wrap = new T.Mesh(new T.TorusGeometry(0.26, 0.07, 6, 16), material);
+    wrap.rotation.x = Math.PI / 2 - 0.25;
+    adornment.add(wrap);
+    const stripe = new T.Mesh(
+      new T.TorusGeometry(0.26, 0.074, 6, 16, Math.PI / 3),
+      new T.MeshStandardMaterial({ color: "#f3e3b5", roughness: 0.6 }),
+    );
+    stripe.rotation.copy(wrap.rotation);
+    adornment.add(stripe);
+    const tail = new T.Mesh(new T.BoxGeometry(0.12, 0.3, 0.05), material);
+    tail.position.set(0.14, -0.16, 0.2);
+    tail.rotation.z = 0.3;
+    adornment.add(tail);
+    adornment.position.set(0, headY - 0.3, headZ - 0.1);
+  } else if (accessory === "crown") {
+    const band = new T.Mesh(new T.CylinderGeometry(0.15, 0.17, 0.09, 10, 1, true), material);
+    band.material.side = T.DoubleSide;
+    adornment.add(band);
+    for (let i = 0; i < 5; i++) {
+      const point = new T.Mesh(new T.ConeGeometry(0.035, 0.11, 4), material);
+      const a = (i / 5) * Math.PI * 2;
+      point.position.set(Math.cos(a) * 0.15, 0.09, Math.sin(a) * 0.15);
+      adornment.add(point);
+    }
+    adornment.position.set(0, headY + 0.33, headZ - 0.02);
+    adornment.rotation.x = -0.12;
+  } else {
+    for (let i = 0; i < 5; i++) {
+      const petal = new T.Mesh(new T.SphereGeometry(0.07, 7, 5), material);
+      const a = (i / 5) * Math.PI * 2;
+      petal.position.set(Math.cos(a) * 0.08, Math.sin(a) * 0.08, 0);
+      petal.scale.set(1, 1, 0.45);
+      adornment.add(petal);
+    }
+    const middle = new T.Mesh(
+      new T.SphereGeometry(0.045, 7, 5),
+      new T.MeshStandardMaterial({ color: "#f4cf5d", roughness: 0.6 }),
+    );
+    middle.position.z = 0.03;
+    adornment.add(middle);
+    adornment.position.set(0.22, headY + 0.25, headZ + 0.05);
+    adornment.rotation.y = 0.5;
   }
-  adornment.position.set(0, 0.65, 0.55);
   (model.userData.rig as T.Group).add(adornment);
+  return model;
+}
+/** Festival outfits for the keeper: hats on the head, a cape across the back. */
+export function dressKeeper(model: T.Group, outfit?: string) {
+  if (!outfit) return model;
+  const head = model.userData.head as T.Group | undefined;
+  const piece = new T.Group();
+  piece.name = "keeper-outfit";
+  const mat = (color: string, extra: Partial<T.MeshStandardMaterialParameters> = {}) =>
+    new T.MeshStandardMaterial({ color, roughness: 0.55, ...extra });
+  if (outfit === "lantern-hat") {
+    const shade = new T.Mesh(
+      new T.CylinderGeometry(0.17, 0.2, 0.2, 10),
+      mat("#f6d58a", { emissive: "#f3b45a", emissiveIntensity: 0.6 }),
+    );
+    shade.position.y = 0.3;
+    piece.add(shade);
+    for (const y of [0.19, 0.41]) {
+      const rim = new T.Mesh(new T.CylinderGeometry(0.21, 0.21, 0.03, 10), mat("#c5573f"));
+      rim.position.y = y;
+      piece.add(rim);
+    }
+    const tassel = new T.Mesh(new T.ConeGeometry(0.04, 0.12, 5), mat("#c5573f"));
+    tassel.position.y = 0.48;
+    piece.add(tassel);
+    head?.add(piece);
+  } else if (outfit === "wreath" || outfit === "star-crown") {
+    const crown = outfit === "star-crown";
+    const ring = new T.Mesh(
+      new T.TorusGeometry(0.19, crown ? 0.025 : 0.04, 6, 18),
+      mat(crown ? "#e3bd56" : "#6f9c5f", crown ? { metalness: 0.5 } : {}),
+    );
+    ring.rotation.x = Math.PI / 2;
+    ring.position.y = 0.17;
+    piece.add(ring);
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2;
+      const bit = new T.Mesh(
+        crown ? new T.OctahedronGeometry(0.05, 0) : new T.SphereGeometry(0.045, 6, 5),
+        mat(crown ? "#f4d673" : ["#f09ab4", "#f4cf5d", "#fff3e6"][i % 3], crown ? { metalness: 0.4, emissive: "#a8822a", emissiveIntensity: 0.25 } : {}),
+      );
+      bit.position.set(Math.cos(a) * 0.19, crown ? 0.24 : 0.19, Math.sin(a) * 0.19);
+      piece.add(bit);
+    }
+    head?.add(piece);
+  } else if (outfit === "festival-cape") {
+    const cape = new T.Mesh(new T.BoxGeometry(0.5, 0.62, 0.04), mat("#c5573f"));
+    cape.position.set(0, 1.12, -0.2);
+    cape.rotation.x = 0.12;
+    piece.add(cape);
+    for (const x of [-0.12, 0.12]) {
+      const stripe = new T.Mesh(new T.BoxGeometry(0.07, 0.62, 0.045), mat("#f3e3b5"));
+      stripe.position.set(x, 1.12, -0.2);
+      stripe.rotation.x = 0.12;
+      piece.add(stripe);
+    }
+    const clasp = new T.Mesh(new T.TorusGeometry(0.16, 0.03, 5, 14, Math.PI), mat("#e3bd56", { metalness: 0.4 }));
+    clasp.position.set(0, 1.42, -0.05);
+    clasp.rotation.x = -Math.PI / 2;
+    piece.add(clasp);
+    model.add(piece);
+  }
   return model;
 }
 export function TownScenery({ garden }: { garden: TownState["garden"] }) {

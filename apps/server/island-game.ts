@@ -60,7 +60,9 @@ export function islandMutation(p: Profile, kind: string, v: any, now = Date.now(
   switch (kind) {
     case "home-place": {
       const entry = catalogEntry(String(v.item));
-      if (!entry || entry.tickets) throw Error("Choose something from the builder's catalog.");
+      if (!entry) throw Error("Choose something from the builder's catalog.");
+      if (entry.tickets && !((home.stash?.[entry.kind] || 0) > 0))
+        throw Error("Win this piece with festival tickets at Lanternfair first.");
       const house = HOUSE_LEVELS[home.house];
       if (home.house < entry.house)
         throw Error(`Upgrade your house to the ${HOUSE_LEVELS[entry.house].name} first.`);
@@ -76,6 +78,7 @@ export function islandMutation(p: Profile, kind: string, v: any, now = Date.now(
         problem = placementError(home, entry, x, z, rot);
       if (problem) throw Error(problem);
       p.gold -= entry.gold;
+      if (entry.tickets) home.stash![entry.kind]--;
       const uid = `h${++home.seq}`;
       home.items.push({ uid, kind: entry.kind, x, z, rot });
       if (entry.type === "habitat") {
@@ -107,6 +110,11 @@ export function islandMutation(p: Profile, kind: string, v: any, now = Date.now(
       const refund = Math.floor(entry.gold / 2);
       p.gold += refund;
       home.items = home.items.filter((i) => i !== item);
+      if (entry.tickets) {
+        home.stash ||= {};
+        home.stash[entry.kind] = (home.stash[entry.kind] || 0) + 1;
+        return { message: `${entry.name} packed away. You can place it again any time.` };
+      }
       return {
         message: `${entry.name} packed away. ${refund + gold} Gold returned${gold ? " with its stored income" : ""}.`,
       };

@@ -20,6 +20,7 @@ import { resourcesForRegion } from "../../packages/shared/haven";
 import { track } from "../../packages/shared/events";
 import { eventMutation } from "./events-game";
 import { islandMutation, ISLAND_KINDS } from "./island-game";
+import { festivalMutation, FESTIVAL_KINDS } from "./festival-game";
 import {
   adventureMutation,
   addGear,
@@ -110,6 +111,7 @@ export function mutate(p: Profile, kind: string, v: any) {
     return value;
   }
   if (ISLAND_KINDS.includes(kind)) return islandMutation(p, kind, v);
+  if (FESTIVAL_KINDS.includes(kind)) return festivalMutation(p, kind, v);
   if (["login-claim", "event-claim", "event-chest"].includes(kind))
     return eventMutation(p, kind, v, Date.now(), random);
   switch (kind) {

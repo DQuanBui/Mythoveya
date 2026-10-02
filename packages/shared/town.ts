@@ -526,6 +526,30 @@ export const ITEMS = {
     sell: 0,
     stock: 1,
   },
+  crown: {
+    name: "Tiny crown",
+    icon: "♔",
+    description: "A tiny golden crown from the Lanternfair ticket booth.",
+    buy: 0,
+    sell: 0,
+    stock: 0,
+  },
+  scarf: {
+    name: "Lantern scarf",
+    icon: "≋",
+    description: "A warm striped scarf from the Lanternfair ticket booth.",
+    buy: 0,
+    sell: 0,
+    stock: 0,
+  },
+  flower: {
+    name: "Fair flower",
+    icon: "❀",
+    description: "A big festival flower from the Lanternfair ticket booth.",
+    buy: 0,
+    sell: 0,
+    stock: 0,
+  },
   minnow: {
     name: "Willow minnow",
     icon: "≈",
@@ -584,6 +608,9 @@ export const ITEMS = {
   },
 };
 export const FISH = ["minnow", "carp", "skyfin"] as const;
+/** Companion accessories: ribbon and bell from Pip's market, the rest from Lanternfair. */
+export const ACCESSORIES = ["ribbon", "bell", "crown", "scarf", "flower"] as const;
+export type Accessory = (typeof ACCESSORIES)[number];
 export const FISH_WEIGHTS = { minnow: 0.55, carp: 0.33, skyfin: 0.12 };
 export const FISHING_CASTS_PER_DAY = 8;
 export type ItemId = keyof typeof ITEMS;
