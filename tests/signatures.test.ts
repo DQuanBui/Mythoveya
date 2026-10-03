@@ -115,8 +115,8 @@ describe("signature behavior and presentation contracts", () => {
     }
     expect(seen.size).toBeLessThanOrEqual(12);
   });
-  it("provides eight full music cycles and more than thirty distinct cue recipes", () => {
-    expect(Object.keys(MUSIC)).toHaveLength(8);
+  it("provides ten full music cycles and more than thirty distinct cue recipes", () => {
+    expect(Object.keys(MUSIC)).toHaveLength(10);
     for (const song of Object.values(MUSIC)) {
       expect((song.steps * 60) / song.bpm / 2).toBeGreaterThanOrEqual(45);
       expect((song.steps * 60) / song.bpm / 2).toBeLessThanOrEqual(90);

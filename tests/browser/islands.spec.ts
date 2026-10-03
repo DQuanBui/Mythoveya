@@ -181,7 +181,7 @@ test("Lanternfair opens after a win: welcome tickets, an outfit and a reload", a
   await page.locator('[data-shop="wreath"] button').click();
   await expect(page.locator("[data-tickets]")).toHaveText("17");
   await page.getByRole("tab", { name: "♔ Wardrobe" }).click();
-  await page.locator('[data-outfit="wreath"] button').click();
+  await page.locator('[data-outfit="wreath"] button', { hasText: "Wear" }).click();
   await expect(page.locator('[data-outfit="wreath"]')).toContainText("Wearing now");
   await page.reload();
   await page.getByRole("button", { name: "Continue your journey" }).click();

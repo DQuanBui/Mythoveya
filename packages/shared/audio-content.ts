@@ -30,7 +30,7 @@ export const MUSIC = {
   },
   // Lanternfair Isle: a bright, bouncing fairground tune.
   festival: {
-    steps: 128,
+    steps: 192,
     bpm: 116,
     root: 60,
     wave: "triangle",
