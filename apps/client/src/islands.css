@@ -426,3 +426,11 @@
     width: 200px;
   }
 }
+.fish-call.bite {
+  background: #d9674fdd;
+  color: #fff8e6;
+  font-weight: 600;
+}
+.racer-names[hidden] {
+  display: none;
+}

@@ -68,7 +68,7 @@ export default function App() {
     [placing, setPlacing] = useState<Placing | null>(null),
     [homeFocus, setHomeFocus] = useState<string | undefined>(),
     [festTab, setFestTab] = useState<FestivalTab>("today"),
-    [fairGame, setFairGame] = useState<"race" | "course">("race");
+    [fairGame, setFairGame] = useState<"race" | "course" | "fishing">("race");
   const input = useRef<ExplorationInput>({ x: 0, z: 0 });
   const mission = useRef(false);
   const [trail, setTrail] = useState<string | null>(null);
@@ -314,8 +314,8 @@ export default function App() {
       else if (id === "fest-board" || id === "fest-shop") {
         setFestTab(id === "fest-shop" ? "shop" : "today");
         setPanel("festival");
-      } else if (id === "fest-race" || id === "fest-course") {
-        setFairGame(id === "fest-race" ? "race" : "course");
+      } else if (id === "fest-race" || id === "fest-course" || id === "fest-fishing") {
+        setFairGame(id === "fest-race" ? "race" : id === "fest-course" ? "course" : "fishing");
         setPanel("");
         setScreen("fair-game");
       } else if (id.startsWith("fest-lantern-")) {

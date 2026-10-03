@@ -16,10 +16,15 @@ import {
   raceBonus,
   racePads,
   rivalPresses,
+  FISHING,
+  FishSim,
+  fishingBites,
+  type FishKind,
   type Activity,
   type Obstacle,
 } from "../../../packages/shared/festival-games";
-import { utcDay } from "../../../packages/shared/town";
+import { ITEMS, utcDay } from "../../../packages/shared/town";
+import { fishWeights, weatherAt } from "../../../packages/shared/weather";
 import { api } from "./api";
 import { animateAvatar, animateCreature, createAvatar, createCreature } from "./models";
 import { dressKeeper } from "./TownScenery";
@@ -79,6 +84,14 @@ const INFIELD_POSTS = Array.from({ length: 16 }, (_, i) => {
 });
 const COURSE_TENTS = Array.from({ length: 22 }, (_, i) => [i * 12 - 10, -16 - (i % 2) * 3, 0] as [number, number, number]);
 const COURSE_POSTS = Array.from({ length: 30 }, (_, i) => [i * 8 - 6, -9] as [number, number]);
+const FISH_TENTS = Array.from({ length: 9 }, (_, i) => {
+  const a = Math.PI + (i / 8) * Math.PI;
+  return [Math.cos(a) * 22, Math.sin(a) * 16 - 6, -a] as [number, number, number];
+});
+const FISH_POSTS = Array.from({ length: 12 }, (_, i) => {
+  const a = Math.PI + 0.2 + (i / 11) * (Math.PI - 0.4);
+  return [Math.cos(a) * 14, Math.sin(a) * 10 - 5] as [number, number];
+});
 import { Portrait } from "./portraits";
 import { audio, settings } from "./audio";
 
@@ -95,7 +108,118 @@ type Ghost = {
   outfit?: string;
 };
 type Board = { day: string; featured: Activity; today: BoardRow[]; allTime: BoardRow[]; ghosts: Ghost[] };
-type Racer = { name: string; species?: string; avatar?: number; outfit?: string; mine?: boolean; sim: RaceSim | CourseSim };
+type Racer = {
+  name: string;
+  species?: string;
+  avatar?: number;
+  outfit?: string;
+  mine?: boolean;
+  sim: RaceSim | CourseSim | FishSim;
+};
+const FISH_COLORS: Record<FishKind, string> = { minnow: "#c9d6dc", carp: "#e8b34f", skyfin: "#7fc6e8" };
+
+/** The tournament jetty: your keeper, a float that dips on a bite, and fish that leap out. */
+function FishingWorld({ racer, clock }: { racer: Racer; clock: { current: number } }) {
+  const keeper = useMemo(() => dressKeeper(createAvatar(racer.avatar ?? 0), racer.outfit), [racer]);
+  const float = useRef<T.Group>(null),
+    ring = useRef<T.Mesh>(null),
+    fish = useRef<T.Group>(null),
+    fishBody = useRef<T.MeshStandardMaterial>(null);
+  const { camera } = useThree();
+  useEffect(() => {
+    keeper.position.set(0, 0.4, 3.2);
+    keeper.rotation.y = Math.PI;
+    camera.position.set(2.6, 4.2, 9);
+    camera.lookAt(0, 0.4, -2);
+  }, [keeper, camera]);
+  useFrame(() => {
+    const sim = racer.sim as FishSim,
+      t = clock.current;
+    sim.advance(t);
+    animateAvatar(keeper, t / 1000, false, false, settings.reduced);
+    keeper.position.y = 0.4;
+    const bite = sim.biting();
+    if (float.current) float.current.position.y = bite ? -0.18 : Math.sin(t / 400) * 0.04;
+    const last = sim.last,
+      since = last ? t - last.at : 1e9;
+    if (ring.current) {
+      const phase = bite ? ((t - (bite.at + FISHING.early)) % 600) / 600 : since < 700 ? since / 700 : -1;
+      ring.current.visible = phase >= 0;
+      ring.current.scale.setScalar(0.4 + Math.max(0, phase) * 1.6);
+      (ring.current.material as T.MeshBasicMaterial).opacity = 0.8 * (1 - Math.max(0, phase));
+    }
+    if (fish.current) {
+      // A landed fish arcs from the float back to the jetty.
+      const show = !!last?.fish && since < 900;
+      fish.current.visible = show;
+      if (show) {
+        const k = since / 900;
+        fish.current.position.set(0, Math.sin(k * Math.PI) * 2.4, -4 + k * 6.5);
+        fish.current.rotation.z = k * 6;
+        fishBody.current?.color.set(FISH_COLORS[last!.fish!]);
+      }
+    }
+  });
+  return (
+    <>
+      <color attach="background" args={["#a7c7cf"]} />
+      <fog attach="fog" args={["#bcd3d0", 25, 80]} />
+      <ambientLight intensity={0.9} />
+      <hemisphereLight args={["#f4ead1", "#5a8a74", 1.2]} />
+      <directionalLight position={[10, 20, 15]} intensity={2} color="#fff0ce" />
+      <ModelLighting intensity={0.35} />
+      <Backdrop tents={FISH_TENTS} posts={FISH_POSTS} />
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.05, 0]}>
+        <circleGeometry args={[60, 48]} />
+        <meshStandardMaterial color="#a9c98f" />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, -5]} scale={[1.4, 1, 1]}>
+        <circleGeometry args={[9, 48]} />
+        <meshStandardMaterial color="#6fb0bf" roughness={0.25} />
+      </mesh>
+      <mesh position={[0, 0.2, 3.5]}>
+        <boxGeometry args={[2.2, 0.2, 3.6]} />
+        <meshStandardMaterial color="#b49c78" />
+      </mesh>
+      <primitive object={keeper} />
+      {/* Rod and line out to the float. */}
+      <mesh position={[0.35, 1.9, 1.3]} rotation={[-0.9, 0, 0]}>
+        <cylinderGeometry args={[0.025, 0.04, 3.6, 6]} />
+        <meshStandardMaterial color="#6d5847" />
+      </mesh>
+      <mesh position={[0.2, 1.5, -1.8]} rotation={[0.62, 0, 0]}>
+        <cylinderGeometry args={[0.006, 0.006, 4.9, 4]} />
+        <meshBasicMaterial color="#f3ead2" />
+      </mesh>
+      <group position={[0, 0, -4]}>
+        <group ref={float}>
+          <mesh position={[0, 0.12, 0]}>
+            <sphereGeometry args={[0.16, 12, 10]} />
+            <meshStandardMaterial color="#d9674f" />
+          </mesh>
+          <mesh position={[0, 0.27, 0]}>
+            <sphereGeometry args={[0.1, 10, 8]} />
+            <meshStandardMaterial color="#f3ead2" />
+          </mesh>
+        </group>
+        <mesh ref={ring} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.03, 0]}>
+          <ringGeometry args={[0.45, 0.55, 32]} />
+          <meshBasicMaterial color="#ffffff" transparent opacity={0.8} />
+        </mesh>
+      </group>
+      <group ref={fish} visible={false}>
+        <mesh scale={[0.5, 0.25, 0.18]}>
+          <sphereGeometry args={[1, 12, 8]} />
+          <meshStandardMaterial ref={fishBody} color="#c9d6dc" />
+        </mesh>
+        <mesh position={[-0.55, 0, 0]} rotation={[0, 0, Math.PI / 2]} scale={[1, 1, 0.4]}>
+          <coneGeometry args={[0.22, 0.35, 4]} />
+          <meshStandardMaterial color="#9aa7ad" />
+        </mesh>
+      </group>
+    </>
+  );
+}
 const LANES = [0, 1.6, 3.2, 4.8];
 
 /** The lap position on the oval for a distance; two laps make a race. */
@@ -127,15 +251,16 @@ function RaceWorld({ racers, pads, clock }: { racers: Racer[]; pads: number[]; c
   useFrame(() => {
     const t = clock.current;
     racers.forEach((r, i) => {
-      r.sim.advance(t);
-      const p = onTrack(r.sim.d, LANES[i]),
+      const sim = r.sim as RaceSim;
+      sim.advance(t);
+      const p = onTrack(sim.d, LANES[i]),
         m = models[i];
       m.position.set(p.x, 0, p.z);
       m.rotation.y = p.heading;
       animateCreature(m, t / 1000, r.sim.finished === null && t > 0 ? "walk" : "idle", 0, settings.reduced);
     });
     // The camera trails the player's companion around the bends.
-    const me = racers[0].sim,
+    const me = racers[0].sim as RaceSim,
       p = onTrack(me.d, 0),
       behind = onTrack(Math.max(0, me.d - 9), -6);
     camera.position.lerp(new T.Vector3(behind.x, 6, behind.z), 0.12);
@@ -313,7 +438,7 @@ export function FestivalGame({
   exit,
 }: {
   profile: Profile;
-  activity: Exclude<Activity, "fishing">;
+  activity: Activity;
   run: Run;
   exit: () => void;
 }) {
@@ -324,7 +449,19 @@ export function FestivalGame({
   const [companion, setCompanion] = useState(profile.team[0] || profile.owned[0]?.id);
   const [count, setCount] = useState(3);
   const [result, setResult] = useState<any>(null);
-  const [hud, setHud] = useState({ t: 0, stamina: 100, place: 1, pad: false, lap: 1, misses: 0, d: 0 });
+  const [hud, setHud] = useState({
+    t: 0,
+    stamina: 100,
+    place: 1,
+    pad: false,
+    lap: 1,
+    misses: 0,
+    d: 0,
+    score: 0,
+    combo: 0,
+    biting: false,
+    catch: "",
+  });
   const [racers, setRacers] = useState<Racer[]>([]);
   const clock = useRef(0),
     start = useRef(0),
@@ -365,6 +502,9 @@ export function FestivalGame({
         rivalPresses(pads, bonus, skill).forEach((t) => sim.press(t));
         list.push({ name, species, sim });
       }
+    } else if (activity === "fishing") {
+      const bites = fishingBites(day, fishWeights(weatherAt(Date.now()).weather));
+      list.push({ name: "You", avatar: profile.avatar, outfit: f?.outfit, mine: true, sim: new FishSim(bites) });
     } else {
       list.push({ name: "You", avatar: profile.avatar, outfit: f?.outfit, mine: true, sim: new CourseSim(obstacles) });
       for (const g of ghosts) {
@@ -404,17 +544,24 @@ export function FestivalGame({
     frame = requestAnimationFrame(tick);
     const hudTimer = setInterval(() => {
       const sim = me.sim;
-      const ahead = racers.filter((r) => r !== me && r.sim.d > sim.d).length;
+      const d = sim instanceof FishSim ? 0 : sim.d;
+      const ahead = racers.filter((r) => r !== me && !(r.sim instanceof FishSim) && r.sim.d > d).length;
+      const last = sim instanceof FishSim ? sim.last : null;
       setHud({
         t: clock.current,
         stamina: sim instanceof RaceSim ? sim.stamina : 0,
         pad: sim instanceof RaceSim ? sim.onPad() : false,
         place: ahead + 1,
-        lap: Math.min(RACE.laps, Math.floor(sim.d / (RACE.length / RACE.laps)) + 1),
+        lap: Math.min(RACE.laps, Math.floor(d / (RACE.length / RACE.laps)) + 1),
         misses: sim instanceof CourseSim ? sim.misses : 0,
-        d: sim.d,
+        d,
+        score: sim instanceof FishSim ? sim.score : 0,
+        combo: sim instanceof FishSim ? sim.combo : 0,
+        biting: sim instanceof FishSim ? !!sim.biting() : false,
+        catch: last && clock.current - last.at < 1500 ? (last.fish ? ITEMS[last.fish].name : "Splash! Too early") : "",
       });
-      const done = sim.finished !== null || clock.current > (activity === "race" ? RACE.maxMs : COURSE.maxMs);
+      const limit = activity === "race" ? RACE.maxMs : activity === "course" ? COURSE.maxMs : FISHING.round;
+      const done = sim.finished !== null || clock.current > limit + 200;
       if (done && !sent.current) {
         sent.current = true;
         audio.cue("victory");
@@ -430,7 +577,7 @@ export function FestivalGame({
       clearInterval(hudTimer);
     };
   }, [phase]);
-  const press = (kind: "boost" | "jump" | "slide") => {
+  const press = (kind: "boost" | "jump" | "slide" | "reel") => {
     if (phase !== "play" || !me) return;
     const t = Math.max(1, Math.round(performance.now() - start.current));
     if (activity === "race" && kind === "boost") {
@@ -438,7 +585,12 @@ export function FestivalGame({
       inputs.current.push(t);
       sim.press(t);
       audio.cue(sim.stamina >= (sim.onPad() ? RACE.padCost : RACE.boostCost) ? "confirm" : "error");
-    } else if (activity === "course" && kind !== "boost") {
+    } else if (activity === "fishing" && kind === "reel") {
+      const sim = me.sim as FishSim;
+      inputs.current.push(t);
+      sim.press(t);
+      audio.cue(sim.biting() ? "collect" : "error");
+    } else if (activity === "course" && (kind === "jump" || kind === "slide")) {
       const value = kind === "jump" ? t : -t;
       inputs.current.push(value);
       me.sim.press(value);
@@ -451,6 +603,10 @@ export function FestivalGame({
       if (activity === "race" && (e.code === "Space" || e.code === "ArrowUp" || e.code === "KeyW")) {
         e.preventDefault();
         press("boost");
+      }
+      if (activity === "fishing" && (e.code === "Space" || e.code === "KeyE")) {
+        e.preventDefault();
+        press("reel");
       }
       if (activity === "course") {
         if (e.code === "Space" || e.code === "ArrowUp" || e.code === "KeyW") {
@@ -492,7 +648,9 @@ export function FestivalGame({
               <small>
                 {activity === "race"
                   ? `${result.perfect} pad boosts · ${result.stumbles} stumbles`
-                  : `${result.cleared} cleared · ${result.misses} missed`}
+                  : activity === "fishing"
+                    ? `${result.caught.length} fish landed · ${result.splashes} splashes${result.tickets ? ` · up to ${FISHING.maxCatch} kept in your bag` : ""}`
+                    : `${result.cleared} cleared · ${result.misses} missed`}
               </small>
             </div>
           )}
@@ -524,7 +682,9 @@ export function FestivalGame({
           <p className="muted small-print">
             {activity === "race"
               ? "Space or the Boost button: a boost costs 30 stamina, only 15 on a glowing pad, and boosting without stamina makes your companion stumble. The top three runs today race beside you as ghosts."
-              : "Space or ↑ to jump hurdles, ↓ or S to slide under the yellow bars. A wrong move costs a second. The top three runs today run beside you as ghosts."}
+              : activity === "fishing"
+                ? "Space or the Reel button when the float dips. Minnows are worth 1, carp 3 and Skyfin 8, with a bonus for catches in a row. Reeling at still water splashes and scares off the next fish. Rain brings more Skyfin."
+                : "Space or ↑ to jump hurdles, ↓ or S to slide under the yellow bars. A wrong move costs a second. The top three runs today run beside you as ghosts."}
           </p>
         </div>
       </div>
@@ -535,6 +695,8 @@ export function FestivalGame({
         <Canvas camera={{ position: [0, 6, 20], fov: 50 }} dpr={[1, settings.quality === "High" ? 1.6 : 1.25]}>
           {activity === "race" ? (
             <RaceWorld racers={racers} pads={pads} clock={clock} />
+          ) : activity === "fishing" ? (
+            <FishingWorld racer={racers[0]} clock={clock} />
           ) : (
             <CourseWorld racers={racers} obstacles={obstacles} clock={clock} />
           )}
@@ -542,7 +704,9 @@ export function FestivalGame({
       </div>
       <div className="fest-hud">
         <div className="fest-timer" data-clock>
-          {(hud.t / 1000).toFixed(1)} s
+          {activity === "fishing"
+            ? `${Math.max(0, (FISHING.round - hud.t) / 1000).toFixed(1)} s left`
+            : `${(hud.t / 1000).toFixed(1)} s`}
         </div>
         {activity === "race" ? (
           <>
@@ -555,12 +719,21 @@ export function FestivalGame({
               <span>{hud.pad ? "On a pad! Boost for 15" : "Stamina"}</span>
             </div>
           </>
+        ) : activity === "fishing" ? (
+          <>
+            <div className="fest-meta" data-score>
+              {hud.score} points{hud.combo > 1 ? ` · combo ×${hud.combo}` : ""}
+            </div>
+            <div className={`fest-meta fish-call ${hud.biting ? "bite" : ""}`}>
+              {hud.catch || (hud.biting ? "Bite! Reel now!" : "Watch the float…")}
+            </div>
+          </>
         ) : (
           <div className="fest-meta">
             {Math.round(COURSE.length - hud.d)} m to go · {hud.misses} missed
           </div>
         )}
-        <div className="racer-names">
+        <div className="racer-names" hidden={activity === "fishing"}>
           {racers.map((r, i) => (
             <span key={i} className={r.mine ? "mine" : ""}>
               {r.name}
@@ -573,6 +746,10 @@ export function FestivalGame({
         {activity === "race" ? (
           <button className="primary" onPointerDown={() => press("boost")}>
             ➶ Boost <kbd>Space</kbd>
+          </button>
+        ) : activity === "fishing" ? (
+          <button className="primary" onPointerDown={() => press("reel")}>
+            ≈ Reel <kbd>Space</kbd>
           </button>
         ) : (
           <>

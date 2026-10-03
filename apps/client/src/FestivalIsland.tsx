@@ -38,6 +38,7 @@ export function festivalInteractables(profile: Profile) {
     { id: "fest-shop", name: "Ticket booth", hint: "Spend festival tickets", p: [P.shop[0] - 1.2, 0, P.shop[1]] },
     { id: "fest-race", name: "Sprint Stakes", hint: "Race your companion", p: [P.race[0], 0, P.race[1] + 1.5] },
     { id: "fest-course", name: "Hop Hollow course", hint: "Run the obstacle lane", p: [P.course[0] - 1.5, 0, P.course[1] + 1] },
+    { id: "fest-fishing", name: "Pond tournament", hint: "Forty-five seconds of fishing", p: [P.fishing[0] - 1.6, 0, P.fishing[1]] },
     ...huntSpots(utcDay())
       .filter((s) => !found.includes(s.id))
       .map((s) => ({ id: `fest-lantern-${s.id}`, name: "Hidden lantern", hint: "Click to collect", p: [s.point[0], 0, s.point[1]] })),
@@ -624,8 +625,23 @@ export function FestivalScene({
             <meshBasicMaterial visible={false} />
           </mesh>
         </WorldInteraction>
+        <WorldInteraction
+          name="interactable-fest-fishing"
+          position={[P.fishing[0], 0, P.fishing[1] + 1.7]}
+          title="Lantern pond tournament"
+          hint="Fish for points and tickets"
+          disabled={blocked}
+          approach={[points["fest-fishing"][0], points["fest-fishing"][2]]}
+          activate={() => onInteract("fest-fishing")}
+        >
+          <mesh position={[0, 1, 0]}>
+            <boxGeometry args={[1.8, 2, 1.6]} />
+            <meshBasicMaterial visible={false} />
+          </mesh>
+        </WorldInteraction>
         {!blocked && (
           <>
+            <Label position={[P.fishing[0], 2.6, P.fishing[1] + 1.7]} icon="≈" text="Pond tournament" id="fest-fishing" onClick={go("fest-fishing", points["fest-fishing"])} />
             <Label position={[P.race[0], 3.4, P.race[1] - 0.5]} icon="➶" text="Sprint Stakes" id="fest-race" onClick={go("fest-race", points["fest-race"])} />
             <Label position={[14, 2, -6.5]} icon="⤴" text="Hop Hollow course" id="fest-course" onClick={go("fest-course", points["fest-course"])} />
             <Label position={[islandDock(R)[0], 3.4, 0]} icon="⛵" text="Skyferry" id="fest-ferry" onClick={go("fest-ferry", points["fest-ferry"])} />

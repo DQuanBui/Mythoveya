@@ -37,7 +37,7 @@ export function FestivalPanel({
   profile: Profile;
   run: Run;
   tab: FestivalTab;
-  play: (activity: "race" | "course") => void;
+  play: (activity: "race" | "course" | "fishing") => void;
 }) {
   const [tab, setTab] = useState<FestivalTab>(initial);
   const today = utcDay(),
@@ -85,7 +85,7 @@ export function FestivalPanel({
           <section className="fest-activities">
             <h3>Festival games</h3>
             <div className="market-stock">
-              {(["race", "course"] as const).map((id) => {
+              {(["race", "course", "fishing"] as const).map((id) => {
                 const a = ACTIVITIES[id],
                   played = fresh ? f.plays[id] || 0 : 0,
                   best = f.best[id];
