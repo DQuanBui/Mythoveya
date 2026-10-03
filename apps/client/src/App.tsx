@@ -114,15 +114,20 @@ export default function App() {
     audio.location(
       screen === "battle"
         ? "battle"
-        : screen === "arena" || screen === "fair-game"
+        : screen === "arena" ||
+            (screen === "fair-game" && fairGame !== "fishing")
           ? "arena"
-          : screen === "world"
-            ? profile?.island
-              ? "meadow"
-              : profile?.region || "haven"
+          : screen === "fair-game"
+            ? "festival"
+            : screen === "world"
+            ? profile?.island === "festival"
+              ? "festival"
+              : profile?.island
+                ? "home"
+                : profile?.region || "haven"
             : "title",
     );
-  }, [screen, profile?.region, profile?.island]);
+  }, [screen, profile?.region, profile?.island, fairGame]);
   useEffect(() => {
     // Rain and mist ambience follow the blended weather while exploring.
     const t = setInterval(

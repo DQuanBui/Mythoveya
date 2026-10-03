@@ -322,15 +322,22 @@ class AudioEngine {
         ["battle", "boss", "arena", "canyon"].includes(this.scene)
       )
         this.tone(70, 35, 0.18, "sine", 0.06, "music", this.next);
+      if (this.scene === "festival") {
+        // An oom-pah bass on the beat and a light shaker in between.
+        if (this.beat % 2 === 0) {
+          const bass = 440 * 2 ** ((song.root + chord - 24 + (this.beat % 4 ? 7 : 0) - 69) / 12);
+          this.tone(bass, bass, step * 0.9, "triangle", 0.05, "music", this.next);
+        } else this.tone(5200, 3800, 0.035, "square", 0.006, "music", this.next);
+      }
       this.next += step;
       this.beat = (this.beat + 1) % song.steps;
     }
     if (
       ++this.ambientBeat % 45 === 0 &&
-      ["haven", "meadow", "canyon", "hollow"].includes(this.scene)
+      ["haven", "meadow", "canyon", "hollow", "home", "festival"].includes(this.scene)
     )
       this.cue(
-        this.scene === "hollow"
+        this.scene === "hollow" || this.scene === "festival"
           ? "chime"
           : this.scene === "canyon"
             ? "wind"

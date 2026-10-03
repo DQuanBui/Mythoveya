@@ -20,6 +20,22 @@ export const MUSIC = {
     wave: "sine",
     pattern: [0, 7, 9, 12, 9, 7, 4, 2],
   },
+  // Hearthfall Isle: unhurried and warm, for building and tending habitats.
+  home: {
+    steps: 128,
+    bpm: 82,
+    root: 53,
+    wave: "sine",
+    pattern: [0, 4, 7, 9, 7, 4, 0, -3],
+  },
+  // Lanternfair Isle: a bright, bouncing fairground tune.
+  festival: {
+    steps: 128,
+    bpm: 116,
+    root: 60,
+    wave: "triangle",
+    pattern: [0, 4, 7, 12, 9, 7, 4, 7],
+  },
   canyon: {
     steps: 192,
     bpm: 108,
