@@ -5,6 +5,7 @@ import {
   LAGOON,
   LIGHTHOUSE,
   PIER,
+  SUMMIT_RING,
   groundHeight,
 } from "../../../packages/shared/haven";
 import { Kit, SHAPES } from "./village-kit";
@@ -72,10 +73,10 @@ function frontierGeometry() {
     sy = groundHeight(sx, sz);
   k.push([sx, sy, sz]);
   k.add(SHAPES.CYL, "#a9a796", [0, 0.06, 0], [3, 0.14, 3]);
-  for (let i = 0; i < 12; i++) {
-    const a = (i / 12) * Math.PI * 2;
-    k.add(SHAPES.ROCK, i % 2 ? "#bdb8a6" : "#9c9a8c", [Math.cos(a) * 3, 0.25, Math.sin(a) * 3], [0.35, 0.3, 0.32]);
-  }
+  // The ring leaves a gap where the trail arrives.
+  SUMMIT_RING.forEach(({ a }, i) =>
+    k.add(SHAPES.ROCK, i % 2 ? "#bdb8a6" : "#9c9a8c", [Math.cos(a) * 3, 0.25, Math.sin(a) * 3], [0.35, 0.3, 0.32]),
+  );
   for (let i = 0; i < 5; i++) k.add(SHAPES.ROCK, "#a8a494", [1.6, 0.25 + i * 0.32, -1.4], [0.42 - i * 0.06, 0.2, 0.38 - i * 0.05]);
   k.add(SHAPES.CYL6, "#6d5847", [-1.6, 1.6, -1.2], [0.06, 3.2, 0.06]);
   k.add(SHAPES.CYL6, "#584737", [1.2, 0.5, 1.4], [0.05, 1, 0.05]);

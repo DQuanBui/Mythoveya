@@ -70,8 +70,33 @@ export const FESTIVAL_PLACES = {
 };
 export const FESTIVAL_TRACK = { x: 0, z: -15.5, rx: 10, rz: 5.5 };
 export const FESTIVAL_POND = { x: 13, z: 9.5, rx: 4.5, rz: 3.2 };
+/** Striped tents around the rim, kept clear of the wheel and the striker. */
+export const FESTIVAL_TENTS = Array.from({ length: 7 }, (_, i) => {
+  const a = -1.9 + i * 0.62,
+    r = FESTIVAL_RADIUS - 3.2;
+  return { x: Math.cos(a) * r, z: Math.sin(a) * r, a, i };
+}).filter(
+  (t) =>
+    Math.hypot(t.x - FESTIVAL_PLACES.wheel[0], t.z - FESTIVAL_PLACES.wheel[1]) >= 6 &&
+    Math.hypot(t.x - FESTIVAL_PLACES.striker[0], t.z - FESTIVAL_PLACES.striker[1]) >= 4,
+);
+/** Lantern posts carrying the bunting across the plaza. */
+export const FESTIVAL_POLES: [number, number][] = [
+  [-11, -6],
+  [-4, -6],
+  [4, -6],
+  [-11, 3],
+  [-4, 8],
+  [3, 6],
+  [9, 3],
+];
+/** The practice hurdles beside the obstacle course gate. */
+export const FESTIVAL_HURDLES = Array.from({ length: 4 }, (_, i) => ({ x: 12 + i * 2.2, z: -5.5 - i * 0.6 }));
 /** Solid attractions as circles the keeper walks around. */
 export const FESTIVAL_OBSTACLES: { x: number; z: number; r: number }[] = [
+  ...FESTIVAL_TENTS.map((t) => ({ x: t.x, z: t.z, r: 1.55 })),
+  ...FESTIVAL_POLES.map(([x, z]) => ({ x, z, r: 0.25 })),
+  ...FESTIVAL_HURDLES.flatMap((h) => [-0.7, 0, 0.7].map((dz) => ({ x: h.x, z: h.z + dz, r: 0.3 }))),
   { x: 0, z: 0, r: 1.7 },
   { x: -7, z: -5, r: 1.2 },
   { x: -7, z: 6.6, r: 1.6 },
@@ -104,7 +129,7 @@ export const HUNT_SPOTS = [
   { id: "coursegate", point: [15.5, -9] as [number, number], clue: "Just beyond the obstacle course's last hurdle." },
   { id: "confetti", point: [-17, 12.5] as [number, number], clue: "Where the confetti cannon is pointing." },
   { id: "eastcliff", point: [21.5, -3] as [number, number], clue: "At the eastern cliff, facing the morning sun." },
-  { id: "northtent", point: [5, -21] as [number, number], clue: "Beside the striped tent at the north edge." },
+  { id: "northtent", point: [3.4, -19.2] as [number, number], clue: "Beside the striped tent at the north edge." },
 ];
 export const HUNT_DAILY = 5;
 export const HUNT_TICKETS = 3;

@@ -4,19 +4,12 @@ import * as T from "three";
 import {
   HAVEN_TREES as FOREST,
   type TreeSite,
-  onIsland,
-  inPond,
-  pathDistance,
-  seeded,
-  blockedByStructure,
   groundHeight,
-  inLagoon,
-  slopeAt,
-  HAVEN_HOUSES,
-  HAVEN_PLACES,
-  RESOURCE_NODES,
+  havenScatter,
+  havenUndergrowth,
 } from "../../../packages/shared/haven";
-import { settings } from "./audio";
+import { audio, settings } from "./audio";
+import { worldFocus } from "./village-materials";
 
 function makeInstances(
   geometry: T.BufferGeometry,
@@ -75,22 +68,10 @@ export function HavenNature() {
     last = useRef(-1);
   const meshes = useMemo(() => {
     const trees = FOREST;
-    const random = seeded(156),
-      scatter: TreeSite[] = [];
-    for (let i = 0; i < (settings.quality === "Low" ? 480 : 1300); i++) {
-      const x = (random() - 0.5) * 152,
-        z = (random() - 0.5) * 152;
-      if (
-        onIsland(x, z, 2) &&
-        Math.hypot(x, z) > 12 &&
-        !inPond(x, z, 1) &&
-        !inLagoon(x, z, 4) &&
-        groundHeight(x, z) < 10.5 &&
-        (Math.hypot(x, z) < 44 || slopeAt(x, z) < 1) &&
-        pathDistance(x, z) > 1.6
-      )
-        scatter.push({ x, z, scale: random(), pine: false });
-    }
+    // Rocks come from the shared scatter so they match collision; low quality thins the grass only.
+    const all = havenScatter(),
+      scatter = settings.quality === "Low" ? all.filter((_, i) => i % 3 === 0) : all,
+      rocks = all.filter((_, i) => i % 7 === 0);
     return [
       makeInstances(new T.CylinderGeometry(0.17, 0.28, 3, 6), trees, "trunk"),
       makeInstances(
@@ -106,12 +87,17 @@ export function HavenNature() {
       makeInstances(new T.ConeGeometry(1, 1, 3), scatter, "grass"),
       makeInstances(
         new T.DodecahedronGeometry(1, 0),
-        scatter.filter((_, i) => i % 7 === 0),
+        rocks,
         "stone",
       ),
     ];
   }, []);
   const extras = useMemo(() => undergrowth(), []);
+  // Bushes are soft: walking through one makes it sway for a moment.
+  const rustle = useMemo(() => {
+    const { bushes } = havenUndergrowth();
+    return { bushes, shake: new Float32Array(bushes.length), o: new T.Object3D(), last: new T.Vector3() };
+  }, []);
   useEffect(
     () => () => {
       [...meshes, ...extras].forEach((m) => {
@@ -123,6 +109,30 @@ export function HavenNature() {
     [meshes],
   );
   // Shared foliage geometry keeps hundreds of plants in a handful of draw calls.
+  useFrame(({ clock }, dt) => {
+    const mesh = extras[0],
+      { bushes, shake, o, last } = rustle;
+    const moved = last.distanceToSquared(worldFocus) > 1e-4;
+    last.copy(worldFocus);
+    let changed = false;
+    for (let i = 0; i < bushes.length; i++) {
+      const b = bushes[i];
+      if (moved && Math.hypot(b.x - worldFocus.x, b.z - worldFocus.z) < b.s * 0.95 + 0.3) {
+        if (shake[i] < 0.3) audio.cue("leaves", 0, "ambience");
+        shake[i] = 1;
+      }
+      if (shake[i] <= 0) continue;
+      shake[i] = Math.max(0, shake[i] - dt * 1.4);
+      const w = settings.reduced ? 0 : Math.sin(clock.elapsedTime * 16 + i) * 0.16 * shake[i];
+      o.position.set(b.x, groundHeight(b.x, b.z) + b.s * 0.55, b.z);
+      o.rotation.set(w, i, w * 0.7);
+      o.scale.set(b.s * 1.15 * (1 - shake[i] * 0.08), b.s * 0.8, b.s);
+      o.updateMatrix();
+      mesh.setMatrixAt(i, o.matrix);
+      changed = true;
+    }
+    if (changed) mesh.instanceMatrix.needsUpdate = true;
+  });
   useFrame(({ camera, clock }) => {
     if (
       clock.elapsedTime - last.current < 0.4 &&
@@ -169,37 +179,7 @@ export function HavenNature() {
 }
 // Bushes soften trail edges and yards; mushrooms dot the shaded grove.
 function undergrowth() {
-  const random = seeded(913),
-    bushes: { x: number; z: number; s: number }[] = [],
-    shrooms: { x: number; z: number; s: number }[] = [];
-  const target = settings.quality === "Low" ? 110 : 260;
-  for (let i = 0; i < 8000 && bushes.length < target; i++) {
-    const x = (random() - 0.5) * 150,
-      z = (random() - 0.5) * 150,
-      d = pathDistance(x, z);
-    if (
-      inLagoon(x, z, 3) ||
-      groundHeight(x, z) > 9 ||
-      d < 1.75 ||
-      d > 3.4 ||
-      !onIsland(x, z, 2.5) ||
-      inPond(x, z, 0.8) ||
-      Math.hypot(x, z - 2) < 9 ||
-      blockedByStructure(x, z, 0.5) ||
-      HAVEN_HOUSES.some((h) => Math.hypot(x - h.point[0], z - h.point[1]) < 3.6) ||
-      HAVEN_PLACES.some((p) => Math.hypot(x - p.point[0], z - p.point[1]) < 3) ||
-      RESOURCE_NODES.some((p) => Math.hypot(x - p.point[0], z - p.point[1]) < 1.8) ||
-      bushes.some((b) => Math.hypot(b.x - x, b.z - z) < 1.6)
-    )
-      continue;
-    bushes.push({ x, z, s: 0.45 + random() * 0.45 });
-  }
-  for (let i = 0; i < 600 && shrooms.length < 46; i++) {
-    const x = -40 + random() * 26,
-      z = -26 + random() * 36;
-    if (!onIsland(x, z, 2.5) || pathDistance(x, z) < 1.6) continue;
-    shrooms.push({ x, z, s: 0.6 + random() * 0.7 });
-  }
+  const { bushes, shrooms } = havenUndergrowth();
   const o = new T.Object3D(),
     c = new T.Color();
   const make = (

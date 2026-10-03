@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { slideStep, HAVEN_HOUSES, houseDoor } from "../packages/shared/haven";
+import { slideStep, HAVEN_HOUSES, houseDoor, havenProps } from "../packages/shared/haven";
 import {
   HAVEN_WILDLIFE,
   HAVEN_TREES,
@@ -68,6 +68,15 @@ describe("Havenreach exploration layout", () => {
             z = path[i - 1][1] * (1 - t) + path[i][1] * t;
           expect(havenWalkable(x, z), `${x},${z}`).toBe(true);
         }
+  });
+  it("blocks every rock, bench, signpost and summit stone that is drawn", () => {
+    const props = havenProps();
+    expect(props.filter((p) => p.kind === "rock").length).toBeGreaterThan(40);
+    // Solid props leave every trail at least half a metre of clearance.
+    for (const p of props) expect(pathDistance(p.x, p.z) - p.r, `${p.kind} ${p.x},${p.z}`).toBeGreaterThan(0.5);
+    for (const p of props) expect(havenWalkable(p.x, p.z), `${p.kind} ${p.x},${p.z}`).toBe(false);
+    // Signposts stand beside, never on, the trail.
+    for (const p of props.filter((p) => p.kind === "sign")) expect(pathDistance(p.x, p.z)).toBeGreaterThan(1.2);
   });
   it("blocks water and cliffs while leaving a complete bridge crossing", () => {
     expect(inPond(21, -2)).toBe(true);

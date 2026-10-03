@@ -3,7 +3,10 @@ import * as T from "three";
 import {
   HAVEN_PLACES,
   HAVEN_LANDMARK_OBSTACLES,
+  HAVEN_BENCHES,
+  PICNIC,
   groundHeight,
+  signSpot,
 } from "../../../packages/shared/haven";
 function Bench({
   x,
@@ -97,9 +100,9 @@ export function HavenLandmarks() {
           </mesh>
         </group>
       </group>
-      <Bench x={18} z={-27.4} />
-      <Bench x={7} z={29} rotation={Math.PI} />
-      <Bench x={32} z={-1} rotation={-1.2} />
+      {HAVEN_BENCHES.map((b, i) => (
+        <Bench key={i} x={b.x} z={b.z} rotation={b.rotation} />
+      ))}
       <group name="sunseed-orchard">
         {[
           [-27, 24],
@@ -132,7 +135,7 @@ export function HavenLandmarks() {
           </group>
         ))}
       </group>
-      <group name="sunpetal-picnic" position={[8, 0.045, 26]}>
+      <group name="sunpetal-picnic" position={[PICNIC[0], 0.045, PICNIC[1]]}>
         <mesh rotation={[-Math.PI / 2, 0, 0.3]}>
           <planeGeometry args={[2.5, 2]} />
           <meshStandardMaterial color="#d4b69f" />
@@ -147,9 +150,9 @@ export function HavenLandmarks() {
           key={p.id}
           name={`trail-sign-${p.id}`}
           position={[
-            p.point[0] + 2.2,
-            groundHeight(p.point[0] + 2.2, p.point[1] + 2.3),
-            p.point[1] + 2.3,
+            signSpot(p.point)[0],
+            groundHeight(...signSpot(p.point)),
+            signSpot(p.point)[1],
           ]}
         >
           <mesh position={[0, 0.85, 0]} castShadow>

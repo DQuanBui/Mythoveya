@@ -8,6 +8,9 @@ import {
   FESTIVAL_POND,
   FESTIVAL_RADIUS as R,
   FESTIVAL_TRACK,
+  FESTIVAL_TENTS,
+  FESTIVAL_POLES,
+  FESTIVAL_HURDLES,
   festivalWalkable,
   huntSpots,
 } from "../../../packages/shared/festival";
@@ -93,12 +96,10 @@ function fairGeometry(): Built {
   for (const x of [-1.8, 1.8]) k.add(SHAPES.CYL6, "#efe7d6", [x, 1.4, -9.5], [0.12, 2.8, 0.12]);
   k.box("#d9674f", [0, 2.75, -9.5], [3.9, 0.35, 0.1]);
   for (let i = 0; i < 6; i++) k.box(i % 2 ? "#f3e3b5" : "#2f4f57", [-1.5 + i * 0.6, 0.02, -10.1], [0.6, 0.02, 0.6]);
-  for (let i = 0; i < 4; i++) {
-    const x = 12 + i * 2.2,
-      z = -5.5 - i * 0.6;
+  FESTIVAL_HURDLES.forEach(({ x, z }, i) => {
     for (const s of [-0.7, 0.7]) k.box("#efe7d6", [x, 0.35, z + s], [0.08, 0.7, 0.08]);
     k.box(i % 2 ? "#d9674f" : "#5fa7bb", [x, 0.62, z], [0.1, 0.1, 1.5]);
-  }
+  });
   // Tournament booth beside the pond.
   k.push([P.fishing[0], 0, P.fishing[1] + 1.7]);
   k.box("#efe4cc", [0, 0.55, 0], [1.6, 1.1, 1.2]);
@@ -120,21 +121,14 @@ function fairGeometry(): Built {
   k.add(SHAPES.CYL, "#f2c75e", [0, 1.3, 0.75], [0.36, 0.15, 0.36], [-0.9, 0, 0]);
   k.pop();
   // Striped tents and bunting poles around the rim.
-  for (let i = 0; i < 7; i++) {
-    const a = -1.9 + i * 0.62,
-      r = R - 3.2,
-      x = Math.cos(a) * r,
-      z = Math.sin(a) * r;
-    if (Math.hypot(x - P.wheel[0], z - P.wheel[1]) < 6 || Math.hypot(x - P.striker[0], z - P.striker[1]) < 4) continue;
+  for (const { x, z, a, i } of FESTIVAL_TENTS) {
     k.push([x, 0, z], -a + Math.PI / 2);
     for (let j = 0; j < 8; j++) k.add(SHAPES.CONE4, STRIPES[j % 2 ? 1 : i % 3 === 0 ? 0 : i % 3 === 1 ? 2 : 4], [0, 1.35, 0], [1.5, 2.7, 1.5], [0, (j / 8) * Math.PI * 2, 0]);
     k.add(SHAPES.CYL6, "#6d5847", [0, 3, 0], [0.04, 0.8, 0.04]);
     k.box(STRIPES[i % STRIPES.length], [0.18, 3.25, 0], [0.32, 0.18, 0.02]);
     k.pop();
   }
-  const poles: [number, number][] = [
-    [-11, -6], [-4, -6], [4, -6], [-11, 3], [-4, 8], [3, 6], [9, 3],
-  ];
+  const poles = FESTIVAL_POLES;
   for (const [x, z] of poles) {
     k.add(SHAPES.CYL6, "#6d5847", [x, 1.7, z], [0.07, 3.4, 0.07]);
     glow.add(SHAPES.BALL, "#fff", [x, 3.5, z], [0.15, 0.18, 0.15]);

@@ -401,7 +401,8 @@ export function havenWalkable(x: number, z: number) {
     ) &&
     !(treesNear ||= bucketed(HAVEN_TREES, (t) => [t.x, t.z]))(x, z).some(
       (t) => Math.hypot(x - t.x, z - t.z) < 0.3 * t.scale + 0.24,
-    )
+    ) &&
+    !blockedByProp(x, z)
   );
 }
 export function segmentDistance(x: number, z: number, a: Point, b: Point) {
@@ -874,4 +875,146 @@ export function slideStep(
   if (allowed(x + dx, z)) x += dx;
   if (allowed(x, z + dz)) z += dz;
   return [x, z];
+}
+
+// ---- Small solid props -------------------------------------------------------
+// Every rock, bench, post and sign the keeper can't walk through. The renderer
+// draws from the same lists, so what you see is what blocks you. Bushes are
+// soft: you push through them and they rustle.
+export type Prop = { x: number; z: number; r: number; kind: string };
+/** Woodland scatter: grass tufts, with every seventh site a rock. */
+export function havenScatter(samples = 1300) {
+  const random = seeded(156),
+    scatter: TreeSite[] = [];
+  for (let i = 0; i < samples; i++) {
+    const x = (random() - 0.5) * 152,
+      z = (random() - 0.5) * 152;
+    if (
+      onIsland(x, z, 2) &&
+      Math.hypot(x, z) > 12 &&
+      !inPond(x, z, 1) &&
+      !inLagoon(x, z, 4) &&
+      groundHeight(x, z) < 10.5 &&
+      (Math.hypot(x, z) < 44 || slopeAt(x, z) < 1) &&
+      pathDistance(x, z) > 1.6
+    )
+      scatter.push({ x, z, scale: random(), pine: false });
+  }
+  return scatter;
+}
+type Spot = { x: number; z: number; s: number };
+/** Bushes softening the trail edges, and mushrooms in the shaded grove. */
+export function havenUndergrowth() {
+  const random = seeded(913),
+    bushes: Spot[] = [],
+    shrooms: Spot[] = [];
+  for (let i = 0; i < 8000 && bushes.length < 260; i++) {
+    const x = (random() - 0.5) * 150,
+      z = (random() - 0.5) * 150,
+      d = pathDistance(x, z);
+    if (
+      inLagoon(x, z, 3) ||
+      groundHeight(x, z) > 9 ||
+      d < 1.75 ||
+      d > 3.4 ||
+      !onIsland(x, z, 2.5) ||
+      inPond(x, z, 0.8) ||
+      Math.hypot(x, z - 2) < 9 ||
+      blockedByStructure(x, z, 0.5) ||
+      HAVEN_HOUSES.some((h) => Math.hypot(x - h.point[0], z - h.point[1]) < 3.6) ||
+      HAVEN_PLACES.some((p) => Math.hypot(x - p.point[0], z - p.point[1]) < 3) ||
+      RESOURCE_NODES.some((p) => Math.hypot(x - p.point[0], z - p.point[1]) < 1.8) ||
+      bushes.some((b) => Math.hypot(b.x - x, b.z - z) < 1.6)
+    )
+      continue;
+    bushes.push({ x, z, s: 0.45 + random() * 0.45 });
+  }
+  for (let i = 0; i < 600 && shrooms.length < 46; i++) {
+    const x = -40 + random() * 26,
+      z = -26 + random() * 36;
+    if (!onIsland(x, z, 2.5) || pathDistance(x, z) < 1.6) continue;
+    shrooms.push({ x, z, s: 0.6 + random() * 0.7 });
+  }
+  return { bushes, shrooms };
+}
+/** A trail signpost beside a destination, on the first corner clear of the trails. */
+export function signSpot(point: Point): Point {
+  const corners: Point[] = [
+    [2.2, 2.3],
+    [-2.2, 2.3],
+    [2.2, -2.3],
+    [-2.2, -2.3],
+  ];
+  const [dx, dz] = corners.find(([dx, dz]) => pathDistance(point[0] + dx, point[1] + dz) > 1.2) || corners[0];
+  return [point[0] + dx, point[1] + dz];
+}
+/** Pebbles around the village stations, drawn in every region. */
+export const PEBBLES = Array.from({ length: 35 }, (_, i) => ({
+  x: Math.sin(i * 8) * 16,
+  z: Math.cos(i * 3) * 15,
+  size: 0.13 + (i % 3) * 0.1,
+}));
+/** Havenreach keeps paths clear: pebbles on a trail are left out. */
+export const havenPebbles = () => PEBBLES.filter((p) => pathDistance(p.x, p.z) > 1.3);
+/** The meadow picnic, beside the campfire and clear of the trails. */
+export const PICNIC: Point = [5, 27.5];
+export const HAVEN_BENCHES = [
+  { x: 18, z: -27.4, rotation: 0 },
+  { x: 7, z: 29, rotation: Math.PI },
+  { x: 32, z: -1, rotation: -1.2 },
+];
+/** The summit's stone ring, open toward the trail so you can walk in. */
+export const SUMMIT_RING = Array.from({ length: 12 }, (_, i) => (i / 12) * Math.PI * 2)
+  .filter((a) => Math.abs(Math.atan2(Math.sin(a - 2.36), Math.cos(a - 2.36))) > 0.45)
+  .map((a) => ({ x: SUMMIT[0] + Math.cos(a) * 3, z: SUMMIT[1] + Math.sin(a) * 3, a }));
+const line = (ax: number, az: number, bx: number, bz: number, r: number, kind: string) => {
+  const n = Math.max(1, Math.ceil(Math.hypot(bx - ax, bz - az) / r));
+  return Array.from({ length: n + 1 }, (_, i) => ({ x: ax + ((bx - ax) * i) / n, z: az + ((bz - az) * i) / n, r, kind }));
+};
+let props: Prop[] | null = null;
+export function havenProps(): Prop[] {
+  if (props) return props;
+  props = [
+    ...havenScatter()
+      .filter((_, i) => i % 7 === 0)
+      .map((s) => ({ x: s.x, z: s.z, r: 0.3 + s.scale * 0.2, kind: "rock" })),
+    ...havenPebbles()
+      .filter((p) => p.size > 0.2)
+      .map((p) => ({ x: p.x, z: p.z, r: p.size + 0.12, kind: "pebble" })),
+    // Benches are two metres long: three circles along each seat.
+    ...HAVEN_BENCHES.flatMap((b) =>
+      [-0.68, 0, 0.68].map((t) => ({ x: b.x + Math.cos(b.rotation) * t, z: b.z - Math.sin(b.rotation) * t, r: 0.4, kind: "bench" })),
+    ),
+    // Village stations: Riftgate pillars, the shrine, the hall, the market stall and the garden bed.
+    { x: -1, z: -6, r: 0.45, kind: "pillar" },
+    { x: 3, z: -6, r: 0.45, kind: "pillar" },
+    { x: -6, z: -3, r: 1.05, kind: "shrine" },
+    { x: 7, z: -3, r: 1.8, kind: "hall" },
+    ...line(9.9, 4.4, 12.1, 4.4, 0.7, "stall"),
+    ...line(-10.9, 11.25, -8.3, 11.25, 0.55, "garden"),
+    ...line(-10.9, 12.35, -8.3, 12.35, 0.55, "garden"),
+    { x: -13, z: -6, r: 1.9, kind: "landmark" },
+    { x: 11, z: -10, r: 1.9, kind: "landmark" },
+    // Cloudwatch lookout rail and telescope; the picnic hamper.
+    ...line(16, -33.5, 22, -33.5, 0.3, "rail"),
+    { x: 21.2, z: -28.7, r: 0.3, kind: "telescope" },
+    { x: PICNIC[0] + 0.7, z: PICNIC[1], r: 0.35, kind: "hamper" },
+    // Trail signposts beside each destination.
+    ...HAVEN_PLACES.filter((p) => p.id !== "village").map((p) => {
+      const [x, z] = signSpot(p.point);
+      return { x, z, r: 0.25, kind: "sign" };
+    }),
+    // Summit ring stones, cairn, flagpole and telescope; the pier's crate.
+    ...SUMMIT_RING.map((s) => ({ x: s.x, z: s.z, r: 0.38, kind: "summit-stone" })),
+    { x: SUMMIT[0] + 1.6, z: SUMMIT[1] - 1.4, r: 0.45, kind: "cairn" },
+    { x: SUMMIT[0] - 1.6, z: SUMMIT[1] - 1.2, r: 0.15, kind: "flagpole" },
+    { x: SUMMIT[0] + 1.2, z: SUMMIT[1] + 1.4, r: 0.22, kind: "telescope" },
+    { x: PIER.x + 0.5, z: PIER.z1 - 0.5, r: 0.28, kind: "crate" },
+  ];
+  return props;
+}
+let propsNear: ((x: number, z: number) => Prop[]) | null = null;
+export function blockedByProp(x: number, z: number) {
+  propsNear ||= bucketed(havenProps(), (p) => [p.x, p.z]);
+  return propsNear(x, z).some((p) => Math.hypot(x - p.x, z - p.z) < p.r);
 }

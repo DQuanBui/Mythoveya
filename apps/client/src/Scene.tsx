@@ -37,6 +37,8 @@ import {
   shopFront,
   groundHeight,
   PIER,
+  PEBBLES,
+  pathDistance,
   SKYFERRY,
   slideStep,
   type Point,
@@ -371,13 +373,14 @@ function Environment({
             />
           ),
         )}
-      {Array.from({ length: 35 }, (_, i) => (
+      {PEBBLES.map((p, i) => (
         <group
           key={i}
-          position={[Math.sin(i * 8) * 16, 0.06, Math.cos(i * 3) * 15]}
+          visible={!expanded || pathDistance(p.x, p.z) > 1.3}
+          position={[p.x, expanded ? groundHeight(p.x, p.z) + 0.06 : 0.06, p.z]}
         >
           <mesh rotation={[0, i, 0.2]}>
-            <dodecahedronGeometry args={[0.13 + (i % 3) * 0.1, 0]} />
+            <dodecahedronGeometry args={[p.size, 0]} />
             <meshStandardMaterial
               color={
                 i % 4 === 0 ? "#ecbfa6" : i % 4 === 1 ? "#d3d8a4" : r.ground
@@ -714,11 +717,14 @@ export function Explorer({
     (x: number, z: number) =>
       (profile.region === "haven"
         ? havenWalkable(x, z)
-        : Math.hypot(x, z) < 16.5) &&
-      !blocksLandmark(profile.region, x, z) &&
-      !((x - 11) ** 2 + (z - 4.4) ** 2 < 1.4) &&
-      !((x - 7) ** 2 + (z + 3) ** 2 < 3.2) &&
-      !((x + 6) ** 2 + (z + 3) ** 2 < 0.8),
+        : Math.hypot(x, z) < 16.5 &&
+          // Smaller regions share the village stations and pebbles.
+          !((x - 11) ** 2 + (z - 4.4) ** 2 < 1.4) &&
+          !((x - 7) ** 2 + (z + 3) ** 2 < 3.2) &&
+          !((x + 6) ** 2 + (z + 3) ** 2 < 1.1) &&
+          !(Math.abs(x - 1) > 1.6 && Math.abs(x - 1) < 2.4 && Math.abs(z + 6) < 0.5) &&
+          !PEBBLES.some((p) => p.size > 0.2 && Math.hypot(x - p.x, z - p.z) < p.size + 0.12)) &&
+      !blocksLandmark(profile.region, x, z),
     [profile.region],
   );
   const allowed = area?.allowed ?? regionAllowed;
