@@ -21,14 +21,17 @@ const team = (start = 0) =>
   }));
 describe("content and economy", () => {
   it("has complete, stable content with executable actions", () => {
-    expect(SPECIES).toHaveLength(60);
-    expect(new Set(SPECIES.map((s) => s.id)).size).toBe(60);
+    // Ten species per tier, plus six newer A-tier and six newer S-tier.
+    expect(SPECIES).toHaveLength(72);
+    expect(new Set(SPECIES.map((s) => s.id)).size).toBe(72);
     for (const tier of TIERS)
-      expect(SPECIES.filter((s) => s.tier === tier)).toHaveLength(10);
+      expect(SPECIES.filter((s) => s.tier === tier)).toHaveLength(
+        tier === "A" || tier === "S" ? 16 : 10,
+      );
     expect(
       new Set(SPECIES.flatMap((s) => s.actions.map((a) => a.id))).size,
-    ).toBe(180);
-    expect(new Set(SPECIES.map((s) => s.passive.id)).size).toBe(60);
+    ).toBe(216);
+    expect(new Set(SPECIES.map((s) => s.passive.id)).size).toBe(72);
     expect(new Set(SPECIES.map((s) => s.family)).size).toBe(12);
     for (const s of SPECIES) {
       expect(

@@ -3,6 +3,15 @@ import { useFrame } from "@react-three/fiber";
 import * as T from "three";
 import { byId } from "../../../packages/shared/content";
 import { settings } from "./audio";
+/** Newer mythics reuse the recipe that best matches their ultimate. */
+const MYTHIC_RECIPES: Record<string, string> = {
+  astravelle: "aurelith",
+  pyronox: "solkarath",
+  abyssara: "pelagryth",
+  verdantus: "everbloom",
+  fulgurion: "zephyreon",
+  umbravix: "nyxavorn",
+};
 // Bounded, reusable geometry recipes. Each mythic has a distinct silhouette and cadence.
 export function UltimateEffect({
   id,
@@ -16,20 +25,21 @@ export function UltimateEffect({
   phase?: number;
 }) {
   const ref = useRef<T.Group>(null);
-  const color = byId[id].color;
+  const color = byId[id].color,
+    kind = MYTHIC_RECIPES[id] || id;
   useFrame(() => {
     if (!ref.current) return;
     const p = phase ?? Math.min(1, Math.max(0, (Date.now() - at) / duration));
     ref.current.children.forEach((child, i) => {
-      if (id === "pelagryth") {
+      if (kind === "pelagryth") {
         const wave = Math.max(0, p - i * 0.12);
         child.scale.setScalar(0.4 + wave * 2.5);
         child.visible = wave > 0 && p < 0.97;
-      } else if (id === "everbloom") {
+      } else if (kind === "everbloom") {
         child.scale.y = Math.max(0.01, Math.min(1, p * 2 - i * 0.03));
-      } else if (id === "nyxavorn") {
+      } else if (kind === "nyxavorn") {
         child.rotation.z = (i % 2 ? 1 : -1) * p * 0.4;
-      } else if (id === "vortalyx" || id === "zephyreon") {
+      } else if (kind === "vortalyx" || kind === "zephyreon") {
         child.rotation.y = p * (settings.reduced ? 0.1 : 6) + i * 0.7;
       } else child.scale.setScalar(0.65 + Math.sin(p * Math.PI) * 0.4);
     });
@@ -48,7 +58,7 @@ export function UltimateEffect({
   );
   return (
     <group ref={ref} name={`mythic-${id}`}>
-      {id === "solkarath" && (
+      {kind === "solkarath" && (
         <>
           <mesh position={[0, 1.4, 0]}>
             <icosahedronGeometry args={[0.45, 1]} />
@@ -70,7 +80,7 @@ export function UltimateEffect({
           {ring(1.2, 0.15, 7)}
         </>
       )}
-      {id === "thaloryx" && (
+      {kind === "thaloryx" && (
         <>
           {ring(1.5, 0.7, 0)}
           {ring(1.8, 0.1, 1)}
@@ -89,7 +99,7 @@ export function UltimateEffect({
           ))}
         </>
       )}
-      {id === "everbloom" &&
+      {kind === "everbloom" &&
         Array.from({ length: 12 }, (_, i) => (
           <group key={i} rotation={[0, (i * Math.PI) / 6, 0]}>
             <mesh position={[0.6, 0.3, 0]} rotation={[0, 0, -0.8]}>
@@ -102,7 +112,7 @@ export function UltimateEffect({
             </mesh>
           </group>
         ))}
-      {id === "orogantis" &&
+      {kind === "orogantis" &&
         Array.from({ length: 6 }, (_, i) => (
           <mesh
             key={i}
@@ -123,7 +133,7 @@ export function UltimateEffect({
             />
           </mesh>
         ))}
-      {id === "zephyreon" && (
+      {kind === "zephyreon" && (
         <>
           {[0, 1, 2, 3, 4].map((i) =>
             ring(1.2 - i * 0.15, i * 0.28, i, i % 2 ? "#f3efd2" : color),
@@ -134,7 +144,7 @@ export function UltimateEffect({
           </mesh>
         </>
       )}
-      {id === "iskavelle" &&
+      {kind === "iskavelle" &&
         Array.from({ length: 9 }, (_, i) => {
           const a = (i * Math.PI * 2) / 9;
           return (
@@ -152,7 +162,7 @@ export function UltimateEffect({
             </mesh>
           );
         })}
-      {id === "aurelith" && (
+      {kind === "aurelith" && (
         <>
           {ring(0.85, 1.5, 0, "#fff1bd", [0, 0, 0])}
           {[-1, 1].flatMap((side) =>
@@ -169,7 +179,7 @@ export function UltimateEffect({
           )}
         </>
       )}
-      {id === "nyxavorn" && (
+      {kind === "nyxavorn" && (
         <>
           <mesh position={[0, 1, 0]}>
             <torusGeometry args={[1, 0.13, 6, 32]} />
@@ -200,11 +210,11 @@ export function UltimateEffect({
           ))}
         </>
       )}
-      {id === "pelagryth" &&
+      {kind === "pelagryth" &&
         [0, 1, 2].map((i) =>
           ring(0.65, i * 0.22, i, i === 1 ? "#e0ffef" : "#8ddbd9"),
         )}
-      {id === "vortalyx" &&
+      {kind === "vortalyx" &&
         Array.from({ length: 7 }, (_, i) => (
           <mesh
             key={i}

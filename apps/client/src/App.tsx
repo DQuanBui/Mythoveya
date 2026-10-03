@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  ALL_SPECIES,
   AVATARS,
   byId,
   REGIONS,
@@ -459,7 +460,7 @@ export default function App() {
           </div>
           <footer className="title-bottom">
             <span>CALL OF THE WILDBOUND</span>
-            <span>60 WILDBOUND · ONE EXTRAORDINARY JOURNEY</span>
+            <span>{ALL_SPECIES.length} WILDBOUND · ONE EXTRAORDINARY JOURNEY</span>
           </footer>
         </>
       )}

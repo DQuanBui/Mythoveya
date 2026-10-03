@@ -261,8 +261,10 @@ class AudioEngine {
       [0, 7, 9, 12, 7, 4],
       [0, 3, 10, 7, 14],
     ];
-    const root = 150 + (s.index - 50) * 17;
-    motifs[s.index - 50].forEach((n, i) => {
+    // Newer mythics reuse a motif at a slightly brighter pitch.
+    const k = (s.index - 50) % motifs.length,
+      root = 150 + k * 17 + (s.index >= 60 ? 9 : 0);
+    motifs[k].forEach((n, i) => {
       const f = root * 2 ** (n / 12);
       this.tone(
         f,

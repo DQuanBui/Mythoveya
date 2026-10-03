@@ -10,7 +10,7 @@ Mythoveya is a locally playable, browser-based 3D creature-collection RPG. Its w
 
 ## The game
 
-- **60 Wildbound:** ten species in each rarity from E to S, eight elements, twelve body families, 180 actions, and 60 passives.
+- **72 Wildbound, plus 16 evolved forms:** ten species in each rarity from E to B and sixteen each in A and S, eight elements, twelve body families, 216 actions and 72 passives. Every species builds its own look from its description: palette, ears, tail, markings and anatomy such as manes, trunks, sails, owl faces and nine fanned tails.
 - **Eight keepers:** choose a recognizable character and change your appearance later without losing progress.
 - **Eight village friends:** meet Liora, Sella, Bram, Kael, Oren, Tali, Pip, and Wren. Explore 24 conversation topics, complete 16 missions, and unlock their daily help.
 - **Make yourself at home:** trade supplies at Pip's rotating market, grow Sunseed, craft treats, nurture friendship, name companions, and dress your following friend with a ribbon or bell.

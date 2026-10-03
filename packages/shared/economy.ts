@@ -11,9 +11,8 @@ export function pull(pity: { as: number; s: number }, random: () => number) {
     tier = RATES.findIndex((v) => (sum += v) > r);
     if (tier < 0) tier = 5;
   }
-  const species = SPECIES.filter((s) => s.tier === TIERS[tier])[
-    Math.min(9, Math.floor(random() * 10))
-  ];
+  const pool = SPECIES.filter((s) => s.tier === TIERS[tier]);
+  const species = pool[Math.min(pool.length - 1, Math.floor(random() * pool.length))];
   pity.as = tier >= 4 ? 0 : pity.as + 1;
   pity.s = tier === 5 ? 0 : pity.s + 1;
   return species.id;

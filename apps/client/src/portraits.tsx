@@ -4,6 +4,8 @@ import { createCreature } from "./models";
 import { environmentFor } from "./ModelLighting";
 import { byId } from "../../../packages/shared/content";
 const cache = new Map<string, string>();
+/** The three-quarter view every portrait is taken from. */
+const VIEW = new T.Vector3(2.6, 1.6, 3.5).normalize();
 let renderer: T.WebGLRenderer | undefined;
 let scene: T.Scene, camera: T.PerspectiveCamera;
 export function renderPortrait(id: string) {
@@ -32,6 +34,13 @@ export function renderPortrait(id: string) {
   }
   const model = createCreature(id);
   scene.add(model);
+  // Frame every creature by its own size, so tall mythics fit like small pups.
+  const box = new T.Box3().setFromObject(model),
+    center = box.getCenter(new T.Vector3()),
+    radius = box.getBoundingSphere(new T.Sphere()).radius;
+  const distance = Math.max(3.9, (radius / Math.sin(T.MathUtils.degToRad(camera.fov / 2))) * 1.02);
+  camera.position.copy(center).add(VIEW.clone().multiplyScalar(distance));
+  camera.lookAt(center.x, center.y - radius * 0.05, center.z);
   renderer.render(scene, camera);
   const image = renderer.domElement.toDataURL("image/png");
   scene.remove(model);

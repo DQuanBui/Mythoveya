@@ -850,7 +850,7 @@ export function Gallery() {
       <div className="gallery-layout">
         <aside>
           <input
-            placeholder="Search all 60 species"
+            placeholder={`Search all ${SPECIES.length} species`}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />

@@ -32,7 +32,7 @@ async function openGallery(page: Page) {
   await expect(page.locator(".keeper-badge")).toContainText("Gallery Reviewer");
   await page.keyboard.press("Escape");
   await page.getByRole("button", { name: "Asset gallery" }).click();
-  await expect(page.locator(".gallery-list button")).toHaveCount(60);
+  await expect(page.locator(".gallery-list button")).toHaveCount(SPECIES.length);
   return errors;
 }
 
@@ -47,8 +47,8 @@ test("all models, eight keepers, and bounded audio", async ({ page }) => {
     },
     SPECIES.map((s) => s.id),
   );
-  expect(hashes).toHaveLength(60);
-  expect(new Set(hashes).size).toBe(60);
+  expect(hashes).toHaveLength(SPECIES.length);
+  expect(new Set(hashes).size).toBe(SPECIES.length);
   expect(hashes.every((h) => h.startsWith("data:image/png;base64,"))).toBe(
     true,
   );

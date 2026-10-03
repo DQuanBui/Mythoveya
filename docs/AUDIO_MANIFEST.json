@@ -52,6 +52,40 @@
       ],
       "seconds": 50
     },
+    "home": {
+      "steps": 128,
+      "bpm": 82,
+      "root": 53,
+      "wave": "sine",
+      "pattern": [
+        0,
+        4,
+        7,
+        9,
+        7,
+        4,
+        0,
+        -3
+      ],
+      "seconds": 46.829268292682926
+    },
+    "festival": {
+      "steps": 192,
+      "bpm": 116,
+      "root": 60,
+      "wave": "triangle",
+      "pattern": [
+        0,
+        4,
+        7,
+        12,
+        9,
+        7,
+        4,
+        7
+      ],
+      "seconds": 49.6551724137931
+    },
     "canyon": {
       "steps": 192,
       "bpm": 108,
@@ -1123,6 +1157,126 @@
       "species": "vortalyx",
       "family": "fox",
       "profile": "fox:59",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "prismara",
+      "family": "bird",
+      "profile": "bird:60",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "galeclaw",
+      "family": "fox",
+      "profile": "fox:61",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "coralynx",
+      "family": "fox",
+      "profile": "fox:62",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "embertusk",
+      "family": "quadruped",
+      "profile": "quadruped:63",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "gloamtoad",
+      "family": "amphibian",
+      "profile": "amphibian:64",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "frostram",
+      "family": "quadruped",
+      "profile": "quadruped:65",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "astravelle",
+      "family": "antler",
+      "profile": "antler:66",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "pyronox",
+      "family": "dragon",
+      "profile": "dragon:67",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "abyssara",
+      "family": "serpent",
+      "profile": "serpent:68",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "verdantus",
+      "family": "golem",
+      "profile": "golem:69",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "fulgurion",
+      "family": "bird",
+      "profile": "bird:70",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "umbravix",
+      "family": "fox",
+      "profile": "fox:71",
       "variants": [
         "call",
         "attack",

@@ -26,12 +26,12 @@ writeFileSync(
   ) + "\n",
 );
 if (
-  SPECIES.length !== 60 ||
-  TIERS.some((t) => SPECIES.filter((s) => s.tier === t).length !== 10)
+  SPECIES.length !== 72 ||
+  TIERS.some((t) => SPECIES.filter((s) => s.tier === t).length !== (t === "A" || t === "S" ? 16 : 10))
 )
   throw Error("Invalid roster distribution");
 const ids = new Set(SPECIES.flatMap((s) => s.actions.map((a) => a.id)));
-if (ids.size !== 180 || new Set(SPECIES.map((s) => s.passive.id)).size !== 60)
+if (ids.size !== SPECIES.length * 3 || new Set(SPECIES.map((s) => s.passive.id)).size !== SPECIES.length)
   throw Error("Duplicate actions or passives");
 const columns = [
   "ID",
@@ -69,5 +69,5 @@ writeFileSync(
   [columns, ...rows].map((row) => row.map(quote).join(",")).join("\n") + "\n",
 );
 console.log(
-  `Audited ${SPECIES.length} species, ${ids.size} actions, 60 passives, ${new Set(SPECIES.map((s) => s.family)).size} model families.`,
+  `Audited ${SPECIES.length} species, ${ids.size} actions, ${SPECIES.length} passives, ${new Set(SPECIES.map((s) => s.family)).size} model families.`,
 );

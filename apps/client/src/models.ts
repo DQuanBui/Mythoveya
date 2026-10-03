@@ -367,8 +367,9 @@ export function createCreature(id: string) {
       }
     }
   }
-  if (f.trunk) {
+  if (f.trunk)
     part(rig, "capsule", c, [0, headY - 0.32 * hs, headZ + 0.42 * hs], [0.09, 0.32, 0.09], [0.35, 0, 0]);
+  if (f.mouthTusks) {
     for (const side of [-1, 1])
       part(rig, "cone", "#f3ecd9", [side * 0.16, headY - 0.3 * hs, headZ + 0.45 * hs], [0.06, 0.5, 0.06], [Math.PI / 2 + 0.6, 0, side * 0.25]);
   }
@@ -421,9 +422,12 @@ export function createCreature(id: string) {
       part(rig, "capsule", dark, [ex, ey + 0.13 * es, ez + 0.02], [0.025, 0.07, 0.02], [0, 0, Math.PI / 2 + side * 0.35]);
   }
   // Tails: each species' tail follows its description.
-  if (["fox", "quadruped", "dragon", "antler", "bird"].includes(s.family)) {
-    const tail = new T.Group();
-    tail.position.set(0, 0.7 + lift, -0.65 * (four ? bz : 1));
+  const tailCount = ["fox", "quadruped", "dragon", "antler", "bird"].includes(s.family) ? f.tailCount : 0;
+  for (let n = 0; n < tailCount; n++) {
+    const tail = new T.Group(),
+      spread = tailCount > 1 ? (n / (tailCount - 1) - 0.5) * (tailCount > 3 ? 2.2 : 1.1) : 0;
+    tail.position.set(Math.sin(spread) * 0.12, 0.7 + lift, -0.65 * (four ? bz : 1));
+    tail.rotation.set(tailCount > 3 ? -0.35 : 0, spread, 0);
     rig.add(tail);
     const t = dna.tail;
     if (t === "flame") {
@@ -479,7 +483,7 @@ export function createCreature(id: string) {
       const a = i * 2.4;
       part(rig, "orb", i % 2 ? accent : "#91c878", [Math.sin(a) * 0.32, 1.2 + lift + (i % 3) * 0.13, Math.cos(a) * 0.35 - 0.2], [0.15, 0.27, 0.06], [0.3, 0, a]);
     }
-  if (/horn|tusk/.test(s.appearance) && s.family !== "antler" && s.id !== "solkarath")
+  if (/horn|tusk/.test(s.appearance) && !f.mouthTusks && s.family !== "antler" && s.id !== "solkarath")
     for (const side of [-1, 1]) horn(side * 0.3 * hs, headY + 0.36 * hs, headZ + 0.12, 0.4, rare ? accent : cream);
   if (/winged/i.test(s.appearance) && ["quadruped", "fox"].includes(s.family)) {
     wing(-1, 1.2);

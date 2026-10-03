@@ -42,6 +42,9 @@ export type Dna = {
     bat: boolean;
     bigTail: boolean;
     molten: boolean;
+    /** Tusks at the mouth (boars, mammoths) instead of horns on the head. */
+    mouthTusks: boolean;
+    tailCount: number;
   };
 };
 
@@ -149,7 +152,7 @@ export function dnaOf(s: Species): Dna {
               ? "bolt"
               : has(s, /lion|lynx|mane|tuft/)
                 ? "tuft"
-                : has(s, /plume|feather|comet|streamer/)
+                : has(s, /plume|feather|comet|streamer|peacock/)
                   ? "plume"
                   : has(s, /hare|rabbit|bunny|pup/)
                     ? "stub"
@@ -196,8 +199,10 @@ export function dnaOf(s: Species): Dna {
       tallBird: has(s, /crane|heron|stork|tall/),
       needleBeak: has(s, /hummingbird/),
       bat: has(s, /\bbat\b/),
-      bigTail: has(s, /squirrel|fan-shaped|ring tail/),
+      bigTail: has(s, /squirrel|fan-shaped|ring tail|peacock/),
       molten: has(s, /molten|kiln|lava|volcanic/),
+      mouthTusks: has(s, /boar|mammoth/),
+      tailCount: has(s, /nine-tailed/) ? 9 : has(s, /three-tailed/) ? 3 : has(s, /twin-tailed/) ? 2 : 1,
     },
   };
 }

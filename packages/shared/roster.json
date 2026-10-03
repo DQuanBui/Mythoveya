@@ -538,5 +538,113 @@
     "role": "controller",
     "appearance": "Winged lynx with curved storm horns and a slowly orbiting cyclone tail",
     "signature": "Tempest Loom marks one enemy for a delayed gust that reorders its next-round initiative"
+  },
+  {
+    "id": "prismara",
+    "name": "Prismara",
+    "tier": "A",
+    "element": "Light",
+    "role": "support",
+    "appearance": "Peacock with a fan of prism-glass plume feathers and a golden crest",
+    "signature": "Prism Fan shields the weakest ally and cleanses one debuff"
+  },
+  {
+    "id": "galeclaw",
+    "name": "Galeclaw",
+    "tier": "A",
+    "element": "Storm",
+    "role": "striker",
+    "appearance": "Lean wind wolf with streamer ears and a gale-tufted tail",
+    "signature": "Gale Rend deals swift damage and gains a speed bonus"
+  },
+  {
+    "id": "coralynx",
+    "name": "Coralynx",
+    "tier": "A",
+    "element": "Tide",
+    "role": "controller",
+    "appearance": "Spotted reef lynx with coral-branch tufts and a fin-shaped tail",
+    "signature": "Riptide Pounce slows one enemy and marks it for the team"
+  },
+  {
+    "id": "embertusk",
+    "name": "Embertusk",
+    "tier": "A",
+    "element": "Flame",
+    "role": "tank",
+    "appearance": "Molten boar with ember tusks and a smoldering mane",
+    "signature": "Kiln Bulwark protects itself and scorches attackers with thorns"
+  },
+  {
+    "id": "gloamtoad",
+    "name": "Gloamtoad",
+    "tier": "A",
+    "element": "Shadow",
+    "role": "healer",
+    "appearance": "Moon-spotted bullfrog with a lantern throat and a dusk sail",
+    "signature": "Moonlit Croak heals all allies and grants gentle regeneration"
+  },
+  {
+    "id": "frostram",
+    "name": "Frostram",
+    "tier": "A",
+    "element": "Frost",
+    "role": "tank",
+    "appearance": "Glacier ram with spiral ice horns and a snow-white fleece",
+    "signature": "Avalanche Brace shields all allies and raises their guard"
+  },
+  {
+    "id": "astravelle",
+    "name": "Astravelle",
+    "tier": "S",
+    "element": "Light",
+    "role": "healer",
+    "appearance": "Starlit kirin with a constellation mane and a crown of floating stars",
+    "signature": "Starfall Grace revives a fallen ally and heals the whole team"
+  },
+  {
+    "id": "pyronox",
+    "name": "Pyronox",
+    "tier": "S",
+    "element": "Flame",
+    "role": "striker",
+    "appearance": "Obsidian phoenix-dragon with molten wing veins and a crown of fire",
+    "signature": "Cinderstorm Crown deals piercing damage and burns a whole row"
+  },
+  {
+    "id": "abyssara",
+    "name": "Abyssara",
+    "tier": "S",
+    "element": "Tide",
+    "role": "controller",
+    "appearance": "Abyssal leviathan with lantern fins and an orbiting tide halo",
+    "signature": "Undertow Halo delays the enemy front row and slows them"
+  },
+  {
+    "id": "verdantus",
+    "name": "Verdantus",
+    "tier": "S",
+    "element": "Grove",
+    "role": "tank",
+    "appearance": "Towering grove titan with a mossy back garden and root-woven fists",
+    "signature": "Rootwall Bastion protects all allies with shields and thorns"
+  },
+  {
+    "id": "fulgurion",
+    "name": "Fulgurion",
+    "tier": "S",
+    "element": "Storm",
+    "role": "striker",
+    "appearance": "Thunderbird with lightning-forked wings and a storm crown",
+    "signature": "Skybreaker Bolt deals piercing damage and stuns its target"
+  },
+  {
+    "id": "umbravix",
+    "name": "Umbravix",
+    "tier": "S",
+    "element": "Shadow",
+    "role": "controller",
+    "appearance": "Nine-tailed shadow fox with moonlit tips and orbiting dusk lanterns",
+    "signature": "Ninefold Eclipse weakens a whole row and delays their turns"
   }
 ]

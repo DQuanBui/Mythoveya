@@ -81,6 +81,19 @@ export const FAMILIES = [
   "dragon",
   "aquatic",
   "fox",
+  // Newer arrivals: six A-tier and six S-tier Wildbound.
+  "bird",
+  "fox",
+  "fox",
+  "quadruped",
+  "amphibian",
+  "quadruped",
+  "antler",
+  "dragon",
+  "serpent",
+  "golem",
+  "bird",
+  "fox",
 ] as const;
 export type Effect =
   | "damage"
@@ -176,6 +189,18 @@ const mechanics: Effect[][] = [
   ["weaken", "delay", "damage"],
   ["heal", "cleanse", "regen"],
   ["mark", "delay", "slow"],
+  ["shield", "cleanse"],
+  ["damage", "haste"],
+  ["slow", "mark", "damage"],
+  ["guard", "thorns"],
+  ["heal", "regen"],
+  ["shield", "guard"],
+  ["revive", "heal", "cleanse"],
+  ["damage", "burn", "pierce"],
+  ["delay", "slow", "damage"],
+  ["guard", "shield", "thorns"],
+  ["damage", "pierce", "stun"],
+  ["weaken", "delay", "silence"],
 ];
 const targets: Record<number, Action["target"]> = {
   3: "self",
@@ -205,6 +230,14 @@ const targets: Record<number, Action["target"]> = {
   53: "allies",
   57: "row",
   58: "allies",
+  63: "self",
+  64: "allies",
+  65: "allies",
+  66: "allies",
+  67: "row",
+  68: "row",
+  69: "allies",
+  71: "row",
 };
 export type Species = (typeof roster)[number] & {
   index: number;
