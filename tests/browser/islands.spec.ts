@@ -196,3 +196,60 @@ test("Lanternfair opens after a win: welcome tickets, an outfit and a reload", a
   expect(festival.tickets).toBe(17);
   expect(errors).toEqual([]);
 });
+
+test("a Sprint Stakes race is scored, ranked and shown on the board", async ({ page }) => {
+  test.setTimeout(240000);
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.goto("/");
+  const id = await page.evaluate(async () => {
+    const post = (data: unknown, path: string, token = "") =>
+      fetch("/api/" + path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+        body: JSON.stringify(data),
+      }).then((r) => r.json());
+    const g = await post({ name: "Track Star", avatar: 1 }, "guest");
+    localStorage.setItem("mythoveya-session", g.token);
+    for (const data of [{ kind: "starter", species: "emberfox" }, { kind: "guide" }])
+      await post({ ...data, requestId: crypto.randomUUID() }, "mutate", g.token);
+    return g.profile.id as string;
+  });
+  // Start on Lanternfair, as after a win and a ferry ride.
+  const { DatabaseSync } = await import("node:sqlite");
+  const db = new DatabaseSync("data/browser-tests.sqlite");
+  const row = db.prepare("SELECT data FROM profiles WHERE id=?").get(id) as { data: string };
+  db.prepare("UPDATE profiles SET data=? WHERE id=?").run(
+    JSON.stringify({ ...JSON.parse(row.data), wins: 1, island: "festival" }),
+    id,
+  );
+  db.close();
+  await page.reload();
+  await page.getByRole("button", { name: "Continue your journey" }).click();
+  await expect(page.locator(".location")).toContainText("Lanternfair Isle");
+  await page.getByRole("button", { name: "Festival board →" }).click();
+  await page.locator('[data-game="race"] button').click();
+  await expect(page.locator(".fest-game-lobby")).toBeVisible();
+  await page.getByRole("button", { name: /^Start/ }).click();
+  await expect(page.locator("[data-clock]")).toBeVisible();
+  // Boost now and then until the race ends.
+  for (let i = 0; i < 25 && !(await page.locator("[data-result]").count()); i++) {
+    await page.keyboard.press("Space");
+    await page.waitForTimeout(2200);
+  }
+  await expect(page.locator("[data-result]")).toBeVisible({ timeout: 60000 });
+  await expect(page.locator("[data-result]")).toContainText(/#\d+ today/);
+  await expect(page.locator(".fest-board li.mine").first()).toContainText("Track Star");
+  const festival = await page.evaluate(async () => {
+    const r = await fetch("/api/profile", {
+      headers: { Authorization: "Bearer " + localStorage.getItem("mythoveya-session") },
+    });
+    return (await r.json()).festival;
+  });
+  expect(festival.plays.race).toBe(1);
+  expect(festival.tickets).toBeGreaterThan(0);
+  expect(festival.best.race).toBeLessThan(40000);
+  await page.getByRole("button", { name: "Back to the fair" }).last().click();
+  await expect(page.locator(".island-card")).toBeVisible();
+  expect(errors).toEqual([]);
+});

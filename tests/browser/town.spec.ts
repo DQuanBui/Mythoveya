@@ -146,6 +146,20 @@ test("village missions, market, gardening and companion care persist", async ({
   await page.getByRole("button", { name: "Continue your journey" }).click();
   const after = await profile(page);
   expect(after).toEqual(before);
+  // Wait until the reloaded world has registered its renderer.
+  await expect
+    .poll(() =>
+      page.evaluate(async () => {
+        const url = performance
+          .getEntriesByType("resource")
+          .map((r) => r.name)
+          .find((name) => name.includes("@react-three_fiber.js"));
+        if (!url) return false;
+        const { _roots } = await import(/* @vite-ignore */ url);
+        return !!_roots.get(document.querySelector(".scene canvas"));
+      }),
+    )
+    .toBe(true);
   const visibleWorld = await page.evaluate(async () => {
     const moduleUrl = performance
       .getEntriesByType("resource")
