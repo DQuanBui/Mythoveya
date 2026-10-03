@@ -37,6 +37,7 @@ export class ArenaRoom extends Room {
             randomInt(0, 1000000),
           );
           this.battle.deadline = Date.now() + 20000;
+          this.battle.arena = "arena";
         }
         this.sync();
       }

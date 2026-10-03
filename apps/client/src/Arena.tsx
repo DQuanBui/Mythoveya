@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Client, type Room } from "@colyseus/sdk";
 import type { Battle, Profile } from "../../../packages/shared/types";
 import { session } from "./api";
 import { byId } from "../../../packages/shared/content";
 import { targets } from "../../../packages/shared/combat";
 import { BattleScene } from "./Scene";
-import { audio } from "./audio";
+import { audio, settings } from "./audio";
 import { Portrait } from "./portraits";
 export type Snapshot = {
   code: string;
@@ -20,6 +20,30 @@ export type Snapshot = {
   ranked: boolean;
   ratingChanges: { before: number; after: number }[];
 };
+/** A banner sweeps across for an ultimate, with a flash at the moment of impact. */
+function UltimateMoment({ battle, now }: { battle: Battle; now: number }) {
+  const e = battle.event;
+  if (!e || !e.action.endsWith("-2") || now - e.at > e.duration) return null;
+  const actor = battle.units.find((u) => u.id === e.actor);
+  if (!actor) return null;
+  const s = byId[actor.species];
+  return (
+    <>
+      <div
+        className="ult-banner"
+        key={`banner-${e.id}`}
+        style={{ "--c": s.color, "--d": `${Math.round(e.duration * 0.85)}ms` } as CSSProperties}
+      >
+        <small>{actor.side === 0 ? "ULTIMATE" : "ENEMY ULTIMATE"}</small>
+        <strong>{e.name.replace(`${s.name} · `, "")}</strong>
+        <span>{s.name}</span>
+      </div>
+      {!settings.reduced && (
+        <div className="ult-flash" key={`flash-${e.id}`} style={{ animationDelay: `${Math.round(e.duration * 0.42)}ms` }} />
+      )}
+    </>
+  );
+}
 export function BattleUI({
   battle,
   side = 0,
@@ -97,6 +121,7 @@ export function BattleUI({
   return (
     <div className="battle-screen">
       <BattleScene battle={battle} target={chosen} onTarget={setTarget} />
+      <UltimateMoment battle={battle} now={now} />
       <header className="battle-top">
         <div>
           <span className="eyebrow">

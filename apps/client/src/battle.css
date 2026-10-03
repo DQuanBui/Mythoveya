@@ -1,0 +1,207 @@
+/* Battle presentation: slim unit bars, floating numbers and ultimate moments */
+.unit-bar {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 76px;
+  padding: 3px 4px 4px;
+  border: none;
+  border-radius: 6px;
+  background: #10282dcc;
+  box-shadow: 0 2px 6px #0d1f2444;
+  cursor: pointer;
+}
+.unit-bar strong,
+.unit-bar small {
+  display: none;
+  white-space: nowrap;
+  font-weight: 500;
+  color: #f5efd9;
+}
+.unit-bar strong {
+  font-size: 11px;
+}
+.unit-bar small {
+  font-size: 9px;
+  color: #d4dcc6;
+}
+.unit-bar:hover,
+.unit-bar.selected,
+.unit-bar.acting {
+  width: auto;
+  min-width: 92px;
+  z-index: 2;
+}
+.unit-bar:hover strong,
+.unit-bar.selected strong,
+.unit-bar.acting strong,
+.unit-bar:hover small,
+.unit-bar.selected small {
+  display: block;
+}
+.unit-bar.selected {
+  box-shadow:
+    0 0 0 1.5px #f5d38a,
+    0 2px 8px #0d1f2466;
+}
+.unit-bar.acting {
+  box-shadow:
+    0 0 0 1.5px #81f8dc,
+    0 2px 8px #0d1f2466;
+}
+.unit-bar.down {
+  opacity: 0.35;
+}
+.unit-bar .hp {
+  position: relative;
+  width: 100%;
+  min-width: 66px;
+  height: 6px;
+  margin: 0;
+  border-radius: 3px;
+  background: #00000055;
+  overflow: hidden;
+}
+.unit-bar .hp i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 3px;
+  transition: width 0.35s ease-out;
+}
+.unit-bar.side-0 .hp i {
+  background: linear-gradient(90deg, #5fc79b, #a5e7b8);
+}
+.unit-bar.side-1 .hp i {
+  background: linear-gradient(90deg, #e0705d, #f2a582);
+}
+.unit-bar .hp b {
+  position: absolute;
+  inset: 0 0 0 auto;
+  background: #9fd3f0cc;
+}
+.unit-bar .statuses abbr {
+  font-size: 8px;
+  padding: 0 3px;
+  border-radius: 3px;
+  background: #e8d39c33;
+}
+.float-number {
+  display: block;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+  pointer-events: none;
+  -webkit-text-stroke: 3px #10282d;
+  paint-order: stroke fill;
+  animation: float-pop 1.15s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+}
+.float-number.damage {
+  color: #ffb27a;
+}
+.float-number.healing {
+  color: #9ff0b8;
+}
+.float-number.shield {
+  color: #9fd3f0;
+}
+.float-number.big {
+  font-size: 32px;
+  color: #ffe08a;
+}
+@keyframes float-pop {
+  0% {
+    transform: translateY(8px) scale(0.3);
+    opacity: 0;
+  }
+  18% {
+    transform: translateY(-6px) scale(1.35);
+    opacity: 1;
+  }
+  35% {
+    transform: translateY(-10px) scale(1);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-38px) scale(0.95);
+    opacity: 0;
+  }
+}
+.ult-banner {
+  position: absolute;
+  top: 34%;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 18px 0 16px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--c) 55%, #10282d) 20%, color-mix(in srgb, var(--c) 55%, #10282d) 80%, transparent);
+  pointer-events: none;
+  z-index: 5;
+  animation: ult-sweep var(--d, 1.6s) ease-out forwards;
+}
+.ult-banner small {
+  letter-spacing: 6px;
+  font-size: 11px;
+  color: #fff4d6;
+}
+.ult-banner strong {
+  font-family: Georgia, serif;
+  font-size: 40px;
+  color: #fff8e6;
+  text-shadow: 0 3px 14px #0006;
+}
+.ult-banner span {
+  font-size: 13px;
+  color: #fff4d6cc;
+}
+@keyframes ult-sweep {
+  0% {
+    transform: translateX(-30%) skewX(-8deg);
+    opacity: 0;
+  }
+  15% {
+    transform: translateX(0) skewX(-8deg);
+    opacity: 1;
+  }
+  70% {
+    transform: translateX(2%) skewX(-8deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(20%) skewX(-8deg);
+    opacity: 0;
+  }
+}
+.ult-flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, #fffbea, #fffbea00 70%);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 4;
+  animation: ult-flash 0.5s ease-out forwards;
+}
+@keyframes ult-flash {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.75;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .float-number,
+  .ult-banner,
+  .ult-flash {
+    animation-duration: 0.01s;
+  }
+}

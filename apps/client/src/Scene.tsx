@@ -4,6 +4,7 @@ import { HavenVillage } from "./HavenVillage";
 import { HavenBirds } from "./HavenBirds";
 import { HavenFrontier } from "./HavenFrontier";
 import { SkyferryDock } from "./Skyferry";
+import { BattleArena } from "./BattleArena";
 import { WeatherEffects } from "./Weather";
 import { HavenTreasure } from "./HavenTreasure";
 import { Riftgate } from "./Riftgate";
@@ -1435,10 +1436,11 @@ export function unitPosition(
   side: number,
   slot: number,
 ): [number, number, number] {
+  // Two well-spaced rows per side, seen from behind your own team.
   return [
-    ((slot % 3) - 1) * 2.35,
+    ((slot % 3) - 1) * 2.9,
     0,
-    (side === 0 ? 1 : -1) * (Math.floor(slot / 3) * 2.1 + 1.9),
+    (side === 0 ? 1 : -1) * (Math.floor(slot / 3) * 2.5 + 2.4),
   ];
 }
 function BattleCamera({
@@ -1451,11 +1453,30 @@ function BattleCamera({
   phase?: number;
 }) {
   const { camera, size } = useThree();
+  const saved = useRef<{ pos: T.Vector3; look: T.Vector3 } | null>(null);
   useFrame(() => {
     const cam = camera as T.PerspectiveCamera;
     const e = battle.event;
     const p = phase ?? (e ? (Date.now() - e.at) / e.duration : 2);
     const ultimate = e?.action.endsWith("-2");
+    // Ultimates get a camera moment: a push in on the caster, then back out.
+    if (!preview && ultimate && !settings.reduced && p >= 0 && p < 1) {
+      const actor = battle.units.find((u) => u.id === e!.actor);
+      if (actor) {
+        if (!saved.current) saved.current = { pos: cam.position.clone(), look: new T.Vector3(0, 0, 1.2) };
+        const at = new T.Vector3(...unitPosition(actor.side, actor.slot)),
+          toward = actor.side === 0 ? -1 : 1,
+          close = at.clone().add(new T.Vector3(2.6, 2.4, toward * 4.6)),
+          ease = (v: number) => v * v * (3 - 2 * v),
+          k = p < 0.25 ? ease(p / 0.25) : p > 0.7 ? ease(Math.max(0, (1 - p) / 0.3)) : 1;
+        cam.position.lerpVectors(saved.current.pos, close, k);
+        cam.lookAt(new T.Vector3().lerpVectors(saved.current.look, at.add(new T.Vector3(0, 0.9, 0)), k));
+      }
+    } else if (saved.current) {
+      cam.position.copy(saved.current.pos);
+      cam.lookAt(saved.current.look);
+      saved.current = null;
+    }
     const amount =
       !settings.reduced && ultimate && p >= 0 && p < 1
         ? Math.sin(p * Math.PI) *
@@ -1621,7 +1642,7 @@ export function BattleScene({
   return (
     <Canvas
       shadows
-      camera={{ position: preview ? [7, 6, 10] : [10, 12, 15], fov: 42 }}
+      camera={{ position: preview ? [7, 6, 10] : [0, 13.5, 17.5], fov: 42 }}
       dpr={[1, 1.5]}
     >
       <BattleCamera
@@ -1629,20 +1650,26 @@ export function BattleScene({
         preview={preview}
         phase={preview && paused ? previewPhase : undefined}
       />
-      <color attach="background" args={["#75939b"]} />
+      <BattleArena theme={battle.arena} />
       <ModelLighting intensity={0.55} />
-      <fog attach="fog" args={["#75939b", 25, 70]} />
-      <ambientLight intensity={1.6} />
-      <directionalLight position={[-4, 12, 6]} intensity={2.8} castShadow />
-      <mesh receiveShadow position={[0, -0.3, 0]}>
-        <cylinderGeometry args={[9, 10, 0.6, 12]} />
-        <meshStandardMaterial color="#697f7c" />
-      </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
-        <ringGeometry args={[6.9, 7, 64]} />
-        <meshBasicMaterial color="#cfbc81" />
-      </mesh>
+      <ambientLight intensity={0.75} />
+      <directionalLight
+        position={[-6, 14, 8]}
+        intensity={2.9}
+        castShadow
+        shadow-mapSize={[1024, 1024]}
+        shadow-camera-left={-12}
+        shadow-camera-right={12}
+        shadow-camera-top={12}
+        shadow-camera-bottom={-12}
+      />
       {battle.units.map((u) => {
+        // During an ultimate the camera is close, so the bars step aside.
+        const cinematic =
+          !preview &&
+          !settings.reduced &&
+          !!battle.event?.action.endsWith("-2") &&
+          Date.now() - battle.event.at < battle.event.duration;
         const p = unitPosition(u.side, u.slot),
           event = battle.event,
           elapsed =
@@ -1683,8 +1710,8 @@ export function BattleScene({
               phase={elapsed}
               scale={0.92}
             />
-            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.035, 0]}>
-              <ringGeometry args={[0.65, 0.72, 32]} />
+            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.035, 0]} scale={battle.queue[0] === u.id ? 1.15 : 1}>
+              <ringGeometry args={[0.65, battle.queue[0] === u.id ? 0.8 : 0.72, 32]} />
               <meshBasicMaterial
                 color={
                   target === u.id
@@ -1697,56 +1724,56 @@ export function BattleScene({
                 }
               />
             </mesh>
-            {!preview && (
+            {!preview && !cinematic && (
               <Html
-                position={[0, 2.05, 0]}
+                position={[0, 1.75 * byId[u.species].size + 0.45, 0]}
                 center
-                distanceFactor={17}
+                distanceFactor={15}
                 zIndexRange={[3, 0]}
               >
+                {/* A slim health bar; the name shows for the acting or targeted unit and on hover. */}
                 <button
-                  className={`unit-label ${target === u.id ? "selected" : ""}`}
+                  className={`unit-bar side-${u.side} ${target === u.id ? "selected" : ""} ${battle.queue[0] === u.id ? "acting" : ""} ${shownHp === 0 ? "down" : ""}`}
                   onClick={() => onTarget(u.id)}
+                  aria-label={`${byId[u.species].name} ${shownHp} of ${u.maxHp}`}
                 >
                   <strong>{byId[u.species].name}</strong>
                   <span className="hp">
                     <i style={{ width: `${(shownHp / u.maxHp) * 100}%` }} />
+                    {u.shield > 0 && (
+                      <b style={{ width: `${Math.min(100, (u.shield / u.maxHp) * 100)}%` }} />
+                    )}
                   </span>
                   <small>
                     {shownHp}/{u.maxHp}
                     {u.shield > 0 ? ` · ◇${u.shield}` : ""}
                   </small>
-                  <span className="statuses">
-                    {u.statuses.map((s) => (
-                      <abbr
-                        key={s.kind}
-                        title={`${s.kind}: ${s.turns} round(s)`}
-                      >
-                        {s.kind.slice(0, 3)} {s.turns}
-                      </abbr>
-                    ))}
-                  </span>
-                  {active &&
-                    elapsed > 0.4 &&
-                    event?.amounts
-                      .filter((a) => a.id === u.id)
-                      .map((a) => (
-                        <em
-                          key={a.id}
-                          className={a.amount < 0 ? "healing" : "damage"}
-                        >
-                          {a.amount === 0
-                            ? a.shield > 0
-                              ? `◇ +${a.shield}`
-                              : ""
-                            : a.amount > 0
-                              ? `−${a.amount}`
-                              : `+${-a.amount}`}
-                        </em>
+                  {u.statuses.length > 0 && (
+                    <span className="statuses">
+                      {u.statuses.map((s) => (
+                        <abbr key={s.kind} title={`${s.kind}: ${s.turns} round(s)`}>
+                          {s.kind.slice(0, 3)} {s.turns}
+                        </abbr>
                       ))}
+                    </span>
+                  )}
                 </button>
               </Html>
             )}
+            {!preview &&
+              active &&
+              elapsed > 0.42 &&
+              event?.amounts
+                .filter((a) => a.id === u.id && (a.amount !== 0 || a.shield > 0))
+                .map((a) => (
+                  <Html key={`${event.at}-${a.id}`} position={[0, 1.75 * byId[u.species].size + 1.1, 0]} center zIndexRange={[4, 0]}>
+                    <span
+                      className={`float-number ${a.amount > 0 ? "damage" : a.amount < 0 ? "healing" : "shield"} ${event.action.endsWith("-2") ? "big" : ""}`}
+                    >
+                      {a.amount > 0 ? a.amount : a.amount < 0 ? `+${-a.amount}` : `◇${a.shield}`}
+                    </span>
+                  </Html>
+                ))}
           </group>
         );
       })}
@@ -1754,10 +1781,8 @@ export function BattleScene({
         battle={battle}
         phase={preview && paused ? previewPhase : undefined}
       />
-      <Island position={[-22, 0, -24]} />
-      <Island position={[23, 6, -38]} />
       <OrbitControls
-        target={[0, 0, 0]}
+        target={[0, 0, preview ? 0 : 1.2]}
         enablePan={false}
         minDistance={preview ? 7 : 15}
         maxDistance={25}

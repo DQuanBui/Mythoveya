@@ -138,6 +138,8 @@ export type Battle = {
   delayed: { actor: string; target: string; action: number; round: number }[];
   mode: string;
   title?: string;
+  /** Which themed arena the battle is staged in. */
+  arena?: string;
   rewards?: {
     gold: number;
     diamonds: number;

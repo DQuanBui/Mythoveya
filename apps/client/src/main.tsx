@@ -7,6 +7,7 @@ import "./town.css";
 import "./haven.css";
 import "./adventure.css";
 import "./islands.css";
+import "./battle.css";
 class Boundary extends Component<{ children: ReactNode }, { error: string }> {
   state = { error: "" };
   static getDerivedStateFromError(e: Error) {

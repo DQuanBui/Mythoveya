@@ -90,6 +90,8 @@ export function team(p: Profile) {
     return o;
   });
 }
+/** Each story chapter is fought in its own themed arena. */
+const CHAPTER_ARENAS = ["grove", "embers", "tides", "frost", "rift", "archive", "skyforge", "throne"];
 const ADVENTURE_KINDS = [
   "skill-up",
   "gear-equip",
@@ -298,6 +300,13 @@ export function startPve(
           ? "Hollow Sentinel"
           : "Thorncrown"
       : "Wild encounter";
+  b.arena = practice
+    ? "arena"
+    : p.region === "canyon"
+      ? "embers"
+      : p.region === "hollow"
+        ? "frost"
+        : "grove";
   if (p.wins === 0 && !boss)
     for (const u of b.units.filter((u) => u.side === 1)) {
       u.hp = u.maxHp = Math.round(u.maxHp * 0.5);
@@ -349,6 +358,7 @@ function startMission(p: Profile, mission: Mission) {
       randomInt(0, 10000000),
     );
     b.title = `Rift Tower · Floor ${floor}${t.boss ? " · Warden" : ""}`;
+    b.arena = t.boss ? "throne" : "rift";
     if (t.boss) {
       const u = b.units.find((u) => u.side === 1 && u.species === t.boss)!;
       u.hp = u.maxHp = Math.round(u.maxHp * BOSS_SCALE.hp);
@@ -367,6 +377,7 @@ function startMission(p: Profile, mission: Mission) {
       randomInt(0, 10000000),
     );
     b.title = stage.boss?.title || `Chapter ${stage.ci + 1} · ${stage.name}`;
+    b.arena = CHAPTER_ARENAS[stage.ci] || "grove";
     if (stage.ease)
       for (const u of b.units.filter((u) => u.side === 1)) {
         u.hp = u.maxHp = Math.round(u.maxHp * stage.ease);
@@ -400,6 +411,13 @@ function startMission(p: Profile, mission: Mission) {
       randomInt(0, 10000000),
     );
     b.title = `${d.name} · Tier ${["I", "II", "III", "IV", "V"][tier]}`;
+    b.arena = d.name.startsWith("Crystal")
+      ? "rift"
+      : d.name.startsWith("Ember")
+        ? "embers"
+        : d.name.startsWith("Tidal")
+          ? "tides"
+          : "grove";
     const guardian = b.units[b.units.length - 1];
     guardian.hp = guardian.maxHp = Math.round(guardian.maxHp * 1.6);
     battleMeta.set(b.id, {
