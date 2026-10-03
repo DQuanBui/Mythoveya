@@ -24,12 +24,16 @@ import {
   runTickets,
   simulateCourse,
   simulateRace,
+  FISHING,
+  fishingBites,
+  simulateFishing,
   type Activity,
 } from "../../packages/shared/festival-games";
+import { fishWeights, weatherAt } from "../../packages/shared/weather";
 import { recordRun, topRuns } from "./store";
 
-/** Runs played on the festival island: race and course for now. */
-const PLAYABLE: Activity[] = ["race", "course"];
+/** Games played on the festival island. */
+const PLAYABLE: Activity[] = ["race", "course", "fishing"];
 function inputsOf(v: any, max: number) {
   const list = v.inputs;
   if (!Array.isArray(list) || list.length > MAX_PRESSES) throw Error("That run could not be read.");
@@ -108,7 +112,10 @@ export function festivalMutation(p: Profile, kind: string, v: any, now = Date.no
       const activity = v.quest as Activity;
       if (!PLAYABLE.includes(activity)) throw Error("Choose a festival game.");
       if (f.started?.activity !== activity) throw Error("Start the game at its gate first.");
-      let score: number, detail: { time?: number; misses?: number }, data: Record<string, unknown>;
+      let score: number,
+        minTime: number,
+        detail: { time?: number; misses?: number; score?: number; caught?: string[] },
+        data: Record<string, unknown>;
       const keeper = { avatar: p.avatar, outfit: f.outfit };
       if (activity === "race") {
         const o = p.owned.find((o) => o.id === v.id);
@@ -116,24 +123,38 @@ export function festivalMutation(p: Profile, kind: string, v: any, now = Date.no
         const inputs = inputsOf(v, RACE.maxMs),
           bonus = raceBonus(o),
           result = simulateRace(inputs, racePads(f.day), bonus);
-        score = result.time;
+        score = minTime = result.time;
         detail = result;
         data = { inputs, bonus, species: o.species, ...keeper };
+      } else if (activity === "fishing") {
+        const inputs = inputsOf(v, FISHING.round),
+          weather = weatherAt(f.started.at).weather,
+          result = simulateFishing(inputs, fishingBites(f.day, fishWeights(weather)));
+        score = result.score;
+        minTime = FISHING.round;
+        detail = result;
+        data = { inputs, weather, ...keeper };
       } else {
         const inputs = inputsOf(v, COURSE.maxMs),
           result = simulateCourse(inputs, courseObstacles(f.day));
-        score = result.time;
+        score = minTime = result.time;
         detail = result;
         data = { inputs, ...keeper };
       }
       // A run can't be scored faster than the time that has passed since its start.
-      if (now - f.started.at < score - 2000) throw Error("That run finished faster than the clock allows.");
+      if (now - f.started.at < minTime - 2000) throw Error("That run finished faster than the clock allows.");
       delete f.started;
       let tickets = 0;
       if ((f.plays[activity] || 0) < TICKET_PLAYS) {
         f.plays[activity] = (f.plays[activity] || 0) + 1;
         tickets = runTickets(activity, detail) * (featuredActivity(f.day) === activity ? 2 : 1);
         f.tickets += tickets;
+        // Tournament catches go in your bag, a few per round, to sell or brew.
+        if (detail.caught) {
+          const t = ensureTown(p, now);
+          for (const fish of detail.caught.slice(0, FISHING.maxCatch))
+            t.inventory[fish] = (t.inventory[fish] || 0) + 1;
+        }
       }
       const lower = ACTIVITIES[activity].lowerIsBetter,
         best = f.best[activity],

@@ -14,7 +14,11 @@ import {
   rivalPresses,
   simulateCourse,
   simulateRace,
+  FISHING,
+  fishingBites,
+  simulateFishing,
 } from "../packages/shared/festival-games";
+import { fishWeights, weatherAt } from "../packages/shared/weather";
 import { utcDay } from "../packages/shared/town";
 
 process.env.DB_PATH = join(mkdtempSync(join(tmpdir(), "mythoveya-fairgames-")), "save.sqlite");
@@ -110,5 +114,21 @@ describe("server-scored festival runs", () => {
     for (let i = 0; i < TICKET_PLAYS + 1; i++) tickets = raceWith(slow, [], now + (i + 1) * 100000).tickets;
     expect(tickets).toBe(0);
     expect(() => act(slow, "fest-start", { quest: "juggling" }, now)).toThrow("Choose a festival game");
+  });
+  it("scores a tournament round and puts the first catches in the bag", () => {
+    const token = fairgoer("Angler");
+    const bites = fishingBites(day, fishWeights(weatherAt(now).weather));
+    const presses = bites.map((b) => b.at + 500);
+    expect(simulateFishing(presses, bites).caught).toHaveLength(bites.length);
+    expect(simulateFishing(Array.from({ length: 90 }, (_, i) => i * 500 + 1), bites).score).toBe(0);
+    act(token, "fest-start", { quest: "fishing" }, now);
+    expect(() => act(token, "fest-run", { quest: "fishing", inputs: presses }, now + 20000)).toThrow("clock");
+    const run = act(token, "fest-run", { quest: "fishing", inputs: presses }, now + FISHING.round + 500);
+    expect(run.score).toBe(simulateFishing(presses, bites).score);
+    expect(run.score).toBeGreaterThan(40);
+    const bag = authenticate(token).town!.inventory;
+    const landed = ["minnow", "carp", "skyfin"].reduce((n, f) => n + (bag[f] || 0), 0);
+    expect(landed).toBe(FISHING.maxCatch);
+    expect(topRuns(day, "fishing", false)[0]).toMatchObject({ name: "Angler", score: run.score });
   });
 });

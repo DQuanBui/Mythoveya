@@ -215,6 +215,90 @@ export function courseTrace(inputs: number[], obstacles: Obstacle[]) {
   return trace;
 }
 
+// ---- Lantern pond tournament ----
+export const FISHING = { round: 45000, early: 250, late: 1000, maxCatch: 5 };
+export const FISH_POINTS = { minnow: 1, carp: 3, skyfin: 8 } as const;
+export type FishKind = keyof typeof FISH_POINTS;
+export type Bite = { at: number; fish: FishKind };
+/** Today's bites; the weather at the start of the round sets the fish. */
+export function fishingBites(day: string, weights: Record<FishKind, number>): Bite[] {
+  const random = seededRandom(daySeed(day, "tournament")),
+    bites: Bite[] = [];
+  let at = 1800;
+  while (at < FISHING.round - FISHING.late) {
+    let roll = random(),
+      fish: FishKind = "minnow";
+    for (const kind of ["skyfin", "carp", "minnow"] as FishKind[]) {
+      if (roll < weights[kind]) {
+        fish = kind;
+        break;
+      }
+      roll -= weights[kind];
+    }
+    bites.push({ at: Math.round(at), fish });
+    at += 2200 + random() * 2300;
+  }
+  return bites;
+}
+/** Reel inside a bite's window to land it; a reel at still water scares off the next bite. */
+export class FishSim {
+  t = 0;
+  score = 0;
+  combo = 0;
+  splashes = 0;
+  caught: FishKind[] = [];
+  last: { fish: FishKind | null; at: number } | null = null;
+  next = 0;
+  scared = -1;
+  finished: number | null = null;
+  private queue: number[] = [];
+  constructor(readonly bites: Bite[]) {}
+  press(at: number) {
+    this.queue.push(at);
+  }
+  /** The bite whose float is down right now, if any. */
+  biting() {
+    const b = this.bites[this.next];
+    return b && this.next !== this.scared && this.t >= b.at + FISHING.early && this.t <= b.at + FISHING.late ? b : null;
+  }
+  advance(to: number) {
+    while (this.finished === null && this.t + TICK <= to) {
+      this.t += TICK;
+      this.queue.sort((a, b) => a - b);
+      while (this.queue.length && this.queue[0] <= this.t) {
+        this.queue.shift();
+        const bite = this.biting();
+        if (bite) {
+          this.combo = Math.min(4, this.combo + 1);
+          this.score += FISH_POINTS[bite.fish] + this.combo - 1;
+          this.caught.push(bite.fish);
+          this.last = { fish: bite.fish, at: this.t };
+          this.next++;
+        } else {
+          this.splashes++;
+          this.combo = 0;
+          this.last = { fish: null, at: this.t };
+          // A splash scares off the next fish that comes along.
+          if (this.scared < this.next) this.scared = this.next;
+        }
+      }
+      const b = this.bites[this.next];
+      if (b && this.t > b.at + FISHING.late) {
+        if (this.next !== this.scared) this.combo = 0;
+        this.next++;
+      }
+      if (this.t >= FISHING.round) this.finished = FISHING.round;
+    }
+    return this;
+  }
+}
+export function simulateFishing(presses: number[], bites: Bite[]) {
+  const sim = new FishSim(bites);
+  presses.forEach((p) => sim.press(p));
+  sim.advance(FISHING.round);
+  return { score: sim.score, caught: sim.caught, splashes: sim.splashes };
+}
+
 /** Tickets for a finished run, before the featured bonus. */
 export function runTickets(activity: Activity, result: { time?: number; misses?: number; score?: number }) {
   if (activity === "race") return result.time! < 30000 ? 6 : result.time! < 34000 ? 4 : 2;
