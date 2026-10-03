@@ -434,3 +434,32 @@
 .racer-names[hidden] {
   display: none;
 }
+.wardrobe {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+.wardrobe > div:first-child {
+  position: sticky;
+  top: 0;
+  text-align: center;
+}
+.outfit-preview {
+  width: 220px;
+  height: 280px;
+  border-radius: 14px;
+  background: radial-gradient(circle at 50% 35%, #e8d39c33, #0f2a3155);
+  border: 1px solid #b8c8aa30;
+}
+.wardrobe .market-stock {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+@media (max-width: 720px) {
+  .wardrobe {
+    grid-template-columns: 1fr;
+  }
+  .outfit-preview {
+    margin: 0 auto;
+  }
+}

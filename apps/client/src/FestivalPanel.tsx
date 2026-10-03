@@ -1,4 +1,10 @@
-import { useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import * as T from "three";
+import { animateAvatar, createAvatar } from "./models";
+import { dressKeeper } from "./TownScenery";
+import { ModelLighting } from "./ModelLighting";
+import { settings } from "./audio";
 import type { Profile } from "../../../packages/shared/types";
 import {
   FESTIVAL_SHOP,
@@ -27,6 +33,30 @@ const SECTIONS: [ShopEntry["kind"], string][] = [
   ["supply", "Weekly supplies"],
 ];
 
+function Mannequin({ avatar, outfit }: { avatar: number; outfit?: string }) {
+  const model = useMemo(() => dressKeeper(createAvatar(avatar), outfit), [avatar, outfit]);
+  const turn = useRef(0);
+  useFrame(({ clock }, dt) => {
+    if (!settings.reduced) turn.current += dt * 0.6;
+    // A full slow turn, so capes are seen from behind too.
+    model.rotation.y = turn.current;
+    animateAvatar(model, clock.elapsedTime, false, false, settings.reduced);
+  });
+  return <primitive object={model} />;
+}
+/** A turning preview of your keeper in an outfit. */
+function OutfitPreview({ avatar, outfit }: { avatar: number; outfit?: string }) {
+  return (
+    <div className="outfit-preview" aria-label="Outfit preview">
+      <Canvas camera={{ position: [0, 1.25, 3.9], fov: 34 }} dpr={[1, 1.5]} onCreated={({ camera }) => camera.lookAt(new T.Vector3(0, 0.98, 0))}>
+        <ModelLighting intensity={0.8} />
+        <ambientLight intensity={1.3} />
+        <directionalLight position={[2, 3, 3]} intensity={2.2} />
+        <Mannequin avatar={avatar} outfit={outfit} />
+      </Canvas>
+    </div>
+  );
+}
 /** Lanternfair's board and ticket booth. */
 export function FestivalPanel({
   profile,
@@ -40,6 +70,7 @@ export function FestivalPanel({
   play: (activity: "race" | "course" | "fishing") => void;
 }) {
   const [tab, setTab] = useState<FestivalTab>(initial);
+  const [trying, setTrying] = useState<string | undefined>();
   const today = utcDay(),
     f = profile.festival || defaultFestival(),
     fresh = f.day === today,
@@ -161,6 +192,11 @@ export function FestivalPanel({
           </section>
         ))}
       {tab === "wardrobe" && (
+        <div className="wardrobe">
+        <div>
+          <OutfitPreview avatar={profile.avatar} outfit={trying ?? f.outfit} />
+          <small className="muted">{trying ? "Previewing" : f.outfit ? "Wearing" : "No outfit"}</small>
+        </div>
         <div className="market-stock">
           {FESTIVAL_SHOP.filter((s) => s.kind === "outfit").map((s) => {
             const owned = f.outfits.includes(s.id),
@@ -171,15 +207,24 @@ export function FestivalPanel({
                 <h3>{s.name}</h3>
                 <p>{s.description}</p>
                 <small>{owned ? (wearing ? "Wearing now" : "In your wardrobe") : `${s.tickets} tickets at the booth`}</small>
-                <button
-                  disabled={!owned}
-                  onClick={() => run("fest-outfit", { item: wearing ? "none" : s.id })}
-                >
-                  {!owned ? "Not owned yet" : wearing ? "Take off" : "Wear"}
-                </button>
+                <div className="button-row">
+                  <button onClick={() => setTrying(trying === s.id ? undefined : s.id)}>
+                    {trying === s.id ? "Stop preview" : "Preview"}
+                  </button>
+                  <button
+                    disabled={!owned}
+                    onClick={() => {
+                      setTrying(undefined);
+                      run("fest-outfit", { item: wearing ? "none" : s.id });
+                    }}
+                  >
+                    {!owned ? "Not owned yet" : wearing ? "Take off" : "Wear"}
+                  </button>
+                </div>
               </article>
             );
           })}
+        </div>
         </div>
       )}
     </div>

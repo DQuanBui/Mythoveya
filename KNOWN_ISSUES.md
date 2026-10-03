@@ -20,7 +20,7 @@
 - Festival games run on a daily seed, so every keeper plays the same course, and the server rescores each run from its recorded inputs. That stops edited scores and impossibly fast runs. It can't stop a perfectly scripted input sequence that takes at least the real game time.
 - The lantern hunt trusts the client about where you are when you collect a lantern, as with Skyglass caches. Only today's lantern ids are accepted, once each.
 - The ticket rewards, shop prices, habitat Gold rates and house costs were chosen by calculation and simulated runs, not long-term playtesting.
-- There are four keeper outfits and three festival companion accessories. The wardrobe has no live 3D preview; outfits show on your keeper in the world and in race ghosts.
+- There are four keeper outfits and three festival companion accessories. The wardrobe previews outfits on your keeper; companion accessories are previewed only once equipped.
 - Island scenes reuse the Havenreach weather, and only Havenreach has wild encounters, regions and villagers. The islands are optional side content.
 
 ## Systems and scope

@@ -129,18 +129,19 @@ export function dressKeeper(model: T.Group, outfit?: string) {
     }
     head?.add(piece);
   } else if (outfit === "festival-cape") {
-    const cape = new T.Mesh(new T.BoxGeometry(0.5, 0.62, 0.04), mat("#c5573f"));
-    cape.position.set(0, 1.12, -0.2);
+    // Draped over the backpack so it reads from behind.
+    const cape = new T.Mesh(new T.BoxGeometry(0.58, 0.74, 0.04), mat("#c5573f"));
+    cape.position.set(0, 1.08, -0.36);
     cape.rotation.x = 0.12;
     piece.add(cape);
     for (const x of [-0.12, 0.12]) {
-      const stripe = new T.Mesh(new T.BoxGeometry(0.07, 0.62, 0.045), mat("#f3e3b5"));
-      stripe.position.set(x, 1.12, -0.2);
+      const stripe = new T.Mesh(new T.BoxGeometry(0.07, 0.74, 0.045), mat("#f3e3b5"));
+      stripe.position.set(x, 1.08, -0.365);
       stripe.rotation.x = 0.12;
       piece.add(stripe);
     }
     const clasp = new T.Mesh(new T.TorusGeometry(0.16, 0.03, 5, 14, Math.PI), mat("#e3bd56", { metalness: 0.4 }));
-    clasp.position.set(0, 1.42, -0.05);
+    clasp.position.set(0, 1.44, -0.12);
     clasp.rotation.x = -Math.PI / 2;
     piece.add(clasp);
     model.add(piece);
