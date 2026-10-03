@@ -421,7 +421,9 @@ export type Motion =
   | "entrance"
   | "victory"
   | "guard"
-  | "stunned";
+  | "stunned"
+  | "sleep"
+  | "play";
 export function animateCreature(
   g: T.Group,
   time: number,
@@ -472,6 +474,22 @@ export function animateCreature(
   if (state === "victory") rig.position.y += Math.abs(Math.sin(time * 4)) * 0.18 * motion;
   if (state === "guard") rig.scale.y = 0.85;
   if (state === "stunned") rig.rotation.z = Math.sin(time * 3) * 0.12;
+  if (state === "sleep") {
+    // Curled low with slow, deep breaths and a tucked, still tail.
+    rig.position.y = (floating ? 0.05 : -0.05) + Math.sin(time * 1.2) * 0.02 * motion;
+    rig.scale.set(1.04, 0.86 + Math.sin(time * 1.2) * 0.03 * motion, 1);
+    rig.rotation.x = 0.12;
+    limbs.forEach((l: T.Group) => (l.rotation.x = 0));
+    tails.forEach((t: T.Group) => (t.rotation.y = 0.5));
+    wings.forEach((w: T.Group, i: number) => (w.rotation.z = ((i % 2) * 2 - 1) * -0.1));
+  }
+  if (state === "play") {
+    // Playful pounces: a crouch, a hop and a happy tilt.
+    const hop = Math.max(0, Math.sin(time * 5));
+    rig.position.y += hop * 0.28 * motion;
+    rig.rotation.z = Math.sin(time * 2.5) * 0.18 * motion;
+    rig.rotation.x = -hop * 0.2 * motion;
+  }
 }
 
 // Keepers: rounded proportions, faces with brows and smiles, and per-character hair.

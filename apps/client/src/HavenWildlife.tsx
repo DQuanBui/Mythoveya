@@ -9,6 +9,7 @@ import {
 } from "../../../packages/shared/haven";
 import { createCreature, animateCreature } from "./models";
 import { audio, settings } from "./audio";
+import { daylight, islandHour } from "./daytime";
 import { byId } from "../../../packages/shared/content";
 
 function Resident({
@@ -40,8 +41,10 @@ function Resident({
       (settings.quality === "Low" ? 26 : settings.quality === "High" ? 43 : 36);
     if (!model.visible) return;
     time.current += Math.min(dt, 0.05);
+    // Wildlife settles down to sleep after dark.
     const t = time.current,
-      walking = !settings.reduced && t % 12 < 7;
+      asleep = daylight(islandHour()).glow > 0.6,
+      walking = !settings.reduced && !asleep && t % 12 < 7;
     if (walking) {
       const x = site.point[0] + Math.sin(t * 0.23) * site.radius,
         z = site.point[1] + Math.cos(t * 0.17) * site.radius;
@@ -56,8 +59,8 @@ function Resident({
     model.position.y = site.water
       ? 0.08
       : groundHeight(model.position.x, model.position.z);
-    animateCreature(model, t, walking ? "walk" : "idle", 0, settings.reduced);
-    if (t - lastVoice.current > 24 + index && distance < 14) {
+    animateCreature(model, t, walking ? "walk" : asleep && !site.water ? "sleep" : "idle", 0, settings.reduced);
+    if (!asleep && t - lastVoice.current > 24 + index && distance < 14) {
       audio.voice(
         site.species,
         "call",

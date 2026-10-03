@@ -32,6 +32,7 @@ import { Explorer, type WalkArea } from "./Scene";
 import { SkyferryDock } from "./Skyferry";
 import { animateCreature, createCreature } from "./models";
 import { audio, settings } from "./audio";
+import { daylight, islandHour } from "./daytime";
 import type { ExplorationInput } from "./world-guide";
 
 export type Placing = { kind: string; uid?: string; rot: number };
@@ -414,11 +415,25 @@ function Placed({ item }: { item: HomeItem }) {
     </group>
   );
 }
-/** A companion living in a habitat: it wanders the front of the plot and can be greeted. */
+// A heart outline shared by every greeting burst.
+const heartShape = new T.Shape()
+  .moveTo(0, -0.12)
+  .bezierCurveTo(-0.02, -0.08, -0.16, -0.02, -0.16, 0.06)
+  .bezierCurveTo(-0.16, 0.14, -0.06, 0.17, 0, 0.1)
+  .bezierCurveTo(0.06, 0.17, 0.16, 0.14, 0.16, 0.06)
+  .bezierCurveTo(0.16, -0.02, 0.02, -0.08, 0, -0.12);
+const heartGeometry = new T.ShapeGeometry(heartShape);
+const seedOf = (text: string) => [...text].reduce((n, c) => (n * 31 + c.charCodeAt(0)) % 997, 7);
+/**
+ * A companion living in a habitat. By day it wanders the open front of the
+ * plot and now and then plays with its housemates; after dark it curls up
+ * to sleep. A greeting makes it hop with a burst of hearts.
+ */
 function HabitatResident({
   species,
   item,
   index,
+  housemates,
   onGreet,
   disabled,
   title,
@@ -426,54 +441,116 @@ function HabitatResident({
   species: string;
   item: HomeItem;
   index: number;
+  housemates: number;
   onGreet: () => void;
   disabled: boolean;
   title: string;
 }) {
   const model = useMemo(() => createCreature(species), [species]),
-    time = useRef(index * 4.1),
-    cheer = useRef(0);
+    cheer = useRef(0),
+    hearts = useRef<T.Group>(null),
+    dreams = useRef<T.Group>(null);
   const angle = (-item.rot * Math.PI) / 2,
     cos = Math.cos(angle),
-    sin = Math.sin(angle);
+    sin = Math.sin(angle),
+    offset = seedOf(item.uid);
+  const place = (lx: number, lz: number) => [item.x + lx * cos + lz * sin, item.z - lx * sin + lz * cos] as const;
   useEffect(() => {
     model.scale.setScalar(0.72);
+    const [x, z] = place((index - 1) * 0.9, 0.6);
+    model.position.set(x, 0.1, z);
   }, [model]);
-  useFrame((_s, dt) => {
-    time.current += Math.min(dt, 0.05);
+  useFrame(({ clock, camera }, dt) => {
+    // Housemates share a clock so they gather to play together.
+    const t = clock.elapsedTime + offset,
+      cycle = t % 24,
+      night = daylight(islandHour()).glow > 0.55;
     cheer.current = Math.max(0, cheer.current - dt);
-    const t = time.current,
-      walking = !settings.reduced && cheer.current <= 0 && t % 10 < 6;
-    if (walking) {
-      // Local wander in the open front half of the plot, rotated with the habitat.
-      const lx = Math.sin(t * 0.31 + index * 2) * 1.2,
-        lz = 0.55 + Math.cos(t * 0.23 + index) * 0.75;
-      const x = item.x + lx * cos + lz * sin,
-        z = item.z - lx * sin + lz * cos;
-      const dx = x - model.position.x,
-        dz = z - model.position.z;
-      if (Math.hypot(dx, dz) > 0.001) model.rotation.y = Math.atan2(dx, dz);
-      model.position.set(x, 0.1, z);
-    } else if (!model.position.lengthSq()) {
-      model.position.set(item.x + (index - 1) * 0.9 * cos, 0.1, item.z - (index - 1) * 0.9 * sin);
+    let state: "walk" | "idle" | "play" | "sleep" | "victory" = "idle",
+      target: readonly [number, number] | null = null;
+    if (cheer.current > 0) state = "victory";
+    else if (night) {
+      state = "sleep";
+      target = place((index - 1) * 0.8, 0.35);
+    } else if (settings.reduced) state = "idle";
+    else if (housemates > 1 && cycle >= 10 && cycle < 14) {
+      state = "play";
+      target = place((index - (housemates - 1) / 2) * 0.55, 0.7);
+    } else if (cycle < 6 || (cycle >= 14 && cycle < 20)) {
+      state = "walk";
+      target = place(Math.sin(t * 0.31 + index * 2) * 1.2, 0.55 + Math.cos(t * 0.23 + index) * 0.75);
     }
-    animateCreature(model, t, cheer.current > 0 ? "victory" : walking ? "walk" : "idle", 0, settings.reduced);
+    if (target) {
+      const dx = target[0] - model.position.x,
+        dz = target[1] - model.position.z,
+        dist = Math.hypot(dx, dz);
+      const step = Math.min(dist, dt * (state === "walk" ? 1.6 : 1.2));
+      if (dist > 0.02) {
+        model.position.x += (dx / dist) * step;
+        model.position.z += (dz / dist) * step;
+        if (state !== "sleep") model.rotation.y = Math.atan2(dx, dz);
+      }
+      // At play, face the middle of the group.
+      if (state === "play" && dist < 0.1) {
+        const [cx, cz] = place(0, 1.3);
+        model.rotation.y = Math.atan2(cx - model.position.x, cz - model.position.z);
+      }
+      if (state !== "walk" && dist > 0.1 && state !== "sleep") state = "walk";
+    }
+    animateCreature(model, t, state, 0, settings.reduced);
+    if (hearts.current) {
+      const k = 1 - cheer.current / 1.6;
+      hearts.current.visible = cheer.current > 0;
+      hearts.current.position.set(model.position.x, 1.1 + k * 0.9, model.position.z);
+      hearts.current.quaternion.copy(camera.quaternion);
+      hearts.current.children.forEach((h, i) => {
+        h.position.set(Math.sin(i * 2.1) * 0.35 * k, i * 0.18 * k, 0);
+        ((h as T.Mesh).material as T.MeshBasicMaterial).opacity = Math.max(0, 1 - k);
+      });
+    }
+    if (dreams.current) {
+      dreams.current.visible = state === "sleep";
+      dreams.current.position.set(model.position.x, 0.9, model.position.z);
+      dreams.current.children.forEach((b, i) => {
+        const p = (t * 0.35 + i / 3) % 1;
+        b.position.set(0.15 + p * 0.25, p * 0.8, 0);
+        b.scale.setScalar(0.4 + p * 0.8);
+        ((b as T.Mesh).material as T.MeshBasicMaterial).opacity = 0.75 * (1 - p);
+      });
+    }
   });
   return (
-    <WorldInteraction
-      name={`home-resident-${species}-${index}`}
-      title={title}
-      hint="Lives here · Click to greet"
-      disabled={disabled}
-      reach={4}
-      activate={() => {
-        cheer.current = 1.6;
-        audio.voice(species);
-        onGreet();
-      }}
-    >
-      <primitive object={model} />
-    </WorldInteraction>
+    <>
+      <WorldInteraction
+        name={`home-resident-${species}-${index}`}
+        title={title}
+        hint="Lives here · Click to greet"
+        disabled={disabled}
+        reach={4}
+        activate={() => {
+          cheer.current = 1.6;
+          audio.voice(species);
+          onGreet();
+        }}
+      >
+        <primitive object={model} />
+      </WorldInteraction>
+      <group ref={hearts} visible={false}>
+        {[0, 1, 2, 3].map((i) => (
+          <mesh key={i} geometry={heartGeometry}>
+            <meshBasicMaterial color="#f07a98" transparent depthWrite={false} side={T.DoubleSide} />
+          </mesh>
+        ))}
+      </group>
+      <group ref={dreams} visible={false}>
+        {[0, 1, 2].map((i) => (
+          <mesh key={i}>
+            <sphereGeometry args={[0.07, 8, 6]} />
+            <meshBasicMaterial color="#eef4f8" transparent depthWrite={false} />
+          </mesh>
+        ))}
+      </group>
+    </>
   );
 }
 function Habitat({
@@ -511,6 +588,7 @@ function Habitat({
           species={o.species}
           item={item}
           index={i}
+          housemates={residents.length}
           disabled={disabled}
           title={o.nickname || byId[o.species]?.name || "Companion"}
           onGreet={() => onInteract(`pet-${o.id}`)}
