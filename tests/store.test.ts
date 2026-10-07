@@ -8,7 +8,7 @@ process.env.DB_PATH = join(
 );
 const store = await import("../apps/server/store");
 const game = await import("../apps/server/game");
-const { gainXp, resetDaily, formation } = await import(
+const { gainXp, resetDaily, formation, own } = await import(
   "../packages/shared/economy"
 );
 const { createProfile, operation, authenticate, db, getProfile, save } = store;
@@ -20,6 +20,32 @@ const op = (
 ) => operation(token, requestId, (p) => game.mutate(p, kind, data));
 afterAll(() => db.close());
 describe("durable economy", () => {
+  it("persists a shimmering acquisition once and keeps it through habitats and duplicate retries", () => {
+    const { token } = createProfile("Shimmer Saver", 0);
+    const acquisition = crypto.randomUUID();
+    const acquire = () => operation(token, acquisition, (p) => {
+      p.gold = 2000;
+      const o = own(p, "emberfox", () => 0);
+      p.team = [o.id];
+      return { id: o.id, shimmer: o.shimmer };
+    });
+    expect(acquire()).toEqual(acquire());
+    op(token, "guide");
+    const before = authenticate(token).owned[0];
+    expect(before.shimmer).toBe(true);
+    op(token, "island-travel", { region: "home" });
+    const habitat = op(token, "home-place", { item: "habitat-flame", x: -6, z: -7, rot: 0 });
+    op(token, "home-assign", { quest: habitat.value.uid, id: before.id });
+    const duplicateId = crypto.randomUUID();
+    for (let i = 0; i < 2; i++)
+      operation(token, duplicateId, (p) => own(p, "emberfox", () => { throw Error("Duplicate rerolled"); }));
+    op(token, "island-travel", { region: "haven" });
+    const after = authenticate(token);
+    expect(after.owned[0]).toEqual({ ...before, shards: 1 });
+    expect(after.home!.residents[habitat.value.uid]).toEqual([before.id]);
+    expect(game.team(after)[0].shimmer).toBe(true);
+  });
+
   it("uses opaque tokens and grants the first six once", () => {
     const { token, profile } = createProfile("Keeper", 0);
     expect(() => authenticate(profile.id)).toThrow();

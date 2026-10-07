@@ -206,6 +206,7 @@ describe("evolution", () => {
     p.gold = 2000;
     o.level = 9;
     o.skills = [3, 2];
+    o.shimmer = true;
     p.town!.inventory.crystal = 1;
     save(p);
     expect(() => mutate(token, "evolve", { id: o.id })).toThrow("level 10");
@@ -220,7 +221,7 @@ describe("evolution", () => {
     expect(result.value).toMatchObject({ species: "lilyreign" });
     const after = authenticate(token),
       evolved = after.owned.find((x) => x.id === o.id)!;
-    expect(evolved).toMatchObject({ species: "lilyreign", level: 10, skills: [3, 2] });
+    expect(evolved).toMatchObject({ species: "lilyreign", level: 10, skills: [3, 2], shimmer: true });
     expect(after.team).toContain(o.id);
     expect(after.town!.inventory.crystal).toBe(1);
     expect(after.gold).toBe(2000 - 300);
