@@ -1,9 +1,21 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as T from "three";
 import { createCreature } from "./models";
 import { environmentFor } from "./ModelLighting";
 import { byId } from "../../../packages/shared/content";
 const cache = new Map<string, string>();
+// One model per frame keeps opening a large Journal from monopolising the UI.
+const pending = new Set<() => void>();
+let frame = 0;
+function flushPortrait() {
+  frame = 0;
+  const job = pending.values().next().value;
+  if (job) {
+    pending.delete(job);
+    job();
+  }
+  if (pending.size) frame = requestAnimationFrame(flushPortrait);
+}
 /** The three-quarter view every portrait is taken from. */
 const VIEW = new T.Vector3(2.6, 1.6, 3.5).normalize();
 let renderer: T.WebGLRenderer | undefined;
@@ -58,22 +70,32 @@ export function Portrait({
   shimmer?: boolean;
 }) {
   const key = `${id}:${shimmer}`;
-  const [src, setSrc] = useState(cache.get(key));
+  const element = useRef<HTMLImageElement>(null);
+  const [image, setImage] = useState({ key, src: cache.get(key) });
   useEffect(() => {
-    let cancelled = false;
-    const t = setTimeout(() => {
-      if (!cancelled) setSrc(renderPortrait(id, shimmer));
-    }, 0);
+    if (cache.has(key)) {
+      setImage({ key, src: cache.get(key) });
+      return;
+    }
+    const job = () => setImage({ key, src: renderPortrait(id, shimmer) });
+    const observer = new IntersectionObserver((entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      observer.disconnect();
+      pending.add(job);
+      if (!frame) frame = requestAnimationFrame(flushPortrait);
+    }, { rootMargin: "100px" });
+    if (element.current) observer.observe(element.current);
     return () => {
-      cancelled = true;
-      clearTimeout(t);
+      observer.disconnect();
+      pending.delete(job);
     };
-  }, [id, shimmer]);
+  }, [id, shimmer, key]);
   return (
     <img
+      ref={element}
       className={`portrait ${shimmer ? "shimmer-portrait" : ""} ${className}`}
       data-shimmer={shimmer}
-      src={src || "/emblem.svg"}
+      src={cache.get(key) || (image.key === key ? image.src : undefined) || "/emblem.svg"}
       alt={`${shimmer ? "Shimmering " : ""}${byId[id].name}`}
       style={{
         background: `radial-gradient(ellipse,${byId[id].color}30,transparent 70%)`,
