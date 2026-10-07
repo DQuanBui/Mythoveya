@@ -6,6 +6,8 @@ export type Owned = {
   shards: number;
   upgrade: number;
   locked: boolean;
+  /** Rolled once on first acquisition; absent in legacy saves means normal. */
+  shimmer?: boolean;
   nickname?: string;
   friendship?: number;
   accessory?: import("./town").Accessory;

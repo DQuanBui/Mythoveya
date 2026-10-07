@@ -17,7 +17,9 @@ export function pull(pity: { as: number; s: number }, random: () => number) {
   pity.s = tier === 5 ? 0 : pity.s + 1;
   return species.id;
 }
-export function own(p: Profile, species: string): Owned {
+export const SHIMMER_CHANCE = 1 / 50;
+/** Duplicates become shards and never reroll an existing companion. */
+export function own(p: Profile, species: string, random: () => number = Math.random): Owned {
   const found = p.owned.find((o) => o.species === species);
   if (found) {
     found.shards++;
@@ -35,6 +37,7 @@ export function own(p: Profile, species: string): Owned {
     shards: 0,
     upgrade: 0,
     locked: false,
+    shimmer: random() < SHIMMER_CHANCE,
   };
   p.owned.push(o);
   return o;

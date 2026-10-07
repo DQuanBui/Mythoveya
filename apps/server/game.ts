@@ -120,12 +120,12 @@ export function mutate(p: Profile, kind: string, v: any, now = Date.now()) {
     case "starter":
       if (p.owned.length) throw Error("You already chose a starter.");
       if (!STARTERS.includes(v.species)) throw Error("Choose a starter.");
-      p.team = [own(p, v.species).id];
+      p.team = [own(p, v.species, random).id];
       break;
     case "guide":
       if (!p.owned.length) throw Error("Choose your first companion.");
       if (!p.quests.guide) {
-        for (const s of COMPANIONS) p.team.push(own(p, s).id);
+        for (const s of COMPANIONS) p.team.push(own(p, s, random).id);
         p.quests.guide = 1;
       }
       break;
@@ -138,8 +138,8 @@ export function mutate(p: Profile, kind: string, v: any, now = Date.now()) {
       for (let i = 0; i < count; i++) {
         const species = pull(p.pity, random);
         const duplicate = p.owned.some((o) => o.species === species);
-        own(p, species);
-        result.push({ species, duplicate });
+        const companion = own(p, species, random);
+        result.push({ species, duplicate, shimmer: companion.shimmer === true });
       }
       p.quests.recruit = 1;
       track(p, "recruits", count);
@@ -237,7 +237,7 @@ export function mutate(p: Profile, kind: string, v: any, now = Date.now()) {
       p.tokens--;
       p.bond.used = true;
       const success = random() < p.bond.chance;
-      if (success) own(p, p.bond.species);
+      if (success) own(p, p.bond.species, random);
       return { success, species: p.bond.species };
     }
     default:
@@ -544,6 +544,7 @@ export function finishPve(profileId: string, b: Battle) {
             : meta.region === "hollow"
               ? "crysalune"
               : "sylvarion",
+          random,
         );
         p.diamonds += 150;
       }
