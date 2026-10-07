@@ -14,8 +14,7 @@ import { WEATHER_INFO } from "../../../packages/shared/weather";
 import { eventsReady } from "../../../packages/shared/events";
 import { utcDay } from "../../../packages/shared/town";
 import { islandHour, timeLabel } from "./daytime";
-import { homeInteractables } from "./HomeIsland";
-import { festivalInteractables } from "./FestivalIsland";
+import { homeInteractables, festivalInteractables } from "./island-guide";
 import {
   FESTIVAL_RADIUS,
   FESTIVAL_TRACK,

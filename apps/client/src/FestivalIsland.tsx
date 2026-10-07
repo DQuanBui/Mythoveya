@@ -1,3 +1,4 @@
+import { festivalInteractables } from "./island-guide";
 import { useEffect, useMemo, useRef, useState, type MutableRefObject } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
@@ -32,21 +33,6 @@ import type { ExplorationInput } from "./world-guide";
 const STRIPES = ["#d9674f", "#f3e3b5", "#5fa7bb", "#f2c75e", "#9bc27a", "#b49be0"];
 type Built = { solid: T.BufferGeometry; glow: T.BufferGeometry };
 
-/** Named points for the HUD, minimap and nearby prompts. */
-export function festivalInteractables(profile: Profile) {
-  const found = profile.festival?.day === utcDay() ? profile.festival.hunt : [];
-  return [
-    { id: "fest-ferry", name: "Skyferry", hint: "Sail back to Havenreach", p: [islandDock(R)[0], 0, 0] },
-    { id: "fest-board", name: "Festival board", hint: "Today's activities and the lantern hunt", p: [P.board[0] - 1.2, 0, P.board[1]] },
-    { id: "fest-shop", name: "Ticket booth", hint: "Spend festival tickets", p: [P.shop[0] - 1.2, 0, P.shop[1]] },
-    { id: "fest-race", name: "Sprint Stakes", hint: "Race your companion", p: [P.race[0], 0, P.race[1] + 1.5] },
-    { id: "fest-course", name: "Hop Hollow course", hint: "Run the obstacle lane", p: [P.course[0] - 1.5, 0, P.course[1] + 1] },
-    { id: "fest-fishing", name: "Pond tournament", hint: "Forty-five seconds of fishing", p: [P.fishing[0] - 1.6, 0, P.fishing[1]] },
-    ...huntSpots(utcDay())
-      .filter((s) => !found.includes(s.id))
-      .map((s) => ({ id: `fest-lantern-${s.id}`, name: "Hidden lantern", hint: "Click to collect", p: [s.point[0], 0, s.point[1]] })),
-  ];
-}
 export function festivalArea(profile: Profile): WalkArea {
   return {
     key: "festival",

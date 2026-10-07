@@ -1,3 +1,4 @@
+import { homeInteractables } from "./island-guide";
 import { useEffect, useMemo, useRef, useState, type MutableRefObject } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
@@ -656,17 +657,6 @@ function PlacementGhost({ home, placing, onPlace }: { home: HomeState; placing: 
   );
 }
 
-/** Named points on the Home island, for the HUD, minimap and touch prompts. */
-export function homeInteractables(home: HomeState) {
-  const r = homeRadius(home);
-  return [
-    { id: "home-ferry", name: "Skyferry", hint: "Sail back to Havenreach", p: [islandDock(r)[0], 0, 0] },
-    { id: "home-house", name: "Your house", hint: "Build, decorate and upgrade", p: [-(houseHalf(home) + 1.2), 0, 0] },
-    ...home.items
-      .filter((i) => catalogEntry(i.kind)?.type === "habitat")
-      .map((i) => ({ id: `habitat-${i.uid}`, name: catalogEntry(i.kind)!.name, hint: "Manage habitat", p: [i.x, 0, i.z] })),
-  ];
-}
 /** Walk area for the Home island; the key changes with its layout so paths are replanned. */
 export function homeArea(home: HomeState): WalkArea {
   const r = homeRadius(home);

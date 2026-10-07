@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import {
   ALL_SPECIES,
   AVATARS,
@@ -9,7 +9,7 @@ import {
 import type { Battle, Profile } from "../../../packages/shared/types";
 import { api, mutate, session, setSession } from "./api";
 import { audio, settings } from "./audio";
-import { INTERACTABLES, Preview, TitleScene, WorldScene } from "./Scene";
+import { Preview, TitleScene, WorldScene } from "./Scene";
 import { Portrait } from "./portraits";
 import { WorldHUD } from "./WorldHUD";
 import { NPCS } from "../../../packages/shared/town";
@@ -23,23 +23,9 @@ import { EventsPanel } from "./EventsPanel";
 import { TOWNSFOLK } from "./HavenTownsfolk";
 import { AdventurePanel, type MissionStart } from "./AdventurePanel";
 import { currentObjective, type ExplorationInput } from "./world-guide";
-import {
-  Appearance,
-  Collection,
-  Formation,
-  Gallery,
-  Leaderboard,
-  MapPanel,
-  Quests,
-  Recruitment,
-} from "./Panels";
 import { SettingsPanel } from "./SettingsPanel";
-import { Arena, BattleUI } from "./Arena";
-import { IslandScene, type Placing } from "./HomeIsland";
-import { HomePanel, SkyferryPanel } from "./HomePanel";
-import { FestivalScene } from "./FestivalIsland";
-import { FestivalPanel, type FestivalTab } from "./FestivalPanel";
-import { FestivalGame } from "./FestivalGames";
+import type { Placing } from "./HomeIsland";
+import type { FestivalTab } from "./FestivalPanel";
 import { FESTIVAL_RADIUS } from "../../../packages/shared/festival";
 import { SKYFERRY } from "../../../packages/shared/haven";
 import {
@@ -48,6 +34,24 @@ import {
   homeRadius,
   islandArrival,
 } from "../../../packages/shared/islands";
+const Appearance = lazy(() => import("./Panels").then((m) => ({ default: m.Appearance })));
+const Collection = lazy(() => import("./Panels").then((m) => ({ default: m.Collection })));
+const Formation = lazy(() => import("./Panels").then((m) => ({ default: m.Formation })));
+const Leaderboard = lazy(() => import("./Panels").then((m) => ({ default: m.Leaderboard })));
+const MapPanel = lazy(() => import("./Panels").then((m) => ({ default: m.MapPanel })));
+const Quests = lazy(() => import("./Panels").then((m) => ({ default: m.Quests })));
+const Recruitment = lazy(() => import("./Panels").then((m) => ({ default: m.Recruitment })));
+const Gallery = import.meta.env.DEV ? lazy(() => import("./Panels").then((m) => ({ default: m.Gallery }))) : () => null;
+const Arena = lazy(() => import("./Arena").then((m) => ({ default: m.Arena })));
+const BattleUI = lazy(() => import("./Arena").then((m) => ({ default: m.BattleUI })));
+// Islands and minigames are loaded only when the keeper travels there.
+const IslandScene = lazy(() => import("./HomeIsland").then((m) => ({ default: m.IslandScene })));
+const HomePanel = lazy(() => import("./HomePanel").then((m) => ({ default: m.HomePanel })));
+const SkyferryPanel = lazy(() => import("./HomePanel").then((m) => ({ default: m.SkyferryPanel })));
+const FestivalScene = lazy(() => import("./FestivalIsland").then((m) => ({ default: m.FestivalScene })));
+const FestivalPanel = lazy(() => import("./FestivalPanel").then((m) => ({ default: m.FestivalPanel })));
+const FestivalGame = lazy(() => import("./FestivalGames").then((m) => ({ default: m.FestivalGame })));
+
 /** Where you step off the ferry in Havenreach: just inland from the dock gate. */
 const FERRY_LANDING: number[] = [SKYFERRY.point[0] * 0.95, SKYFERRY.point[1] * 0.95];
 export default function App() {
@@ -401,6 +405,7 @@ export default function App() {
         if (!audio.ctx) void audio.unlock();
       }}
     >
+      <Suspense fallback={<div className="panel fatal" role="status">Preparing your destination...</div>}>
       {(screen === "title" || onboarding) && (
         <div className="scene full">
           <TitleScene avatar={avatar} species={starter} />
@@ -987,6 +992,7 @@ export default function App() {
           {toast}
         </div>
       )}
+      </Suspense>
     </main>
   );
 }
