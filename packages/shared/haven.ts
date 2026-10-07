@@ -871,9 +871,17 @@ export function slideStep(
   dz: number,
   allowed: (x: number, z: number) => boolean,
 ): Point {
-  if (allowed(x + dx, z + dz)) return [x + dx, z + dz];
-  if (allowed(x + dx, z)) x += dx;
-  if (allowed(x, z + dz)) z += dz;
+  // At low frame rates a sprint can cross a thin post in one frame. Check the
+  // whole movement segment, including axis slides, rather than only its end.
+  const clear = (sx: number, sz: number) => {
+    const steps = Math.max(1, Math.ceil(Math.hypot(sx, sz) / 0.1));
+    for (let i = 1; i <= steps; i++)
+      if (!allowed(x + (sx * i) / steps, z + (sz * i) / steps)) return false;
+    return true;
+  };
+  if (clear(dx, dz)) return [x + dx, z + dz];
+  if (clear(dx, 0)) x += dx;
+  if (clear(0, dz)) z += dz;
   return [x, z];
 }
 

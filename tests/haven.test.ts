@@ -50,6 +50,17 @@ describe("Havenreach exploration layout", () => {
     for (const node of resourcesForRegion("haven"))
       expect(havenWalkable(...node.point), node.id).toBe(true);
   });
+  it("cannot sprint through thin solids even when the destination is clear", () => {
+    const thinWall = (x: number) => x < 0.4 || x > 0.6;
+    expect(slideStep(0, 0, 1, 0, thinWall)).toEqual([0, 0]);
+    expect(slideStep(0, 0, 1, 0.8, thinWall)).toEqual([0, 0.8]);
+    expect(slideStep(1, 0, -1, 0, thinWall)).toEqual([1, 0]);
+    expect(slideStep(0, 0, 0, 1, (_x, z) => thinWall(z))).toEqual([0, 0]);
+    const post = (x: number, z: number) => Math.hypot(x - 0.5, z - 0.5) > 0.15;
+    const end = slideStep(0, 0, 1, 1, post);
+    // Sliding around the post is permitted; the diagonal shortcut is not.
+    expect(post(...end)).toBe(true);
+  });
   it("uses existing species and keeps woodland off the walking routes", () => {
     expect(HAVEN_WILDLIFE.length).toBeGreaterThan(12);
     for (const resident of HAVEN_WILDLIFE)
