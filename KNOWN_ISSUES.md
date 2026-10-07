@@ -2,7 +2,7 @@
 
 ## Presentation
 
-- The 60 species have distinct procedural recipes and complete gameplay mappings, but some anatomical details are stylized approximations. They are not sixty individually sculpted, production-finished character assets. Further silhouette and material work would improve resemblance to every authored description.
+- The 72 recruitable species and 16 evolved forms have distinct procedural recipes and complete gameplay mappings, but some anatomical details are stylized approximations. They are not individually sculpted, production-finished character assets. Further silhouette and material work would improve resemblance to every authored description.
 - Havenreach now reaches a beach and a climbable mountain range with real ground height. Only Havenreach has elevation. The other regions keep their compact layouts and shared service stations, and longer regional stories remain future work.
 - The six visitor-book houses have clickable porch visits and durable rewards. The nine village cottages, windmill, and well are decorative. Walkable interiors and house ownership are not implemented. Islanders follow simple day/night routines, and their greetings do not affect progress.
 - Click-to-walk plans routes on a half-metre grid over the same collision rules as keyboard movement. Very narrow gaps can still make the keeper stop early; the walk then interacts if the target is within easy reach, or simply ends.
@@ -12,7 +12,7 @@
 - Creature family rigs support the requested states. Recruitment now has a staged 3D shrine entrance for every species; species-specific choreography, greet/victory responses, and keeper gestures remain simple.
 - The battle effect system is bounded and includes ten distinct mythic recipes. Delayed outcomes are authoritative and telegraphed, but their presentation is attached to the round transition rather than a separate cinematic sequence. Further support-skill choreography would make multi-target healing and protection clearer.
 - Music and voices are original Web Audio synthesis. Playback, settings and voice limits are checked programmatically; a subjective headphone/speaker listening pass has not been performed. Musical mixing and voice personality should be refined through listening before describing the sound as finished.
-- The client is a substantial WebGL bundle. Graphics presets reduce decorative work, but laptop/GPU performance varies and no universal frame-rate claim is made. Exploration now includes a responsive mobile HUD and touch joystick; physical-device ergonomics and the full battle interface still need broader mobile review.
+- The initial client is still a substantial WebGL bundle (about 1.38 MB of JavaScript before compression). Arena, panels and island activities load on demand; Journal portraits are generated near the viewport. Graphics presets reduce decorative work, but laptop/GPU performance varies and no universal frame-rate claim is made. Exploration now includes a responsive mobile HUD and touch joystick; physical-device ergonomics and the full battle interface still need broader mobile review.
 
 ## Islands and the festival
 
@@ -31,6 +31,7 @@
 - Villagers offer 24 selectable conversation topics and 16 persistent missions. Dialogue choices reveal authored replies but do not change story outcomes. A longer branching campaign, expanded gathering materials and guided help overlays remain future work.
 - Village helpers provide daily gifts. Autonomous harvesting, encounter-rate bonuses, purchasable abilities, craftable potions, and dusk-only tracking are not implemented. The weekly challenge rewards victories over existing region guardians; it does not yet introduce a rotating exclusive boss.
 - The existing six-creature teams, eight elements, three actions, currency names, and server-owned saves remain intact. The brief's alternative 3v3 rules, five elements, four moves, renamed currencies, and manual local-storage imports have not replaced them.
+- Shimmer rolls occur only for newly created companions. Old saves do not get retroactive rolls and duplicates do not upgrade an existing appearance. Older festival ghosts without the optional appearance field render normally.
 - The first version needs wider balance testing, especially high-rarity status combinations and long-term recruitment progression. Automated rules tests establish behavior, not competitive balance.
 
 See [PROGRESS.md](PROGRESS.md) for the exact automated and visual verification completed, and [the upgrade review](docs/UPGRADE_REVIEW.md) for proposed changes that affect existing combat and save rules.

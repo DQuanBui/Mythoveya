@@ -14,6 +14,7 @@ Mythoveya is a locally playable, browser-based 3D creature-collection RPG. Its w
 - **Eight keepers:** choose a recognizable character and change your appearance later without losing progress.
 - **Eight village friends:** meet Liora, Sella, Bram, Kael, Oren, Tali, Pip, and Wren. Explore 24 conversation topics, complete 16 missions, and unlock their daily help.
 - **Make yourself at home:** trade supplies at Pip's rotating market, grow Sunseed, craft treats, nurture friendship, name companions, and dress your following friend with a ribbon or bell.
+- **Rare shimmering companions:** each newly acquired companion has a 1-in-50 chance of alternate colours and soft glints. Its appearance persists through battles, following, habitats, the Journal, evolution and reloads. Duplicates grant shards without rerolling, and existing saves keep their original colours. Shimmering changes no combat stats.
 - **Your own six:** three front slots and three rear slots, with drag-and-drop or click-to-place formation editing.
 - **Know where to go:** a chapter tracker, objective distance, and matching gold waypoints in the world and minimap guide your first journey. Nearby labels stay readable, while resource sparkles keep the scenery clear.
 - **Explore on a smaller screen:** the quest tracker, map, wallet, team strip, and complete menu adapt to narrow screens. Drag the movement joystick, tap the ground or an object, or tap the nearby action button.
