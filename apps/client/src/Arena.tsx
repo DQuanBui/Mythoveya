@@ -13,7 +13,7 @@ export type Snapshot = {
     id: string;
     name: string;
     ready: boolean;
-    team: { species: string; level: number }[];
+    team: { species: string; level: number; shimmer?: boolean }[];
   }[];
   battle: Battle | null;
   mode: string;
@@ -462,7 +462,7 @@ export function Arena({
                       key={i}
                       title={`${byId[o.species].name} · Level ${o.level}`}
                     >
-                      <Portrait id={o.species} />
+                      <Portrait id={o.species} shimmer={o.shimmer} />
                       <small>{byId[o.species].name}</small>
                     </div>
                   ))}

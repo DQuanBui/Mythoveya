@@ -611,7 +611,7 @@ function CompanionCare({
         ))}
       </select>
       <div className="care-detail">
-        <Portrait id={o.species} />
+        <Portrait id={o.species} shimmer={o.shimmer} />
         <div>
           <strong>{o.nickname || byId[o.species].name}</strong>
           <p>

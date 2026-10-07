@@ -187,6 +187,7 @@ export class ArenaRoom extends Room {
         ready,
         team: team(getProfile(id)).map((o) => ({
           species: o.species,
+          shimmer: o.shimmer === true,
           level: o.level,
         })),
       })),

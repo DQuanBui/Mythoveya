@@ -104,6 +104,7 @@ type Ghost = {
   inputs: number[];
   bonus?: number;
   species?: string;
+  shimmer?: boolean;
   avatar?: number;
   outfit?: string;
 };
@@ -111,6 +112,7 @@ type Board = { day: string; featured: Activity; today: BoardRow[]; allTime: Boar
 type Racer = {
   name: string;
   species?: string;
+  shimmer?: boolean;
   avatar?: number;
   outfit?: string;
   mine?: boolean;
@@ -235,7 +237,7 @@ function RaceWorld({ racers, pads, clock }: { racers: Racer[]; pads: number[]; c
   const models = useMemo(
     () =>
       racers.map((r) => {
-        const m = createCreature(r.species || "emberfox");
+        const m = createCreature(r.species || "emberfox", r.shimmer);
         if (!r.mine)
           m.traverse((c) => {
             if (c instanceof T.Mesh) {
@@ -485,11 +487,11 @@ export function FestivalGame({
     const ghosts = (board?.ghosts || []).slice(0, 3);
     const list: Racer[] = [];
     if (activity === "race") {
-      list.push({ name: "You", species: own?.species, mine: true, sim: new RaceSim(pads, own ? raceBonus(own) : 0) });
+      list.push({ name: "You", species: own?.species, shimmer: own?.shimmer, mine: true, sim: new RaceSim(pads, own ? raceBonus(own) : 0) });
       for (const g of ghosts) {
         const sim = new RaceSim(pads, g.bonus || 0);
         g.inputs.forEach((t) => sim.press(t));
-        list.push({ name: g.profile === profile.id ? "Your best" : g.name, species: g.species, sim });
+        list.push({ name: g.profile === profile.id ? "Your best" : g.name, species: g.species, shimmer: g.shimmer, sim });
       }
       // Fair rivals fill any empty lanes.
       const rivals = [
@@ -662,7 +664,7 @@ export function FestivalGame({
                 if (!o) return null;
                 return (
                   <button key={id} className={companion === id ? "selected" : ""} onClick={() => setCompanion(id)} title={byId[o.species].name}>
-                    <Portrait id={o.species} />
+                    <Portrait id={o.species} shimmer={o.shimmer} />
                     <small>+{raceBonus(o).toFixed(2)} m/s</small>
                   </button>
                 );

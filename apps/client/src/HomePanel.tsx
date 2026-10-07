@@ -178,7 +178,7 @@ function HabitatCard({ item, profile, run, focused }: { item: HomeItem; profile:
           if (!o) return null;
           return (
             <div key={id} className="resident">
-              <Portrait id={o.species} />
+              <Portrait id={o.species} shimmer={o.shimmer} />
               <span>
                 {o.nickname || byId[o.species].name}
                 <small>
@@ -205,7 +205,7 @@ function HabitatCard({ item, profile, run, focused }: { item: HomeItem; profile:
                 run("home-assign", { quest: item.uid, id: o.id });
               }}
             >
-              <Portrait id={o.species} />
+              <Portrait id={o.species} shimmer={o.shimmer} />
               <span>
                 {o.nickname || byId[o.species].name}
                 <small>

@@ -125,7 +125,7 @@ export function festivalMutation(p: Profile, kind: string, v: any, now = Date.no
           result = simulateRace(inputs, racePads(f.day), bonus);
         score = minTime = result.time;
         detail = result;
-        data = { inputs, bonus, species: o.species, ...keeper };
+        data = { inputs, bonus, species: o.species, shimmer: o.shimmer === true, ...keeper };
       } else if (activity === "fishing") {
         const inputs = inputsOf(v, FISHING.round),
           weather = weatherAt(f.started.at).weather,

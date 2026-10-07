@@ -419,7 +419,7 @@ export function WorldHUD({
                 title={o.nickname || byId[o.species].name}
                 onClick={() => open("formation")}
               >
-                <Portrait id={o.species} />
+                <Portrait id={o.species} shimmer={o.shimmer} />
                 <small>{o.level}</small>
               </button>
             );

@@ -149,13 +149,14 @@ export function Collection({
         </button>
         <div className="detail-grid">
           <div className="model-preview">
-            <Preview species={detail} />
+            <Preview species={detail} shimmer={o?.shimmer} />
           </div>
           <div>
             <p className="eyebrow">
               TIER {s.tier} · {s.element} · {s.role}
             </p>
             <h2>{s.name}</h2>
+            {o?.shimmer && <span className="shimmer-badge">Shimmering companion</span>}
             <p>
               {s.appearance}. A wild spirit of Mythoveya, drawn to keepers who
               share its courage.
@@ -336,8 +337,9 @@ export function Collection({
               }}
             >
               <span className={`tier tier-${s.tier}`}>{s.tier}</span>
-              <Portrait id={s.id} />
+              <Portrait id={s.id} shimmer={o?.shimmer} />
               <strong>{s.name}</strong>
+              {o?.shimmer && <span className="shimmer-badge">Shimmering</span>}
               <span>
                 {s.element} · {s.role}
               </span>
@@ -402,7 +404,7 @@ export function Formation({
                 >
                   {o ? (
                     <>
-                      <Portrait id={o.species} />
+                      <Portrait id={o.species} shimmer={o.shimmer} />
                       <strong>{byId[o.species].name}</strong>
                       <small>
                         {byId[o.species].role} · Lv. {o.level}
@@ -426,7 +428,7 @@ export function Formation({
             onDragStart={(e) => e.dataTransfer.setData("text/plain", o.id)}
             onClick={() => setSelected(o.id)}
           >
-            <Portrait id={o.species} />
+            <Portrait id={o.species} shimmer={o.shimmer} />
             <span>{byId[o.species].name}</span>
           </button>
         ))}
@@ -547,7 +549,7 @@ export function Recruitment({
   run: Mutation;
 }) {
   const [result, setResult] = useState<
-      { species: string; duplicate: boolean }[]
+      { species: string; duplicate: boolean; shimmer?: boolean }[]
     >([]),
     [busy, setBusy] = useState(false),
     [reveal, setReveal] = useState(0),
@@ -573,12 +575,13 @@ export function Recruitment({
     <>
       <p className="eyebrow">THE BOND SHRINE</p>
       <h2>Somewhere, a Wildbound is waiting.</h2>
-      <p className="muted">Offer a little starlight. Begin a new story.</p>
+      <p className="muted">Each new companion has a 1-in-50 chance to shimmer. Its colours stay with it forever. Duplicates grant shards and keep the existing appearance.</p>
       {result.length ? (
         <>
           <RecruitmentStage
             key={`${reveal}-${result[reveal].species}`}
             id={result[reveal].species}
+            shimmer={result[reveal].shimmer}
           />
           <div className="recruit-results">
             {result.map((r, i) => (
@@ -592,8 +595,9 @@ export function Recruitment({
                 <span className={`tier tier-${byId[r.species].tier}`}>
                   TIER {byId[r.species].tier}
                 </span>
-                <Portrait id={r.species} />
+                <Portrait id={r.species} shimmer={r.shimmer} />
                 <h3>{byId[r.species].name}</h3>
+                {r.shimmer && <span className="shimmer-badge">Shimmering</span>}
                 <p>{r.duplicate ? "+1 species shard" : "A new bond begins"}</p>
               </button>
             ))}

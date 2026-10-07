@@ -83,6 +83,7 @@ function RenderStats() {
 }
 export function Creature({
   id,
+  shimmer = false,
   state = "idle",
   phase = 0,
   position = [0, 0, 0],
@@ -91,6 +92,7 @@ export function Creature({
   paused = false,
 }: {
   id: string;
+  shimmer?: boolean;
   state?: Motion;
   phase?: number;
   position?: [number, number, number];
@@ -98,7 +100,7 @@ export function Creature({
   scale?: number;
   paused?: boolean;
 }) {
-  const model = useMemo(() => createCreature(id), [id]);
+  const model = useMemo(() => createCreature(id, shimmer), [id, shimmer]);
   useFrame(({ clock }) => {
     if (!paused)
       animateCreature(
@@ -672,10 +674,10 @@ export function Explorer({
   const companion = useMemo(
     () =>
       dressCompanion(
-        createCreature(leader?.species || "emberfox"),
+        createCreature(leader?.species || "emberfox", leader?.shimmer),
         leader?.accessory,
       ),
-    [leader?.species, leader?.accessory],
+    [leader?.species, leader?.accessory, leader?.shimmer],
   );
   const player = useRef(new T.Vector3(spawn[0], 0, spawn[1]));
   const keys = useRef(new Set<string>());
@@ -1389,11 +1391,13 @@ export function TitleScene({
 }
 export function Preview({
   species,
+  shimmer = false,
   avatar,
   state = "idle",
   paused = false,
 }: {
   species?: string;
+  shimmer?: boolean;
   avatar?: number;
   state?: Motion;
   paused?: boolean;
@@ -1410,7 +1414,7 @@ export function Preview({
       <directionalLight position={[3, 5, 4]} intensity={3} />
       <directionalLight position={[-3, 2, -3]} color="#a7e4de" intensity={2} />
       {species ? (
-        <Creature id={species} state={state} paused={paused} />
+        <Creature id={species} shimmer={shimmer} state={state} paused={paused} />
       ) : (
         <Avatar index={avatar} />
       )}
@@ -1705,6 +1709,7 @@ export function BattleScene({
           <group key={u.id} position={p} onClick={() => onTarget(u.id)}>
             <Creature
               id={u.species}
+              shimmer={u.shimmer}
               rotation={u.side === 0 ? Math.PI : 0}
               state={state}
               phase={elapsed}

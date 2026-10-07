@@ -6,7 +6,7 @@ import { byId } from "../../../packages/shared/content";
 import { Creature } from "./Scene";
 import { settings } from "./audio";
 
-function Entrance({ id }: { id: string }) {
+function Entrance({ id, shimmer = false }: { id: string; shimmer?: boolean }) {
   const creature = useRef<T.Group>(null);
   const halo = useRef<T.Group>(null);
   const started = useRef<number | null>(null);
@@ -46,7 +46,7 @@ function Entrance({ id }: { id: string }) {
         />
       </mesh>
       <group ref={creature}>
-        <Creature id={id} state="victory" scale={0.9} />
+        <Creature id={id} shimmer={shimmer} state="victory" scale={0.9} />
       </group>
       <group ref={halo}>
         {[0, 1].map((i) => (
@@ -77,16 +77,16 @@ function Entrance({ id }: { id: string }) {
   );
 }
 
-export function RecruitmentStage({ id }: { id: string }) {
+export function RecruitmentStage({ id, shimmer = false }: { id: string; shimmer?: boolean }) {
   return (
     <div
       className="recruitment-stage"
       role="img"
-      aria-label={`${byId[id].name} arrives at the bond shrine`}
+      aria-label={`${shimmer ? "Shimmering " : ""}${byId[id].name} arrives at the bond shrine`}
     >
       <Canvas camera={{ position: [3.5, 2.3, 5.5], fov: 36 }} dpr={[1, 1.5]}>
         <ModelLighting intensity={0.7} />
-        <Entrance key={id} id={id} />
+        <Entrance key={`${id}:${shimmer}`} id={id} shimmer={shimmer} />
       </Canvas>
     </div>
   );

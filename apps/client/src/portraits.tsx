@@ -8,8 +8,9 @@ const cache = new Map<string, string>();
 const VIEW = new T.Vector3(2.6, 1.6, 3.5).normalize();
 let renderer: T.WebGLRenderer | undefined;
 let scene: T.Scene, camera: T.PerspectiveCamera;
-export function renderPortrait(id: string) {
-  if (cache.has(id)) return cache.get(id)!;
+export function renderPortrait(id: string, shimmer = false) {
+  const key = `${id}:${shimmer}`;
+  if (cache.has(key)) return cache.get(key)!;
   if (!renderer) {
     renderer = new T.WebGLRenderer({
       alpha: true,
@@ -32,7 +33,7 @@ export function renderPortrait(id: string) {
     camera.position.set(2.6, 2.1, 3.5);
     camera.lookAt(0, 0.85, 0);
   }
-  const model = createCreature(id);
+  const model = createCreature(id, shimmer);
   scene.add(model);
   // Frame every creature by its own size, so tall mythics fit like small pups.
   const box = new T.Box3().setFromObject(model),
@@ -44,32 +45,36 @@ export function renderPortrait(id: string) {
   renderer.render(scene, camera);
   const image = renderer.domElement.toDataURL("image/png");
   scene.remove(model);
-  cache.set(id, image);
+  cache.set(key, image);
   return image;
 }
 export function Portrait({
   id,
   className = "",
+  shimmer = false,
 }: {
   id: string;
   className?: string;
+  shimmer?: boolean;
 }) {
-  const [src, setSrc] = useState(cache.get(id));
+  const key = `${id}:${shimmer}`;
+  const [src, setSrc] = useState(cache.get(key));
   useEffect(() => {
     let cancelled = false;
     const t = setTimeout(() => {
-      if (!cancelled) setSrc(renderPortrait(id));
+      if (!cancelled) setSrc(renderPortrait(id, shimmer));
     }, 0);
     return () => {
       cancelled = true;
       clearTimeout(t);
     };
-  }, [id]);
+  }, [id, shimmer]);
   return (
     <img
-      className={`portrait ${className}`}
+      className={`portrait ${shimmer ? "shimmer-portrait" : ""} ${className}`}
+      data-shimmer={shimmer}
       src={src || "/emblem.svg"}
-      alt={byId[id].name}
+      alt={`${shimmer ? "Shimmering " : ""}${byId[id].name}`}
       style={{
         background: `radial-gradient(ellipse,${byId[id].color}30,transparent 70%)`,
       }}

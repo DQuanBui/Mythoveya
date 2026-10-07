@@ -1713,3 +1713,6 @@ main {
     display: none;
   }
 }
+
+.shimmer-badge { color: #ffe8a6; font-size: 0.78rem; letter-spacing: 0.04em; }
+.shimmer-portrait { filter: drop-shadow(0 0 5px #ddbb7660); }

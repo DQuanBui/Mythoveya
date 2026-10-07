@@ -431,6 +431,7 @@ const seedOf = (text: string) => [...text].reduce((n, c) => (n * 31 + c.charCode
  */
 function HabitatResident({
   species,
+  shimmer,
   item,
   index,
   housemates,
@@ -439,6 +440,7 @@ function HabitatResident({
   title,
 }: {
   species: string;
+  shimmer?: boolean;
   item: HomeItem;
   index: number;
   housemates: number;
@@ -446,7 +448,7 @@ function HabitatResident({
   disabled: boolean;
   title: string;
 }) {
-  const model = useMemo(() => createCreature(species), [species]),
+  const model = useMemo(() => createCreature(species, shimmer), [species, shimmer]),
     cheer = useRef(0),
     hearts = useRef<T.Group>(null),
     dreams = useRef<T.Group>(null);
@@ -586,6 +588,7 @@ function Habitat({
         <HabitatResident
           key={o.id}
           species={o.species}
+          shimmer={o.shimmer}
           item={item}
           index={i}
           housemates={residents.length}
