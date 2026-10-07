@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { own, SHIMMER_CHANCE } from "../packages/shared/economy";
+import { makeBattle, stats } from "../packages/shared/combat";
 import type { Profile } from "../packages/shared/types";
 
 const keeper = () => ({ id: "variant-test", owned: [] }) as unknown as Profile;
@@ -25,6 +26,17 @@ describe("persistent companion appearances", () => {
       expect(duplicate.id).toBe(first.id);
       expect(duplicate.shards).toBe(1);
       expect(restored.owned).toHaveLength(1);
+    }
+  });
+
+  it("carries appearance into both arena modes without changing stats or seeds", () => {
+    const normal = own(keeper(), "emberfox", () => 0.5);
+    const shimmer = { ...normal, shimmer: true };
+    for (const mode of ["pve", "power", "tactical"]) {
+      const battle = makeBattle("appearance", [[shimmer], [normal]], mode, 123);
+      expect(battle.units.map((u) => u.shimmer)).toEqual([true, false]);
+      expect(stats(shimmer, mode === "tactical")).toEqual(stats(normal, mode === "tactical"));
+      expect(battle.seed).toBe(makeBattle("control", [[normal], [normal]], mode, 123).seed);
     }
   });
 

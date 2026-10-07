@@ -95,6 +95,7 @@ export type Status = {
 };
 export type Unit = {
   id: string;
+  shimmer?: boolean;
   species: string;
   side: number;
   slot: number;

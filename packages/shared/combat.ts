@@ -70,6 +70,7 @@ export function makeBattle(
           maxHp: s.hp,
           id: `${side}:${slot}`,
           species: o.species,
+          shimmer: o.shimmer === true,
           side,
           slot,
           level: o.level,
