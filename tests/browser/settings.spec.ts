@@ -1,0 +1,32 @@
+import { test, expect } from "@playwright/test";
+
+test("title, HUD and pause settings links work and retain separate preferences", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.goto("/");
+  await page.getByRole("button", { name: "Sound & settings" }).click();
+  await expect(page.getByRole("heading", { name: "Sound & atmosphere" })).toBeVisible();
+  await page.getByLabel("Day and night cycle").uncheck();
+  await page.getByLabel("Camera shake", { exact: true }).check();
+  await page.getByLabel("Mute all sound").check();
+  await page.getByLabel("Reduced motion").check();
+  await page.getByLabel("Close panel").click();
+  await page.getByRole("button", { name: "Begin your journey" }).click();
+  await page.getByLabel("Keeper name").fill("Settings Keeper");
+  await page.getByRole("button", { name: "Choose this keeper" }).click();
+  await page.getByRole("button", { name: "Begin with Emberfox" }).click();
+  await page.getByLabel("Open settings").click();
+  await expect(page.getByLabel("Day and night cycle")).not.toBeChecked();
+  await expect(page.getByLabel("Camera shake", { exact: true })).toBeChecked();
+  await page.getByLabel("Close panel").click();
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "Sound & graphics" }).click();
+  await expect(page.getByRole("heading", { name: "Sound & atmosphere" })).toBeVisible();
+  await page.reload();
+  await page.getByRole("button", { name: "Sound & settings" }).click();
+  await expect(page.getByLabel("Mute all sound")).toBeChecked();
+  await expect(page.getByLabel("Reduced motion")).toBeChecked();
+  await expect(page.getByLabel("Day and night cycle")).not.toBeChecked();
+  expect(errors).toEqual([]);
+  await page.screenshot({ path: "artifacts/settings-verified.png" });
+});

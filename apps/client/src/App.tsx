@@ -32,8 +32,8 @@ import {
   MapPanel,
   Quests,
   Recruitment,
-  SettingsPanel,
 } from "./Panels";
+import { SettingsPanel } from "./SettingsPanel";
 import { Arena, BattleUI } from "./Arena";
 import { IslandScene, type Placing } from "./HomeIsland";
 import { HomePanel, SkyferryPanel } from "./HomePanel";
