@@ -100,13 +100,24 @@ function consolidate(root: T.Object3D, key: string) {
 const tint = (a: string, b: string, t: number) =>
   new T.Color(a).lerp(new T.Color(b), t).getStyle();
 
-export function createCreature(id: string) {
+/** Rotate the existing palette without changing a species' anatomy or shared DNA. */
+function shimmerDna(dna: ReturnType<typeof dnaOf>) {
+  const next = { ...dna };
+  for (const key of ["base", "light", "cream", "dark", "mid", "accent", "blush", "iris"] as const) {
+    const c = new T.Color(dna[key]);
+    c.offsetHSL(0.38, 0.08, key === "dark" ? 0.03 : 0.08);
+    next[key] = c.getStyle();
+  }
+  return next;
+}
+
+export function createCreature(id: string, shimmer = false) {
   const s = byId[id],
     g = new T.Group(),
     rig = new T.Group();
   g.add(rig);
   // Each species' own palette and anatomy; see creature-dna.ts.
-  const dna = dnaOf(s),
+  const dna = shimmer ? shimmerDna(dnaOf(s)) : dnaOf(s),
     f = dna.features;
   const c = dna.base,
     light = dna.light,
@@ -533,9 +544,19 @@ export function createCreature(id: string) {
   if (s.id === "zephyreon")
     for (const side of [-1, 1])
       part(rig, "cone", light, [side * 0.3, 0.8 + lift, -1.2], [0.15, 0.9, 0.14], [Math.PI / 2, 0, side * 0.5]);
-  consolidate(rig, `creature:${id}`);
+  consolidate(rig, `creature:${id}:${shimmer ? "shimmer" : "normal"}`);
+  const glints = new T.Group();
+  if (shimmer) {
+    glints.name = "shimmer-glints";
+    glints.position.y = headY * 0.65;
+    for (let i = 0; i < 3; i++) {
+      const a = (i / 3) * Math.PI * 2;
+      part(glints, "orb", "#fff1ba", [Math.cos(a) * 0.8, (i - 1) * 0.3, Math.sin(a) * 0.8], [0.035, 0.075, 0.035], undefined, true);
+    }
+    rig.add(glints);
+  }
   g.scale.setScalar(s.size);
-  g.userData = { rig, limbs, wings, tails, family: s.family, index: s.index, headAt: [headY, headZ] };
+  g.userData = { shimmer, glints, rig, limbs, wings, tails, family: s.family, index: s.index, headAt: [headY, headZ] };
   return g;
 }
 export type Motion =
@@ -559,7 +580,11 @@ export function animateCreature(
   phase = 0,
   reduced = false,
 ) {
-  const { rig, limbs, wings, tails, family, index } = g.userData;
+  const { rig, limbs, wings, tails, family, index, glints } = g.userData;
+  if (glints && g.userData.shimmer) {
+    glints.rotation.y = reduced ? 0 : time * 0.45;
+    glints.scale.setScalar(reduced ? 1 : 0.92 + Math.sin(time * 2) * 0.08);
+  }
   const floating = ["bird", "aquatic", "spirit"].includes(family),
     speed = 2 + (index % 4) * 0.3;
   const motion = reduced ? 0.2 : 1;
