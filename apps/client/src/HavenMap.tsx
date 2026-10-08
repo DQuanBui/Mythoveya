@@ -239,7 +239,7 @@ export function HavenMap({
           <p className="muted">
             {place.species.length
               ? "Wildbound you may see here"
-              : "A porch to visit and a stamp for your visitor book"}
+              : place.id.startsWith("exp-") ? "A stop on the western companion journey" : "A porch to visit and a stamp for your visitor book"}
           </p>
           <button className="primary" onClick={() => choose(place.id)}>
             Set walking waypoint →

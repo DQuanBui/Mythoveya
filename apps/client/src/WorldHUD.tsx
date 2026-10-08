@@ -286,6 +286,7 @@ export function WorldHUD({
             <b>{distance <= 3 ? "Arrived" : `${distance} m`}</b>
           </div>
         )}
+        {objective.waypoint && target && <button className="text-button" disabled={blocked} onClick={() => { input.current.walkTarget = target.id; }}>Walk to waypoint</button>}
         <button className="text-button" onClick={() => open(objective.action)}>
           {objective.button} →
         </button>

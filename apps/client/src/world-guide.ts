@@ -139,6 +139,7 @@ export function currentObjective(p: Profile): Objective {
 }
 
 export type ExplorationInput = {
+  walkTarget?: string;
   x: number;
   z: number;
   sprint?: boolean;

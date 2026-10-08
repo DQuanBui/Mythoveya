@@ -817,6 +817,11 @@ export function Explorer({
       recenter();
       last.current = -1;
     }
+    if (input.current.walkTarget && !blocked) {
+      const id = input.current.walkTarget; delete input.current.walkTarget;
+      const stop = (area?.points ?? getInteractables(profile.region)).find((p) => p.id === id);
+      if (stop) walker.current.go([stop.p[0], stop.p[2]], .8, () => onInteract(stop.id));
+    }
     let x = blocked
       ? 0
       : input.current.x +
