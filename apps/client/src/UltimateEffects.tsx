@@ -11,7 +11,7 @@ const MYTHIC_RECIPES: Record<string, string> = {
   verdantus: "everbloom",
   fulgurion: "zephyreon",
   umbravix: "nyxavorn",
-  auroroc: "crysalune",
+
 };
 // Bounded, reusable geometry recipes. Each mythic has a distinct silhouette and cadence.
 export function UltimateEffect({
@@ -59,6 +59,13 @@ export function UltimateEffect({
   );
   return (
     <group ref={ref} name={`mythic-${id}`}>
+      {kind === "auroroc" && <>
+        {[0, 1, 2, 3, 4].map((i) => <mesh key={i} position={[(i - 2) * .48, 1.1 + Math.sin(i) * .35, 0]} rotation={[0, 0, (i - 2) * -.18]}>
+          <torusGeometry args={[.7 + i * .12, .065, 6, 40, Math.PI * 1.45]} />
+          <meshBasicMaterial color={["#8be4d1", "#acb8f0", "#e6d1fc"][i % 3]} transparent opacity={.65} />
+        </mesh>)}
+        {ring(1.5, .1, 8, "#cef2ed")}
+      </>}
       {kind === "solkarath" && (
         <>
           <mesh position={[0, 1.4, 0]}>

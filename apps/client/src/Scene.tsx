@@ -1,3 +1,4 @@
+import { WildwoodEffect } from "./WildwoodEffects";
 import { WildwoodScenery } from "./WildwoodScenery";
 import { expeditionOf, EXPEDITION_STOPS } from "../../../packages/shared/wildwood";
 import { WorldInteraction } from "./WorldInteraction";
@@ -1530,11 +1531,11 @@ function SkillEffect({ battle, phase }: { battle: Battle; phase?: number }) {
         new T.Vector3(0, 0.6, 0),
       );
     ref.current.position.copy(from.lerp(to, Math.min(1, p * 2)));
-    ref.current.rotation.y = p * 5;
+    ref.current.rotation.y = settings.reduced ? 0 : p * 5;
     const scale = p < 0.5 ? 0.25 + p : 1 + Math.sin((p - 0.5) * Math.PI) * 1.5;
     ref.current.scale.setScalar(settings.reduced ? 0.8 : scale);
     ref.current.children.forEach((m, i) => {
-      if (m instanceof T.Mesh) m.rotation.z = p * (i % 2 ? 1 : -1) * 6;
+      if (m instanceof T.Mesh && !settings.reduced) m.rotation.z = p * (i % 2 ? 1 : -1) * 6;
     });
   });
   const e = battle.event;
@@ -1544,6 +1545,7 @@ function SkillEffect({ battle, phase }: { battle: Battle; phase?: number }) {
     v = s.index % 10;
   return (
     <group ref={ref} name="skill-effect">
+      {!e.action.endsWith("-0") && <WildwoodEffect id={s.id} />}
       {ult && s.tier === "S" && (
         <UltimateEffect
           id={s.id}

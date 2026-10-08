@@ -138,3 +138,23 @@ test("ten mythic effects remain visible at paused impact", async ({ page }) => {
   }
   expect(errors).toEqual([]);
 });
+
+test("six western species have readable models and rendered signature skills", async ({ page }) => {
+  const errors = await openGallery(page);
+  for (const s of SPECIES.filter((s) => ["reedlet", "lanternmoth", "coppershell", "bloomanta", "galehart", "auroroc"].includes(s.id))) {
+    await page.locator(".gallery-list").getByRole("button", { name: `${s.tier} · ${s.name}`, exact: true }).click();
+    await page.waitForTimeout(150);
+    await page.locator(".gallery-preview").screenshot({ path: `artifacts/wildwood-model-${s.id}.png` });
+    await page.getByRole("button", { name: "Preview ultimate", exact: true }).click();
+    await page.getByRole("button", { name: "Pause", exact: true }).click();
+    const count = await page.evaluate(async (id) => {
+      const url = performance.getEntriesByType("resource").map((r) => r.name).find((n) => n.includes("@react-three_fiber.js"))!;
+      const { _roots } = await import(/* @vite-ignore */ url);
+      return _roots.get(document.querySelector(".gallery-preview canvas")).store.getState().scene.getObjectByName(`signature-${id}`)?.children.length;
+    }, s.id);
+    expect(count).toBe(6);
+    await page.locator(".gallery-preview").screenshot({ path: `artifacts/wildwood-skill-${s.id}.png` });
+    await page.getByRole("button", { name: "Play", exact: true }).click();
+  }
+  expect(errors).toEqual([]);
+});

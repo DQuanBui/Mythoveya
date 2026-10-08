@@ -169,8 +169,8 @@ export function Collection({
             ) : (
               <p className="notice">
                 Find through the bond shrine
-                {s.tier <= "C" ? " or selected wild encounters" : ""}. Equal
-                chance among all ten species in its tier.
+                {["E", "D", "C"].includes(s.tier) ? " or selected wild encounters" : ""}. Equal
+                chance among the {SPECIES.filter((entry) => entry.tier === s.tier).length} species in its tier.
                 {s.evolvesTo ? ` Evolves into ${byId[s.evolvesTo].name}.` : ""}
               </p>
             )}
