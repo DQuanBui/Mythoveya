@@ -380,8 +380,10 @@ test("click-to-walk reaches a hidden cache, shows hover help, and fishes at the 
     .poll(async () => (await position())[1], { timeout: 15000 })
     .toBeLessThan(2.5);
   await expect(page.locator(".modal")).toHaveCount(0);
+  // Return to the clear central path before heading north. A diagonal from
+  // (3, 4) clips the village pebble depending on the helper's arrival tolerance.
   await walkRoute(page, [
-    [3, 4],
+    [0, 1.5],
     [0, -9],
     [8, -9],
   ]);
