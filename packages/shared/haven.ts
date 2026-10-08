@@ -453,6 +453,12 @@ export function seeded(seed: number) {
 }
 
 export const HAVEN_WILDLIFE = [
+  { species: "reedlet", point: [-48, 12] as Point, radius: 1, water: true },
+  { species: "bloomanta", point: [-52, 14] as Point, radius: 1.2, water: true },
+  { species: "lanternmoth", point: [-52, -4] as Point, radius: .8 },
+  { species: "coppershell", point: [-38, 24] as Point, radius: .7 },
+  { species: "galehart", point: [-59, 19] as Point, radius: .7 },
+  { species: "auroroc", point: [-59, 0] as Point, radius: .7 },
   { species: "thornhare", point: [-24, 20] as Point, radius: 1.2 },
   { species: "pebblit", point: [-20, 24] as Point, radius: 1 },
   { species: "mossprig", point: [-27, -4] as Point, radius: 1.3 },

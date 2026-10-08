@@ -1,3 +1,5 @@
+import { WildwoodScenery } from "./WildwoodScenery";
+import { expeditionOf } from "../../../packages/shared/wildwood";
 import { WorldInteraction } from "./WorldInteraction";
 import { HavenHouses } from "./HavenHouses";
 import { HavenVillage } from "./HavenVillage";
@@ -254,9 +256,11 @@ function Island({
 function Environment({
   region = "haven",
   title = false,
+  expedition,
 }: {
   region?: string;
   title?: boolean;
+  expedition?: Profile["expedition"];
 }) {
   const sky = title
     ? "#94b5b6"
@@ -461,7 +465,8 @@ function Environment({
           speed={0.2}
         />
       </group>
-      {expanded && <HavenVillage />}
+      {expanded && <HavenVillage restored={expedition?.restored === true} />}
+      {expanded && <WildwoodScenery repaired={expedition?.repaired || []} restored={expedition?.restored === true} />}
       {expanded && <HavenBirds />}
       {expanded && <HavenFrontier />}
       <RegionScenery region={region} />
@@ -1151,7 +1156,7 @@ export function WorldScene({
     >
       <WalkContext.Provider value={walker}>
       <ModelLighting intensity={0.35} />
-      <Environment region={profile.region} />
+      <Environment region={profile.region} expedition={expeditionOf(profile)} />
       {profile.region === "haven" && (
         <HavenHouses onInteract={onInteract} disabled={blocked} />
       )}

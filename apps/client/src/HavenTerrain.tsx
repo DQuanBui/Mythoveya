@@ -158,7 +158,7 @@ export function HavenTerrain() {
       </mesh>
       <TrailSurface points={strips} />
       {HAVEN_PLACES.filter(
-        (p) => !["village", "driftshore", "summit"].includes(p.id),
+        (p) => !["village", "driftshore", "summit", "windrest", "fieldstation"].includes(p.id),
       ).map((p) => (
         <mesh
           key={p.id}

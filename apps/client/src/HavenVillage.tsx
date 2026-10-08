@@ -297,7 +297,7 @@ function bunting(k: Kit) {
   }
 }
 
-export function HavenVillage() {
+export function HavenVillage({ restored = true }: { restored?: boolean }) {
   const built = useMemo(() => {
     const k = new Kit(),
       g = new Kit(),
@@ -333,7 +333,7 @@ export function HavenVillage() {
   const [mx, mz] = HAVEN_WINDMILL.point;
   useFrame(({ clock }, dt) => {
     if (settings.reduced) return;
-    if (sails.current) sails.current.rotation.z -= Math.min(dt, 0.05) * 0.55;
+    if (sails.current && restored && !settings.reduced) sails.current.rotation.z -= Math.min(dt, 0.05) * 0.55;
     if (boat.current) {
       boat.current.position.y = 0.02 + Math.sin(clock.elapsedTime * 1.3) * 0.035;
       boat.current.rotation.z = Math.sin(clock.elapsedTime * 1.1) * 0.035;
