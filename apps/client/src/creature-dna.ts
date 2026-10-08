@@ -92,6 +92,16 @@ const COLOR_WORDS: [RegExp, string][] = [
 const has = (s: Species, re: RegExp) => re.test(`${s.appearance} ${s.name}`.toLowerCase());
 const tiers = ["E", "D", "C", "B", "A", "S"];
 
+// Art-directed palettes and proportions for the western habitats.
+const WILDWOOD_DNA: Record<string, Partial<Dna>> = {
+  reedlet: { base: "#55c9bb", mid: "#3a9d9b", light: "#a5eee0", cream: "#fff0d9", dark: "#326a76", accent: "#f094ae", iris: "#3f6da5", body: [.85, .8, 1.3], head: 1.2, ears: "none", marking: "spots" },
+  lanternmoth: { base: "#f2e5bb", mid: "#c8b788", light: "#fff6d7", cream: "#fff9e9", dark: "#927250", accent: "#eab35d", iris: "#8f698e", body: [.6, .8, 1.1], head: .85, ears: "none", marking: "none" },
+  coppershell: { base: "#bb7e53", mid: "#986340", light: "#e9bc83", cream: "#e8d5a4", dark: "#3b796a", accent: "#85bd8c", iris: "#476c69", body: [1.15, .9, 1.05], head: .8, ears: "none", marking: "none" },
+  bloomanta: { base: "#4eac8b", mid: "#368877", light: "#95d6ad", cream: "#f9d8db", dark: "#476b78", accent: "#e798ba", iris: "#8066a8", body: [.9, .5, 1.15], head: .8, ears: "none", marking: "none" },
+  galehart: { base: "#5968a7", mid: "#404d85", light: "#bce2e2", cream: "#e2eeeb", dark: "#2f466a", accent: "#53bfb2", iris: "#d9b866", body: [.85, .9, 1.2], head: .85, legs: 1.5, ears: "pointed", marking: "socks" },
+  auroroc: { base: "#e9f3f0", mid: "#b8d2d5", light: "#ffffff", cream: "#f5e6fa", dark: "#3769a3", accent: "#9b8dde", iris: "#4382bf", body: [.75, .95, 1.05], head: .85, ears: "none", marking: "none" },
+};
+
 export function dnaOf(s: Species): Dna {
   const r = random(hash(s.id)),
     rank = tiers.indexOf(s.tier),
@@ -188,6 +198,7 @@ export function dnaOf(s: Species): Dna {
     eye: (rank <= 1 ? 1.15 : rank >= 4 ? 0.92 : 1) * (0.92 + r() * 0.16),
     slant: s.role === "striker" || s.element === "Shadow" ? 0.25 : s.role === "healer" ? -0.08 : 0,
     glowEyes: rank === 5,
+    ...WILDWOOD_DNA[s.id],
     features: {
       mane: has(s, /lion|leonine|mane/),
       trunk: has(s, /mammoth|elephant/),

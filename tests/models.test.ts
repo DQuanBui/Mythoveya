@@ -43,3 +43,17 @@ describe("companion rendering recipes", () => {
     }
   });
 });
+
+it("returns from attacks cleanly and preserves authored tails during animation", () => {
+  const model = createCreature("bloomanta");
+  animateCreature(model, 1, "attack", .5);
+  expect(model.userData.rig.position.z).toBeGreaterThan(0);
+  animateCreature(model, 2, "idle");
+  expect(model.userData.rig.position.z).toBe(0);
+  expect(model.getObjectsByProperty("name", "bloomanta-ribbon")).toHaveLength(2);
+  const sleeping = createCreature("reedlet");
+  animateCreature(sleeping, 3, "sleep");
+  expect(sleeping.userData.eyes.every((eye: any) => eye.scale.y < .1)).toBe(true);
+  animateCreature(sleeping, 3, "idle", 0, true);
+  expect(sleeping.userData.eyes.every((eye: any) => eye.scale.y === 1)).toBe(true);
+});

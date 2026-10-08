@@ -131,7 +131,8 @@ export function createCreature(id: string, shimmer = false) {
     rare = rank >= 4;
   const limbs: T.Group[] = [],
     wings: T.Group[] = [],
-    tails: T.Group[] = [];
+    tails: T.Group[] = [],
+    eyes: T.Group[] = [];
   const four = ["quadruped", "fox", "antler", "dragon"].includes(s.family);
   const [bx, by, bz] = dna.body;
   // Longer legs lift the whole body.
@@ -265,7 +266,9 @@ export function createCreature(id: string, shimmer = false) {
         part(l, "capsule", dark, [x * 0.4, -0.14, 0], [0.05, 0.24, 0.05], [0, 0, x * 1.4]);
         limbs.push(l);
       }
-    if (/moth|mantis|winged|wing/i.test(s.appearance)) {
+    if (s.id === "lanternmoth") {
+      // Broad luna wings are added by the authored anatomy below.
+    } else if (/moth|mantis|winged|wing/i.test(s.appearance)) {
       wing(-1, 1.3, accent);
       wing(1, 1.3, accent);
     } else
@@ -313,8 +316,7 @@ export function createCreature(id: string, shimmer = false) {
     body([0, 0.82, 0.12], [0.34 * bx, 0.3, 0.62 * bz], cream);
     headY = 0.99;
     headZ = 0.61;
-    wing(-1, 1.15, accent);
-    wing(1, 1.15, accent);
+    if (s.id !== "bloomanta") { wing(-1, 1.15, accent); wing(1, 1.15, accent); }
     if (/jellyfish|cuttlefish/.test(s.appearance)) {
       body([0, 1.05, 0], [0.66, 0.42, 0.65]);
       for (let i = 0; i < 6; i++) {
@@ -423,10 +425,12 @@ export function createCreature(id: string, shimmer = false) {
       ez = headZ + 0.27 * hs,
       es = dna.eye * hs,
       tilt = [0, 0, side * dna.slant];
-    part(rig, "smooth", "#fffaf0", [ex, ey, ez], [0.1 * es, 0.115 * es, 0.07], tilt, false, true);
-    part(rig, "smooth", dna.iris, [ex, ey - 0.005, ez + 0.042], [0.065 * es, 0.08 * es, 0.035], tilt, dna.glowEyes, true);
-    part(rig, "smooth", "#0d1418", [ex, ey - 0.005, ez + 0.06], [0.036 * es, 0.048 * es, 0.02], tilt, false, true);
-    part(rig, "smooth", "#ffffff", [ex - side * 0.02, ey + 0.035 * es, ez + 0.075], [0.018 * es, 0.02 * es, 0.01], undefined, true);
+    const eye = new T.Group(); eye.position.set(0, ey, 0); rig.add(eye); eyes.push(eye);
+    part(eye, "smooth", "#fffaf0", [ex, ey, ez], [0.1 * es, 0.115 * es, 0.07], tilt, false, true);
+    part(eye, "smooth", dna.iris, [ex, ey - 0.005, ez + 0.042], [0.065 * es, 0.08 * es, 0.035], tilt, dna.glowEyes, true);
+    part(eye, "smooth", "#0d1418", [ex, ey - 0.005, ez + 0.06], [0.036 * es, 0.048 * es, 0.02], tilt, false, true);
+    part(eye, "smooth", "#ffffff", [ex - side * 0.02, ey + 0.035 * es, ez + 0.075], [0.018 * es, 0.02 * es, 0.01], undefined, true);
+    eye.children.forEach((p) => { p.position.y -= ey; });
     part(rig, "orb", blush, [side * 0.27 * hs, headY - 0.07 * hs, headZ + 0.2 * hs], [0.07, 0.04, 0.03]);
     // A soft brow gives strikers and shadows a determined look.
     if (dna.slant > 0.1)
@@ -544,6 +548,58 @@ export function createCreature(id: string, shimmer = false) {
   if (s.id === "zephyreon")
     for (const side of [-1, 1])
       part(rig, "cone", light, [side * 0.3, 0.8 + lift, -1.2], [0.15, 0.9, 0.14], [Math.PI / 2, 0, side * 0.5]);
+  // Named anatomy makes each western species readable even in silhouette.
+  if (s.id === "reedlet") {
+    for (const side of [-1, 1]) for (let i = 0; i < 3; i++) {
+      const x = side * (.36 + i * .08), y = headY + .07 + i * .09, z = headZ - i * .16;
+      part(rig, "capsule", accent, [x, y, z], [.035, .27, .045], [0, 0, -side * .9]);
+      for (let j = 0; j < 3; j++) part(rig, "orb", j % 2 ? blush : accent, [x + side * (.09 + j * .06), y + j * .045, z], [.1, .035, .07], [0, 0, side * .3]);
+    }
+    const paddle = new T.Group(); paddle.name = "reedlet-paddle"; paddle.position.set(0, .55, -.65); rig.add(paddle); tails.push(paddle);
+    part(paddle, "orb", light, [0, .05, -.48], [.08, .27, .65]);
+    part(paddle, "orb", accent, [0, .08, -.8], [.025, .2, .27]);
+  }
+  if (s.id === "lanternmoth" || s.id === "bloomanta") {
+    const moth = s.id === "lanternmoth";
+    for (const side of [-1, 1]) {
+      const fin = new T.Group(); fin.name = moth ? "luna-wing" : "petal-fin"; fin.position.set(side * .24, moth ? .9 : 1, 0); rig.add(fin); wings.push(fin);
+      part(fin, "orb", moth ? cream : accent, [side * .58, 0, -.03], [.8, .06, moth ? .62 : .85], [0, side * -.3, side * .12]);
+      part(fin, "orb", moth ? accent : light, [side * .6, .065, .05], [.22, .015, .23]);
+      part(fin, "orb", moth ? dark : cream, [side * .6, .082, .05], [.095, .015, .11]);
+      if (moth) part(fin, "orb", light, [side * .78, 0, -.8], [.09, .035, .58], [0, side * .2, 0]);
+      else {
+        const ribbon = new T.Group(); ribbon.name = "bloomanta-ribbon"; ribbon.position.set(side * .2, .8, -.6); rig.add(ribbon); tails.push(ribbon);
+        for (let j = 0; j < 4; j++) part(ribbon, "orb", j % 2 ? accent : cream, [side * j * .1, Math.sin(j) * .08, -.2 - j * .3], [.065, .025, .22], [0, -side * .25, 0]);
+      }
+    }
+    if (moth) part(rig, "orb", accent, [0, .68, -.52], [.2, .2, .32], undefined, true);
+    else for (let i = 0; i < 5; i++) part(rig, "orb", accent, [Math.cos(i * 1.26) * .22, headY + .32, headZ + Math.sin(i * 1.26) * .15], [.18, .045, .12], [0, i * 1.26, 0]);
+  }
+  if (s.id === "coppershell") {
+    for (let row = 0; row < 3; row++) for (let i = 0; i < 6; i++) {
+      const a = i * Math.PI / 3, r = .48 - row * .13;
+      part(rig, "box", row % 2 ? accent : dark, [Math.sin(a) * r, 1.1 + row * .12, -.1 + Math.cos(a) * r], [.25 - row * .03, .1, .25 - row * .03], [0, a, 0]);
+    }
+    part(rig, "orb", light, [0, headY - .11, headZ + .36], [.28, .08, .21]);
+  }
+  if (s.id === "galehart") {
+    for (const side of [-1, 1]) {
+      for (let i = 0; i < 3; i++) {
+        part(rig, "capsule", cream, [side * (.28 + i * .15), headY + .45 + i * .16, headZ - .1], [.045, .26, .045], [0, 0, -side * .7]);
+        part(rig, "ring", "#d9be76", [side * (.34 + i * .15), headY + .26 + i * .16, headZ - .1], [.055, .09, .35], undefined, true);
+      }
+      for (const z of [-.38, .4]) part(rig, "ring", "#d9be76", [side * .29 * bx, .15, z * bz], [.14, .14, .5], [Math.PI / 2, 0, 0]);
+    }
+  }
+  if (s.id === "auroroc") {
+    const fan = new T.Group(); fan.name = "aurora-fan"; fan.position.set(0, 1.35, -.35); rig.add(fan); tails.push(fan);
+    for (let i = 0; i < 7; i++) {
+      const a = (i - 3) * .2;
+      part(fan, "orb", [accent, "#72d8ca", dark][i % 3], [Math.sin(a) * .8, .25, -Math.cos(a) * .7], [.095, .055, .72], [-.35, -a, 0]);
+      part(fan, "orb", light, [Math.sin(a) * 1.25, .52, -Math.cos(a) * 1.18], [.055, .025, .16], [-.35, -a, 0]);
+    }
+  }
+  tails.forEach((t) => { t.userData.restRotation = t.rotation.clone(); });
   consolidate(rig, `creature:${id}:${shimmer ? "shimmer" : "normal"}`);
   const glints = new T.Group();
   if (shimmer) {
@@ -556,7 +612,7 @@ export function createCreature(id: string, shimmer = false) {
     rig.add(glints);
   }
   g.scale.setScalar(s.size);
-  g.userData = { shimmer, glints, rig, limbs, wings, tails, family: s.family, index: s.index, headAt: [headY, headZ] };
+  g.userData = { shimmer, glints, rig, limbs, wings, tails, eyes, family: s.family, index: s.index, headAt: [headY, headZ] };
   return g;
 }
 export type Motion =
@@ -580,7 +636,7 @@ export function animateCreature(
   phase = 0,
   reduced = false,
 ) {
-  const { rig, limbs, wings, tails, family, index, glints } = g.userData;
+  const { rig, limbs, wings, tails, family, index, glints, eyes } = g.userData;
   if (glints && g.userData.shimmer) {
     glints.rotation.y = reduced ? 0 : time * 0.45;
     glints.scale.setScalar(reduced ? 1 : 0.92 + Math.sin(time * 2) * 0.08);
@@ -588,7 +644,10 @@ export function animateCreature(
   const floating = ["bird", "aquatic", "spirit"].includes(family),
     speed = 2 + (index % 4) * 0.3;
   const motion = reduced ? 0.2 : 1;
-  rig.position.y = (floating ? 0.15 : 0) + Math.sin(time * speed) * 0.035 * motion;
+  rig.position.set(0, (floating ? 0.15 : 0) + Math.sin(time * speed) * 0.035 * motion, 0);
+  const blinkPhase = (time + index * .37) % 4.7;
+  const blink = state === "sleep" ? .07 : reduced ? 1 : blinkPhase > 4.5 ? Math.max(.07, Math.abs(blinkPhase - 4.6) * 10) : 1;
+  eyes?.forEach((eye: T.Group) => { eye.scale.y = blink; });
   rig.rotation.set(0, 0, 0);
   // A soft breathing swell and a slow head-to-tail sway.
   rig.scale.set(
@@ -608,9 +667,14 @@ export function animateCreature(
       Math.sin(time * (state === "walk" ? 8 : 3)) * ((i % 2) * 2 - 1) * 0.27 * motion;
   });
   tails.forEach((t: T.Group, i: number) => {
-    t.rotation.y = Math.sin(time * 2 + i * 0.7) * 0.22 * motion;
-    t.rotation.x = Math.sin(time * 2 + i) * 0.08 * motion;
+    t.rotation.y = (t.userData.restRotation?.y || 0) + Math.sin(time * 2 + i * 0.7) * 0.22 * motion;
+    t.rotation.x = (t.userData.restRotation?.x || 0) + Math.sin(time * 2 + i) * 0.08 * motion;
   });
+  if (state === "walk") {
+    if (family === "amphibian") rig.position.y += Math.abs(Math.sin(time * 5)) * .16 * motion;
+    if (family === "shell") rig.rotation.z = Math.sin(time * 5) * .07 * motion;
+    if (family === "aquatic") rig.rotation.y = Math.sin(time * 3) * .18 * motion;
+  }
   if (["attack", "cast", "ultimate"].includes(state)) {
     const p = Math.sin(Math.min(1, phase) * Math.PI);
     rig.position.z = p * (state === "attack" ? 0.4 : 0.15) * motion;
