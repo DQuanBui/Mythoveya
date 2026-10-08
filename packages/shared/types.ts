@@ -127,6 +127,7 @@ export type BattleEvent = {
   message: string;
 };
 export type Battle = {
+  encounter?: "windmill";
   id: string;
   units: Unit[];
   round: number;

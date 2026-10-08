@@ -1,3 +1,4 @@
+import { expeditionOf, FIELD_NODES } from "../../packages/shared/wildwood";
 import { expeditionMutation } from "./expedition-game";
 import { randomInt, randomUUID } from "node:crypto";
 import {
@@ -56,6 +57,7 @@ import {
 export const pve = new Map<string, Battle>();
 export const activeHuman = new Set<string>();
 export type Mission = {
+  expedition?: boolean;
   stage?: string;
   dungeon?: string;
   tier?: number;
@@ -256,6 +258,7 @@ export function startPve(
   if (activeHuman.has(p.id)) throw Error("Finish your arena match first.");
   const existing = pve.get(p.id);
   if (existing && existing.winner === null) return existing;
+  if (mission.expedition) return startExpedition(p);
   if (mission.stage || mission.dungeon || mission.tower)
     return startMission(p, mission);
   const ids =
@@ -343,6 +346,23 @@ const buffed = (p: Profile) => {
   applyBuffs(p, six);
   return six;
 };
+function startExpedition(p: Profile) {
+  const e = expeditionOf(p);
+  if (p.region !== "haven" || p.island) throw Error("Return to Havenreach first.");
+  if (!e.started || FIELD_NODES.some((n) => !e.repaired.includes(n.id))) throw Error("Recover the three windmill pieces first.");
+  if (e.guardian) throw Error("The guardian is already at peace.");
+  const b = makeBattle(randomUUID(), [buffed(p), enemyTeam(["galehart", "coppershell", "lanternmoth", "reedlet", "mossprig", "zippinch"], 1)], "pve", randomInt(0, 10000000));
+  b.title = "The Windrest Guardian";
+  b.arena = "grove";
+  b.encounter = "windmill";
+  for (const u of b.units.filter((u) => u.side === 1)) {
+    u.hp = u.maxHp = Math.round(u.maxHp * (u.slot === 0 ? 1.7 : .5));
+    u.attack = Math.round(u.attack * .65);
+  }
+  pve.set(p.id, b);
+  battleMeta.set(b.id, { region: "haven", boss: false, expedition: true });
+  return b;
+}
 function startMission(p: Profile, mission: Mission) {
   if (p.team.length !== 6) throw Error("Form a team of six first.");
   const a = ensureAdventure(p);
@@ -491,6 +511,18 @@ export function finishPve(profileId: string, b: Battle) {
     };
     const meta = battleMeta.get(b.id);
     const town = ensureTown(p);
+    if (meta?.expedition) {
+      const e = expeditionOf(p);
+      const rewarded = b.winner === 0 && !e.guardian;
+      if (rewarded) {
+        e.guardian = true; p.expedition = e;
+        p.gold += 80; gainXp(p, 90); p.wins++; p.daily.wins++; track(p, "wins");
+      }
+      b.rewards = { gold: p.gold - before.gold, diamonds: p.diamonds - before.diamonds, tokens: 0, xp: rewarded ? 90 : 0, newSpecies: [], items: rewarded ? ["Guardian calmed. Return to the windmill to restore its sails."] : [] };
+      db.prepare("INSERT INTO matches VALUES(?,?)").run(b.id, JSON.stringify({ winner: b.winner, kind: "expedition", profileId }));
+      save(p);
+      return;
+    }
     if (meta?.stage || meta?.dungeon || meta?.tower) {
       let result: { items: string[]; xp: number; stars?: number } = {
         items: [],

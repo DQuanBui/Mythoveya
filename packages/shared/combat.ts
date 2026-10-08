@@ -1,3 +1,4 @@
+import { guardianDamage } from "./guardian";
 import { byId, signatureId, TIERS } from "./content";
 import { skillPower } from "./adventure";
 import type { Battle, Owned, Unit, Status } from "./types";
@@ -346,7 +347,7 @@ export function act(
                     : u.defense))) *
                 elementMultiplier(s.element, byId[u.species].element) *
                 (0.94 + rng(b) * 0.12) *
-                crit *
+                crit * guardianDamage(b, u) *
                 (has(actor, "weaken") ? 0.8 : 1) *
                 (has(actor, "boost") ? 1.2 : 1) *
                 (has(u, "mark") ? 1.2 : 1) *

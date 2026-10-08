@@ -205,3 +205,8 @@
     animation-duration: 0.01s;
   }
 }
+
+.guardian-intent { position:absolute; top:108px; left:50%; transform:translateX(-50%); max-width:560px; width:calc(100% - 32px); padding:10px 16px; border:1px solid #bcdac0; border-radius:12px; background:#183f35ed; color:#f6f1d8; z-index:4; pointer-events:none; text-align:center; }
+.guardian-intent strong { display:block; color:#edcf83; margin-bottom:3px; }
+.guardian-intent span { font-size:12px; }
+@media(max-width:600px) { .guardian-intent { top:96px; padding:6px 10px; } }

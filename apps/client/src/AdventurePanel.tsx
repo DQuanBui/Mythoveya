@@ -23,6 +23,7 @@ import { utcDay } from "../../../packages/shared/town";
 import { Portrait } from "./portraits";
 
 export type MissionStart = {
+  expedition?: boolean;
   stage?: string;
   dungeon?: string;
   tier?: number;

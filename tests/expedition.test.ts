@@ -1,3 +1,5 @@
+import { makeBattle, act } from "../packages/shared/combat";
+import { guardianIntent } from "../packages/shared/guardian";
 import { describe, expect, it } from "vitest";
 import { FIELD_HOUSES, FIELD_NODES, GUARDIAN_POINT, MILL_POINT, WILDWOOD_PLACES, discoveryWindow, expeditionOf } from "../packages/shared/wildwood";
 import { havenWalkable, groundHeight } from "../packages/shared/haven";
@@ -30,4 +32,22 @@ describe("western Havenreach", () => {
     expect(discoveryWindow("starglass", DAY_CYCLE_MS * 0.8)).toBe(true);
     expect(discoveryWindow("forged", Date.now())).toBe(false);
   });
+});
+
+it("applies the telegraphed guardian resistance and vulnerability to real damage", () => {
+  const owned = (species: string) => ({ id: species, species, level: 1, xp: 0, shards: 0, upgrade: 0, locked: false });
+  const base = makeBattle("mantle", [[owned("emberfox")], [owned("galehart")]], "pve", 65);
+  const damage = (round: number, encounter?: "windmill") => {
+    const b = structuredClone(base); b.round = round; b.encounter = encounter;
+    b.queue = ["0:0", "1:0"]; b.readyAt = 0;
+    const target = b.units[1], before = target.hp;
+    act(b, 0, 0, target.id, 100000, true);
+    return before - target.hp;
+  };
+  expect(damage(1, "windmill")).toBeCloseTo(damage(1) * .5, -1);
+  expect(damage(2, "windmill")).toBeCloseTo(damage(2) * 2, -1);
+  base.encounter = "windmill";
+  expect(guardianIntent(base)?.title).toBe("Wind mantle");
+  base.units[1].hp = 0;
+  expect(guardianIntent(base)).toBeNull();
 });

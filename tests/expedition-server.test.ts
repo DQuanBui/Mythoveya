@@ -1,3 +1,4 @@
+import { act, autoAction } from "../packages/shared/combat";
 import { afterAll, expect, it } from "vitest";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -55,4 +56,30 @@ it("validates actual server time for discoveries and keeps house stories once", 
   expect(p.diamonds).toBe(before.diamonds + 15);
   expect(p.gold).toBe(before.gold + 20);
   expect(p.expedition!.visits).toEqual(["naturalist"]);
+});
+
+it("requires pieces before the guardian, supports a retry and records victory once", () => {
+  const token = keeper();
+  expect(() => game.startPve(authenticate(token), false, false, { expedition: true })).toThrow("three windmill");
+  op(token, "exp-start");
+  for (const n of FIELD_NODES) {
+    const o = authenticate(token).owned.find((o) => byId[o.species].element === n.element)!;
+    op(token, "exp-field", { quest: n.id, id: o.id });
+  }
+  const lost = game.startPve(authenticate(token), false, false, { expedition: true });
+  lost.winner = 1; game.finishPve(authenticate(token).id, lost);
+  expect(authenticate(token).expedition!.guardian).toBe(false);
+  const b = game.startPve(authenticate(token), false, false, { expedition: true });
+  b.seed = 333;
+  expect(b.encounter).toBe("windmill");
+  for (let i = 0; i < 320 && b.winner === null; i++) {
+    const a = autoAction(b);
+    act(b, b.units.find((u) => u.id === b.queue[0])!.side, a.action, a.target, Date.now() + i * 10000, true);
+  }
+  expect(b.winner).toBe(0);
+  const before = authenticate(token);
+  game.finishPve(before.id, b); game.finishPve(before.id, b);
+  expect(authenticate(token).expedition!.guardian).toBe(true);
+  expect(authenticate(token).gold).toBe(before.gold + 80);
+  expect(() => game.startPve(authenticate(token), false, false, { expedition: true })).toThrow("at peace");
 });

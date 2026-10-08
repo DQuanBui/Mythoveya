@@ -1,3 +1,4 @@
+import { guardianIntent } from "../../../packages/shared/guardian";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Client, type Room } from "@colyseus/sdk";
 import type { Battle, Profile } from "../../../packages/shared/types";
@@ -122,6 +123,7 @@ export function BattleUI({
     <div className="battle-screen">
       <BattleScene battle={battle} target={chosen} onTarget={setTarget} />
       <UltimateMoment battle={battle} now={now} />
+      {guardianIntent(battle) && battle.winner === null && <aside className="guardian-intent" role="status"><strong>{guardianIntent(battle)!.title}</strong><span>{guardianIntent(battle)!.text}</span></aside>}
       <header className="battle-top">
         <div>
           <span className="eyebrow">
