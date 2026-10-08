@@ -2,17 +2,17 @@
 
 ## Presentation
 
-- The 72 recruitable species and 16 evolved forms have distinct procedural recipes and complete gameplay mappings, but some anatomical details are stylized approximations. They are not individually sculpted, production-finished character assets. Further silhouette and material work would improve resemblance to every authored description.
-- Havenreach now reaches a beach and a climbable mountain range with real ground height. Only Havenreach has elevation. The other regions keep their compact layouts and shared service stations, and longer regional stories remain future work.
-- The six visitor-book houses have clickable porch visits and durable rewards. The nine village cottages, windmill, and well are decorative. Walkable interiors and house ownership are not implemented. Islanders follow simple day/night routines, and their greetings do not affect progress.
+- The 78 recruitable species and 16 evolved forms have distinct procedural recipes and complete gameplay mappings, but some anatomical details are stylized approximations. They are not individually sculpted, production-finished character assets. Further silhouette and material work would improve resemblance to every authored description.
+- Havenreach now reaches a beach and a climbable mountain range with real ground height. Western Havenreach adds Reedwater Lake, a hillside lookout and two field cottages. Only Havenreach has elevation. The other regions keep their compact layouts and shared service stations, and longer regional stories remain future work.
+- The six visitor-book houses have clickable porch visits and durable rewards. The twelve village cottages and well are decorative. Two western field houses offer saved stories, and the windmill now has a restoration quest and persistent moving sails. Walkable interiors and house ownership are not implemented. Islanders follow simple day/night routines, and their greetings do not affect progress.
 - Click-to-walk plans routes on a half-metre grid over the same collision rules as keyboard movement. Very narrow gaps can still make the keeper stop early; the walk then interacts if the target is within easy reach, or simply ends.
 - Story chapters are fought with the existing battle system and roster; there are no chapter cutscenes or new creature models for bosses. Stage difficulty was calibrated with simulated auto-battles of the starter team, not with human playtesting. Chapter and dungeon battles do not offer wild bond attempts.
 - Equipment has three slots and four rarities with fixed stat lines; there are no sets, random sub-stats, or trading. Equipment and skill levels deliberately do not apply in Tactical Arena.
 - Habitat creatures provide ambient movement and calls using the existing roster. They are not new species or additional combat encounter types. The current wild-battle and bonding rules still apply through Ranger Tali and the existing encounter service.
 - Creature family rigs support the requested states. Recruitment now has a staged 3D shrine entrance for every species; species-specific choreography, greet/victory responses, and keeper gestures remain simple.
-- The battle effect system is bounded and includes ten distinct mythic recipes. Delayed outcomes are authoritative and telegraphed, but their presentation is attached to the round transition rather than a separate cinematic sequence. Further support-skill choreography would make multi-target healing and protection clearer.
+- The battle effect system is bounded and includes eleven distinct mythic recipes and six western signature skill effects. Delayed outcomes are authoritative and telegraphed, but their presentation is attached to the round transition rather than a separate cinematic sequence. Further support-skill choreography would make multi-target healing and protection clearer.
 - Music and voices are original Web Audio synthesis. Playback, settings and voice limits are checked programmatically; a subjective headphone/speaker listening pass has not been performed. Musical mixing and voice personality should be refined through listening before describing the sound as finished.
-- The initial client is still a substantial WebGL bundle (about 1.38 MB of JavaScript before compression). Arena, panels and island activities load on demand; Journal portraits are generated near the viewport. Graphics presets reduce decorative work, but laptop/GPU performance varies and no universal frame-rate claim is made. Exploration now includes a responsive mobile HUD and touch joystick; physical-device ergonomics and the full battle interface still need broader mobile review.
+- The initial client is still a substantial WebGL bundle (over 1.3 MB of JavaScript before compression). Arena, panels and island activities load on demand; Journal portraits are generated near the viewport. Graphics presets reduce decorative work, but laptop/GPU performance varies and no universal frame-rate claim is made. Exploration now includes a responsive mobile HUD and touch joystick; physical-device ergonomics and the full battle interface still need broader mobile review.
 
 ## Islands and the festival
 
@@ -25,6 +25,8 @@
 
 ## Systems and scope
 
+- The windmill quest validates progress, companion ownership/elements, discovery time windows and one-time rewards on the server. Like existing caches and lanterns, physical proximity is enforced by the client; there is no authoritative shared-world movement server yet. House stories and weather discoveries are short authored interactions, not branching quests.
+- The guardian has fixed introductory difficulty. Its alternating half/double incoming damage is shown before each round; damage-over-time statuses keep their ordinary rules. Experienced teams can outlevel it.
 - Guest tokens are local development authentication. There is no account recovery, public hosting, global matchmaking population, chat, trading, or shared exploration world.
 - Finished matches, progress and currencies are durable. Active matches remain in memory and are canceled if the server restarts, without competitive rating changes.
 - A wild bond is offered after eligible victories at a fixed displayed 80% chance. There is no mid-battle capture or remaining-HP-dependent bonding model yet.

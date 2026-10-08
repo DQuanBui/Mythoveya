@@ -2,7 +2,7 @@
 
 ![The Riftgate in Havenreach village, with its hover tooltip and a strolling islander](screenshots/havenreach.png)
 
-Havenreach is the first place to learn the world at your own pace. Its village services remain together near the starting plaza, while a larger outer walking loop connects six quieter destinations.
+Havenreach is the first place to learn the world at your own pace. Its village services remain together near the starting plaza, while outer walking loops connect the grove, shore, mountains and western lake district.
 
 | Place | What to find |
 | --- | --- |
@@ -12,13 +12,30 @@ Havenreach is the first place to learn the world at your own pace. Its village s
 | Waystone Ruins | Standing stones, a small crystal, Glimlet, and Pebblit |
 | Cloudwatch Lookout | A viewing platform, telescope, resting bench, and bird Wildbound |
 | Willowmere Pond | A wooden bridge, lily pads, ripples, and Tide creatures |
-| Sunpetal Clearing | A picnic spot, wildflowers, butterflies, and little companions |
+| Sunpetal Clearing | A picnic spot, wildflowers, butterflies, and the windmill journey |
+| Driftshore | A lagoon, pier, lighthouse and shore creatures |
+| Highcrag Summit | Climbable mountain trails and alpine wildlife |
+| Reedwater Lake | Reeds, lilies, dragonflies, Reedlet and Bloomanta |
+| Windrest Lookout | A hillside telescope, star shelter and Auroroc |
+| Willow Field Station | Mira's cottage, Lanternmoth and western trail supplies |
 
-Open **Travel map**, select a destination, and set a walking waypoint. Follow the pale paths around obstacles. The pond crossing is marked on both the local map and minimap. Hold Shift to sprint, press R to restore the camera, or choose **Return to Havenreach village** in the pause menu.
+Open **Travel map**, select a destination, and set a walking waypoint. Use **Walk to waypoint** to follow a route around obstacles, or follow the pale paths yourself. Keyboard movement cancels the automatic walk. The pond crossing is marked on both the local map and minimap. Hold Shift to sprint, press R to restore the camera, or choose **Return to Havenreach village** in the pause menu.
 
 There are nine daily Sunseed sites in Havenreach, including the original three. Gathering still grants one Sunseed and 25 Gold; the server remembers each pickup and resets availability on the UTC daily boundary. Other regions retain their original three nodes.
 
 ![Crossing Willowmere with a companion](screenshots/willowmere.png)
+
+## The Silent Windmill
+
+![Mira's field cottage and a Lanternmoth beside the western trail](screenshots/wildwood-field-station.png)
+
+Open **Adventure > The Silent Windmill**, or the windmill journal in the pause menu. Track the windmill beside Sunpetal Clearing, then walk there to begin. Three stops ask an owned companion to help: a Flame companion Kindles the beacon, a Tide companion clears the sluice with Flow, and a Grove companion uses Bloom to release the spindle. Companions do not need an active team slot. Each recovered piece grants 30 Gold and up to 5 friendship.
+
+After recovering all pieces, meet the Windrest guardian beside the lake. Its mantle halves direct damage in odd rounds; its open core takes double damage in even rounds. Save energy for that opening. A loss allows another attempt. Victory grants 80 Gold and 90 XP once. Return to the windmill for Galehart (a shard if already owned), 200 Gold and 50 Diamonds. The restored sails keep turning after reload.
+
+Mira's field cottage and Orrin's star shelter each offer a journal story and 20 Gold once. Rain-written tracks appear during actual rain; Starglass can be recorded between 18:00 and 06:00 island time. Each discovery grants 15 Diamonds once. Disabling visual day/night does not alter the server's discovery windows.
+
+![The Windrest guardian beside Reedwater Lake](screenshots/wildwood-lake.png)
 
 ## A welcome on the porch
 
@@ -30,7 +47,7 @@ Click a roaming habitat Wildbound to read its field note and hear its species ca
 
 ## A village that feels lived in
 
-Nine timber cottages, a windmill, a stone well, a campfire, and lamp posts now line the trails. Six islanders (Mira, Old Tomas, Juniper, Rowan, Ada, and Brother Elm) walk between the plaza, the market, the dock, the clearing, and their homes. Click one to say hello; their greetings hint at caches, fishing, the forge, and the Riftgate. They head home when night falls.
+Twelve timber cottages, a windmill, a stone well, a campfire, and lamp posts now line the trails. Six islanders (Mira, Old Tomas, Juniper, Rowan, Ada, and Brother Elm) walk between the plaza, the market, the dock, the clearing, and their homes. Click one to say hello; their greetings hint at caches, fishing, the forge, and the Riftgate. They head home when night falls.
 
 An island day lasts 18 real minutes. At dusk, windows, lanterns, and lamps glow; at night, moonlight, stars, and fireflies appear, and three warm lights brighten the plaza, market, and campfire. Turn the cycle off in **Sound & settings** to keep the afternoon light.
 
@@ -51,11 +68,11 @@ The woodland batches trees and ground cover into instanced meshes. Low graphics 
 ## Verification
 
 ```powershell
-npx vitest run tests/haven.test.ts tests/town.test.ts
-npx playwright test tests/browser/haven.spec.ts tests/browser/hud.spec.ts tests/browser/journey.spec.ts
+npx vitest run tests/haven.test.ts tests/town.test.ts tests/expedition.test.ts tests/expedition-server.test.ts tests/models.test.ts
+npx playwright test tests/browser/haven.spec.ts tests/browser/hud.spec.ts tests/browser/journey.spec.ts tests/browser/expedition.spec.ts tests/browser/gallery.spec.ts
 npm run build
 ```
 
 The layout tests sample every trail segment and destination, check the bridge/shoreline, verify resource eligibility, and keep trees away from the trail center. The browser route walks to the clearing, gathers a new resource, crosses the pond, visits the northern landmarks, and returns to the village. It also checks map selection, mobile layout, scenery presence, and a bounded draw-call count at the sampled scene. A second scenario clicks actual 3D villagers, resource crystals, and a house, signs a book, and checks persistence after reload. The tests use separate profiles and a test database.
 
-New lands, extra creature tiers, and a redesigned mission/animation format are later additions. This expansion gives those future adventures a stronger starting place.
+The windmill browser scenario also follows the western routes, uses every field ability, visits both cottages, wins the guardian battle, checks moving sails and verifies saved restoration after reload.

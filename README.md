@@ -10,7 +10,8 @@ Mythoveya is a locally playable, browser-based 3D creature-collection RPG. Its w
 
 ## The game
 
-- **72 Wildbound, plus 16 evolved forms:** ten species in each rarity from E to B and sixteen each in A and S, eight elements, twelve body families, 216 actions and 72 passives. Every species builds its own look from its description: palette, ears, tail, markings and anatomy such as manes, trunks, sails, owl faces and nine fanned tails.
+- **The Silent Windmill:** explore the western lake and hillside cottages, use Flame, Tide and Grove companions in the field, calm a guardian with alternating defenses, and restore the village windmill. Earn Galehart, discover rain tracks and starlight, and keep every reward in your saved journey.
+- **78 Wildbound, plus 16 evolved forms:** eleven species in each rarity from E to B and seventeen each in A and S, eight elements, twelve body families, 234 actions and 78 passives. Every species builds its own look from its description: palette, ears, tail, markings and anatomy such as manes, trunks, sails, owl faces and nine fanned tails.
 - **Eight keepers:** choose a recognizable character and change your appearance later without losing progress.
 - **Eight village friends:** meet Liora, Sella, Bram, Kael, Oren, Tali, Pip, and Wren. Explore 24 conversation topics, complete 16 missions, and unlock their daily help.
 - **Make yourself at home:** trade supplies at Pip's rotating market, grow Sunseed, craft treats, nurture friendship, name companions, and dress your following friend with a ribbon or bell.
@@ -37,10 +38,10 @@ Mythoveya is a locally playable, browser-based 3D creature-collection RPG. Its w
 - **A growing collection:** recruit with earned diamonds, bond with wild creatures, train companions, collect shards, and claim story and daily rewards.
 - **Meet each new bond:** watch your recruited Wildbound arrive on the 3D shrine stage, and select any result from a ten-bond reveal to meet it up close.
 - **Human arena battles:** friendly room codes and ranked matchmaking, separate Power and Tactical ratings, authoritative turns, and reconnect support.
-- **A living presentation:** articulated creatures and keepers, model-rendered portraits, eight synthesized music arrangements, elemental effects, species voices, and ten mythic ultimate recipes.
+- **A living presentation:** articulated creatures and keepers, model-rendered portraits, eight synthesized music arrangements, elemental effects, species voices, and eleven mythic ultimate recipes.
 - **Saved adventures:** SQLite stores profiles, formations, inventory, currency, pity counters, quests, completed results, and competitive ratings.
 
-Explore the [Havenreach starting-island guide](docs/STARTING_ISLAND.md) for the trail map, new homes, and visitor-book activity.
+Explore the [Havenreach starting-island guide](docs/STARTING_ISLAND.md) for the trail map, western lake district, Silent Windmill journey and visitor-book activity.
 
 This first playable version uses a compact procedural art style. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for presentation and scope limits, and [PROGRESS.md](PROGRESS.md) for the verification record.
 
@@ -166,7 +167,7 @@ Your first garden kit contains two Sunseed. Plant one, wait **two real minutes**
 
 Market stock and helper gifts refresh at **00:00 UTC**. Win a practice battle to claim Bram's daily 40 Gold and 10 Diamonds. Defeat a region guardian to claim Kael's weekly 70 Gold and 120 Diamonds; the bounty refreshes Monday at 00:00 UTC. Normal guardian rewards still apply.
 
-A single bond costs 100 diamonds; ten cost 1,000 and require confirmation. Base rarity rates are E 30%, D 30%, C 22%, B 12%, A 5%, and S 1%, with equal selection among the ten species in each tier.
+A single bond costs 100 diamonds; ten cost 1,000 and require confirmation. Base rarity rates are E 30%, D 30%, C 22%, B 12%, A 5%, and S 1%, with equal selection within each tier (eleven species each in E through B, seventeen each in A and S).
 
 After 29 pulls without A/S, the next pull guarantees A or S at normalized 5:1 weights. After 89 without S, the next pull guarantees S. S takes priority when both guarantees coincide and resets both counters. Ten-pulls resolve in order. Duplicate requests cannot spend or grant twice; duplicate creatures become species shards.
 
