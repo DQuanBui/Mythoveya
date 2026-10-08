@@ -11,6 +11,7 @@ const MYTHIC_RECIPES: Record<string, string> = {
   verdantus: "everbloom",
   fulgurion: "zephyreon",
   umbravix: "nyxavorn",
+  auroroc: "crysalune",
 };
 // Bounded, reusable geometry recipes. Each mythic has a distinct silhouette and cadence.
 export function UltimateEffect({

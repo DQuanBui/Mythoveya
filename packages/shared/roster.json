@@ -646,5 +646,59 @@
     "role": "controller",
     "appearance": "Nine-tailed shadow fox with moonlit tips and orbiting dusk lanterns",
     "signature": "Ninefold Eclipse weakens a whole row and delays their turns"
+  },
+  {
+    "id": "reedlet",
+    "name": "Reedlet",
+    "tier": "E",
+    "element": "Tide",
+    "role": "healer",
+    "appearance": "Turquoise axolotl with six rose-pink feathery gills, pearl spots and a translucent paddle tail",
+    "signature": "Springdrop heals and cleanses an ally"
+  },
+  {
+    "id": "lanternmoth",
+    "name": "Lanternmoth",
+    "tier": "D",
+    "element": "Light",
+    "role": "support",
+    "appearance": "Ivory luna moth with broad amber eyespot wings, curled antennae and a glowing lantern abdomen",
+    "signature": "Lantern Veil shields and hastens allies"
+  },
+  {
+    "id": "coppershell",
+    "name": "Coppershell",
+    "tier": "C",
+    "element": "Stone",
+    "role": "tank",
+    "appearance": "Copper tortoise with a terraced jade shell, bronze hexagonal plates and a sturdy shovel snout",
+    "signature": "Verdigris Guard protects itself and reflects attacks"
+  },
+  {
+    "id": "bloomanta",
+    "name": "Bloomanta",
+    "tier": "B",
+    "element": "Grove",
+    "role": "healer",
+    "appearance": "Rose and emerald manta with broad petal fins, a flowering crown and two long ribbon tails",
+    "signature": "Petal Current heals allies and grants regeneration"
+  },
+  {
+    "id": "galehart",
+    "name": "Galehart",
+    "tier": "A",
+    "element": "Storm",
+    "role": "controller",
+    "appearance": "Indigo stag with branching silver antlers, a streaming teal mane, golden hoof rings and wind chimes",
+    "signature": "Gale Refrain damages and marks a row while slowing it"
+  },
+  {
+    "id": "auroroc",
+    "name": "Auroroc",
+    "tier": "S",
+    "element": "Frost",
+    "role": "striker",
+    "appearance": "Regal white crane with long legs, a sapphire crest and a fan of aurora ribbons fading from violet to turquoise",
+    "signature": "Aurora Lance damages a row with piercing frost and slows it"
   }
 ]

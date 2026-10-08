@@ -1282,6 +1282,66 @@
         "attack",
         "hurt"
       ]
+    },
+    {
+      "species": "reedlet",
+      "family": "amphibian",
+      "profile": "amphibian:72",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "lanternmoth",
+      "family": "insect",
+      "profile": "insect:73",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "coppershell",
+      "family": "shell",
+      "profile": "shell:74",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "bloomanta",
+      "family": "aquatic",
+      "profile": "aquatic:75",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "galehart",
+      "family": "antler",
+      "profile": "antler:76",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "auroroc",
+      "family": "bird",
+      "profile": "bird:77",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
     }
   ]
 }

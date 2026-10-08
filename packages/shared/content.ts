@@ -94,6 +94,7 @@ export const FAMILIES = [
   "golem",
   "bird",
   "fox",
+  "amphibian", "insect", "shell", "aquatic", "antler", "bird",
 ] as const;
 export type Effect =
   | "damage"
@@ -201,6 +202,12 @@ const mechanics: Effect[][] = [
   ["guard", "shield", "thorns"],
   ["damage", "pierce", "stun"],
   ["weaken", "delay", "silence"],
+  ["heal", "cleanse"],
+  ["shield", "haste"],
+  ["guard", "reflect"],
+  ["heal", "regen"],
+  ["damage", "mark", "slow"],
+  ["damage", "pierce", "slow"],
 ];
 const targets: Record<number, Action["target"]> = {
   3: "self",
@@ -238,6 +245,7 @@ const targets: Record<number, Action["target"]> = {
   68: "row",
   69: "allies",
   71: "row",
+  72: "ally", 73: "allies", 74: "self", 75: "allies", 76: "row", 77: "row",
 };
 export type Species = (typeof roster)[number] & {
   index: number;

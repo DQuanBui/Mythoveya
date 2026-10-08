@@ -26,8 +26,8 @@ writeFileSync(
   ) + "\n",
 );
 if (
-  SPECIES.length !== 72 ||
-  TIERS.some((t) => SPECIES.filter((s) => s.tier === t).length !== (t === "A" || t === "S" ? 16 : 10))
+  SPECIES.length !== 78 ||
+  TIERS.some((t) => SPECIES.filter((s) => s.tier === t).length !== (t === "A" || t === "S" ? 17 : 11))
 )
   throw Error("Invalid roster distribution");
 const ids = new Set(SPECIES.flatMap((s) => s.actions.map((a) => a.id)));
