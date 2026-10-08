@@ -1,3 +1,4 @@
+import { expeditionMutation } from "./expedition-game";
 import { randomInt, randomUUID } from "node:crypto";
 import {
   byId,
@@ -104,6 +105,7 @@ const ADVENTURE_KINDS = [
 ];
 export function mutate(p: Profile, kind: string, v: any, now = Date.now()) {
   const town = ensureTown(p);
+  if (kind.startsWith("exp-")) return expeditionMutation(p, kind, v, now, random);
   if (kind.startsWith("town-"))
     return townMutation(p, kind, v, Date.now(), random);
   if (ADVENTURE_KINDS.includes(kind)) {
