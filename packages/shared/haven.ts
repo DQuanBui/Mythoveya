@@ -1,3 +1,4 @@
+import { WILDWOOD_PATHS, WILDWOOD_PLACES, inReedwater, fieldStructureBlocked } from "./wildwood";
 // All starting-island routes, habitats, and navigation coordinates share this map.
 export type Point = [number, number];
 export const HAVEN_HOUSES = [
@@ -67,6 +68,7 @@ export const HAVEN = {
   sprintSpeed: 6.7,
 };
 export const HAVEN_PLACES = [
+  ...WILDWOOD_PLACES,
   {
     id: "village",
     name: "Havenreach Village",
@@ -247,6 +249,7 @@ export const HAVEN_PATHS: Point[][] = [
     [41, 29.5],
     [43.5, 30.5],
   ],
+  ...WILDWOOD_PATHS,
   // Highcrag: switchbacks from the ruins trail up to the summit lookout.
   [
     [-23, -19],
@@ -295,7 +298,8 @@ export function edgeRadius(angle: number) {
     Math.sin(angle * 3) * 2 +
     Math.cos(angle * 5) * 1.5 +
     lobe(angle, 0.85, 0.42, 26) +
-    lobe(angle, -2.2, 0.5, 30)
+    lobe(angle, -2.2, 0.5, 30) +
+    lobe(angle, 3.05, 0.55, 29)
   );
 }
 export function lagoonDistance(x: number, z: number) {
@@ -341,7 +345,8 @@ function mountain(x: number, z: number) {
 export function groundHeight(x: number, z: number) {
   const e = lagoonDistance(x, z);
   if (e < 1) return -1.3 * Math.pow(1 - e, 0.6);
-  const natural = mountain(x, z);
+  if (inReedwater(x, z)) return -0.8;
+  const natural = mountain(x, z) + 4 * Math.exp(-((x + 62) ** 2 + (z - 1) ** 2) / 110) * smooth(38, 50, -x);
   if (natural === 0 && Math.hypot(x, z) < 44) return 0;
   // A flat summit plateau for the lookout.
   const top = Math.hypot(x - SUMMIT[0], z - SUMMIT[1]);
@@ -389,6 +394,8 @@ export function onBridge(x: number, z: number) {
 export function havenWalkable(x: number, z: number) {
   return (
     onIsland(x, z) &&
+    !inReedwater(x, z, 0.35) &&
+    !fieldStructureBlocked(x, z) &&
     (!inPond(x, z, 0.35) || onBridge(x, z) || onDock(x, z)) &&
     (!inLagoon(x, z, 0.4) || onPier(x, z)) &&
     climbable(x, z) &&
@@ -814,6 +821,7 @@ export function forestSites(): TreeSite[] {
     const x = (random() - 0.5) * 152,
       z = (random() - 0.5) * 152;
     if (
+      inReedwater(x, z, 2) || fieldStructureBlocked(x, z, 2) ||
       inLagoon(x, z, 6) ||
       groundHeight(x, z) > 10 ||
       (Math.hypot(x, z) >= 44 && slopeAt(x, z) > 1.1) ||
@@ -901,6 +909,7 @@ export function havenScatter(samples = 1300) {
       onIsland(x, z, 2) &&
       Math.hypot(x, z) > 12 &&
       !inPond(x, z, 1) &&
+      !inReedwater(x, z, 1.2) && !fieldStructureBlocked(x, z, 1) &&
       !inLagoon(x, z, 4) &&
       groundHeight(x, z) < 10.5 &&
       (Math.hypot(x, z) < 44 || slopeAt(x, z) < 1) &&
@@ -921,6 +930,7 @@ export function havenUndergrowth() {
       z = (random() - 0.5) * 150,
       d = pathDistance(x, z);
     if (
+      inReedwater(x, z, 1.5) || fieldStructureBlocked(x, z, 1) ||
       inLagoon(x, z, 3) ||
       groundHeight(x, z) > 9 ||
       d < 1.75 ||
