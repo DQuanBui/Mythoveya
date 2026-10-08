@@ -727,7 +727,7 @@ export default function App() {
               <SkyferryPanel profile={profile} run={run} />
             )}
             {panel === "adventure" && profile && (
-              <><button className="expedition-entry" onClick={() => setPanel("exp-journal")}>The Silent Windmill ? Explore western Havenreach</button><AdventurePanel
+              <><button className="expedition-entry" onClick={() => setPanel("exp-journal")}>The Silent Windmill · Explore western Havenreach</button><AdventurePanel
                 profile={profile}
                 run={run}
                 begin={(m) => startBattle(false, false, m)}

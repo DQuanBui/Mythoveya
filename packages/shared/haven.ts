@@ -1,4 +1,4 @@
-import { WILDWOOD_PATHS, WILDWOOD_PLACES, inReedwater, fieldStructureBlocked } from "./wildwood";
+import { WILDWOOD_PATHS, WILDWOOD_PLACES, FIELD_HOUSES, FIELD_NODES, inReedwater, fieldStructureBlocked } from "./wildwood";
 // All starting-island routes, habitats, and navigation coordinates share this map.
 export type Point = [number, number];
 export const HAVEN_HOUSES = [
@@ -828,6 +828,8 @@ export function forestSites(): TreeSite[] {
       z = (random() - 0.5) * 152;
     if (
       inReedwater(x, z, 2) || fieldStructureBlocked(x, z, 2) ||
+      FIELD_HOUSES.some((h) => Math.hypot(x - h.point[0], z - h.point[1]) < 7) ||
+      FIELD_NODES.some((n) => Math.hypot(x - n.point[0], z - n.point[1]) < 3.4) ||
       inLagoon(x, z, 6) ||
       groundHeight(x, z) > 10 ||
       (Math.hypot(x, z) >= 44 && slopeAt(x, z) > 1.1) ||
