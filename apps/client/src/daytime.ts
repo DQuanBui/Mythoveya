@@ -1,18 +1,14 @@
 import { settings } from "./audio";
 
-// One island day lasts 18 real minutes. Daylight (06:00-18:00) takes 65% of it.
-export const DAY_CYCLE_MS = 18 * 60 * 1000;
-const DAYLIGHT_SHARE = 0.65;
+import { worldHour } from "../../../packages/shared/world-time";
+export { DAY_CYCLE_MS } from "../../../packages/shared/world-time";
 
 export function islandHour(now = Date.now()) {
   if (!settings.daynight) return 13;
   // Development builds can pin the hour for screenshots and tests.
   const pinned = (globalThis as { __islandHour?: number }).__islandHour;
   if (import.meta.env.DEV && typeof pinned === "number") return pinned;
-  const p = (now % DAY_CYCLE_MS) / DAY_CYCLE_MS;
-  return p < DAYLIGHT_SHARE
-    ? 6 + (p / DAYLIGHT_SHARE) * 12
-    : (18 + ((p - DAYLIGHT_SHARE) / (1 - DAYLIGHT_SHARE)) * 12) % 24;
+  return worldHour(now);
 }
 const smooth = (a: number, b: number, v: number) => {
   const t = Math.max(0, Math.min(1, (v - a) / (b - a)));

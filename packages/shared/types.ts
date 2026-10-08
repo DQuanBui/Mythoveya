@@ -49,6 +49,7 @@ export type TownState = {
   guardianClaimed?: string;
 };
 export type Profile = {
+  expedition?: import("./wildwood").Expedition;
   id: string;
   name: string;
   avatar: number;
