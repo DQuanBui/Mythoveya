@@ -1,3 +1,4 @@
+import { EXPEDITION_STOPS, FIELD_HOUSES, WILDWOOD_LAKE } from "../../../packages/shared/wildwood";
 import { useState } from "react";
 import {
   HAVEN_PLACES,
@@ -23,6 +24,7 @@ import { Portrait } from "./portraits";
 import { SHOPS } from "../../../packages/shared/shops";
 export const MAP_DESTINATIONS = [
   ...HAVEN_PLACES,
+  ...EXPEDITION_STOPS.map((s) => ({ ...s, short: s.name, description: s.text, color: "#c9a4d9", species: [] as string[] })),
   ...(["smith", "apothecary"] as const).map((id) => ({
     id,
     name: SHOPS[id].name,
@@ -91,6 +93,8 @@ export function HavenMap({
               stroke="#c4d2a7"
               strokeWidth=".7"
             />
+            <ellipse cx={WILDWOOD_LAKE.x} cy={WILDWOOD_LAKE.z} rx={WILDWOOD_LAKE.rx} ry={WILDWOOD_LAKE.rz} fill="#70b3ba" stroke="#cbd4a5" strokeWidth=".7" />
+            {FIELD_HOUSES.map((h) => <rect key={h.id} x={h.point[0] - 1.8} y={h.point[1] - 1.8} width="3.6" height="3.6" fill={h.roof} stroke="#ecdfbe" strokeWidth=".4" />)}
             {HAVEN_TREES.map((t, i) => (
               <circle
                 key={i}

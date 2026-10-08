@@ -1,3 +1,4 @@
+import { ExpeditionPanel } from "./ExpeditionPanel";
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import {
   ALL_SPECIES,
@@ -185,7 +186,7 @@ export default function App() {
       audio.cue("confirm");
       if (kind === "resource") notify("Gathered +1 Sunseed · +25 Gold");
       if (
-        (kind.startsWith("town-") || kind.startsWith("home-") || kind.startsWith("island-")) &&
+        (kind.startsWith("exp-") || kind.startsWith("town-") || kind.startsWith("home-") || kind.startsWith("island-")) &&
         result.value?.message &&
         kind !== "town-talk" &&
         kind !== "town-fish"
@@ -269,7 +270,7 @@ export default function App() {
         practice,
         ...adventure,
       });
-      mission.current = !!(adventure.stage || adventure.dungeon || adventure.tower);
+      mission.current = !!(adventure.expedition || adventure.stage || adventure.dungeon || adventure.tower);
       setBattle(b);
       setPanel("");
       setAuto(false);
@@ -388,7 +389,7 @@ export default function App() {
               title: destination.name,
               text: destination.description,
               target:
-                trail?.startsWith("porch-") || trail === "smith" || trail === "apothecary"
+                trail?.startsWith("exp-") || trail?.startsWith("porch-") || trail === "smith" || trail === "apothecary"
                   ? trail
                   : `trail-${destination.id}`,
               waypoint: true,
@@ -648,7 +649,7 @@ export default function App() {
             setScreen("world");
             setBattle(null);
             setPanel(
-              mission.current
+              battle.encounter === "windmill" ? "exp-journal" : mission.current
                 ? "adventure"
                 : profile?.bond && !profile.bond.used
                   ? "bond"
@@ -684,7 +685,7 @@ export default function App() {
         <div className="modal-backdrop">
           <section
             key={panel}
-            className={`panel modal ${["collection", "formation", "gallery", "town", "map", "adventure", "training", "events", "smith", "apothecary", "home", "skyferry", "festival"].includes(panel) || panel.startsWith("npc-") ? "wide" : ""}`}
+            className={`panel modal ${["collection", "formation", "gallery", "town", "map", "adventure", "training", "events", "smith", "apothecary", "home", "skyferry", "festival"].includes(panel) || panel.startsWith("exp-") || panel.startsWith("npc-") ? "wide" : ""}`}
             aria-label={panel}
           >
             <button
@@ -697,6 +698,7 @@ export default function App() {
             >
               ×
             </button>
+            {panel.startsWith("exp-") && profile && <ExpeditionPanel profile={profile} position={position} focus={panel.slice(4)} busy={busy} run={run} track={(id) => { setTrail(id); setPanel(""); }} begin={() => startBattle(false, false, { expedition: true })} />}
             {panel === "settings" && <SettingsPanel />}
             {panel === "home" && profile && (
               <HomePanel
@@ -725,11 +727,11 @@ export default function App() {
               <SkyferryPanel profile={profile} run={run} />
             )}
             {panel === "adventure" && profile && (
-              <AdventurePanel
+              <><button className="expedition-entry" onClick={() => setPanel("exp-journal")}>The Silent Windmill ? Explore western Havenreach</button><AdventurePanel
                 profile={profile}
                 run={run}
                 begin={(m) => startBattle(false, false, m)}
-              />
+              /></>
             )}
             {panel === "events" && profile && (
               <EventsPanel profile={profile} run={run} />
@@ -911,6 +913,7 @@ export default function App() {
                 <h2>Your story is safe.</h2>
                 <p>Progress is saved on the local server after each action.</p>
                 <div className="pause-buttons">
+                  <button onClick={() => setPanel("exp-journal")}>The Silent Windmill journal</button>
                   <button className="primary" onClick={() => setPanel("")}>
                     Return to the reaches
                   </button>

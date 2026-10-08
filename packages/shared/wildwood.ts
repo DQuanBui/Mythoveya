@@ -12,9 +12,9 @@ export const WILDWOOD_PATHS: Point[][] = [
   [[8, 26], [4, 26], [2.8, 23]],
 ];
 export const WILDWOOD_PLACES = [
-  { id: "reedwater", name: "Reedwater Lake", short: "Reedwater", point: [-49, 22] as Point, color: "#78c6c7", description: "Dragonflies skim the reeds beneath copper-leaved willows. Tide companions can clear the old sluice.", species: ["ripplefin", "puddlepip"] },
-  { id: "windrest", name: "Windrest Lookout", short: "Windrest", point: [-61, 1] as Point, color: "#c5a9d7", description: "A gentle climb to an astronomer's shelter, above the lake and mountain pines.", species: ["voltwing", "rimeowl"] },
-  { id: "fieldstation", name: "Willow Field Station", short: "Field station", point: [-49, -3] as Point, color: "#deb982", description: "Two welcoming cottages keep the westward trails supplied with maps, lanterns and stories.", species: ["mossprig", "thornhare"] },
+  { id: "reedwater", name: "Reedwater Lake", short: "Reedwater", point: [-49, 22] as Point, color: "#78c6c7", description: "Dragonflies skim the reeds beneath copper-leaved willows. Tide companions can clear the old sluice.", species: ["reedlet", "bloomanta"] },
+  { id: "windrest", name: "Windrest Lookout", short: "Windrest", point: [-61, 1] as Point, color: "#c5a9d7", description: "A gentle climb to an astronomer's shelter, above the lake and mountain pines.", species: ["galehart", "auroroc"] },
+  { id: "fieldstation", name: "Willow Field Station", short: "Field station", point: [-49, -3] as Point, color: "#deb982", description: "Two welcoming cottages keep the westward trails supplied with maps, lanterns and stories.", species: ["lanternmoth", "coppershell"] },
 ];
 export const FIELD_HOUSES = [
   { id: "naturalist", name: "Mira's Field Station", point: [-49, -6] as Point, door: [-49, -3] as Point, roof: "#bd805b", story: "Mira sketches every leaf and feather she finds. She leaves a map of the lake for visiting keepers." },
@@ -47,7 +47,14 @@ export function discoveryWindow(id: string, now: number) {
 }
 export const DISCOVERIES = [
   { id: "rainprints", name: "Rain-written tracks", point: [-55, 22] as Point, clue: "After the rain begins, silver tracks appear on Reedwater's southern trail." },
-  { id: "starglass", name: "Starglass constellation", point: [-61, 1] as Point, clue: "Between 18:00 and 06:00 island time, the lookout catches falling starlight." },
+  { id: "starglass", name: "Starglass constellation", point: [-61, -2.5] as Point, clue: "Between 18:00 and 06:00 island time, the lookout catches falling starlight." },
+];
+export const EXPEDITION_STOPS = [
+  { id: "exp-mill", name: "The Silent Windmill", point: MILL_POINT, text: "Begin or complete the windmill journey." },
+  ...FIELD_NODES.map((n) => ({ id: `exp-${n.id}`, name: n.name, point: [...n.point] as Point, text: n.text })),
+  { id: "exp-guardian", name: "Windrest guardian", point: GUARDIAN_POINT, text: "Calm the guardian after recovering three windmill pieces." },
+  ...FIELD_HOUSES.map((h) => ({ id: `exp-${h.id}`, name: h.name, point: h.door, text: h.story })),
+  ...DISCOVERIES.map((d) => ({ id: `exp-${d.id}`, name: d.name, point: d.point, text: d.clue })),
 ];
 export function expeditionObjective(p: Profile) {
   const e = expeditionOf(p);

@@ -1,5 +1,5 @@
 import { WildwoodScenery } from "./WildwoodScenery";
-import { expeditionOf } from "../../../packages/shared/wildwood";
+import { expeditionOf, EXPEDITION_STOPS } from "../../../packages/shared/wildwood";
 import { WorldInteraction } from "./WorldInteraction";
 import { HavenHouses } from "./HavenHouses";
 import { HavenVillage } from "./HavenVillage";
@@ -474,6 +474,7 @@ function Environment({
   );
 }
 export const INTERACTABLES = [
+  ...EXPEDITION_STOPS.map((s) => ({ id: s.id, name: s.name, hint: s.text, p: [s.point[0], 0, s.point[1]] })),
   ...HAVEN_HOUSES.map((h) => ({
     id: `porch-${h.id}`,
     name: h.name,
@@ -593,7 +594,7 @@ export const getInteractables = (region: string) =>
   INTERACTABLES.filter(
     (o) =>
       (region === "haven" ||
-        (!o.id.startsWith("trail-") &&
+        (!o.id.startsWith("exp-") && !o.id.startsWith("trail-") &&
           !o.id.startsWith("porch-") &&
           !["fishing", "pierfishing", "riftgate", "smith", "apothecary", "skyferry"].includes(o.id))) &&
       (!o.id.startsWith("resource-") ||
@@ -1275,7 +1276,7 @@ export function WorldScene({
             {!resource &&
               !blocked &&
               opacity > 0 &&
-              (o.id !== "trail-village" || objective.target === o.id) && (
+              (!["trail-village", "trail-windrest", "trail-fieldstation"].includes(o.id) || objective.target === o.id) && (
                 <Html
                   position={
                     npc
