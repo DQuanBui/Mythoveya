@@ -828,7 +828,7 @@ export function forestSites(): TreeSite[] {
       z = (random() - 0.5) * 152;
     if (
       inReedwater(x, z, 2) || fieldStructureBlocked(x, z, 2) ||
-      FIELD_HOUSES.some((h) => Math.hypot(x - h.point[0], z - h.point[1]) < 7) ||
+      FIELD_HOUSES.some((h) => Math.hypot(x - h.point[0], z - h.point[1]) < 7 || Math.hypot(x - h.door[0], z - h.door[1]) < 7) ||
       FIELD_NODES.some((n) => Math.hypot(x - n.point[0], z - n.point[1]) < 3.4) ||
       inLagoon(x, z, 6) ||
       groundHeight(x, z) > 10 ||

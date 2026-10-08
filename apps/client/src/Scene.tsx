@@ -1,3 +1,4 @@
+import { previewFrame } from "./preview-framing";
 import { WildwoodEffect } from "./WildwoodEffects";
 import { WildwoodScenery } from "./WildwoodScenery";
 import { expeditionOf, EXPEDITION_STOPS } from "../../../packages/shared/wildwood";
@@ -1401,6 +1402,16 @@ export function TitleScene({
     </Canvas>
   );
 }
+function PreviewCamera({ model }: { model: T.Object3D }) {
+  const { camera, size } = useThree();
+  useEffect(() => {
+    const fit = previewFrame(model, size.width / Math.max(1, size.height));
+    camera.position.copy(fit.position);
+    camera.lookAt(fit.center);
+    camera.updateProjectionMatrix();
+  }, [camera, model, size.width, size.height]);
+  return null;
+}
 export function Preview({
   species,
   shimmer = false,
@@ -1414,6 +1425,8 @@ export function Preview({
   state?: Motion;
   paused?: boolean;
 }) {
+  const framingModel = useMemo(() => species ? createCreature(species, shimmer) : createAvatar(avatar || 0), [species, shimmer, avatar]);
+  const center = useMemo(() => previewFrame(framingModel, 1).center.toArray() as [number, number, number], [framingModel]);
   return (
     <Canvas
       shadows
@@ -1421,10 +1434,11 @@ export function Preview({
       dpr={[1, 1.5]}
     >
       <color attach="background" args={["#203b41"]} />
-      <ModelLighting intensity={0.8} />
-      <ambientLight intensity={1.5} />
-      <directionalLight position={[3, 5, 4]} intensity={3} />
-      <directionalLight position={[-3, 2, -3]} color="#a7e4de" intensity={2} />
+      <PreviewCamera model={framingModel} />
+      <ModelLighting intensity={0.55} />
+      <ambientLight intensity={0.85} />
+      <directionalLight position={[3, 5, 4]} intensity={2} />
+      <directionalLight position={[-3, 2, -3]} color="#a7e4de" intensity={1} />
       {species ? (
         <Creature id={species} shimmer={shimmer} state={state} paused={paused} />
       ) : (
@@ -1439,11 +1453,11 @@ export function Preview({
         <meshStandardMaterial color="#29484a" />
       </mesh>
       <OrbitControls
-        target={[0, 0.8, 0]}
+        target={center}
         autoRotate={!paused}
         autoRotateSpeed={0.7}
         minDistance={2}
-        maxDistance={8}
+        maxDistance={40}
       />
     </Canvas>
   );

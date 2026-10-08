@@ -99,7 +99,7 @@ test("all models, eight keepers, and bounded audio", async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test("ten mythic effects remain visible at paused impact", async ({ page }) => {
+test("all mythic effects remain visible at paused impact", async ({ page }) => {
   test.setTimeout(360000);
   const errors = await openGallery(page);
   for (const s of SPECIES.filter((s) => s.tier === "S")) {
@@ -147,12 +147,11 @@ test("six western species have readable models and rendered signature skills", a
     await page.locator(".gallery-preview").screenshot({ path: `artifacts/wildwood-model-${s.id}.png` });
     await page.getByRole("button", { name: "Preview ultimate", exact: true }).click();
     await page.getByRole("button", { name: "Pause", exact: true }).click();
-    const count = await page.evaluate(async (id) => {
+    await expect.poll(() => page.evaluate(async (id) => {
       const url = performance.getEntriesByType("resource").map((r) => r.name).find((n) => n.includes("@react-three_fiber.js"))!;
       const { _roots } = await import(/* @vite-ignore */ url);
-      return _roots.get(document.querySelector(".gallery-preview canvas")).store.getState().scene.getObjectByName(`signature-${id}`)?.children.length;
-    }, s.id);
-    expect(count).toBe(6);
+      return _roots.get(document.querySelector(".gallery-preview canvas"))?.store.getState().scene.getObjectByName(`signature-${id}`)?.children.length;
+    }, s.id)).toBe(6);
     await page.locator(".gallery-preview").screenshot({ path: `artifacts/wildwood-skill-${s.id}.png` });
     await page.getByRole("button", { name: "Play", exact: true }).click();
   }

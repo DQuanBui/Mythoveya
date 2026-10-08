@@ -1,3 +1,4 @@
+import { WILDWOOD_LAKE } from "../../../packages/shared/wildwood";
 import { useEffect, useRef, useState, type MutableRefObject } from "react";
 import { byId, REGIONS } from "../../../packages/shared/content";
 import type { Profile } from "../../../packages/shared/types";
@@ -356,6 +357,7 @@ export function WorldHUD({
                   strokeWidth="1"
                 />
               ))}
+              <ellipse cx={WILDWOOD_LAKE.x} cy={WILDWOOD_LAKE.z} rx={WILDWOOD_LAKE.rx} ry={WILDWOOD_LAKE.rz} fill="#94ccd0" />
               <ellipse cx="21" cy="-5" rx="8" ry="6" fill="#94ccd0" />
               <ellipse cx="36.5" cy="41" rx="12" ry="9" fill="#94ccd0" />
               <path d="M-48 -42 L-42 -56 L-36 -42 Z M-53 -29 L-48 -38 L-43 -29 Z" fill="#9aa39a" />

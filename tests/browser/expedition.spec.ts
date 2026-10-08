@@ -23,10 +23,8 @@ async function sails(page: Page) {
       .map((r) => r.name)
       .find((n) => n.includes("@react-three_fiber.js"))!;
     const { _roots } = await import(/* @vite-ignore */ url);
-    const scene = _roots
-      .get(document.querySelector(".scene canvas"))
-      .store.getState().scene;
-    return scene.getObjectByName("windmill-sails").rotation.z;
+    const scene = _roots.get(document.querySelector(".scene canvas"))?.store.getState().scene;
+    return scene?.getObjectByName("windmill-sails")?.rotation.z ?? null;
   });
 }
 test("walk the windmill journey, use companions, calm guardian and persist restoration", async ({
@@ -61,6 +59,7 @@ test("walk the windmill journey, use companions, calm guardian and persist resto
   await page.reload();
   await page.getByRole("button", { name: "Continue your journey" }).click();
   await expect(page.locator(".keeper-badge")).toContainText("Windmill Keeper");
+  await expect.poll(() => sails(page)).not.toBeNull();
   const stopped = await sails(page);
   await page.waitForTimeout(500);
   expect(await sails(page)).toBe(stopped);
@@ -125,7 +124,7 @@ test("walk the windmill journey, use companions, calm guardian and persist resto
   await page.getByLabel("Close panel").click();
   const turning = await sails(page);
   await page.waitForTimeout(500);
-  expect(await sails(page)).toBeLessThan(turning);
+  expect(await sails(page)).toBeLessThan(turning!);
   await page.reload();
   await page.getByRole("button", { name: "Continue your journey" }).click();
   await page.keyboard.press("Escape");

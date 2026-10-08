@@ -1,3 +1,4 @@
+import { weatherAt, WEATHER_SPELL_MS } from "../packages/shared/weather";
 import { act, autoAction } from "../packages/shared/combat";
 import { afterAll, expect, it } from "vitest";
 import { mkdtempSync } from "node:fs";
@@ -76,10 +77,17 @@ it("validates actual server time for discoveries and keeps house stories once", 
   expect(() =>
     op(token, "exp-discover", { id: "starglass" }, DAY_CYCLE_MS * 0.8),
   ).toThrow("already recorded");
+  const windows = Array.from({ length: 50 }, (_, i) => i * WEATHER_SPELL_MS);
+  const wet = windows.find((t) => weatherAt(t).weather === "rain")!;
+  const dry = windows.find((t) => weatherAt(t).weather !== "rain")!;
+  expect(wet).toBeDefined(); expect(dry).toBeDefined();
+  expect(() => op(token, "exp-discover", { id: "rainprints" }, dry)).toThrow("rain begins");
+  op(token, "exp-discover", { id: "rainprints" }, wet);
+  expect(() => op(token, "exp-discover", { id: "rainprints" }, wet)).toThrow("already recorded");
   op(token, "exp-visit", { id: "naturalist" });
   expect(() => op(token, "exp-visit", { id: "naturalist" })).toThrow("already");
   const p = authenticate(token);
-  expect(p.diamonds).toBe(before.diamonds + 15);
+  expect(p.diamonds).toBe(before.diamonds + 30);
   expect(p.gold).toBe(before.gold + 20);
   expect(p.expedition!.visits).toEqual(["naturalist"]);
 });

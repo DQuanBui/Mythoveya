@@ -1,3 +1,5 @@
+import { previewFrame } from "../apps/client/src/preview-framing";
+import { PerspectiveCamera, Vector3 } from "three";
 import { describe, expect, it } from "vitest";
 import { Box3, Mesh } from "three";
 import { ALL_SPECIES } from "../packages/shared/content";
@@ -56,4 +58,17 @@ it("returns from attacks cleanly and preserves authored tails during animation",
   expect(sleeping.userData.eyes.every((eye: any) => eye.scale.y < .1)).toBe(true);
   animateCreature(sleeping, 3, "idle", 0, true);
   expect(sleeping.userData.eyes.every((eye: any) => eye.scale.y === 1)).toBe(true);
+});
+
+it("keeps tall and wide creatures inside portrait and landscape previews", () => {
+  for (const id of ["galehart", "auroroc", "bloomanta", "solkarath"]) for (const aspect of [.6, 2.6]) {
+    const model = createCreature(id), box = new Box3().setFromObject(model), fit = previewFrame(model, aspect);
+    const camera = new PerspectiveCamera(37, aspect, .1, 100);
+    camera.position.copy(fit.position); camera.lookAt(fit.center); camera.updateMatrixWorld();
+    for (const x of [box.min.x, box.max.x]) for (const y of [box.min.y, box.max.y]) for (const z of [box.min.z, box.max.z]) {
+      const p = new Vector3(x, y, z).project(camera);
+      expect(Math.abs(p.x), id).toBeLessThan(1);
+      expect(Math.abs(p.y), id).toBeLessThan(1);
+    }
+  }
 });
