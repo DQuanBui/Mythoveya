@@ -1342,6 +1342,26 @@
         "attack",
         "hurt"
       ]
+    },
+    {
+      "species": "cindervane",
+      "family": "insect",
+      "profile": "insect:78",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "thermala",
+      "family": "amphibian",
+      "profile": "amphibian:79",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
     }
   ]
 }

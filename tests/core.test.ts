@@ -21,17 +21,17 @@ const team = (start = 0) =>
   }));
 describe("content and economy", () => {
   it("has complete, stable content with executable actions", () => {
-    // Eleven species per tier, plus six additional A-tier and six additional S-tier.
-    expect(SPECIES).toHaveLength(78);
-    expect(new Set(SPECIES.map((s) => s.id)).size).toBe(78);
+    // Base roster with the Wildwood and canyon arrivals.
+    expect(SPECIES).toHaveLength(80);
+    expect(new Set(SPECIES.map((s) => s.id)).size).toBe(80);
     for (const tier of TIERS)
       expect(SPECIES.filter((s) => s.tier === tier)).toHaveLength(
-        tier === "A" || tier === "S" ? 17 : 11,
+        ({ E: 11, D: 11, C: 11, B: 12, A: 18, S: 17 })[tier],
       );
     expect(
       new Set(SPECIES.flatMap((s) => s.actions.map((a) => a.id))).size,
-    ).toBe(234);
-    expect(new Set(SPECIES.map((s) => s.passive.id)).size).toBe(78);
+    ).toBe(240);
+    expect(new Set(SPECIES.map((s) => s.passive.id)).size).toBe(80);
     expect(new Set(SPECIES.map((s) => s.family)).size).toBe(12);
     for (const s of SPECIES) {
       expect(

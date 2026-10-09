@@ -700,5 +700,23 @@
     "role": "striker",
     "appearance": "Regal white crane with long legs, a sapphire crest and a fan of aurora ribbons fading from violet to turquoise",
     "signature": "Aurora Lance damages a row with piercing frost and slows it"
+  },
+  {
+    "id": "cindervane",
+    "name": "Cindervane",
+    "tier": "B",
+    "element": "Flame",
+    "role": "striker",
+    "appearance": "Crimson orchid mantis with ivory petal armor, sweeping amber blade forearms and smoky violet wing fans",
+    "signature": "Glasspetal Cut deals piercing damage and burns a target"
+  },
+  {
+    "id": "thermala",
+    "name": "Thermala",
+    "tier": "A",
+    "element": "Tide",
+    "role": "healer",
+    "appearance": "Long teal hot-spring salamander with coral mineral spines, golden freckles and a broad pearl crescent tail",
+    "signature": "Mineral Embrace heals allies and cleanses their ailments"
   }
 ]

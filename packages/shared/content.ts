@@ -95,6 +95,7 @@ export const FAMILIES = [
   "bird",
   "fox",
   "amphibian", "insect", "shell", "aquatic", "antler", "bird",
+  "insect", "amphibian",
 ] as const;
 export type Effect =
   | "damage"
@@ -208,6 +209,8 @@ const mechanics: Effect[][] = [
   ["heal", "regen"],
   ["damage", "mark", "slow"],
   ["damage", "pierce", "slow"],
+  ["damage", "pierce", "burn"],
+  ["heal", "cleanse"],
 ];
 const targets: Record<number, Action["target"]> = {
   3: "self",
@@ -245,7 +248,7 @@ const targets: Record<number, Action["target"]> = {
   68: "row",
   69: "allies",
   71: "row",
-  72: "ally", 73: "allies", 74: "self", 75: "allies", 76: "row", 77: "row",
+  72: "ally", 73: "allies", 74: "self", 75: "allies", 76: "row", 77: "row", 78: "enemy", 79: "allies",
 };
 export type Species = (typeof roster)[number] & {
   index: number;
@@ -344,7 +347,7 @@ export const SPECIES: Species[] = roster.map((r, i) => {
   };
 });
 // Evolved forms are reached only by evolving a companion; they never appear
-// in recruitment, so the sixty-species roster and its odds are unchanged.
+// in recruitment, so recruitment odds are unchanged.
 export const EVOLUTIONS = [
   ["cindermite", "forgebeetle", "Forgebeetle", "Armored furnace beetle with a glowing horn and basalt plates", "Furnace Bite applies a lasting burn"],
   ["puddlepip", "lilyreign", "Lilyreign", "Crowned pond amphibian with a lily-petal crown and an orbit of droplets", "Rainfall Dew heals the weakest ally"],
