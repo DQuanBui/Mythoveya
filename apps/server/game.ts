@@ -1,3 +1,4 @@
+import { canyonOf, CANYON_BEACONS } from "../../packages/shared/canyon";
 import { canyonMutation } from "./canyon-game";
 import { expeditionOf, FIELD_NODES } from "../../packages/shared/wildwood";
 import { expeditionMutation } from "./expedition-game";
@@ -58,6 +59,7 @@ import {
 export const pve = new Map<string, Battle>();
 export const activeHuman = new Set<string>();
 export type Mission = {
+  canyon?: boolean;
   expedition?: boolean;
   stage?: string;
   dungeon?: string;
@@ -260,6 +262,7 @@ export function startPve(
   if (activeHuman.has(p.id)) throw Error("Finish your arena match first.");
   const existing = pve.get(p.id);
   if (existing && existing.winner === null) return existing;
+  if (mission.canyon) return startCanyon(p);
   if (mission.expedition) return startExpedition(p);
   if (mission.stage || mission.dungeon || mission.tower)
     return startMission(p, mission);
@@ -348,6 +351,17 @@ const buffed = (p: Profile) => {
   applyBuffs(p, six);
   return six;
 };
+function startCanyon(p: Profile) {
+  if(p.region!=="canyon" || p.island) throw Error("Travel to Emberglass Canyon first.");
+  if(p.team.length!==6) throw Error("Form a team of six first.");
+  const c=canyonOf(p);
+  if(!c.started || CANYON_BEACONS.some(n=>!c.beacons.includes(n.id))) throw Error("Tune the three canyon beacons first.");
+  if(c.guardian) throw Error("The sentinel is already at peace.");
+  const b=makeBattle(randomUUID(),[buffed(p),enemyTeam(["cindervane","pebblit","reedlet","magmole","glimlet","zippinch"],1)],"pve",randomInt(0,10000000));
+  b.title="The Glass Sentinel"; b.arena="ember"; b.encounter="canyon";
+  for(const u of b.units.filter(u=>u.side===1)) { u.hp=u.maxHp=Math.round(u.maxHp*(u.slot===0 ? 1.6 : .4));u.attack=Math.round(u.attack*.55); }
+  pve.set(p.id,b);battleMeta.set(b.id,{region:"canyon",boss:false,canyon:true});return b;
+}
 function startExpedition(p: Profile) {
   const e = expeditionOf(p);
   if (p.region !== "haven" || p.island) throw Error("Return to Havenreach first.");
@@ -513,6 +527,12 @@ export function finishPve(profileId: string, b: Battle) {
     };
     const meta = battleMeta.get(b.id);
     const town = ensureTown(p);
+    if (meta?.canyon) {
+      const c=canyonOf(p), rewarded=b.winner===0 && !c.guardian;
+      if(rewarded) { c.guardian=true;p.canyon=c;p.gold+=90;gainXp(p,100);p.wins++;p.daily.wins++;track(p,"wins"); }
+      b.rewards={gold:p.gold-before.gold,diamonds:0,tokens:0,xp:rewarded?100:0,newSpecies:[],items:rewarded?["Sentinel calmed. Return to Ashkeeper Camp to restore the signals."]:[]};
+      db.prepare("INSERT INTO matches VALUES(?,?)").run(b.id,JSON.stringify({winner:b.winner,kind:"canyon",profileId}));save(p);return;
+    }
     if (meta?.expedition) {
       const e = expeditionOf(p);
       const rewarded = b.winner === 0 && !e.guardian;

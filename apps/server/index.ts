@@ -157,6 +157,7 @@ app.post("/api/battle/start", (req, res) => {
   const p = authenticate(token(req));
   const v = z
     .object({
+      canyon: z.boolean().optional(),
       expedition: z.boolean().optional(),
       boss: z.boolean().default(false),
       practice: z.boolean().default(false),
@@ -168,6 +169,7 @@ app.post("/api/battle/start", (req, res) => {
     .parse(req.body);
   res.json(
     startPve(p, v.boss, v.practice, {
+      canyon: v.canyon,
       expedition: v.expedition,
       stage: v.stage,
       dungeon: v.dungeon,
