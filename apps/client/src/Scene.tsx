@@ -1,3 +1,5 @@
+import { CanyonTerrain } from "./CanyonTerrain";
+import { CANYON_EXTENT, CANYON_STOPS, canyonHeight, canyonWalkable, canyonPathDistance } from "../../../packages/shared/canyon";
 import { previewFrame } from "./preview-framing";
 import { WildwoodEffect } from "./WildwoodEffects";
 import { WildwoodScenery } from "./WildwoodScenery";
@@ -321,7 +323,7 @@ function Environment({
       )}
       {expanded ? (
         <HavenTerrain />
-      ) : (
+      ) : canyon && !title ? (<CanyonTerrain />) : (
         <>
           <mesh receiveShadow position={[0, -0.3, 0]}>
             <cylinderGeometry args={[18, 18.5, 0.6, 64]} />
@@ -356,7 +358,7 @@ function Environment({
         </mesh>
       ))}
       {trees
-        .filter((t) => !expanded && (t.pos[2] < 2 || t.pos[0] < -13))
+        .filter((t) => !expanded && !canyon && (t.pos[2] < 2 || t.pos[0] < -13))
         .map(({ pos, s }, i) =>
           canyon ? (
             <Crystal
@@ -385,8 +387,8 @@ function Environment({
       {PEBBLES.map((p, i) => (
         <group
           key={i}
-          visible={!expanded || pathDistance(p.x, p.z) > 1.3}
-          position={[p.x, expanded ? groundHeight(p.x, p.z) + 0.06 : 0.06, p.z]}
+          visible={canyon ? canyonPathDistance(p.x,p.z)>1.5 : !expanded || pathDistance(p.x, p.z) > 1.3}
+          position={[p.x, (expanded ? groundHeight(p.x,p.z) : canyon ? canyonHeight(p.x,p.z) : 0) + .06, p.z]}
         >
           <mesh rotation={[0, i, 0.2]}>
             <dodecahedronGeometry args={[p.size, 0]} />
@@ -398,7 +400,7 @@ function Environment({
           </mesh>
         </group>
       ))}
-      <group position={expanded ? [0, -4, -48] : [0, 0, 0]}>
+      <group position={expanded || canyon ? [0, -4, -48] : [0, 0, 0]}>
         <Island position={[-23, 8, -35]} scale={1.4} />
         <Island position={[24, 6, -30]} scale={0.9} />
         <Island position={[4, 14, -62]} scale={1.8} />
@@ -593,7 +595,7 @@ export const INTERACTABLES = [
 // Interaction points sit on the terrain (only Havenreach has elevation).
 for (const o of INTERACTABLES) o.p[1] = groundHeight(o.p[0], o.p[2]);
 export const getInteractables = (region: string) =>
-  INTERACTABLES.filter(
+  [...(region === "canyon" ? CANYON_STOPS.map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],canyonHeight(...s.point),s.point[1]]})) : []), ...INTERACTABLES.filter(
     (o) =>
       (region === "haven" ||
         (!o.id.startsWith("exp-") && !o.id.startsWith("trail-") &&
@@ -601,11 +603,11 @@ export const getInteractables = (region: string) =>
           !["fishing", "pierfishing", "riftgate", "smith", "apothecary", "skyferry"].includes(o.id))) &&
       (!o.id.startsWith("resource-") ||
         resourcesForRegion(region).some((n) => n.id === o.id)),
-  );
+  ).map(o=>region === "haven" ? o : ({...o,p:[o.p[0],region === "canyon" ? canyonHeight(o.p[0],o.p[2]) : 0,o.p[2]]}))];
 const grids = new Map<string, WalkGrid>();
 /** Ground height for a region; only Havenreach has elevation. */
 const groundFor = (region: string) =>
-  region === "haven" ? groundHeight : () => 0;
+  region === "haven" ? groundHeight : region === "canyon" ? canyonHeight : () => 0;
 /** Where a click ray meets the terrain, found by marching then bisecting. */
 function terrainHit(ray: T.Ray, ground: (x: number, z: number) => number) {
   const p = new T.Vector3();
@@ -723,12 +725,12 @@ export function Explorer({
     [profile.region, !!area],
   );
   const zone = area?.key ?? profile.region,
-    extent = area?.extent ?? (profile.region === "haven" ? 78 : 18);
+    extent = area?.extent ?? (profile.region === "haven" ? 78 : profile.region === "canyon" ? CANYON_EXTENT : 18);
   const regionAllowed = useCallback(
     (x: number, z: number) =>
       (profile.region === "haven"
         ? havenWalkable(x, z)
-        : Math.hypot(x, z) < 16.5 &&
+        : profile.region === "canyon" ? canyonWalkable(x,z) : Math.hypot(x, z) < 16.5 &&
           // Smaller regions share the village stations and pebbles.
           !((x - 11) ** 2 + (z - 4.4) ** 2 < 1.4) &&
           !((x - 7) ** 2 + (z + 3) ** 2 < 3.2) &&
