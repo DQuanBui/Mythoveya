@@ -185,9 +185,17 @@ test("walk canyon routes, solve inscriptions, calm sentinel and save restoration
     .toBeLessThan(1);
   await page.reload();
   await page.getByRole("button", { name: "Continue your journey" }).click();
-  await page.keyboard.press("Escape");
+  // Wait for the rendered world navigation after reload; a raw key press can
+  // arrive before React has installed the world's Escape handler.
   await page
-    .getByRole("button", { name: "Signals in the Stone journal", exact: true })
+    .getByRole("navigation", { name: "Game menu" })
+    .getByRole("button", { name: "Adventure" })
+    .click();
+  await page
+    .getByRole("button", {
+      name: "Signals in the Stone / Explore Emberglass Canyon",
+      exact: true,
+    })
     .click();
   await expect(page.locator(".canyon-journal")).toContainText(
     "The canyon signals are restored.",

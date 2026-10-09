@@ -23,7 +23,9 @@ async function sails(page: Page) {
       .map((r) => r.name)
       .find((n) => n.includes("@react-three_fiber.js"))!;
     const { _roots } = await import(/* @vite-ignore */ url);
-    const scene = _roots.get(document.querySelector(".scene canvas"))?.store.getState().scene;
+    const scene = _roots
+      .get(document.querySelector(".scene canvas"))
+      ?.store.getState().scene;
     return scene?.getObjectByName("windmill-sails")?.rotation.z ?? null;
   });
 }
@@ -31,19 +33,24 @@ test("walk the windmill journey, use companions, calm guardian and persist resto
   page,
 }) => {
   test.setTimeout(600000);
+  page.setDefaultTimeout(15000);
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("/");
   await page.evaluate(async () => {
-    const post = (path: string, data: unknown, token = "") =>
-      fetch("/api/" + path, {
+    const post = async (path: string, data: unknown, token = "") => {
+      const response = await fetch("/api/" + path, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + token,
         },
         body: JSON.stringify(data),
-      }).then((r) => r.json());
+      });
+      const body = await response.json();
+      if (!response.ok) throw Error(JSON.stringify(body));
+      return body;
+    };
     const g = await post("guest", { name: "Windmill Keeper", avatar: 1 });
     localStorage.setItem("mythoveya-session", g.token);
     for (const data of [
@@ -55,6 +62,41 @@ test("walk the windmill journey, use companions, calm guardian and persist resto
         { ...data, requestId: crypto.randomUUID() },
         g.token,
       );
+    // Prepare through normal encounters and paid training. An untouched
+    // level-one team can legitimately lose this guardian on an unlucky seed.
+    for (let win = 0; win < 2; win++) {
+      let b = await post("battle/start", {}, g.token);
+      for (let turn = 0; turn < 360 && b.winner === null; turn++) {
+        await new Promise((r) =>
+          setTimeout(r, Math.max(0, b.readyAt - Date.now()) + 15),
+        );
+        b = await post(
+          "battle/act",
+          {
+            auto: true,
+            fast: true,
+            sequence: b.sequence,
+          },
+          g.token,
+        );
+      }
+      if (b.winner !== 0) throw Error("Could not prepare the windmill team");
+    }
+    const profile = await fetch("/api/profile", {
+      headers: { Authorization: "Bearer " + g.token },
+    }).then((r) => r.json());
+    for (const id of profile.team.slice(0, 3)) {
+      const result = await post(
+        "mutate",
+        {
+          kind: "train",
+          id,
+          requestId: crypto.randomUUID(),
+        },
+        g.token,
+      );
+      if (result.error) throw Error(result.error);
+    }
   });
   await page.reload();
   await page.getByRole("button", { name: "Continue your journey" }).click();
@@ -127,9 +169,14 @@ test("walk the windmill journey, use companions, calm guardian and persist resto
   expect(await sails(page)).toBeLessThan(turning!);
   await page.reload();
   await page.getByRole("button", { name: "Continue your journey" }).click();
-  await page.keyboard.press("Escape");
   await page
-    .getByRole("button", { name: "The Silent Windmill journal" })
+    .getByRole("navigation", { name: "Game menu" })
+    .getByRole("button", { name: "Adventure" })
+    .click();
+  await page
+    .getByRole("button", {
+      name: /The Silent Windmill.*Explore western Havenreach/,
+    })
     .click();
   await expect(page.locator(".expedition-grid")).toContainText(
     "The sails are turning",
