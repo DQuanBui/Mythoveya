@@ -32,3 +32,23 @@ it("validates companions and region, gathers once, and crafts atomically without
  const p=authenticate(t);p.region="haven";save(p);
  expect(()=>op(t,"hol-craft")).toThrow("Travel to Moonfrost");
 });
+it("installs crafted lanterns once, persists discoveries and awards restoration only once",()=>{
+ const t=keeper();op(t,"hol-start");
+ expect(()=>op(t,"hol-install",{id:"shore"})).toThrow("Craft a lantern");
+ expect(()=>op(t,"hol-install",{id:"forged"})).toThrow("lantern post");
+ expect(()=>op(t,"hol-finish")).toThrow("all three");gather(t);
+ for(const n of HOLLOW_LANTERNS){
+  op(t,"hol-craft");const id=crypto.randomUUID();op(t,"hol-install",{id:n.id},id);op(t,"hol-install",{id:n.id},id);
+  expect(()=>op(t,"hol-install",{id:n.id})).toThrow("already lit");
+ }
+ expect(authenticate(t).hollow!.lanterns).toBe(0);
+ expect(()=>op(t,"hol-craft")).toThrow("already");
+ op(t,"hol-note",{id:"owl"});op(t,"hol-note",{id:"fox"});
+ expect(()=>op(t,"hol-note",{id:"owl"})).toThrow("already recorded");
+ const before=authenticate(t),id=crypto.randomUUID();op(t,"hol-finish",{},id);op(t,"hol-finish",{},id);
+ const after=authenticate(t);expect(after.hollow!.finished).toBe(true);
+ expect(after.gold-before.gold).toBe(200);expect(after.diamonds-before.diamonds).toBeGreaterThanOrEqual(70);
+ expect(after.owned.some(o=>o.species==="rimeowl")).toBe(true);
+ expect(after.hollow!.notes).toEqual(["owl","fox"]);
+ expect(()=>op(t,"hol-finish")).toThrow("already restored");
+});
