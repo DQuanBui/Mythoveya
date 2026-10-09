@@ -50,6 +50,7 @@ export type TownState = {
 };
 export type Profile = {
   canyon?: import("./canyon").CanyonJourney;
+  hollow?: import("./hollow").HollowJourney;
   expedition?: import("./wildwood").Expedition;
   id: string;
   name: string;

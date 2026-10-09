@@ -1,4 +1,5 @@
 import { PEBBLES, type Point } from "./haven";
+import type { Profile } from "./types";
 
 export const HOLLOW_EXTENT = 52;
 export const HOLLOW_LAKE = { x: -23, z: 12, rx: 8, rz: 5 };
@@ -70,4 +71,28 @@ export function hollowWalkable(x: number, z: number) {
     !((x-11)**2+(z-4.4)**2<1.4) && !((x-7)**2+(z+3)**2<3.2) && !((x+6)**2+(z+3)**2<1.1) &&
     !(Math.abs(x-1)>1.6 && Math.abs(x-1)<2.4 && Math.abs(z+6)<.5) &&
     !hollowPebbles.some(p=>p.size>.2 && Math.hypot(x-p.x,z-p.z)<p.size+.12);
+}
+
+export const HOLLOW_MATERIALS = { glass: "Frostglass", reed: "Moonreed", ember: "Warmstone" } as const;
+export type HollowMaterial = keyof typeof HOLLOW_MATERIALS;
+export const LANTERN_RECIPE: Record<HollowMaterial, number> = { glass: 2, reed: 1, ember: 1 };
+export type HollowJourney = {
+  started: boolean;
+  gathered: string[];
+  materials: Record<HollowMaterial, number>;
+  lanterns: number;
+  installed: string[];
+  finished: boolean;
+  notes: string[];
+};
+export const emptyHollow = (): HollowJourney => ({ started: false, gathered: [], materials: {glass: 0, reed: 0, ember: 0}, lanterns: 0, installed: [], finished: false, notes: [] });
+export const hollowOf = (p: Profile) => p.hollow || emptyHollow();
+export const canCraftLantern = (h: HollowJourney) => h.started && h.lanterns + h.installed.length < 3 &&
+  (Object.keys(LANTERN_RECIPE) as HollowMaterial[]).every(k => h.materials[k] >= LANTERN_RECIPE[k]);
+export function hollowObjective(p: Profile) {
+ const h=hollowOf(p);
+ if(!h.started || h.finished) return HOLLOW_STOPS[0];
+ if(h.lanterns>0){const n=HOLLOW_LANTERNS.find(n=>!h.installed.includes(n.id));if(n)return HOLLOW_STOPS.find(s=>s.id===`hol-${n.id}`)!;}
+ const n=HOLLOW_GATHER.find(n=>!h.gathered.includes(n.id));
+ return n ? HOLLOW_STOPS.find(s=>s.id===`hol-${n.id}`)! : HOLLOW_STOPS[0];
 }

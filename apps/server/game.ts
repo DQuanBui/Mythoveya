@@ -1,3 +1,4 @@
+import { hollowMutation } from "./hollow-game";
 import { canyonOf, CANYON_BEACONS } from "../../packages/shared/canyon";
 import { canyonMutation } from "./canyon-game";
 import { expeditionOf, FIELD_NODES } from "../../packages/shared/wildwood";
@@ -110,6 +111,7 @@ const ADVENTURE_KINDS = [
 ];
 export function mutate(p: Profile, kind: string, v: any, now = Date.now()) {
   const town = ensureTown(p);
+  if (kind.startsWith("hol-")) return hollowMutation(p, kind, v, random);
   if (kind.startsWith("can-")) return canyonMutation(p, kind, v, random);
   if (kind.startsWith("exp-")) return expeditionMutation(p, kind, v, now, random);
   if (kind.startsWith("town-"))
