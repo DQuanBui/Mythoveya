@@ -1,3 +1,4 @@
+import { WorldInteraction } from "./WorldInteraction";
 import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as T from "three";
@@ -96,9 +97,13 @@ let scenery: T.BufferGeometry | undefined;
 export function CanyonScenery({
   beacons,
   restored,
+  onInteract,
+  disabled,
 }: {
   beacons: string[];
   restored: boolean;
+  onInteract: (id: string) => void;
+  disabled: boolean;
 }) {
   const g = useMemo(() => (scenery ||= build()), []),
     steam = useRef<T.Group>(null);
@@ -162,6 +167,38 @@ export function CanyonScenery({
           )),
         )}
       </group>
+      {[...CANYON_BEACONS, ...CANYON_NOTES].map((n) => {
+        const [x, z] = canyonPropPoint(n);
+        return (
+          <WorldInteraction
+            key={n.id}
+            name={`canyon-site-${n.id}`}
+            position={[x, canyonHeight(x, z), z]}
+            approach={[...n.point]}
+            reach={4.5}
+            title={n.name}
+            disabled={disabled}
+            activate={() => onInteract(`can-${n.id}`)}
+          >
+            <mesh
+              position={[
+                0,
+                CANYON_BEACONS.some((b) => b.id === n.id) ? 1.3 : 0.4,
+                0,
+              ]}
+            >
+              <boxGeometry
+                args={[
+                  1.5,
+                  CANYON_BEACONS.some((b) => b.id === n.id) ? 3 : 1,
+                  1.5,
+                ]}
+              />
+              <meshBasicMaterial visible={false} />
+            </mesh>
+          </WorldInteraction>
+        );
+      })}
       {CANYON_BEACONS.map((n, i) => {
         const [x, z] = canyonPropPoint(n),
           lit = beacons.includes(n.id);

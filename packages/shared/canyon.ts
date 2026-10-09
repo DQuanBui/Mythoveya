@@ -249,3 +249,19 @@ export function canyonObjective(p: Profile) {
   if (!c.guardian) return CANYON_STOPS.find((s) => s.id === "can-guardian")!;
   return CANYON_STOPS[0];
 }
+
+export const CANYON_WILDLIFE: {
+  species: string;
+  point: Point;
+  radius: number;
+  water?: boolean;
+}[] = [
+  { species: "cindervane", point: [-30, -5], radius: 0.7 },
+  { species: "thermala", point: [26, 18], radius: 1.3, water: true },
+  { species: "coppershell", point: [-26, 16], radius: 0.6 },
+  { species: "zippinch", point: [24, -16], radius: 0.7 },
+  { species: "magmole", point: [-17, 19], radius: 0.8 },
+  { species: "cragpup", point: [-21, 24], radius: 0.6 },
+  { species: "flintuff", point: [36, 21], radius: 0.8 },
+  { species: "thermala", point: [33, 8], radius: 0.8, water: true },
+];

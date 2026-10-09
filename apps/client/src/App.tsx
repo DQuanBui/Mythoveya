@@ -947,7 +947,7 @@ export default function App() {
                     >
                       Sail back to Havenreach
                     </button>
-                  ) : profile?.region === "haven" && (
+                  ) : (profile?.region === "haven" || profile?.region === "canyon") && (
                     <button
                       onClick={() => {
                         input.current.returnHome =
@@ -956,7 +956,7 @@ export default function App() {
                         setPanel("");
                       }}
                     >
-                      Return to Havenreach village
+                      {profile?.region === "canyon" ? "Return to canyon trailhead" : "Return to Havenreach village"}
                     </button>
                   )}
                   {import.meta.env.DEV && (

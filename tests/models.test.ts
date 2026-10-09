@@ -79,5 +79,5 @@ it("gives canyon companions articulated blades and a separate crescent tail",()=
  expect(mantis.getObjectsByProperty('name','cindervane-petals')).toHaveLength(2);
  expect(spring.getObjectsByProperty('name','thermala-crescent')).toHaveLength(1);
  const before=colors('thermala');expect(colors('thermala',true)).not.toEqual(before);expect(colors('thermala')).toEqual(before);
- for(const model of [mantis,spring]) {animateCreature(model,4,'skill',.5);animateCreature(model,5,'idle');expect(model.userData.rig.position.z).toBe(0);}
+ for(const model of [mantis,spring]) {animateCreature(model,4,'attack',.5);animateCreature(model,5,'idle');expect(model.userData.rig.position.z).toBe(0);}
 });

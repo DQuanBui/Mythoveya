@@ -12,13 +12,19 @@ import { audio, settings } from "./audio";
 import { daylight, islandHour } from "./daytime";
 import { byId } from "../../../packages/shared/content";
 
-function Resident({
+export function HabitatResident({
   site,
   index,
   onInteract,
   disabled,
+  ground = groundHeight,
+  allowed = havenWalkable,
+  interactId,
 }: {
-  site: (typeof HAVEN_WILDLIFE)[number];
+  site: { species: string; point: [number, number]; radius: number; water?: boolean };
+  ground?: (x: number, z: number) => number;
+  allowed?: (x: number, z: number) => boolean;
+  interactId?: string;
   index: number;
   onInteract: (id: string) => void;
   disabled: boolean;
@@ -48,7 +54,7 @@ function Resident({
     if (walking) {
       const x = site.point[0] + Math.sin(t * 0.23) * site.radius,
         z = site.point[1] + Math.cos(t * 0.17) * site.radius;
-      if (site.water || havenWalkable(x, z)) {
+      if (site.water || allowed(x, z)) {
         const dx = x - model.position.x,
           dz = z - model.position.z;
         if (Math.hypot(dx, dz) > 0.001) model.rotation.y = Math.atan2(dx, dz);
@@ -58,7 +64,7 @@ function Resident({
     }
     model.position.y = site.water
       ? 0.08
-      : groundHeight(model.position.x, model.position.z);
+      : ground(model.position.x, model.position.z);
     animateCreature(model, t, walking ? "walk" : asleep && !site.water ? "sleep" : "idle", 0, settings.reduced);
     if (!asleep && t - lastVoice.current > 24 + index && distance < 14) {
       audio.voice(
@@ -77,7 +83,7 @@ function Resident({
       title={byId[site.species].name}
       hint="Wild companion · Click to observe"
       reach={7}
-      activate={() => onInteract(`observe-${site.species}`)}
+      activate={() => onInteract(interactId || `observe-${site.species}`)}
     >
       <primitive object={model} />
     </WorldInteraction>
@@ -93,7 +99,7 @@ export function HavenWildlife({
   return (
     <group name="haven-wildlife">
       {HAVEN_WILDLIFE.map((site, i) => (
-        <Resident
+        <HabitatResident
           key={i}
           site={site}
           index={i}
