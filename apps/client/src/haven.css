@@ -521,3 +521,7 @@ button.world-label:hover {
 .canyon-map svg g[role=button] { cursor:pointer; }
 .canyon-map svg g[role=button]:focus-visible circle { stroke:#fff; stroke-width:1; }
 .naturalist-badge { color:#eed39a !important; letter-spacing:.08em; }
+
+.canyon-map .haven-destinations { margin-top:0; }
+.canyon-map-detail .expedition-objective h3 { font-size:24px; }
+.canyon-map-detail .expedition-objective button { margin:4px 0; }

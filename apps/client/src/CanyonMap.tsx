@@ -118,33 +118,35 @@ export function CanyonMap({
             />
           </svg>
         </div>
-        <div className="haven-destinations">
-          {CANYON_STOPS.map((s) => (
-            <button
-              key={s.id}
-              className={selected === s.id ? "selected" : ""}
-              onClick={() => select(s.id)}
-            >
-              {s.name}
-            </button>
-          ))}
+        <div className="canyon-map-detail">
+          <div className="haven-destinations">
+            {CANYON_STOPS.map((s) => (
+              <button
+                key={s.id}
+                className={selected === s.id ? "selected" : ""}
+                onClick={() => select(s.id)}
+              >
+                {s.name}
+              </button>
+            ))}
+          </div>
+          <article className="expedition-objective">
+            <h3>{stop.name}</h3>
+            <p>{stop.description}</p>
+            <p>
+              {c.beacons.length}/{CANYON_BEACONS.length} beacons tuned
+              {c.restored ? " · Signals restored" : ""}
+            </p>
+            <button className="primary" onClick={() => choose(stop.id)}>
+              Set walking waypoint
+            </button>{" "}
+            <button onClick={() => choose(null)}>Clear waypoint</button>
+          </article>
+          <div className="row">
+            <button onClick={journal}>Open canyon journal</button>
+            <button onClick={regions}>Travel to another region</button>
+          </div>
         </div>
-      </div>
-      <article className="expedition-objective">
-        <h3>{stop.name}</h3>
-        <p>{stop.description}</p>
-        <p>
-          {c.beacons.length}/{CANYON_BEACONS.length} beacons tuned
-          {c.restored ? " · Signals restored" : ""}
-        </p>
-        <button className="primary" onClick={() => choose(stop.id)}>
-          Set walking waypoint
-        </button>{" "}
-        <button onClick={() => choose(null)}>Clear waypoint</button>
-      </article>
-      <div className="row">
-        <button onClick={journal}>Open canyon journal</button>
-        <button onClick={regions}>Travel to another region</button>
       </div>
     </div>
   );
