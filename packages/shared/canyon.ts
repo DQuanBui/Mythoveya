@@ -176,9 +176,33 @@ const canyonPebbleSites = PEBBLES.filter(
   (p) => canyonPathDistance(p.x, p.z) > 1.5,
 );
 export const canyonPebbles = () => canyonPebbleSites;
+export function canyonPropPoint(n: {
+  id: string;
+  point: readonly number[];
+}): Point {
+  const offsets: Record<string, Point> = {
+    kiln: [0, 3],
+    spire: [-3, 0],
+    echo: [0, -3],
+    shell: [2, -2],
+    spring: [0, 3],
+    glass: [2, -2],
+  };
+  const d = offsets[n.id] || [0, 0];
+  return [n.point[0] + d[0], n.point[1] + d[1]];
+}
 export function canyonWalkable(x: number, z: number) {
   return (
     Math.hypot(x, z) < canyonEdge(Math.atan2(z, x)) - 1.4 &&
+    !CANYON_BEACONS.some(
+      (n) =>
+        Math.hypot(x - canyonPropPoint(n)[0], z - canyonPropPoint(n)[1]) < 0.75,
+    ) &&
+    !CANYON_NOTES.some(
+      (n) =>
+        Math.hypot(x - canyonPropPoint(n)[0], z - canyonPropPoint(n)[1]) < 0.6,
+    ) &&
+    !(Math.abs(x + 27) < 0.85 && Math.abs(z - 27) < 0.5) &&
     !CANYON_SPRINGS.some(
       (p) => Math.hypot((x - p.x) / (p.rx + 0.4), (z - p.z) / (p.rz + 0.4)) < 1,
     ) &&

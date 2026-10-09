@@ -1,3 +1,5 @@
+import { CanyonScenery } from "./CanyonScenery";
+import { canyonOf } from "../../../packages/shared/canyon";
 import { CanyonTerrain } from "./CanyonTerrain";
 import { CANYON_EXTENT, CANYON_STOPS, canyonHeight, canyonWalkable, canyonPathDistance } from "../../../packages/shared/canyon";
 import { previewFrame } from "./preview-framing";
@@ -1167,6 +1169,7 @@ export function WorldScene({
       <WalkContext.Provider value={walker}>
       <ModelLighting intensity={0.35} />
       <Environment region={profile.region} expedition={expeditionOf(profile)} />
+      {profile.region === "canyon" && <CanyonScenery beacons={canyonOf(profile).beacons} restored={canyonOf(profile).restored} />}
       {profile.region === "haven" && (
         <HavenHouses onInteract={onInteract} disabled={blocked} />
       )}
