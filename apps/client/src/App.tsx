@@ -1,3 +1,5 @@
+import { CanyonMap } from "./CanyonMap";
+import { CANYON_STOPS } from "../../../packages/shared/canyon";
 import { ExpeditionPanel } from "./ExpeditionPanel";
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -380,7 +382,7 @@ export default function App() {
   const destination =
     profile?.region === "haven"
       ? MAP_DESTINATIONS.find((p) => p.id === trail)
-      : undefined;
+      : profile?.region === "canyon" ? CANYON_STOPS.find(p=>p.id===trail) : undefined;
   const objective = profile
     ? {
         ...currentObjective(profile),
@@ -389,7 +391,7 @@ export default function App() {
               title: destination.name,
               text: destination.description,
               target:
-                trail?.startsWith("exp-") || trail?.startsWith("porch-") || trail === "smith" || trail === "apothecary"
+                trail?.startsWith("can-") || trail?.startsWith("exp-") || trail?.startsWith("porch-") || trail === "smith" || trail === "apothecary"
                   ? trail
                   : `trail-${destination.id}`,
               waypoint: true,
@@ -807,6 +809,7 @@ export default function App() {
               <Recruitment profile={profile} run={run} />
             )}{" "}
             {panel === "leaderboard" && <Leaderboard />}
+            {panel === "map" && profile?.region === "canyon" && <CanyonMap profile={profile} position={position} trail={trail} choose={id=>{setTrail(id);setPanel("");}} regions={()=>setPanel("regions")} journal={()=>setPanel("can-journal")} />}
             {panel === "map" && profile?.region === "haven" && (
               <HavenMap
                 position={position}
@@ -820,7 +823,7 @@ export default function App() {
               />
             )}
             {(panel === "regions" ||
-              (panel === "map" && profile?.region !== "haven")) &&
+              (panel === "map" && profile?.region !== "haven" && profile?.region !== "canyon")) &&
               profile && (
                 <MapPanel
                   profile={profile}

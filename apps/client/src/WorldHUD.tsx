@@ -1,3 +1,4 @@
+import { CANYON_EXTENT, CANYON_PATHS, CANYON_SPRINGS } from "../../../packages/shared/canyon";
 import { WILDWOOD_LAKE } from "../../../packages/shared/wildwood";
 import { useEffect, useRef, useState, type MutableRefObject } from "react";
 import { byId, REGIONS } from "../../../packages/shared/content";
@@ -69,7 +70,7 @@ export function WorldHUD({
       ? festivalInteractables(profile)
       : getInteractables(profile.region);
   // Island minimaps span the land plus a little sky around it.
-  const span = home ? homeRadius(home) + 3 : fair ? FESTIVAL_RADIUS + 3 : 0;
+  const span = home ? homeRadius(home) + 3 : fair ? FESTIVAL_RADIUS + 3 : profile.region === "canyon" ? CANYON_EXTENT : 0;
   const pct = (v: number) =>
     span ? 50 + (v / span) * 50 : mapPercent(v, profile.region);
   const tickets = profile.festival?.tickets || 0,
@@ -342,6 +343,10 @@ export function WorldHUD({
               <rect x={-FESTIVAL_RADIUS} y="-1" width={FESTIVAL_RADIUS - 6} height="2" fill="#e3d5b0" />
             </svg>
           )}
+          {profile.region === "canyon" && !home && !fair && <svg className="map-terrain" viewBox="-52 -52 104 104" aria-hidden="true">
+            {CANYON_PATHS.map((p,i)=><polyline key={i} points={p.map(v=>v.join(',')).join(' ')} fill="none" stroke="#e7c59b" strokeWidth="1"/>)}
+            {CANYON_SPRINGS.map((p,i)=><ellipse key={i} cx={p.x} cy={p.z} rx={p.rx} ry={p.rz} fill="#85c6c5"/>)}
+          </svg>}
           {profile.region === "haven" && !home && !fair && (
             <svg
               className="map-terrain"
