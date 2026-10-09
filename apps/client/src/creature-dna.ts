@@ -94,6 +94,8 @@ const tiers = ["E", "D", "C", "B", "A", "S"];
 
 // Art-directed palettes and proportions for the western habitats.
 const WILDWOOD_DNA: Record<string, Partial<Dna>> = {
+  cindervane: { base:"#bd5065", mid:"#944452", light:"#eeac99", cream:"#fff0d6", dark:"#5d4b74", accent:"#e8ad58", iris:"#a9d6ab", body:[.65,1.15,1.1], head:.95, legs:1.2, ears:"none", marking:"none" },
+  thermala: { base:"#3c9697", mid:"#307779", light:"#8ed4c2", cream:"#f8e7c6", dark:"#315c73", accent:"#e58c87", iris:"#daaa54", body:[1,.68,1.7], head:1.1, legs:.65, ears:"none", marking:"spots", tail:"fin" },
   reedlet: { base: "#55c9bb", mid: "#3a9d9b", light: "#a5eee0", cream: "#fff0d9", dark: "#326a76", accent: "#f094ae", iris: "#3f6da5", body: [.85, .8, 1.3], head: 1.2, ears: "none", marking: "spots" },
   lanternmoth: { base: "#f2e5bb", mid: "#c8b788", light: "#fff6d7", cream: "#fff9e9", dark: "#927250", accent: "#eab35d", iris: "#8f698e", body: [.6, .8, 1.1], head: .85, ears: "none", marking: "none" },
   coppershell: { base: "#bb7e53", mid: "#986340", light: "#e9bc83", cream: "#e8d5a4", dark: "#3b796a", accent: "#85bd8c", iris: "#476c69", body: [1.15, .9, 1.05], head: .8, ears: "none", marking: "none" },

@@ -61,7 +61,7 @@ it("returns from attacks cleanly and preserves authored tails during animation",
 });
 
 it("keeps tall and wide creatures inside portrait and landscape previews", () => {
-  for (const id of ["galehart", "auroroc", "bloomanta", "solkarath"]) for (const aspect of [.6, 2.6]) {
+  for (const id of ["galehart", "auroroc", "bloomanta", "solkarath", "cindervane", "thermala"]) for (const aspect of [.6, 2.6]) {
     const model = createCreature(id), box = new Box3().setFromObject(model), fit = previewFrame(model, aspect);
     const camera = new PerspectiveCamera(37, aspect, .1, 100);
     camera.position.copy(fit.position); camera.lookAt(fit.center); camera.updateMatrixWorld();
@@ -71,4 +71,13 @@ it("keeps tall and wide creatures inside portrait and landscape previews", () =>
       expect(Math.abs(p.y), id).toBeLessThan(1);
     }
   }
+});
+
+it("gives canyon companions articulated blades and a separate crescent tail",()=>{
+ const mantis=createCreature("cindervane"),spring=createCreature("thermala");
+ expect(mantis.getObjectsByProperty('name','cindervane-blade')).toHaveLength(2);
+ expect(mantis.getObjectsByProperty('name','cindervane-petals')).toHaveLength(2);
+ expect(spring.getObjectsByProperty('name','thermala-crescent')).toHaveLength(1);
+ const before=colors('thermala');expect(colors('thermala',true)).not.toEqual(before);expect(colors('thermala')).toEqual(before);
+ for(const model of [mantis,spring]) {animateCreature(model,4,'skill',.5);animateCreature(model,5,'idle');expect(model.userData.rig.position.z).toBe(0);}
 });

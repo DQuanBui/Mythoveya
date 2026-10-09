@@ -5,11 +5,13 @@ export const WILDWOOD_EFFECTS = [
   "coppershell",
   "bloomanta",
   "galehart",
-  "auroroc",
+  "auroroc", "cindervane", "thermala",
 ];
 export function WildwoodEffect({ id }: { id: string }) {
   if (!WILDWOOD_EFFECTS.includes(id)) return null;
   const colors: Record<string, string[]> = {
+    cindervane: ["#efb160", "#c97eac"],
+    thermala: ["#94e0cd", "#f2cca1"],
     reedlet: ["#9ae8d9", "#f6b9d3"],
     lanternmoth: ["#ffe6a0", "#fff5dd"],
     coppershell: ["#84c5a0", "#dba879"],
@@ -32,7 +34,7 @@ export function WildwoodEffect({ id }: { id: string }) {
             ]}
             rotation={[0, -a, 0]}
           >
-            {id === "reedlet" ? (
+            {(id === "reedlet" || id === "thermala") ? (
               <mesh>
                 <sphereGeometry args={[0.16, 10, 8]} />
                 <meshBasicMaterial color={c} transparent opacity={0.6} />
@@ -47,7 +49,7 @@ export function WildwoodEffect({ id }: { id: string }) {
                 <torusGeometry args={[0.4, 0.03, 5, 20, Math.PI * 1.4]} />
                 <meshBasicMaterial color={c} transparent opacity={0.8} />
               </mesh>
-            ) : id === "auroroc" ? (
+            ) : (id === "auroroc" || id === "cindervane") ? (
               <mesh rotation={[0.5, a, 0.5]}>
                 <coneGeometry args={[0.085, 0.8, 5]} />
                 <meshBasicMaterial color={c} transparent opacity={0.8} />

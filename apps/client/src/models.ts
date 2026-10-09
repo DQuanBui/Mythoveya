@@ -599,6 +599,25 @@ export function createCreature(id: string, shimmer = false) {
       part(fan, "orb", light, [Math.sin(a) * 1.25, .52, -Math.cos(a) * 1.18], [.055, .025, .16], [-.35, -a, 0]);
     }
   }
+  if (s.id === "cindervane") {
+    for(const side of [-1,1]) {
+      const blade=new T.Group();blade.name="cindervane-blade";blade.position.set(side*.36,.95,.3);rig.add(blade);limbs.push(blade);
+      part(blade,"capsule",cream,[side*.28,.14,.12],[.09,.52,.09],[0,0,-side*.7]);
+      part(blade,"cone",accent,[side*.49,.16,.48],[.13,.8,.16],[Math.PI*.35,0,side*.2]);
+      for(let j=0;j<3;j++) part(blade,"cone",dark,[side*.49,.25+j*.07,.38+j*.16],[.065,.19,.08],[0,0,side*1.2]);
+      const petals=new T.Group();petals.name="cindervane-petals";petals.position.set(side*.2,.85,-.2);rig.add(petals);wings.push(petals);
+      for(let j=0;j<3;j++) part(petals,"orb",j%2?dark:cream,[side*(.28+j*.13),.02*j,-.15-j*.15],[.25,.035,.52],[0,-side*(.3+j*.2),side*.15]);
+      part(rig,"cone",cream,[side*.25,headY+.26,headZ],[.13,.4,.1],[0,0,-side*.6]);
+    }
+  }
+  if (s.id === "thermala") {
+    for(let i=0;i<7;i++) {
+      part(rig,"cone",i%2?accent:cream,[0,.72+Math.sin(i/6*Math.PI)*.16,.5-i*.25],[.11,.3+Math.sin(i/6*Math.PI)*.18,.16],[.2,0,0]);
+      for(const side of [-1,1]) part(rig,"orb","#e6bd67",[side*.4,.67,.55-i*.21],[.07,.025,.05]);
+    }
+    const crescent=new T.Group();crescent.name="thermala-crescent";crescent.position.set(0,.4,-1.25);rig.add(crescent);tails.push(crescent);
+    for(let i=0;i<7;i++) {const a=(i-3)*.27;part(crescent,"orb",i%2?light:cream,[Math.sin(a)*.5,0,-Math.cos(a)*.45],[.1,.06,.44],[0,-a,0]);}
+  }
   tails.forEach((t) => { t.userData.restRotation = t.rotation.clone(); });
   consolidate(rig, `creature:${id}:${shimmer ? "shimmer" : "normal"}`);
   const glints = new T.Group();
