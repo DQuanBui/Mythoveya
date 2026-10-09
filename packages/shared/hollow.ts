@@ -1,0 +1,73 @@
+import { PEBBLES, type Point } from "./haven";
+
+export const HOLLOW_EXTENT = 52;
+export const HOLLOW_LAKE = { x: -23, z: 12, rx: 8, rz: 5 };
+export const HOLLOW_WORKSHOP: Point = [19, 12];
+export const HOLLOW_PATHS: Point[][] = [
+  [[0, 5], [0, 12], [-10, 20], [-24, 25], [-35, 18], [-35, 8], [-32, -4], [-24, -10], [-16, -23], [0, -27], [13, -25], [25, -18], [28, 4], [29, 23], [12, 23], [12, 12], [19, 12], [0, 12]],
+  [[0, -9], [-14, -8], [-16, -23]],
+];
+export const HOLLOW_MOUNTAINS = [[-39, -18, 3, 8], [-26, -32, 3, 10], [20, -34, 3, 9], [37, -18, 3, 7]];
+export const HOLLOW_BUILDINGS = [
+  { x: 19, z: 17, width: 4.4, depth: 4, roof: "#69758e" },
+  { x: 0, z: -33, width: 6, depth: 4, roof: "#8677a5" },
+  { x: 33, z: 25, width: 3.5, depth: 3, roof: "#597f87" },
+];
+export function hollowEdge(a: number) { return 45 + 2 * Math.sin(a * 4) + Math.cos(a * 7); }
+const smooth = (n: number) => { n = Math.max(0, Math.min(1, n)); return n * n * (3 - 2 * n); };
+export function hollowHeight(x: number, z: number) {
+  if (Math.hypot((x - HOLLOW_LAKE.x) / HOLLOW_LAKE.rx, (z - HOLLOW_LAKE.z) / HOLLOW_LAKE.rz) < 1) return -0.7;
+  const natural = 6 * smooth((-z - 14) / 20);
+  const d = Math.max(0, Math.abs(x) - 3.3, Math.abs(z + 33) - 2.3);
+  return 6 + (natural - 6) * smooth(d / 2);
+}
+export function hollowPathDistance(x: number, z: number) {
+  let d = Infinity;
+  for (const path of HOLLOW_PATHS) for (let i = 1; i < path.length; i++) {
+    const [ax, az] = path[i - 1], [bx, bz] = path[i], dx = bx - ax, dz = bz - az;
+    const t = Math.max(0, Math.min(1, ((x - ax) * dx + (z - az) * dz) / (dx * dx + dz * dz)));
+    d = Math.min(d, Math.hypot(x - ax - dx * t, z - az - dz * t));
+  }
+  return d;
+}
+export const HOLLOW_GATHER = [
+  { id: "glass", name: "Frostglass shelf", point: [-24, -10] as Point, material: "glass" as const, amount: 6, element: "Flame", ability: "Thaw", description: "Warm fallen frostglass gently; living crystals stay untouched." },
+  { id: "reed", name: "Moonreed shore", point: [-24, 25] as Point, material: "reed" as const, amount: 3, element: "Grove", ability: "Weave", description: "Gather loose moonreed fibers for three slow-burning wicks." },
+  { id: "ember", name: "Warmstone spring", point: [28, 4] as Point, material: "ember" as const, amount: 3, element: "Tide", ability: "Cool", description: "Cool three warmstones from the spring without dimming their light." },
+];
+export const HOLLOW_LANTERNS = [
+  { id: "shore", name: "Lakeside lantern", point: [-35, 8] as Point, description: "A warm guide for Snowmew families along the water." },
+  { id: "summit", name: "Observatory lantern", point: [0, -27] as Point, description: "Light the approach to the old mountain observatory." },
+  { id: "refuge", name: "Refuge lantern", point: [29, 23] as Point, description: "Help wandering Wildbound find the eastern shelter." },
+];
+export const HOLLOW_NOTES = [
+  { id: "owl", name: "Feathers in the frost", point: [-16, -23] as Point, species: "rimeowl", description: "Rimeowl's soft feather edges quiet its flight. The birds carry loose moonreed to line warm nests beneath the observatory." },
+  { id: "fox", name: "Tracks under starlight", point: [25, -18] as Point, species: "frostwhisk", description: "Frostwhisk steps into the tracks of its family to conserve warmth. A single trail in the snow may belong to many companions." },
+];
+export const HOLLOW_STOPS = [
+  { id: "hol-workshop", name: "Mira's lantern workshop", point: HOLLOW_WORKSHOP, description: "Help Mira craft three lanterns and reopen the snowy migration road." },
+  ...HOLLOW_GATHER.map(n => ({ ...n, id: `hol-${n.id}` })),
+  ...HOLLOW_LANTERNS.map(n => ({ ...n, id: `hol-${n.id}` })),
+  ...HOLLOW_NOTES.map(n => ({ ...n, id: `hol-${n.id}` })),
+];
+export const hollowPropPoint = (n: {point: Point}): Point => [n.point[0] + 2.4, n.point[1] + 1.8];
+export const hollowPebbles = PEBBLES.filter(p => hollowPathDistance(p.x, p.z) > 1.5);
+function openGround(x: number, z: number) {
+  return Math.hypot(x, z) < hollowEdge(Math.atan2(z, x)) - 1.5 &&
+    Math.hypot((x - HOLLOW_LAKE.x) / (HOLLOW_LAKE.rx + .5), (z - HOLLOW_LAKE.z) / (HOLLOW_LAKE.rz + .5)) >= 1 &&
+    !HOLLOW_BUILDINGS.some(b => Math.abs(x - b.x) < b.width / 2 + .3 && Math.abs(z - b.z) < b.depth / 2 + .3) &&
+    !HOLLOW_MOUNTAINS.some(([a,b,r]) => Math.hypot(x-a,z-b) < r + .4) &&
+    ![...HOLLOW_GATHER, ...HOLLOW_LANTERNS, ...HOLLOW_NOTES].some(n => Math.hypot(x-hollowPropPoint(n)[0],z-hollowPropPoint(n)[1]) < .7);
+}
+export const HOLLOW_FIRS = Array.from({length: 85}, (_,i) => {
+  const a = i * 2.39996, r = 19 + i % 21;
+  return { x: Math.cos(a)*r, z: Math.sin(a)*r, scale: .65 + (i%4)*.15 };
+}).filter(p => openGround(p.x,p.z) && hollowPathDistance(p.x,p.z) > 3.5);
+export function hollowWalkable(x: number, z: number) {
+  return openGround(x,z) &&
+    !HOLLOW_FIRS.some(p => Math.hypot(x-p.x,z-p.z)<.55) &&
+    !Array.from({length:9},(_,i)=>[-11+i*2.4,-11]).some(([a,b])=>Math.hypot(x-a,z-b)<.8) &&
+    !((x-11)**2+(z-4.4)**2<1.4) && !((x-7)**2+(z+3)**2<3.2) && !((x+6)**2+(z+3)**2<1.1) &&
+    !(Math.abs(x-1)>1.6 && Math.abs(x-1)<2.4 && Math.abs(z+6)<.5) &&
+    !hollowPebbles.some(p=>p.size>.2 && Math.hypot(x-p.x,z-p.z)<p.size+.12);
+}
