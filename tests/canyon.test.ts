@@ -1,3 +1,4 @@
+import { act, makeBattle } from "../packages/shared/combat";
 import { expect, it } from "vitest";
 import {
   CANYON_BEACONS,
@@ -48,4 +49,22 @@ it("keeps trails graded, springs blocked and old saves unchanged", () => {
       (n) => n.code.length === 3 && n.code.every((c) => c >= 0 && c <= 2),
     ),
   ).toBe(true);
+});
+
+it("applies sentinel shell, surge and cooling modifiers to actual combat damage",()=>{
+ const owned=(species:string)=>({id:species,species,level:1,xp:0,shards:0,upgrade:0,locked:false});
+ const base=makeBattle('sentinel-phases',[[owned('emberfox')],[owned('cindervane')]],'pve',17);
+ const damage=(round:number,side:0|1,encounter?:'canyon')=>{
+   const b=structuredClone(base);b.encounter=encounter;b.round=round;b.queue=[`${side}:0`,`${1-side}:0`];b.readyAt=0;
+   const target=b.units.find(u=>u.side!==side)!;target.hp=target.maxHp=1000;
+   act(b,side,0,target.id,100000,true);return 1000-target.hp;
+ };
+ expect(Math.abs(damage(1,0,'canyon')-damage(1,0)*.65)).toBeLessThanOrEqual(1);
+ expect(Math.abs(damage(2,1,'canyon')-damage(2,1)*1.5)).toBeLessThanOrEqual(1);
+ expect(Math.abs(damage(3,0,'canyon')-damage(3,0)*1.75)).toBeLessThanOrEqual(1);
+ expect(damage(2,0,'canyon')).toBe(damage(2,0));
+});
+
+it("keeps the ranger shelter foundation level across its full footprint",()=>{
+ for(const x of [-26.3,-24,-21.7]) for(const z of [28,30,32]) expect(canyonHeight(x,z)).toBe(2.5);
 });

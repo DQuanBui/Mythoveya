@@ -101,7 +101,7 @@ export function CanyonTerrain() {
           side={T.DoubleSide}
         />
       </mesh>
-      <mesh position={[0, -5, 0]} rotation={[Math.PI, 0, 0]}>
+      <mesh position={[0, -6, 0]} rotation={[Math.PI, 0, 0]}>
         <coneGeometry args={[45, 10, 16]} />
         <meshStandardMaterial color="#735c5a" flatShading />
       </mesh>

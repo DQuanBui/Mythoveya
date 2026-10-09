@@ -151,7 +151,11 @@ export function canyonHeight(x: number, z: number) {
     )
   )
     return -0.6;
-  return 5 * smooth((-x - 14) / 20);
+  const natural = 5 * smooth((-x - 14) / 20);
+  // A level foundation under the ranger shelter, softly blended into the slope.
+  const campDistance = Math.max(0, Math.abs(x + 24) - 2.6, Math.abs(z - 30) - 2.4);
+  return 2.5 + (natural - 2.5) * smooth(campDistance / 2);
+
 }
 export function canyonEdge(angle: number) {
   return 44 + Math.sin(angle * 3) * 2 + Math.cos(angle * 5) * 1.5;

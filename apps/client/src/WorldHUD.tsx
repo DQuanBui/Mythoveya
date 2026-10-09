@@ -400,8 +400,8 @@ export function WorldHUD({
           </b>
         </div>
         <span>N · {placeName.toUpperCase()}</span>
-        <button onClick={() => open(span ? "skyferry" : "map")}>
-          {span ? "Skyferry" : "Travel map"}
+        <button onClick={() => open(home || fair ? "skyferry" : "map")}>
+          {home || fair ? "Skyferry" : "Travel map"}
         </button>
       </div>
       {touch && nearest && (
@@ -454,7 +454,7 @@ export function WorldHUD({
           ].map(([id, icon, label]) => (
             <button
               key={id}
-              onClick={() => open(span && id === "map" ? "skyferry" : id)}
+              onClick={() => open((home || fair) && id === "map" ? "skyferry" : id)}
             >
               <span>{icon}</span>
               {label}
