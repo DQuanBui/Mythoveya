@@ -1,3 +1,4 @@
+import { canyonMutation } from "./canyon-game";
 import { expeditionOf, FIELD_NODES } from "../../packages/shared/wildwood";
 import { expeditionMutation } from "./expedition-game";
 import { randomInt, randomUUID } from "node:crypto";
@@ -107,6 +108,7 @@ const ADVENTURE_KINDS = [
 ];
 export function mutate(p: Profile, kind: string, v: any, now = Date.now()) {
   const town = ensureTown(p);
+  if (kind.startsWith("can-")) return canyonMutation(p, kind, v, random);
   if (kind.startsWith("exp-")) return expeditionMutation(p, kind, v, now, random);
   if (kind.startsWith("town-"))
     return townMutation(p, kind, v, Date.now(), random);
