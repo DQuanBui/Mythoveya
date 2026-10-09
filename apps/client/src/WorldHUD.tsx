@@ -121,6 +121,7 @@ export function WorldHUD({
           <img src="/emblem.svg" alt="" />
           <div>
             <strong>{profile.name}</strong>
+            {profile.region === "canyon" && profile.canyon?.fieldReward && <small className="naturalist-badge">CANYON NATURALIST</small>}
             <small>RIFTKEEPER · LEVEL {profile.level}</small>
           </div>
         </div>

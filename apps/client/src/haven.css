@@ -508,3 +508,16 @@ button.world-label:hover {
 @media(max-width:650px) { .expedition-grid { grid-template-columns:1fr; } }
 
 .quest-tracker > .text-button { display:block; margin-top:8px; }
+
+/* Canyon inscriptions remain readable without relying on color swatches. */
+.canyon-journal .expedition-grid article { background:#3c3b49; border-color:#776979; }
+.canyon-journal .expedition-objective, .canyon-map .expedition-objective { background:#49414e; border-color:#e0b57a; }
+.canyon-journal label { display:block; font-size:13px; }
+.canyon-journal select { display:block; width:100%; min-width:0; padding:8px; margin-top:5px; background:#fff3de; color:#343a43; border-radius:7px; }
+.canyon-journal blockquote { margin:12px 0; border-left:2px solid #d7b382; padding:8px 12px; color:#f2d5a9; background:#2c303c; }
+.beacon-shutters { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; border:1px solid #776979; border-radius:10px; margin:14px 0; padding:10px; clear:both; }
+.beacon-shutters legend { font-size:12px; padding:0 5px; }
+.canyon-map .row { display:flex; gap:8px; flex-wrap:wrap; }
+.canyon-map svg g[role=button] { cursor:pointer; }
+.canyon-map svg g[role=button]:focus-visible circle { stroke:#fff; stroke-width:1; }
+.naturalist-badge { color:#eed39a !important; letter-spacing:.08em; }
