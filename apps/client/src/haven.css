@@ -525,3 +525,15 @@ button.world-label:hover {
 .canyon-map .haven-destinations { margin-top:0; }
 .canyon-map-detail .expedition-objective h3 { font-size:24px; }
 .canyon-map-detail .expedition-objective button { margin:4px 0; }
+
+/* Moonfrost journey: written ingredient quantities and responsive recipe cards. */
+.hollow-satchel { margin: 1rem 0; padding: 1rem; border: 1px solid #7e9da5; border-radius: 14px; background: #203d49; color: #eff7ef; }
+.hollow-satchel h3 { margin-top: 0; }
+.hollow-materials { display: flex; flex-wrap: wrap; gap: .6rem; }
+.hollow-materials span { padding: .45rem .7rem; background: #345461; border-radius: 8px; }
+.hollow-recipe { padding-left: 1.2rem; }
+.hollow-recipe li { padding: .25rem 0; }
+.hollow-recipe li span { display: inline-block; margin-left: .5rem; font-size: .8rem; color: #a8d9c5; }
+.hollow-journal select { width: 100%; margin: .4rem 0 .8rem; }
+.hollow-journal article button { margin: .25rem .3rem .25rem 0; }
+.lantern-badge { display: block; color: #f3d699; font-size: .62rem; letter-spacing: .14em; }
