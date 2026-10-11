@@ -67,3 +67,30 @@ it("rejects forged and incorrect melodies without spending or changing progress;
   expect(authenticate(t).gold - before.gold).toBe(105);
   expect(authenticate(t).meadow!.choirs).toHaveLength(3);
 });
+
+it("persists notes and grants the restoration companion and currency only once", () => {
+  const t = keeper();
+  op(t, "mea-start");
+  expect(() => op(t, "mea-finish")).toThrow("all three");
+  expect(() => op(t, "mea-note", { id: "forged" })).toThrow("Choose");
+  op(t, "mea-note", { id: "seed" });
+  op(t, "mea-note", { id: "moth" });
+  expect(() => op(t, "mea-note", { id: "seed" })).toThrow("already");
+  for (const s of MEADOW_SHRINES)
+    op(t, "mea-sing", { id: s.id, inputs: MEADOW_VERSES[s.id].answer });
+  const before = authenticate(t),
+    id = crypto.randomUUID();
+  op(t, "mea-finish", {}, id);
+  op(t, "mea-finish", {}, id);
+  const after = authenticate(t);
+  expect(after.gold - before.gold).toBe(150);
+  expect(after.diamonds - before.diamonds).toBeGreaterThanOrEqual(50);
+  expect(after.owned.some((o) => o.species === "fernibble")).toBe(true);
+  expect(after.meadow).toEqual({
+    started: true,
+    choirs: ["brook", "canopy", "root"],
+    notes: ["seed", "moth"],
+    finished: true,
+  });
+  expect(() => op(t, "mea-finish")).toThrow("already");
+});
