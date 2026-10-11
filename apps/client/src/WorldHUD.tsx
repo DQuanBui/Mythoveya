@@ -1,3 +1,4 @@
+import { HOLLOW_EXTENT, HOLLOW_PATHS, HOLLOW_LAKE } from "../../../packages/shared/hollow";
 import { CANYON_EXTENT, CANYON_PATHS, CANYON_SPRINGS } from "../../../packages/shared/canyon";
 import { WILDWOOD_LAKE } from "../../../packages/shared/wildwood";
 import { useEffect, useRef, useState, type MutableRefObject } from "react";
@@ -70,7 +71,7 @@ export function WorldHUD({
       ? festivalInteractables(profile)
       : getInteractables(profile.region);
   // Island minimaps span the land plus a little sky around it.
-  const span = home ? homeRadius(home) + 3 : fair ? FESTIVAL_RADIUS + 3 : profile.region === "canyon" ? CANYON_EXTENT : 0;
+  const span = home ? homeRadius(home) + 3 : fair ? FESTIVAL_RADIUS + 3 : profile.region === "canyon" ? CANYON_EXTENT : profile.region === "hollow" ? HOLLOW_EXTENT : 0;
   const pct = (v: number) =>
     span ? 50 + (v / span) * 50 : mapPercent(v, profile.region);
   const tickets = profile.festival?.tickets || 0,
@@ -121,6 +122,7 @@ export function WorldHUD({
           <img src="/emblem.svg" alt="" />
           <div>
             <strong>{profile.name}</strong>
+            {profile.region === "hollow" && profile.hollow?.finished && <small className="lantern-badge">LANTERN KEEPER</small>}
             {profile.region === "canyon" && profile.canyon?.fieldReward && <small className="naturalist-badge">CANYON NATURALIST</small>}
             <small>RIFTKEEPER · LEVEL {profile.level}</small>
           </div>
@@ -344,6 +346,10 @@ export function WorldHUD({
               <rect x={-FESTIVAL_RADIUS} y="-1" width={FESTIVAL_RADIUS - 6} height="2" fill="#e3d5b0" />
             </svg>
           )}
+          {profile.region === "hollow" && !home && !fair && <svg className="map-terrain" viewBox="-52 -52 104 104" aria-hidden="true">
+            {HOLLOW_PATHS.map((p,i)=><polyline key={i} points={p.map(v=>v.join(",")).join(" ")} fill="none" stroke="#f1dfb5" strokeWidth="1"/>)}
+            <ellipse cx={HOLLOW_LAKE.x} cy={HOLLOW_LAKE.z} rx={HOLLOW_LAKE.rx} ry={HOLLOW_LAKE.rz} fill="#82c1d1"/>
+          </svg>}
           {profile.region === "canyon" && !home && !fair && <svg className="map-terrain" viewBox="-52 -52 104 104" aria-hidden="true">
             {CANYON_PATHS.map((p,i)=><polyline key={i} points={p.map(v=>v.join(',')).join(' ')} fill="none" stroke="#e7c59b" strokeWidth="1"/>)}
             {CANYON_SPRINGS.map((p,i)=><ellipse key={i} cx={p.x} cy={p.z} rx={p.rx} ry={p.rz} fill="#85c6c5"/>)}

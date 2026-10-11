@@ -2,7 +2,7 @@ import { HollowWildlife } from "./HollowWildlife";
 import { HollowScenery } from "./HollowScenery";
 import { hollowOf } from "../../../packages/shared/hollow";
 import { HollowTerrain } from "./HollowTerrain";
-import { HOLLOW_EXTENT, hollowHeight, hollowWalkable, hollowPathDistance } from "../../../packages/shared/hollow";
+import { HOLLOW_EXTENT, HOLLOW_STOPS, hollowHeight, hollowWalkable, hollowPathDistance } from "../../../packages/shared/hollow";
 import { CanyonWildlife } from "./CanyonWildlife";
 import { CanyonScenery } from "./CanyonScenery";
 import { canyonOf } from "../../../packages/shared/canyon";
@@ -600,10 +600,10 @@ export const INTERACTABLES = [
     p: [n.point[0], 0, n.point[1]],
   })),
 ];
-// Interaction points sit on the terrain (only Havenreach has elevation).
+// Interaction points sit on the terrain (using each region's ground height).
 for (const o of INTERACTABLES) o.p[1] = groundHeight(o.p[0], o.p[2]);
 export const getInteractables = (region: string) =>
-  [...(region === "canyon" ? CANYON_STOPS.map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],canyonHeight(...s.point),s.point[1]]})) : []), ...INTERACTABLES.filter(
+  [...(region === "hollow" ? HOLLOW_STOPS.map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],hollowHeight(...s.point),s.point[1]]})) : []), ...(region === "canyon" ? CANYON_STOPS.map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],canyonHeight(...s.point),s.point[1]]})) : []), ...INTERACTABLES.filter(
     (o) =>
       (region === "haven" ||
         (!o.id.startsWith("exp-") && !o.id.startsWith("trail-") &&
@@ -611,9 +611,9 @@ export const getInteractables = (region: string) =>
           !["fishing", "pierfishing", "riftgate", "smith", "apothecary", "skyferry"].includes(o.id))) &&
       (!o.id.startsWith("resource-") ||
         resourcesForRegion(region).some((n) => n.id === o.id)),
-  ).map(o=>region === "haven" ? o : ({...o,p:[o.p[0],region === "canyon" ? canyonHeight(o.p[0],o.p[2]) : 0,o.p[2]]}))];
+  ).map(o=>region === "haven" ? o : ({...o,p:[o.p[0],region === "canyon" ? canyonHeight(o.p[0],o.p[2]) : region === "hollow" ? hollowHeight(o.p[0],o.p[2]) : 0,o.p[2]]}))];
 const grids = new Map<string, WalkGrid>();
-/** Ground height for a region; only Havenreach has elevation. */
+/** Ground height for a region; including expanded snowy and canyon terrain. */
 const groundFor = (region: string) =>
   region === "haven" ? groundHeight : region === "canyon" ? canyonHeight : region === "hollow" ? hollowHeight : () => 0;
 /** Where a click ray meets the terrain, found by marching then bisecting. */
