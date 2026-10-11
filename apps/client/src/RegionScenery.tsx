@@ -95,53 +95,7 @@ export function RegionScenery({ region }: { region: string }) {
         ))}
       </>
     );
-  if (region === "meadow")
-    return (
-      <>
-        {Array.from(
-          { length: settings.quality === "Low" ? 20 : 48 },
-          (_, i) => (
-            <group
-              key={i}
-              position={[
-                Math.sin(i * 2.4) * (11 + (i % 4)),
-                0.15,
-                Math.cos(i * 2.4) * (11 + (i % 4)),
-              ]}
-            >
-              <mesh>
-                <cylinderGeometry args={[0.025, 0.025, 0.3, 4]} />
-                <meshStandardMaterial color="#5e8261" />
-              </mesh>
-              <mesh position={[0, 0.2, 0]}>
-                <icosahedronGeometry args={[0.17, 0]} />
-                <meshStandardMaterial
-                  color={["#eebaae", "#e6d7a0", "#acb2d8"][i % 3]}
-                />
-              </mesh>
-            </group>
-          ),
-        )}
-        <mesh position={[-9, -1.7, -13]}>
-          <boxGeometry args={[2, 4.5, 0.12]} />
-          <meshStandardMaterial
-            color="#b1e8df"
-            emissive="#92bfbf"
-            emissiveIntensity={0.3}
-            transparent
-            opacity={0.75}
-          />
-        </mesh>
-        <mesh position={[-9, 0.04, -9]} rotation={[-Math.PI / 2, 0, 0]}>
-          <circleGeometry args={[2.3, 32]} />
-          <meshStandardMaterial
-            color="#80b8b4"
-            metalness={0.35}
-            roughness={0.2}
-          />
-        </mesh>
-      </>
-    );
+  if (region === "meadow") return null;
   return (
     <>
       {[-1, 1].map((side) => (

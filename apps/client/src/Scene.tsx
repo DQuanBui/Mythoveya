@@ -1,3 +1,5 @@
+import { MeadowTerrain } from "./MeadowTerrain";
+import { MEADOW_EXTENT, MEADOW_STOPS, meadowHeight, meadowWalkable, meadowPathDistance } from "../../../packages/shared/meadow";
 import { HollowWildlife } from "./HollowWildlife";
 import { HollowScenery } from "./HollowScenery";
 import { hollowOf } from "../../../packages/shared/hollow";
@@ -283,7 +285,8 @@ function Environment({
         : "#9bbeb5";
   const r = REGIONS.find((r) => r.id === region) || REGIONS[0];
   const canyon = region === "canyon",
-    snow = region === "hollow";
+    snow = region === "hollow",
+    meadow = region === "meadow";
   const expanded = region === "haven" && !title;
   const trees = useMemo(
     () =>
@@ -325,13 +328,13 @@ function Environment({
       ) : (
         <>
           <DayNight sky={sky} fog={r.color} haven={region === "haven"} />
-          <SkyLife radius={expanded ? 54 : canyon || snow ? 62 : 26} birds={!expanded} />
+          <SkyLife radius={expanded ? 54 : canyon || snow || meadow ? 62 : 26} birds={!expanded} />
           <WeatherEffects region={region} />
         </>
       )}
       {expanded ? (
         <HavenTerrain />
-      ) : canyon && !title ? (<CanyonTerrain />) : snow && !title ? (<HollowTerrain />) : (
+      ) : canyon && !title ? (<CanyonTerrain />) : snow && !title ? (<HollowTerrain />) : meadow && !title ? (<MeadowTerrain />) : (
         <>
           <mesh receiveShadow position={[0, -0.3, 0]}>
             <cylinderGeometry args={[18, 18.5, 0.6, 64]} />
@@ -366,7 +369,7 @@ function Environment({
         </mesh>
       ))}
       {trees
-        .filter((t) => !expanded && !canyon && !snow && (t.pos[2] < 2 || t.pos[0] < -13))
+        .filter((t) => !expanded && !canyon && !snow && !meadow && (t.pos[2] < 2 || t.pos[0] < -13))
         .map(({ pos, s }, i) =>
           canyon ? (
             <Crystal
@@ -395,8 +398,8 @@ function Environment({
       {PEBBLES.map((p, i) => (
         <group
           key={i}
-          visible={snow ? hollowPathDistance(p.x,p.z)>1.5 : canyon ? canyonPathDistance(p.x,p.z)>1.5 : !expanded || pathDistance(p.x, p.z) > 1.3}
-          position={[p.x, (expanded ? groundHeight(p.x,p.z) : canyon ? canyonHeight(p.x,p.z) : snow ? hollowHeight(p.x,p.z) : 0) + .06, p.z]}
+          visible={meadow ? meadowPathDistance(p.x,p.z)>1.5 : snow ? hollowPathDistance(p.x,p.z)>1.5 : canyon ? canyonPathDistance(p.x,p.z)>1.5 : !expanded || pathDistance(p.x, p.z) > 1.3}
+          position={[p.x, (expanded ? groundHeight(p.x,p.z) : canyon ? canyonHeight(p.x,p.z) : snow ? hollowHeight(p.x,p.z) : meadow ? meadowHeight(p.x,p.z) : 0) + .06, p.z]}
         >
           <mesh rotation={[0, i, 0.2]}>
             <dodecahedronGeometry args={[p.size, 0]} />
@@ -408,7 +411,7 @@ function Environment({
           </mesh>
         </group>
       ))}
-      <group position={expanded || canyon || snow ? [0, -4, -48] : [0, 0, 0]}>
+      <group position={expanded || canyon || snow || meadow ? [0, -4, -48] : [0, 0, 0]}>
         <Island position={[-23, 8, -35]} scale={1.4} />
         <Island position={[24, 6, -30]} scale={0.9} />
         <Island position={[4, 14, -62]} scale={1.8} />
@@ -603,7 +606,7 @@ export const INTERACTABLES = [
 // Interaction points sit on the terrain (using each region's ground height).
 for (const o of INTERACTABLES) o.p[1] = groundHeight(o.p[0], o.p[2]);
 export const getInteractables = (region: string) =>
-  [...(region === "hollow" ? HOLLOW_STOPS.map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],hollowHeight(...s.point),s.point[1]]})) : []), ...(region === "canyon" ? CANYON_STOPS.map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],canyonHeight(...s.point),s.point[1]]})) : []), ...INTERACTABLES.filter(
+  [...(region === "meadow" ? MEADOW_STOPS.map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],meadowHeight(...s.point),s.point[1]]})) : []), ...(region === "hollow" ? HOLLOW_STOPS.map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],hollowHeight(...s.point),s.point[1]]})) : []), ...(region === "canyon" ? CANYON_STOPS.map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],canyonHeight(...s.point),s.point[1]]})) : []), ...INTERACTABLES.filter(
     (o) =>
       (region === "haven" ||
         (!o.id.startsWith("exp-") && !o.id.startsWith("trail-") &&
@@ -611,11 +614,11 @@ export const getInteractables = (region: string) =>
           !["fishing", "pierfishing", "riftgate", "smith", "apothecary", "skyferry"].includes(o.id))) &&
       (!o.id.startsWith("resource-") ||
         resourcesForRegion(region).some((n) => n.id === o.id)),
-  ).map(o=>region === "haven" ? o : ({...o,p:[o.p[0],region === "canyon" ? canyonHeight(o.p[0],o.p[2]) : region === "hollow" ? hollowHeight(o.p[0],o.p[2]) : 0,o.p[2]]}))];
+  ).map(o=>region === "haven" ? o : ({...o,p:[o.p[0],region === "canyon" ? canyonHeight(o.p[0],o.p[2]) : region === "hollow" ? hollowHeight(o.p[0],o.p[2]) : region === "meadow" ? meadowHeight(o.p[0],o.p[2]) : 0,o.p[2]]}))];
 const grids = new Map<string, WalkGrid>();
 /** Ground height for a region; including expanded snowy and canyon terrain. */
 const groundFor = (region: string) =>
-  region === "haven" ? groundHeight : region === "canyon" ? canyonHeight : region === "hollow" ? hollowHeight : () => 0;
+  region === "haven" ? groundHeight : region === "canyon" ? canyonHeight : region === "hollow" ? hollowHeight : region === "meadow" ? meadowHeight : () => 0;
 /** Where a click ray meets the terrain, found by marching then bisecting. */
 function terrainHit(ray: T.Ray, ground: (x: number, z: number) => number) {
   const p = new T.Vector3();
@@ -733,12 +736,12 @@ export function Explorer({
     [profile.region, !!area],
   );
   const zone = area?.key ?? profile.region,
-    extent = area?.extent ?? (profile.region === "haven" ? 78 : profile.region === "canyon" ? CANYON_EXTENT : profile.region === "hollow" ? HOLLOW_EXTENT : 18);
+    extent = area?.extent ?? (profile.region === "haven" ? 78 : profile.region === "canyon" ? CANYON_EXTENT : profile.region === "hollow" ? HOLLOW_EXTENT : profile.region === "meadow" ? MEADOW_EXTENT : 18);
   const regionAllowed = useCallback(
     (x: number, z: number) =>
       (profile.region === "haven"
         ? havenWalkable(x, z)
-        : profile.region === "canyon" ? canyonWalkable(x,z) : profile.region === "hollow" ? hollowWalkable(x,z) : Math.hypot(x, z) < 16.5 &&
+        : profile.region === "canyon" ? canyonWalkable(x,z) : profile.region === "hollow" ? hollowWalkable(x,z) : profile.region === "meadow" ? meadowWalkable(x,z) : Math.hypot(x, z) < 16.5 &&
           // Smaller regions share the village stations and pebbles.
           !((x - 11) ** 2 + (z - 4.4) ** 2 < 1.4) &&
           !((x - 7) ** 2 + (z + 3) ** 2 < 3.2) &&
