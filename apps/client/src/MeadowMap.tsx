@@ -2,6 +2,8 @@ import { useState } from "react";
 import type { Profile } from "../../../packages/shared/types";
 import {
   MEADOW_BUILDINGS,
+  MEADOW_TREES,
+  MEADOW_HEART,
   MEADOW_POND,
   MEADOW_PATHS,
   MEADOW_STOPS,
@@ -52,7 +54,40 @@ export function MeadowMap({
             role="group"
             aria-label="Whisperleaf trail map"
           >
-            <polygon points={coast} fill="#9fbbca" stroke="#e8eeee" />
+            <polygon points={coast} fill="#8fa879" stroke="#d4dcb6" />
+            <path
+              d="M-24 -24 Q0 -37 25 -24 M-20 -20 Q0 -31 21 -20"
+              fill="none"
+              stroke="#cad0a1"
+              strokeWidth=".65"
+            />
+            {MEADOW_TREES.map((t, i) => (
+              <circle
+                key={i}
+                cx={t.x}
+                cy={t.z}
+                r={t.scale * 1.4}
+                fill={i % 2 ? "#567c61" : "#65886a"}
+                opacity=".75"
+              />
+            ))}
+            <circle
+              cx={MEADOW_HEART[0]}
+              cy={MEADOW_HEART[1]}
+              r="3"
+              fill={h.finished ? "#dfb8cb" : "#55775e"}
+              stroke="#d4dcb6"
+              strokeWidth=".4"
+            />
+            <text
+              x={MEADOW_HEART[0]}
+              y={MEADOW_HEART[1] - 4.3}
+              textAnchor="middle"
+              fontSize="2.3"
+              fill="#304c3d"
+            >
+              Heartroot
+            </text>
             <ellipse
               cx={lake.x}
               cy={lake.z}

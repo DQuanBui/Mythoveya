@@ -27,7 +27,7 @@ export const MEADOW_PATHS: Point[][] = [
 ];
 export const MEADOW_BUILDINGS = [
   { x: 19, z: 18, width: 4.6, depth: 4, roof: "#6e9275" },
-  { x: 28, z: -27, width: 3.6, depth: 3, roof: "#b59879" },
+  { x: 20, z: -29, width: 3.6, depth: 3, roof: "#b59879" },
 ];
 export const MEADOW_SHRINES = [
   {
@@ -180,9 +180,9 @@ export const MEADOW_WILDLIFE: {
 ];
 
 export const MEADOW_TONES = [
-  { id: 0, name: "Root", symbol: "?", color: "#87b87b", hz: 261.63 },
-  { id: 1, name: "Rain", symbol: "?", color: "#83bdcf", hz: 329.63 },
-  { id: 2, name: "Wing", symbol: "?", color: "#d6acdc", hz: 392 },
+  { id: 0, name: "Root", symbol: "◆", color: "#87b87b", hz: 261.63 },
+  { id: 1, name: "Rain", symbol: "●", color: "#83bdcf", hz: 329.63 },
+  { id: 2, name: "Wing", symbol: "▲", color: "#d6acdc", hz: 392 },
 ] as const;
 export const MEADOW_VERSES: Record<string, { clue: string; answer: number[] }> =
   {

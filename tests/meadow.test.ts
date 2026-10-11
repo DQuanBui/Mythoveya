@@ -8,6 +8,7 @@ import {
   MEADOW_BUILDINGS,
   meadowWalkable,
   meadowHeight,
+  meadowEdge,
 } from "../packages/shared/meadow";
 import { buildGrid, findPath, lineClear } from "../packages/shared/pathfind";
 it("connects every Whisperleaf stop around the lake and mountain obstacles", () => {
@@ -33,6 +34,11 @@ it("places wildlife on open ground and levels each building foundation", () => {
     for (const dx of [-b.width / 2, b.width / 2])
       for (const dz of [-b.depth / 2, b.depth / 2]) {
         expect(meadowHeight(b.x + dx, b.z + dz)).toBe(meadowHeight(b.x, b.z));
+        const x = b.x + dx + Math.sign(dx) * 0.3,
+          z = b.z + dz + Math.sign(dz) * 0.3;
+        expect(Math.hypot(x, z), "Building roof must stay inland").toBeLessThan(
+          meadowEdge(Math.atan2(z, x)) - 0.2,
+        );
       }
 });
 it("keeps signed trails clear and slopes gentle, while blocking the lake", () => {

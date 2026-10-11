@@ -79,9 +79,9 @@ export function MeadowPanel({
           <article aria-label="mea-lodge">
             <h3>Rowan's woodland lodge</h3>
             <p>
-              ?The forest speaks in Root, Rain and Wing. Read each verse in
+              The forest speaks in Root, Rain and Wing. Read each verse in
               order, then play its words on the chimes. A wrong answer costs
-              nothing.?
+              nothing.
             </p>
             {!m.started ? (
               <button
@@ -155,7 +155,7 @@ export function MeadowPanel({
                     aria-label={`${s.name} answer`}
                   >
                     {answer.length
-                      ? answer.map((n) => MEADOW_TONES[n].name).join(" ? ")
+                      ? answer.map((n) => MEADOW_TONES[n].name).join(" → ")
                       : "No chimes selected"}{" "}
                     ({answer.length}/{verse.answer.length})
                   </p>
@@ -193,7 +193,7 @@ export function MeadowPanel({
                     <p>
                       {verse.answer
                         .map((n) => MEADOW_TONES[n].name)
-                        .join(" ? ")}
+                        .join(" → ")}
                     </p>
                   </details>
                   {!m.started ? (
