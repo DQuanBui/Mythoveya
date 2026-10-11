@@ -78,15 +78,6 @@ export function RegionScenery({ region }: { region: string }) {
   if (region === "hollow")
     return (
       <>
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[5, 0.045, 10]}>
-          <circleGeometry args={[3.5, 48]} />
-          <meshPhysicalMaterial
-            color="#9ccbd5"
-            metalness={0.5}
-            roughness={0.1}
-            clearcoat={1}
-          />
-        </mesh>
         {Array.from({ length: 9 }, (_, i) => (
           <mesh
             key={i}
@@ -102,16 +93,6 @@ export function RegionScenery({ region }: { region: string }) {
             />
           </mesh>
         ))}
-        <mesh position={[0, 7, -13]} rotation={[0, 0, -0.12]}>
-          <planeGeometry args={[19, 2.3]} />
-          <meshBasicMaterial
-            color="#9ce2d0"
-            transparent
-            opacity={0.16}
-            side={T.DoubleSide}
-            depthWrite={false}
-          />
-        </mesh>
       </>
     );
   if (region === "meadow")
