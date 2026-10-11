@@ -1,3 +1,5 @@
+import { MeadowMap } from "./MeadowMap";
+import { MEADOW_STOPS } from "../../../packages/shared/meadow";
 import { HollowPanel } from "./HollowPanel";
 import { HollowMap } from "./HollowMap";
 import { HOLLOW_STOPS } from "../../../packages/shared/hollow";
@@ -386,7 +388,7 @@ export default function App() {
   const destination =
     profile?.region === "haven"
       ? MAP_DESTINATIONS.find((p) => p.id === trail)
-      : profile?.region === "canyon" ? CANYON_STOPS.find(p=>p.id===trail) : profile?.region === "hollow" ? HOLLOW_STOPS.find(p=>p.id===trail) : undefined;
+      : profile?.region === "canyon" ? CANYON_STOPS.find(p=>p.id===trail) : profile?.region === "hollow" ? HOLLOW_STOPS.find(p=>p.id===trail) : profile?.region === "meadow" ? MEADOW_STOPS.find(p=>p.id===trail) : undefined;
   const objective = profile
     ? {
         ...currentObjective(profile),
@@ -395,7 +397,7 @@ export default function App() {
               title: destination.name,
               text: destination.description,
               target:
-                trail?.startsWith("hol-") || trail?.startsWith("can-") || trail?.startsWith("exp-") || trail?.startsWith("porch-") || trail === "smith" || trail === "apothecary"
+                trail?.startsWith("mea-") || trail?.startsWith("hol-") || trail?.startsWith("can-") || trail?.startsWith("exp-") || trail?.startsWith("porch-") || trail === "smith" || trail === "apothecary"
                   ? trail
                   : `trail-${destination.id}`,
               waypoint: true,
@@ -815,6 +817,7 @@ export default function App() {
               <Recruitment profile={profile} run={run} />
             )}{" "}
             {panel === "leaderboard" && <Leaderboard />}
+            {panel === "map" && profile?.region === "meadow" && <MeadowMap profile={profile} position={position} trail={trail} choose={id=>{setTrail(id);setPanel("");}} regions={()=>setPanel("regions")} journal={()=>setPanel("mea-journal")} />}
             {panel === "map" && profile?.region === "hollow" && <HollowMap profile={profile} position={position} trail={trail} choose={id=>{setTrail(id);setPanel("");}} regions={()=>setPanel("regions")} journal={()=>setPanel("hol-journal")} />}
             {panel === "map" && profile?.region === "canyon" && <CanyonMap profile={profile} position={position} trail={trail} choose={id=>{setTrail(id);setPanel("");}} regions={()=>setPanel("regions")} journal={()=>setPanel("can-journal")} />}
             {panel === "map" && profile?.region === "haven" && (
@@ -830,7 +833,7 @@ export default function App() {
               />
             )}
             {(panel === "regions" ||
-              (panel === "map" && profile?.region !== "haven" && profile?.region !== "canyon" && profile?.region !== "hollow")) &&
+              (panel === "map" && profile?.region !== "haven" && profile?.region !== "canyon" && profile?.region !== "hollow" && profile?.region !== "meadow")) &&
               profile && (
                 <MapPanel
                   profile={profile}
@@ -953,7 +956,7 @@ export default function App() {
                     >
                       Sail back to Havenreach
                     </button>
-                  ) : (profile?.region === "haven" || profile?.region === "canyon" || profile?.region === "hollow") && (
+                  ) : (profile?.region === "haven" || profile?.region === "canyon" || profile?.region === "hollow" || profile?.region === "meadow") && (
                     <button
                       onClick={() => {
                         input.current.returnHome =
@@ -962,7 +965,7 @@ export default function App() {
                         setPanel("");
                       }}
                     >
-                      {profile?.region === "hollow" ? "Return to Moonfrost trailhead" : profile?.region === "canyon" ? "Return to canyon trailhead" : "Return to Havenreach village"}
+                      {profile?.region === "meadow" ? "Return to Whisperleaf trailhead" : profile?.region === "hollow" ? "Return to Moonfrost trailhead" : profile?.region === "canyon" ? "Return to canyon trailhead" : "Return to Havenreach village"}
                     </button>
                   )}
                   {import.meta.env.DEV && (
