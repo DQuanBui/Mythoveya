@@ -1,7 +1,16 @@
 import { useMemo } from "react";
 import * as T from "three";
 import type { Point } from "../../../packages/shared/haven";
-type TerrainSpec = { name: string; paths: Point[][]; edge: (a:number)=>number; height:(x:number,z:number)=>number; low:string; high:string; side:string; trail:string };
+type TerrainSpec = {
+  name: string;
+  paths: Point[][];
+  edge: (a: number) => number;
+  height: (x: number, z: number) => number;
+  low: string;
+  high: string;
+  side: string;
+  trail: string;
+};
 
 function terrain(spec: TerrainSpec) {
   const pos: number[] = [],
@@ -83,10 +92,13 @@ function trails(spec: TerrainSpec) {
 }
 // Module caches are shared across region visits; no per-frame allocations.
 const cache = new WeakMap<TerrainSpec, [T.BufferGeometry, T.BufferGeometry]>();
-export function RaisedTerrain({spec}:{spec:TerrainSpec}) {
-  const [g,p] = useMemo(() => {
+export function RaisedTerrain({ spec }: { spec: TerrainSpec }) {
+  const [g, p] = useMemo(() => {
     let pair = cache.get(spec);
-    if(!pair){pair=[terrain(spec),trails(spec)];cache.set(spec,pair);}
+    if (!pair) {
+      pair = [terrain(spec), trails(spec)];
+      cache.set(spec, pair);
+    }
     return pair;
   }, [spec]);
   return (
