@@ -1,3 +1,4 @@
+import { playMeadowMelody } from "./meadow-music";
 import { useState } from "react";
 import type { Profile } from "../../../packages/shared/types";
 import {
@@ -136,9 +137,10 @@ export function MeadowPanel({
                         key={t.id}
                         aria-label={`Play ${t.name}`}
                         disabled={answer.length >= verse.answer.length}
-                        onClick={() =>
-                          setAnswers({ ...answers, [s.id]: [...answer, t.id] })
-                        }
+                        onClick={() => {
+                          void playMeadowMelody([t.id]);
+                          setAnswers({ ...answers, [s.id]: [...answer, t.id] });
+                        }}
                       >
                         <span style={{ color: t.color }} aria-hidden="true">
                           {t.symbol}
@@ -157,6 +159,12 @@ export function MeadowPanel({
                       : "No chimes selected"}{" "}
                     ({answer.length}/{verse.answer.length})
                   </p>
+                  <button
+                    disabled={!active || !answer.length}
+                    onClick={() => void playMeadowMelody(answer)}
+                  >
+                    Replay selected melody
+                  </button>
                   <button
                     disabled={!active || !answer.length}
                     onClick={() =>
