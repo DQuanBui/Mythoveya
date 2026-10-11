@@ -99,8 +99,8 @@ function ribbon(i: number) {
     idx: number[] = [];
   for (let j = 0; j <= 48; j++) {
     const x = -21 + j * 0.85,
-      z = -35 + Math.sin(j * 0.17 + i) * 1.3 - i * 1.8,
-      y = 15 + Math.sin(j * 0.12 + i) * 1.5;
+      z = -52 + Math.sin(j * 0.17 + i) * 1.3 - i * 1.8,
+      y = 11.5 + Math.sin(j * 0.12 + i) * 0.8;
     pos.push(x, y, z, x, y + 1.2 + Math.sin(j * 0.2) * 0.4, z);
     if (j < 48) {
       const a = j * 2;
