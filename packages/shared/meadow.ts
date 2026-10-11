@@ -1,3 +1,4 @@
+import type { Profile } from "./types";
 import { PEBBLES, type Point } from "./haven";
 
 export const MEADOW_EXTENT = 46;
@@ -177,3 +178,45 @@ export const MEADOW_WILDLIFE: {
   { species: "fernibble", point: [21, 11], radius: 0.5 },
   { species: "sylvarion", point: [-5, -27], radius: 0.5 },
 ];
+
+export const MEADOW_TONES = [
+  { id: 0, name: "Root", symbol: "?", color: "#87b87b", hz: 261.63 },
+  { id: 1, name: "Rain", symbol: "?", color: "#83bdcf", hz: 329.63 },
+  { id: 2, name: "Wing", symbol: "?", color: "#d6acdc", hz: 392 },
+] as const;
+export const MEADOW_VERSES: Record<string, { clue: string; answer: number[] }> =
+  {
+    brook: {
+      clue: "Rain wakes the Root; the Wing carries its song.",
+      answer: [1, 0, 2],
+    },
+    canopy: {
+      clue: "Wing meets Wing; Rain returns to Root.",
+      answer: [2, 2, 1, 0],
+    },
+    root: {
+      clue: "Root drinks Rain; Wing returns to Root.",
+      answer: [0, 1, 2, 0],
+    },
+  };
+export type MeadowJourney = {
+  started: boolean;
+  choirs: string[];
+  notes: string[];
+  finished: boolean;
+};
+export const emptyMeadow = (): MeadowJourney => ({
+  started: false,
+  choirs: [],
+  notes: [],
+  finished: false,
+});
+export const meadowOf = (p: Profile) => p.meadow || emptyMeadow();
+export function meadowObjective(p: Profile) {
+  const m = meadowOf(p);
+  if (!m.started || m.finished) return MEADOW_STOPS[0];
+  const s = MEADOW_SHRINES.find((s) => !m.choirs.includes(s.id));
+  return s
+    ? MEADOW_STOPS.find((n) => n.id === `mea-${s.id}`)!
+    : MEADOW_STOPS[0];
+}
