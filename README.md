@@ -10,6 +10,8 @@ Mythoveya is a locally playable, browser-based 3D creature-collection RPG. Its w
 
 ## The game
 
+- **The Lantern Road:** explore Moonfrost's snowy lake, fir forests, mountain observatory and shelters. Gather with companions, craft three trail lanterns, restore the migration road and earn Rimeowl plus the Lantern Keeper badge. [Read the Moonfrost guide](docs/MOONFROST.md).
+
 - **Signals in the Stone:** explore Emberglass's basalt terraces, hot springs and ranger camp; solve three companion-powered beacon inscriptions, calm the Glass Sentinel, earn Thermala and collect a Canyon Naturalist badge. [Read the canyon guide](docs/CANYON.md).
 - **The Silent Windmill:** explore the western lake and hillside cottages, use Flame, Tide and Grove companions in the field, calm a guardian with alternating defenses, and restore the village windmill. Earn Galehart, discover rain tracks and starlight, and keep every reward in your saved journey.
 - **80 Wildbound, plus 16 evolved forms:** eleven species each in E/D/C, twelve in B, eighteen in A and seventeen in S, eight elements, twelve body families, 240 actions and 80 passives. Every species builds its own look from its description: palette, ears, tail, markings and anatomy such as manes, trunks, sails, owl faces and nine fanned tails.
@@ -91,7 +93,7 @@ Open **http://127.0.0.1:2567/** for the compiled build. This command serves the 
 
 Training costs 50 gold and stores creature XP even when the account-level cap prevents an immediate level. Three species shards purchase a 2% stat upgrade, up to five upgrades. Tactical Arena ignores these shard bonuses. Stars mark favorites; companions cannot be sold or deleted.
 
-Win more encounters to open the canyon and hollow. Each region guardian has an enhanced roster model; first-time guardian victories grant a configured A-tier companion. Boss variants are not extra collectible species.
+Win two encounters to open Emberglass Canyon and five to open Moonfrost Hollow. Both expanded regions have their own trail maps and saved journeys. Each region guardian has an enhanced roster model; first-time guardian victories grant a configured A-tier companion. Boss variants are not extra collectible species.
 
 ## Controls and comfort
 
@@ -216,4 +218,4 @@ In `npm run dev`, press **Esc → Asset gallery** to inspect species, keeper mod
 
 Add or balance creatures in `packages/shared/roster.json` and `content.ts`; avatars and regions also live in `content.ts`. Economy curves and pity rules live in `economy.ts`. Server reward and quest configuration lives in `apps/server/game.ts`. Keep species IDs stable to preserve existing collections.
 
-Next development priorities are individual creature-art refinement, richer layouts for the other regions, chapter cutscenes and dialogue, deeper balance playtesting with manual play, and a dedicated listening pass on the synthesized score. Longer-term ideas include evolution, sanctuaries, cooperative guardians, and more chapters.
+Next development priorities are a distinct Whisperleaf journey, reusable regional materials and crafting, walkable house interiors, individual creature-art refinement, deeper manual balance playtesting, and a listening pass on the synthesized score. Longer-term work includes accounts, shared exploration, cooperative guardians, and a branching campaign.

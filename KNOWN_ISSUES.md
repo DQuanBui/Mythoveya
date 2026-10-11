@@ -3,7 +3,7 @@
 ## Presentation
 
 - The 80 recruitable species and 16 evolved forms have distinct procedural recipes and complete gameplay mappings, but some anatomical details are stylized approximations. They are not individually sculpted, production-finished character assets. Further silhouette and material work would improve resemblance to every authored description.
-- Havenreach now reaches a beach and a climbable mountain range with real ground height. Western Havenreach adds Reedwater Lake, a hillside lookout and two field cottages. Havenreach and Emberglass Canyon have elevation. Emberglass now includes basalt terraces, hot springs, a camp and a complete beacon journey. Whisperleaf and Moonfrost still have compact layouts and shared service stations.
+- Havenreach now reaches a beach and a climbable mountain range with real ground height. Western Havenreach adds Reedwater Lake, a hillside lookout and two field cottages. Havenreach, Emberglass Canyon and Moonfrost Hollow have elevation. Emberglass includes basalt terraces, hot springs, a camp and a beacon journey. Moonfrost includes a lake, fir forests, an observatory, shelters and a lantern-crafting journey. Whisperleaf retains a compact layout. Regional central service stations are still shared.
 - The six visitor-book houses have clickable porch visits and durable rewards. The twelve village cottages and well are decorative. Two western field houses offer saved stories, and the windmill now has a restoration quest and persistent moving sails. Walkable interiors and house ownership are not implemented. Islanders follow simple day/night routines, and their greetings do not affect progress.
 - Click-to-walk plans routes on a half-metre grid over the same collision rules as keyboard movement. Very narrow gaps can still make the keeper stop early; the walk then interacts if the target is within easy reach, or simply ends.
 - Story chapters are fought with the existing battle system and roster; there are no chapter cutscenes or new creature models for bosses. Stage difficulty was calibrated with simulated auto-battles of the starter team, not with human playtesting. Chapter and dungeon battles do not offer wild bond attempts.
@@ -24,6 +24,8 @@
 - Island scenes reuse the Havenreach weather, and only Havenreach has wild encounters, regions and villagers. The islands are optional side content.
 
 ## Systems and scope
+
+- The Moonfrost journey has one finite material set and one lantern recipe. Materials are reserved for its three trail lights, with no daily respawn, market sales or general-purpose crafting inventory. Gathering, ingredient spending, installation and rewards are validated and saved on the server; physical proximity is checked by the client. Its three buildings are exterior landmarks. The journey uses existing species and adds no battle mode.
 
 - The canyon journey validates beacon inscriptions, companion ownership, quest order and one-time rewards on the server. Three survey notes add a saved badge. Its three-phase sentinel is an introductory encounter with fixed difficulty; wider balance testing remains future work. Canyon interactions, like the existing windmill, use client-side proximity checks.
 - The windmill quest validates progress, companion ownership/elements, discovery time windows and one-time rewards on the server. Like existing caches and lanterns, physical proximity is enforced by the client; there is no authoritative shared-world movement server yet. House stories and weather discoveries are short authored interactions, not branching quests.
