@@ -537,3 +537,14 @@ button.world-label:hover {
 .hollow-journal select { width: 100%; margin: .4rem 0 .8rem; }
 .hollow-journal article button { margin: .25rem .3rem .25rem 0; }
 .lantern-badge { display: block; color: #f3d699; font-size: .62rem; letter-spacing: .14em; }
+
+/* Woodland melodies are playable with text alone and no time pressure. */
+.meadow-journal blockquote { margin: 12px 0; border-left: 3px solid #c8d699; padding: 12px; color: #f6eccb; background: #324b43; }
+.meadow-chimes { display: flex; flex-wrap: wrap; gap: 8px; border: 1px solid #789986; border-radius: 10px; padding: 12px; margin: 12px 0; }
+.meadow-chimes button { min-height: 44px; flex: 1; }
+.meadow-chimes span { display: block; font-size: 24px; }
+.meadow-answer { padding: 10px; background: #18363a; border-radius: 8px; overflow-wrap: anywhere; }
+.meadow-journal article > button { margin: 5px 5px 5px 0; }
+.meadow-journal details { margin-top: 16px; }
+.meadow-journal summary { cursor: pointer; }
+.meadow-map svg g[role=button]:focus-visible circle { stroke: #fff; stroke-width: 1; }

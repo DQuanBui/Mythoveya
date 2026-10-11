@@ -1,3 +1,4 @@
+import { MeadowPanel } from "./MeadowPanel";
 import { MeadowMap } from "./MeadowMap";
 import { MEADOW_STOPS } from "../../../packages/shared/meadow";
 import { HollowPanel } from "./HollowPanel";
@@ -194,7 +195,7 @@ export default function App() {
       audio.cue("confirm");
       if (kind === "resource") notify("Gathered +1 Sunseed · +25 Gold");
       if (
-        (kind.startsWith("hol-") || kind.startsWith("can-") || kind.startsWith("exp-") || kind.startsWith("town-") || kind.startsWith("home-") || kind.startsWith("island-")) &&
+        (kind.startsWith("mea-") || kind.startsWith("hol-") || kind.startsWith("can-") || kind.startsWith("exp-") || kind.startsWith("town-") || kind.startsWith("home-") || kind.startsWith("island-")) &&
         result.value?.message &&
         kind !== "town-talk" &&
         kind !== "town-fish"
@@ -693,7 +694,7 @@ export default function App() {
         <div className="modal-backdrop">
           <section
             key={panel}
-            className={`panel modal ${["collection", "formation", "gallery", "town", "map", "adventure", "training", "events", "smith", "apothecary", "home", "skyferry", "festival"].includes(panel) || panel.startsWith("hol-") || panel.startsWith("can-") || panel.startsWith("exp-") || panel.startsWith("npc-") ? "wide" : ""}`}
+            className={`panel modal ${["collection", "formation", "gallery", "town", "map", "adventure", "training", "events", "smith", "apothecary", "home", "skyferry", "festival"].includes(panel) || panel.startsWith("mea-") || panel.startsWith("hol-") || panel.startsWith("can-") || panel.startsWith("exp-") || panel.startsWith("npc-") ? "wide" : ""}`}
             aria-label={panel}
           >
             <button
@@ -706,6 +707,7 @@ export default function App() {
             >
               ×
             </button>
+            {panel.startsWith("mea-") && profile && <MeadowPanel profile={profile} position={position} focus={panel.slice(4)} busy={busy} run={run} track={id=>{setTrail(id);setPanel("");}} travel={()=>setPanel("regions")} />}
             {panel.startsWith("hol-") && profile && <HollowPanel profile={profile} position={position} focus={panel.slice(4)} busy={busy} run={run} track={id=>{setTrail(id);setPanel("");}} travel={()=>setPanel("regions")} />}
             {panel.startsWith("can-") && profile && <CanyonPanel profile={profile} position={position} focus={panel.slice(4)} busy={busy} run={run} track={id=>{setTrail(id);setPanel("");}} begin={()=>startBattle(false,false,{canyon:true})} travel={()=>setPanel("regions")} />}
             {panel.startsWith("exp-") && profile && <ExpeditionPanel profile={profile} position={position} focus={panel.slice(4)} busy={busy} run={run} track={(id) => { setTrail(id); setPanel(""); }} begin={() => startBattle(false, false, { expedition: true })} />}
@@ -737,7 +739,7 @@ export default function App() {
               <SkyferryPanel profile={profile} run={run} />
             )}
             {panel === "adventure" && profile && (
-              <><button className="expedition-entry" onClick={()=>setPanel("hol-journal")}>The Lantern Road / Explore Moonfrost Hollow</button><button className="expedition-entry" onClick={()=>setPanel("can-journal")}>Signals in the Stone / Explore Emberglass Canyon</button><button className="expedition-entry" onClick={() => setPanel("exp-journal")}>The Silent Windmill · Explore western Havenreach</button><AdventurePanel
+              <><button className="expedition-entry" onClick={()=>setPanel("mea-journal")}>The Forest Choir / Explore Whisperleaf Meadow</button><button className="expedition-entry" onClick={()=>setPanel("hol-journal")}>The Lantern Road / Explore Moonfrost Hollow</button><button className="expedition-entry" onClick={()=>setPanel("can-journal")}>Signals in the Stone / Explore Emberglass Canyon</button><button className="expedition-entry" onClick={() => setPanel("exp-journal")}>The Silent Windmill · Explore western Havenreach</button><AdventurePanel
                 profile={profile}
                 run={run}
                 begin={(m) => startBattle(false, false, m)}
@@ -926,6 +928,7 @@ export default function App() {
                 <h2>Your story is safe.</h2>
                 <p>Progress is saved on the local server after each action.</p>
                 <div className="pause-buttons">
+                  <button onClick={() => setPanel("mea-journal")}>The Forest Choir journal</button>
                   <button onClick={() => setPanel("hol-journal")}>The Lantern Road journal</button>
                   <button onClick={() => setPanel("can-journal")}>Signals in the Stone journal</button>
                   <button onClick={() => setPanel("exp-journal")}>The Silent Windmill journal</button>
