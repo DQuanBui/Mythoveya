@@ -1,3 +1,4 @@
+import { MeadowWildlife } from "./MeadowWildlife";
 import { MeadowScenery } from "./MeadowScenery";
 import { meadowOf } from "../../../packages/shared/meadow";
 import { MeadowTerrain } from "./MeadowTerrain";
@@ -1180,7 +1181,7 @@ export function WorldScene({
       <WalkContext.Provider value={walker}>
       <ModelLighting intensity={0.35} />
       <Environment region={profile.region} expedition={expeditionOf(profile)} />
-      {profile.region === "meadow" && <MeadowScenery journey={meadowOf(profile)} onInteract={onInteract} disabled={blocked} />}
+      {profile.region === "meadow" && <><MeadowScenery journey={meadowOf(profile)} onInteract={onInteract} disabled={blocked} /><MeadowWildlife onInteract={onInteract} disabled={blocked}/></>}
       {profile.region === "hollow" && <><HollowScenery journey={hollowOf(profile)} onInteract={onInteract} disabled={blocked} /><HollowWildlife onInteract={onInteract} disabled={blocked}/></>}
       {profile.region === "canyon" && <><CanyonScenery beacons={canyonOf(profile).beacons} restored={canyonOf(profile).restored} onInteract={onInteract} disabled={blocked} /><CanyonWildlife onInteract={onInteract} disabled={blocked}/></>}
       {profile.region === "haven" && (
