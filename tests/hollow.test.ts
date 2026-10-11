@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { HOLLOW_EXTENT, HOLLOW_STOPS, HOLLOW_PATHS, HOLLOW_LAKE, hollowWalkable, hollowHeight } from "../packages/shared/hollow";
+import { HOLLOW_EXTENT, HOLLOW_STOPS, HOLLOW_PATHS, HOLLOW_LAKE, HOLLOW_WILDLIFE, HOLLOW_BUILDINGS, hollowWalkable, hollowHeight } from "../packages/shared/hollow";
 import { buildGrid, findPath, lineClear } from "../packages/shared/pathfind";
 it("connects every Moonfrost stop around the lake and mountain obstacles",()=>{
  const grid=buildGrid(hollowWalkable,HOLLOW_EXTENT);
@@ -10,6 +10,12 @@ it("connects every Moonfrost stop around the lake and mountain obstacles",()=>{
   let prev:[number,number]=[0,5];
   for(const p of path!){expect(lineClear(prev,p,hollowWalkable),s.name).toBe(true);prev=p;}
   expect(Math.hypot(prev[0]-s.point[0],prev[1]-s.point[1])).toBeLessThan(1);
+ }
+});
+it("places wildlife on open ground and levels each building foundation",()=>{
+ for(const s of HOLLOW_WILDLIFE)expect(hollowWalkable(...s.point),s.species).toBe(true);
+ for(const b of HOLLOW_BUILDINGS)for(const dx of [-b.width/2,b.width/2])for(const dz of [-b.depth/2,b.depth/2]){
+  expect(hollowHeight(b.x+dx,b.z+dz)).toBe(hollowHeight(b.x,b.z));
  }
 });
 it("keeps signed trails clear and slopes gentle, while blocking the lake",()=>{

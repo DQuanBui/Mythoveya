@@ -96,3 +96,13 @@ export function hollowObjective(p: Profile) {
  const n=HOLLOW_GATHER.find(n=>!h.gathered.includes(n.id));
  return n ? HOLLOW_STOPS.find(s=>s.id===`hol-${n.id}`)! : HOLLOW_STOPS[0];
 }
+export const HOLLOW_WILDLIFE: {species:string;point:Point;radius:number}[] = [
+ {species:"snowmew",point:[-32,19],radius:.6},
+ {species:"snowmew",point:[-26,23],radius:.5},
+ {species:"frostwhisk",point:[24,-16],radius:.7},
+ {species:"rimeowl",point:[-12,-24],radius:.6},
+ {species:"auroroc",point:[6,-29],radius:.6},
+ {species:"glimlet",point:[22,10],radius:.6},
+ {species:"shadecko",point:[29,19],radius:.6},
+ {species:"rimeowl",point:[-33,5],radius:.6},
+];
