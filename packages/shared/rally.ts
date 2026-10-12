@@ -128,3 +128,19 @@ export function rallyOf(p: Profile, now = Date.now()): RallyState {
   };
 }
 export const SIGNAL_NAMES = ["Sun", "Leaf", "Star"];
+
+export const rallyProp = (h: RallyHost): [number, number] => [
+  h.point[0] + 3,
+  h.point[1] - 3,
+];
+export function rallyBlocked(region: string, x: number, z: number) {
+  const h = rallyHost(region);
+  if (!h) return false;
+  const [a, b] = rallyProp(h);
+  return (
+    (Math.abs(x - a) < 1.2 && Math.abs(z - b) < 0.6) ||
+    [-1.6, 1.6].some((dx) =>
+      [-1, 1].some((dz) => Math.hypot(x - a - dx, z - b - dz) < 0.18),
+    )
+  );
+}

@@ -1,5 +1,11 @@
 import { expect, it } from "vitest";
-import { RALLY_HOSTS, rallyActivity, rallyOf } from "../packages/shared/rally";
+import {
+  RALLY_HOSTS,
+  rallyActivity,
+  rallyOf,
+  rallyBlocked,
+  rallyProp,
+} from "../packages/shared/rally";
 import { havenWalkable, groundHeight } from "../packages/shared/haven";
 import { meadowWalkable, meadowHeight } from "../packages/shared/meadow";
 import { canyonWalkable, canyonHeight } from "../packages/shared/canyon";
@@ -14,7 +20,14 @@ it("keeps all four rally approaches reachable and prop sites on level open groun
     [hollowWalkable, hollowHeight, 52],
   ] as const;
   RALLY_HOSTS.forEach((h, i) => {
-    const [walk, ground, extent] = rules[i];
+    const [baseWalk, ground, extent] = rules[i];
+    const walk = (x: number, z: number) =>
+      baseWalk(x, z) && !rallyBlocked(h.region, x, z);
+    const [px, pz] = rallyProp(h);
+    expect(baseWalk(px, pz), h.region + " camp footprint").toBe(true);
+    expect(walk(h.point[0], h.point[1] + 2), h.region + " wildlife").toBe(
+      true,
+    );
     expect(walk(...h.point), h.region).toBe(true);
     expect(
       findPath(buildGrid(walk, extent), [0, 5], h.point, walk),
