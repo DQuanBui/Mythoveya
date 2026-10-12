@@ -123,6 +123,7 @@ export function WorldHUD({
           <img src="/emblem.svg" alt="" />
           <div>
             <strong>{profile.name}</strong>
+            {profile.rally?.finished && <small className="lantern-badge">WAYFARER</small>}
             {profile.region === "meadow" && profile.meadow?.finished && <small className="lantern-badge">GROVE LISTENER</small>}
             {profile.region === "hollow" && profile.hollow?.finished && <small className="lantern-badge">LANTERN KEEPER</small>}
             {profile.region === "canyon" && profile.canyon?.fieldReward && <small className="naturalist-badge">CANYON NATURALIST</small>}

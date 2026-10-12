@@ -1,3 +1,4 @@
+import { rallyHost } from "../../../packages/shared/rally";
 import { useState } from "react";
 import type { Profile } from "../../../packages/shared/types";
 import {
@@ -6,11 +7,12 @@ import {
   MEADOW_HEART,
   MEADOW_POND,
   MEADOW_PATHS,
-  MEADOW_STOPS,
+  MEADOW_STOPS as REGION_STOPS,
   meadowEdge,
   meadowObjective,
   meadowOf,
 } from "../../../packages/shared/meadow";
+const MEADOW_STOPS=[...REGION_STOPS,rallyHost("meadow")!];
 export function MeadowMap({
   profile,
   position,
@@ -36,6 +38,7 @@ export function MeadowMap({
     return `${Math.cos(a) * r},${Math.sin(a) * r}`;
   }).join(" ");
   const complete = (id: string) =>
+    (id.startsWith("rally-") && !!profile.rally?.stamps.includes("meadow")) ||
     h.choirs.includes(id.slice(4)) ||
     h.notes.includes(id.slice(4)) ||
     (id === "mea-lodge" && h.finished);

@@ -1,3 +1,4 @@
+import { rallyHost } from "../../../packages/shared/rally";
 import { useState } from "react";
 import type { Profile } from "../../../packages/shared/types";
 import {
@@ -5,11 +6,12 @@ import {
   HOLLOW_LAKE,
   HOLLOW_MOUNTAINS,
   HOLLOW_PATHS,
-  HOLLOW_STOPS,
+  HOLLOW_STOPS as REGION_STOPS,
   hollowEdge,
   hollowObjective,
   hollowOf,
 } from "../../../packages/shared/hollow";
+const HOLLOW_STOPS=[...REGION_STOPS,rallyHost("hollow")!];
 export function HollowMap({
   profile,
   position,
@@ -35,6 +37,7 @@ export function HollowMap({
     return `${Math.cos(a) * r},${Math.sin(a) * r}`;
   }).join(" ");
   const complete = (id: string) =>
+    (id.startsWith("rally-") && !!profile.rally?.stamps.includes("hollow")) ||
     h.gathered.includes(id.slice(4)) ||
     h.installed.includes(id.slice(4)) ||
     h.notes.includes(id.slice(4)) ||

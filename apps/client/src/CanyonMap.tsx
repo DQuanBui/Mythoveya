@@ -1,3 +1,4 @@
+import { rallyHost } from "../../../packages/shared/rally";
 import { useState } from "react";
 import type { Profile } from "../../../packages/shared/types";
 import {
@@ -5,11 +6,12 @@ import {
   CANYON_COLUMNS,
   CANYON_PATHS,
   CANYON_SPRINGS,
-  CANYON_STOPS,
+  CANYON_STOPS as REGION_STOPS,
   canyonEdge,
   canyonOf,
   canyonObjective,
 } from "../../../packages/shared/canyon";
+const CANYON_STOPS=[...REGION_STOPS,rallyHost("canyon")!];
 export function CanyonMap({
   profile,
   position,
