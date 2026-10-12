@@ -718,5 +718,41 @@
     "role": "healer",
     "appearance": "Long teal hot-spring salamander with coral mineral spines, golden freckles and a broad pearl crescent tail",
     "signature": "Mineral Embrace heals allies and cleanses their ailments"
+  },
+  {
+    "id": "sunquill",
+    "name": "Sunquill",
+    "tier": "B",
+    "element": "Light",
+    "role": "support",
+    "appearance": "Turquoise kingfisher with a golden quill crest, cream chest and sun-ringed wings",
+    "signature": "Dawn Dispatch grants shields and haste to allies"
+  },
+  {
+    "id": "bramblebun",
+    "name": "Bramblebun",
+    "tier": "B",
+    "element": "Grove",
+    "role": "healer",
+    "appearance": "Rose and sage rabbit with long leaf ears, berry clusters and a fluffy seed tail",
+    "signature": "Berry Picnic heals allies and grants regeneration"
+  },
+  {
+    "id": "kilnback",
+    "name": "Kilnback",
+    "tier": "B",
+    "element": "Flame",
+    "role": "tank",
+    "appearance": "Charcoal tortoise with copper shell plates, glowing kiln vents and amber brows",
+    "signature": "Fired Hearth grants guard and reflects incoming damage"
+  },
+  {
+    "id": "frostmoth",
+    "name": "Frostmoth",
+    "tier": "B",
+    "element": "Frost",
+    "role": "controller",
+    "appearance": "Violet moth with four broad ice-blue wings, snowflake eye spots and feathery antennae",
+    "signature": "Rime Veil deals damage and slows marked enemies"
   }
 ]

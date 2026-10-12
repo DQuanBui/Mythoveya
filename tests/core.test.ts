@@ -22,16 +22,16 @@ const team = (start = 0) =>
 describe("content and economy", () => {
   it("has complete, stable content with executable actions", () => {
     // Base roster with the Wildwood and canyon arrivals.
-    expect(SPECIES).toHaveLength(80);
-    expect(new Set(SPECIES.map((s) => s.id)).size).toBe(80);
+    expect(SPECIES).toHaveLength(84);
+    expect(new Set(SPECIES.map((s) => s.id)).size).toBe(84);
     for (const tier of TIERS)
       expect(SPECIES.filter((s) => s.tier === tier)).toHaveLength(
-        ({ E: 11, D: 11, C: 11, B: 12, A: 18, S: 17 })[tier],
+        ({ E: 11, D: 11, C: 11, B: 16, A: 18, S: 17 })[tier],
       );
     expect(
       new Set(SPECIES.flatMap((s) => s.actions.map((a) => a.id))).size,
-    ).toBe(240);
-    expect(new Set(SPECIES.map((s) => s.passive.id)).size).toBe(80);
+    ).toBe(252);
+    expect(new Set(SPECIES.map((s) => s.passive.id)).size).toBe(84);
     expect(new Set(SPECIES.map((s) => s.family)).size).toBe(12);
     for (const s of SPECIES) {
       expect(
@@ -91,7 +91,7 @@ describe("combat", () => {
     expect(elo(1000, 1000, 1)).toEqual([1012, 988]);
     expect(elo(1000, 1000, 0.5)).toEqual([1000, 1000]);
   });
-  it("runs all 180 action definitions", () => {
+  it("runs every roster action definition", () => {
     for (const s of SPECIES)
       for (let action = 0; action < 3; action++) {
         const b = makeBattle(s.id, [

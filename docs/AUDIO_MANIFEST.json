@@ -1362,6 +1362,46 @@
         "attack",
         "hurt"
       ]
+    },
+    {
+      "species": "sunquill",
+      "family": "bird",
+      "profile": "bird:80",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "bramblebun",
+      "family": "quadruped",
+      "profile": "quadruped:81",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "kilnback",
+      "family": "shell",
+      "profile": "shell:82",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "frostmoth",
+      "family": "insect",
+      "profile": "insect:83",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
     }
   ]
 }
