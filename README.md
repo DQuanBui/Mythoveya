@@ -10,6 +10,8 @@ Mythoveya is a locally playable, browser-based 3D creature-collection RPG. Its w
 
 ## The game
 
+- **The Forest Choir:** explore Whisperleaf's pond, woodland lodges and elevated heartroot clearing. Solve three accessible chime verses, discover wildlife notes and earn Fernibble plus the Grove Listener badge. [Read the Whisperleaf guide](docs/WHISPERLEAF.md).
+
 - **The Lantern Road:** explore Moonfrost's snowy lake, fir forests, mountain observatory and shelters. Gather with companions, craft three trail lanterns, restore the migration road and earn Rimeowl plus the Lantern Keeper badge. [Read the Moonfrost guide](docs/MOONFROST.md).
 
 - **Signals in the Stone:** explore Emberglass's basalt terraces, hot springs and ranger camp; solve three companion-powered beacon inscriptions, calm the Glass Sentinel, earn Thermala and collect a Canyon Naturalist badge. [Read the canyon guide](docs/CANYON.md).
@@ -218,4 +220,4 @@ In `npm run dev`, press **Esc → Asset gallery** to inspect species, keeper mod
 
 Add or balance creatures in `packages/shared/roster.json` and `content.ts`; avatars and regions also live in `content.ts`. Economy curves and pity rules live in `economy.ts`. Server reward and quest configuration lives in `apps/server/game.ts`. Keep species IDs stable to preserve existing collections.
 
-Next development priorities are a distinct Whisperleaf journey, reusable regional materials and crafting, walkable house interiors, individual creature-art refinement, deeper manual balance playtesting, and a listening pass on the synthesized score. Longer-term work includes accounts, shared exploration, cooperative guardians, and a branching campaign.
+Next development priorities are reusable regional materials and crafting, walkable house interiors, individual creature-art refinement, deeper manual balance playtesting, and a listening pass on the synthesized score. Longer-term work includes accounts, shared exploration, cooperative guardians, and a branching campaign.
