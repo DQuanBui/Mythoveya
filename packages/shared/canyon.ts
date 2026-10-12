@@ -1,3 +1,4 @@
+import { RALLY_PATHS } from "./rally";
 import type { Point } from "./haven";
 import { PEBBLES } from "./haven";
 import type { Profile } from "./types";
@@ -8,6 +9,7 @@ export const CANYON_SPRINGS = [
   { x: 33, z: 8, rx: 3.5, rz: 2.5 },
 ];
 export const CANYON_PATHS: Point[][] = [
+  ...RALLY_PATHS.canyon,
   [
     [0, 5],
     [0, 12],

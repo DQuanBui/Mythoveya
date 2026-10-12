@@ -5,6 +5,7 @@ import {
   rallyOf,
   rallyBlocked,
   rallyProp,
+  RALLY_PATHS,
 } from "../packages/shared/rally";
 import { havenWalkable, groundHeight } from "../packages/shared/haven";
 import { meadowWalkable, meadowHeight } from "../packages/shared/meadow";
@@ -25,15 +26,20 @@ it("keeps all four rally approaches reachable and prop sites on level open groun
       baseWalk(x, z) && !rallyBlocked(h.region, x, z);
     const [px, pz] = rallyProp(h);
     expect(baseWalk(px, pz), h.region + " camp footprint").toBe(true);
-    expect(walk(h.point[0], h.point[1] + 2), h.region + " wildlife").toBe(
-      true,
-    );
+    expect(walk(h.point[0], h.point[1] + 2), h.region + " wildlife").toBe(true);
     expect(walk(...h.point), h.region).toBe(true);
     expect(
       findPath(buildGrid(walk, extent), [0, 5], h.point, walk),
       h.region,
     ).not.toBeNull();
     expect(Number.isFinite(ground(...h.point))).toBe(true);
+    for (const path of RALLY_PATHS[h.region])
+      for (let j = 1; j < path.length; j++)
+        for (let t = 0; t <= 1; t += 0.05) {
+          const x = path[j - 1][0] * (1 - t) + path[j][0] * t,
+            z = path[j - 1][1] * (1 - t) + path[j][1] * t;
+          expect(walk(x, z), h.region + " approach trail").toBe(true);
+        }
   });
 });
 it("rotates through all activity kinds and resets only daily claims at UTC midnight", () => {

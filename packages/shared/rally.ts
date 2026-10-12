@@ -144,3 +144,32 @@ export function rallyBlocked(region: string, x: number, z: number) {
     )
   );
 }
+
+/** Short approach paths join each rally stop to its regional trail network. */
+export const RALLY_PATHS: Record<string, [number, number][][]> = {
+  haven: [
+    [
+      [0, 12],
+      [0, 14],
+    ],
+  ],
+  canyon: [
+    [
+      [0, 12],
+      [0, 14],
+    ],
+  ],
+  meadow: [
+    [
+      [27, 20],
+      [20, 24],
+      [12, 23],
+    ],
+  ],
+  hollow: [
+    [
+      [12, 23],
+      [12, 25],
+    ],
+  ],
+};

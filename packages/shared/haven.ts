@@ -1,3 +1,4 @@
+import { RALLY_PATHS } from "./rally";
 import { WILDWOOD_PATHS, WILDWOOD_PLACES, FIELD_HOUSES, FIELD_NODES, inReedwater, fieldStructureBlocked } from "./wildwood";
 // All starting-island routes, habitats, and navigation coordinates share this map.
 export type Point = [number, number];
@@ -159,6 +160,7 @@ export const HAVEN_PLACES = [
   },
 ] as const;
 export const HAVEN_PATHS: Point[][] = [
+  ...RALLY_PATHS.haven,
   [
     [0, 5],
     [0, 11],

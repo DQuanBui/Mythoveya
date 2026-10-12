@@ -1,3 +1,4 @@
+import { RALLY_PATHS } from "./rally";
 import { PEBBLES, type Point } from "./haven";
 import type { Profile } from "./types";
 
@@ -5,6 +6,7 @@ export const HOLLOW_EXTENT = 52;
 export const HOLLOW_LAKE = { x: -23, z: 12, rx: 8, rz: 5 };
 export const HOLLOW_WORKSHOP: Point = [19, 12];
 export const HOLLOW_PATHS: Point[][] = [
+  ...RALLY_PATHS.hollow,
   [
     [0, 5],
     [0, 12],
