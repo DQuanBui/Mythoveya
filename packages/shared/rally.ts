@@ -10,7 +10,7 @@ export const RALLY_HOSTS = [
     point: [0, 14] as [number, number],
     color: "#e7ba67",
     species: "sunquill",
-    element: "Light",
+    element: "Storm",
     description:
       "Collect your travel passport and help the sky-post welcome migrating companions.",
     clue: "Sunquill follows bright cloth above the post. Which marker guides its flight?",

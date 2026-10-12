@@ -106,3 +106,15 @@ it("requires every stamp and Havenreach for a replay-safe passport finish", () =
     "already",
   );
 });
+
+it("lets the initial team complete all three rotating activity types in every region", () => {
+  for (const h of RALLY_HOSTS)
+    for (let d = 0; d < 3; d++) {
+      const t = keeper(),
+        p = authenticate(t);
+      p.region = h.region;
+      save(p);
+      op(t, payload(t, day + d * 86400000), day + d * 86400000);
+      expect(authenticate(t).rally!.stamps).toContain(h.region);
+    }
+});

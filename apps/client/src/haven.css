@@ -548,3 +548,15 @@ button.world-label:hover {
 .meadow-journal details { margin-top: 16px; }
 .meadow-journal summary { cursor: pointer; }
 .meadow-map svg g[role=button]:focus-visible circle { stroke: #fff; stroke-width: 1; }
+
+.rally-stamps { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+.rally-stamps span { border:1px dashed #89a695; padding:10px; border-radius:8px; }
+.rally-stamps [data-earned=true] { border-style:solid; color:#f3de9e; background:#325854; }
+.rally-journal fieldset { clear:both; border:1px solid #6c9389; border-radius:8px; padding:12px; margin:12px 0; }
+.rally-journal fieldset button,.rally-journal article > button { margin:4px; min-height:44px; }
+.rally-option { display:flex; align-items:center; gap:10px; padding:8px 0; }
+.rally-journal select { display:block; width:100%; padding:8px; margin:8px 0; }
+.rally-journal .row { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.rally-journal details { clear:both; padding:8px 0; }
+.rally-date { color:#e1d5af; }
+@media(max-width:500px){.rally-stamps{grid-template-columns:1fr;}}
