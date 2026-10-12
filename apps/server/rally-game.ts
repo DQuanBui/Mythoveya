@@ -19,6 +19,22 @@ export function rallyMutation(
   if (p.team.length !== 6) throw Error("Form a team of six first.");
   const r = rallyOf(p, now),
     event = rallyActivity(p.region, now);
+  if (kind === "rally-finish") {
+    if (p.region !== "haven")
+      throw Error("Return to Piper in Havenreach to complete the passport.");
+    if (RALLY_HOSTS.some((h) => !r.stamps.includes(h.region)))
+      throw Error("Collect all four regional stamps first.");
+    if (r.finished) throw Error("Your Wayfarer passport is already complete.");
+    r.finished = true;
+    p.rally = r;
+    p.gold += 200;
+    p.diamonds += 100;
+    gainXp(p, 150);
+    return {
+      message:
+        "Four roads, one welcome! +200 Gold, +100 Diamonds, +150 XP and the Wayfarer badge.",
+    };
+  }
   if (kind !== "rally-complete") throw Error("Unknown rally action.");
   if (v.quest !== event.day || v.item !== event.kind)
     throw Error(

@@ -78,3 +78,31 @@ it("resets daily jobs across midnight but never regrants first-visit companions"
   save(q);
   expect(() => op(t, payload(t, next), next)).toThrow("regional");
 });
+
+it("requires every stamp and Havenreach for a replay-safe passport finish", () => {
+  const t = keeper();
+  expect(() => op(t, {}, day, crypto.randomUUID(), "rally-finish")).toThrow(
+    "four",
+  );
+  for (const h of RALLY_HOSTS) {
+    const p = authenticate(t);
+    p.region = h.region;
+    save(p);
+    op(t, payload(t));
+  }
+  expect(() => op(t, {}, day, crypto.randomUUID(), "rally-finish")).toThrow(
+    "Piper",
+  );
+  const p = authenticate(t);
+  p.region = "haven";
+  save(p);
+  const before = authenticate(t),
+    id = crypto.randomUUID();
+  op(t, {}, day, id, "rally-finish");
+  op(t, {}, day, id, "rally-finish");
+  expect(authenticate(t).gold - before.gold).toBe(200);
+  expect(authenticate(t).rally!.finished).toBe(true);
+  expect(() => op(t, {}, day, crypto.randomUUID(), "rally-finish")).toThrow(
+    "already",
+  );
+});
