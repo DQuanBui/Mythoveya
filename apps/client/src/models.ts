@@ -618,6 +618,32 @@ export function createCreature(id: string, shimmer = false) {
     const crescent=new T.Group();crescent.name="thermala-crescent";crescent.position.set(0,.4,-1.25);rig.add(crescent);tails.push(crescent);
     for(let i=0;i<7;i++) {const a=(i-3)*.27;part(crescent,"orb",i%2?light:cream,[Math.sin(a)*.5,0,-Math.cos(a)*.45],[.1,.06,.44],[0,-a,0]);}
   }
+
+  if(s.id==="sunquill") {
+    for(let i=0;i<5;i++)part(rig,"cone",accent,[(i-2)*.09,headY+.42+Math.sin(i/4*Math.PI)*.15,headZ-.08],[.07,.38,.08],[0,0,(i-2)*-.12]);
+    for(const side of [-1,1])part(rig,"ring",accent,[side*.44,1.1,0],[.24,.24,.5],[0,Math.PI/2,0],true);
+  }
+  if(s.id==="bramblebun") {
+    for(const side of [-1,1])for(let i=0;i<3;i++)part(rig,"orb",accent,[side*(.3+i*.06),.95-i*.08,-.35],[.1,.1,.1]);
+    part(rig,"orb",cream,[0,.6,-.8],[.28,.28,.28]);
+  }
+  if(s.id==="kilnback") {
+    for(let i=0;i<5;i++) {
+      const a=i*Math.PI*2/5;
+      part(rig,"box",accent,[Math.cos(a)*.43,1.12,Math.sin(a)*.43],[.24,.12,.24],[0,a,0]);
+      part(rig,"orb","#ffd078",[Math.cos(a)*.45,1.2,Math.sin(a)*.45],[.07,.025,.12],undefined,true);
+    }
+  }
+  if(s.id==="frostmoth") {
+    for(const side of [-1,1]){
+      const wing=new T.Group();wing.name="frostmoth-icewing";wing.position.set(side*.2,.95,-.1);rig.add(wing);wings.push(wing);
+      for(let j=0;j<2;j++){
+        part(wing,"orb",j?accent:light,[side*(.55+j*.15),.08-j*.2,.22-j*.6],[.66,.055,.48],[0,side*(.4-j*.8),side*.1]);
+        part(wing,"orb",dark,[side*(.65+j*.15),.14-j*.2,.22-j*.6],[.16,.03,.16]);
+        part(wing,"orb",cream,[side*(.65+j*.15),.17-j*.2,.22-j*.6],[.07,.02,.07],undefined,true);
+      }
+    }
+  }
   tails.forEach((t) => { t.userData.restRotation = t.rotation.clone(); });
   consolidate(rig, `creature:${id}:${shimmer ? "shimmer" : "normal"}`);
   const glints = new T.Group();
