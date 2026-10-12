@@ -1,3 +1,4 @@
+import { rallyMutation } from "./rally-game";
 import { meadowMutation } from "./meadow-game";
 import { hollowMutation } from "./hollow-game";
 import { canyonOf, CANYON_BEACONS } from "../../packages/shared/canyon";
@@ -112,6 +113,7 @@ const ADVENTURE_KINDS = [
 ];
 export function mutate(p: Profile, kind: string, v: any, now = Date.now()) {
   const town = ensureTown(p);
+  if (kind.startsWith("rally-")) return rallyMutation(p, kind, v, now, random);
   if (kind.startsWith("mea-")) return meadowMutation(p, kind, v, random);
   if (kind.startsWith("hol-")) return hollowMutation(p, kind, v, random);
   if (kind.startsWith("can-")) return canyonMutation(p, kind, v, random);
