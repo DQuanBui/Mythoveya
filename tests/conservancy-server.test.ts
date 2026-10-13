@@ -89,3 +89,31 @@ it("keeps old profiles compatible and can gather one full set in every region", 
     crystal: 12,
   });
 });
+
+it("crafts exact recipes and dismantles spares without losing or duplicating materials", () => {
+  const t = keeper();
+  expect(() => op(t, "cons-craft", { item: "shelter" })).toThrow("missing");
+  gather(t);
+  const before = authenticate(t).conservancy!.materials;
+  expect(() => op(t, "cons-craft", { item: "forged" })).toThrow("blueprint");
+  for (const k of RECIPES) {
+    const id = crypto.randomUUID();
+    op(t, "cons-craft", { item: k.id }, now, id);
+    op(t, "cons-craft", { item: k.id }, now, id);
+  }
+  expect(authenticate(t).conservancy!.materials).toEqual({
+    timber: 0,
+    fiber: 0,
+    crystal: 0,
+  });
+  expect(authenticate(t).conservancy!.kits).toEqual({
+    shelter: 1,
+    planter: 1,
+    lantern: 1,
+  });
+  for (const k of RECIPES) op(t, "cons-dismantle", { item: k.id });
+  expect(authenticate(t).conservancy!.materials).toEqual(before);
+  expect(() => op(t, "cons-dismantle", { item: "shelter" })).toThrow(
+    "no spare",
+  );
+});

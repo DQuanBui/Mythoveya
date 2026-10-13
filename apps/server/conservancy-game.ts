@@ -1,6 +1,8 @@
 import type { Profile } from "../../packages/shared/types";
 import {
   OUTPOSTS,
+  RECIPES,
+  type Material,
   SUPPLY_NODES,
   conservancyOf,
 } from "../../packages/shared/conservancy";
@@ -29,6 +31,33 @@ export function conservancyMutation(
     p.conservancy = r;
     return {
       message: `Gathered ${n.amount} ${n.material}. Living habitats remain untouched.`,
+    };
+  }
+  if (kind === "cons-craft" || kind === "cons-dismantle") {
+    const recipe = RECIPES.find((k) => k.id === v.item);
+    if (!recipe) throw Error("Choose a known habitat blueprint.");
+    const costs = Object.entries(recipe.cost) as [Material, number][];
+    if (kind === "cons-craft") {
+      if (r.kits[recipe.id] >= 99)
+        throw Error("Install or dismantle a kit first.");
+      if (costs.some(([m, n]) => r.materials[m] < n))
+        throw Error("Gather the missing materials first.");
+      costs.forEach(([m, n]) => (r.materials[m] -= n));
+      r.kits[recipe.id]++;
+    } else {
+      if (r.kits[recipe.id] < 1)
+        throw Error("There is no spare kit to dismantle.");
+      if (costs.some(([m, n]) => r.materials[m] + n > 999))
+        throw Error("Use some materials before dismantling.");
+      r.kits[recipe.id]--;
+      costs.forEach(([m, n]) => (r.materials[m] += n));
+    }
+    p.conservancy = r;
+    return {
+      message:
+        kind === "cons-craft"
+          ? `${recipe.name} crafted.`
+          : `${recipe.name} dismantled. All materials returned.`,
     };
   }
   throw Error("Unknown Conservancy action.");

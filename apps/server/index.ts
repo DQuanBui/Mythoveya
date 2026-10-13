@@ -49,7 +49,7 @@ app.get("/api/profile", (req, res) => res.json(authenticate(token(req))));
 const mutation = z.object({
   requestId: z.string().uuid(),
   kind: z.enum([
-    "cons-gather",
+    "cons-gather", "cons-craft", "cons-dismantle",
     "rally-complete", "rally-finish",
     "mea-start", "mea-sing", "mea-note", "mea-finish",
     "hol-start", "hol-gather", "hol-craft", "hol-install", "hol-finish", "hol-note",
