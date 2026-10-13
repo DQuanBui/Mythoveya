@@ -259,7 +259,7 @@ export function createCreature(id: string, shimmer = false) {
     headY = 0.86;
     headZ = 0.62;
     for (const x of [-0.4, 0.4])
-      for (const z of [-0.45, 0, 0.45]) {
+      for (const z of (s.id === "mossloom" ? [-0.6, -0.2, 0.2, 0.6] : [-0.45, 0, 0.45])) {
         const l = new T.Group();
         l.position.set(x, 0.55, z);
         rig.add(l);
@@ -437,7 +437,7 @@ export function createCreature(id: string, shimmer = false) {
       part(rig, "capsule", dark, [ex, ey + 0.13 * es, ez + 0.02], [0.025, 0.07, 0.02], [0, 0, Math.PI / 2 + side * 0.35]);
   }
   // Tails: each species' tail follows its description.
-  const tailCount = ["fox", "quadruped", "dragon", "antler", "bird"].includes(s.family) ? f.tailCount : 0;
+  const tailCount = s.id === "astralynx" ? 3 : ["fox", "quadruped", "dragon", "antler", "bird"].includes(s.family) ? f.tailCount : 0;
   for (let n = 0; n < tailCount; n++) {
     const tail = new T.Group(),
       spread = tailCount > 1 ? (n / (tailCount - 1) - 0.5) * (tailCount > 3 ? 2.2 : 1.1) : 0;
@@ -619,6 +619,26 @@ export function createCreature(id: string, shimmer = false) {
     for(let i=0;i<7;i++) {const a=(i-3)*.27;part(crescent,"orb",i%2?light:cream,[Math.sin(a)*.5,0,-Math.cos(a)*.45],[.1,.06,.44],[0,-a,0]);}
   }
 
+  if (s.id === "mossloom") {
+    part(rig,"orb",accent,[0,.8,-.5],[.6,.48,.6]);
+    for(let i=0;i<4;i++) part(rig,"ring",cream,[0,.85,-.5],[.2+i*.1,.2+i*.1,.22],[Math.PI/2,0,i*.2]);
+    for(const l of limbs){
+      const side=Math.sign(l.position.x);
+      part(l,"capsule","#ddb56e",[side*.3,-.1,0],[.06,.45,.06],[0,0,side*1.15]);
+      part(l,"capsule",light,[side*.51,-.23,0],[.05,.32,.05],[0,0,-side*.25]);
+    }
+    for(let i=0;i<3;i++) part(rig,"orb",light,[(i-1)*.13,headY+.27,headZ-.04],[.08,.06,.23],[.3,0,(i-1)*.5]);
+  }
+  if (s.id === "astralynx") {
+    for(const side of [-1,1]) {
+      part(rig,"cone",accent,[side*.26,headY+.65,headZ-.03],[.055,.45,.065],[0,0,-side*.3]);
+      for(let i=0;i<4;i++) part(rig,"orb",cream,[side*.43,.97,.4-i*.25],[.065,.055,.07],undefined,true);
+    }
+    tails.forEach((t,i)=>{
+      part(t,"ring",i%2?"#ba9de5":"#8de3d1",[.18,.28,-.65],[.17,.17,.4],[.4,0,0],true);
+      part(t,"orb",cream,[.18,.33,-.9],[.1,.07,.27],[.2,0,0]);
+    });
+  }
   if(s.id==="sunquill") {
     for(let i=0;i<5;i++)part(rig,"cone",accent,[(i-2)*.09,headY+.42+Math.sin(i/4*Math.PI)*.15,headZ-.08],[.07,.38,.08],[0,0,(i-2)*-.12]);
     for(const side of [-1,1])part(rig,"ring",accent,[side*.44,1.1,0],[.24,.24,.5],[0,Math.PI/2,0],true);
