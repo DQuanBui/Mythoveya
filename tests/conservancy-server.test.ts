@@ -117,3 +117,52 @@ it("crafts exact recipes and dismantles spares without losing or duplicating mat
     "no spare",
   );
 });
+
+it("restores all four outposts with saved pieces and one-time milestone companions", () => {
+  const t = keeper();
+  expect(() => op(t, "cons-claim", { id: "astralynx" })).toThrow("Restore 4");
+  for (const h of OUTPOSTS) {
+    region(t, h.region);
+    expect(() => op(t, "cons-tend", { id: h.id, quest: "2026-10-12" })).toThrow(
+      "Restore",
+    );
+    gather(t);
+    for (const k of RECIPES) {
+      op(t, "cons-craft", { item: k.id });
+      const id = crypto.randomUUID();
+      expect(() =>
+        op(t, "cons-install", { id: "cons-invalid", item: k.id }),
+      ).toThrow("region");
+      op(t, "cons-install", { id: h.id, item: k.id }, now, id);
+      op(t, "cons-install", { id: h.id, item: k.id }, now, id);
+      expect(() => op(t, "cons-install", { id: h.id, item: k.id })).toThrow(
+        "already",
+      );
+    }
+  }
+  expect(() => op(t, "cons-claim", { id: "astralynx" })).toThrow("Juniper");
+  region(t, "haven");
+  const before = authenticate(t);
+  for (const id of ["mossloom", "astralynx"]) {
+    const req = crypto.randomUUID();
+    op(t, "cons-claim", { id }, now, req);
+    op(t, "cons-claim", { id }, now, req);
+    expect(() => op(t, "cons-claim", { id })).toThrow("already");
+  }
+  const after = authenticate(t);
+  expect(after.diamonds - before.diamonds).toBe(230 + 50 * (after.level - before.level));
+  expect(
+    after.owned.filter((o) => ["mossloom", "astralynx"].includes(o.species)),
+  ).toHaveLength(2);
+  const next = now + 86400000;
+  gather(t, next);
+  op(t, "cons-craft", { item: "planter" }, next);
+  const gold = authenticate(t).gold;
+  op(t, "cons-tend", { id: "cons-haven", quest: "2026-10-13" }, next);
+  expect(authenticate(t).gold - gold).toBe(25);
+  expect(() =>
+    op(t, "cons-tend", { id: "cons-haven", quest: "2026-10-13" }, next),
+  ).toThrow("already");
+  expect(authenticate(t).conservancy!.installed.haven).toHaveLength(3);
+  expect(authenticate(t).conservancy!.claims).toHaveLength(2);
+});
