@@ -98,6 +98,7 @@ export const FAMILIES = [
   "insect", "amphibian",
   "bird", "quadruped", "shell", "insect",
   "insect", "quadruped",
+  "aquatic", "spirit",
 ] as const;
 export type Effect =
   | "damage"
@@ -219,8 +220,11 @@ const mechanics: Effect[][] = [
   ["damage", "slow", "mark"],
   ["shield", "cleanse", "regen"],
   ["damage", "pierce", "mark"],
+  ["guard", "shield"],
+  ["cleanse", "shield", "haste"],
 ];
 const targets: Record<number, Action["target"]> = {
+  86: "allies", 87: "allies",
   84: "allies", 85: "row",
   80: "allies", 81: "allies", 82: "self", 83: "row",
   3: "self",
@@ -344,14 +348,14 @@ export const SPECIES: Species[] = roster.map((r, i) => {
         0,
         ["damage"],
         "enemy",
-        `${r.name} · ${r.element === "Tide" ? "Splash" : r.element === "Light" ? "Gleam" : "Strike"}`,
+        `${r.name} Â· ${r.element === "Tide" ? "Splash" : r.element === "Light" ? "Gleam" : "Strike"}`,
       ),
       action(1, fx, targets[i] || (support ? "ally" : "enemy"), signature),
       action(
         2,
         fx,
         targets[i] || (support ? "allies" : "row"),
-        rank === 5 ? signature : `${r.name} · Wild ${r.element}`,
+        rank === 5 ? signature : `${r.name} Â· Wild ${r.element}`,
       ),
     ],
   };
@@ -412,10 +416,10 @@ export const EVOLVED: Species[] = EVOLUTIONS.map(
         id: `${id}-${n}`,
         name:
           n === 0
-            ? `${name} · ${base.element === "Tide" ? "Splash" : base.element === "Light" ? "Gleam" : "Strike"}`
+            ? `${name} Â· ${base.element === "Tide" ? "Splash" : base.element === "Light" ? "Gleam" : "Strike"}`
             : n === 1
               ? move
-              : `${name} · Wild ${base.element}`,
+              : `${name} Â· Wild ${base.element}`,
       })),
     } as Species;
   },
@@ -438,56 +442,56 @@ export const AVATARS = [
     skin: "#bb825e",
     hair: "#302822",
     coat: "#dd824c",
-    desc: "Confident adventurer · orange travel jacket",
+    desc: "Confident adventurer Â· orange travel jacket",
   },
   {
     name: "Mira Tidevale",
     skin: "#865a41",
     hair: "#172f3a",
     coat: "#409f96",
-    desc: "Calm wildlife researcher · flowing braid",
+    desc: "Calm wildlife researcher Â· flowing braid",
   },
   {
     name: "Rowan Fernstep",
     skin: "#e6b69c",
     hair: "#854a32",
     coat: "#72925a",
-    desc: "Patient forest guide · green poncho",
+    desc: "Patient forest guide Â· green poncho",
   },
   {
     name: "Sora Galecrest",
     skin: "#d5a380",
     hair: "#e1e4e8",
     coat: "#71accc",
-    desc: "Energetic scout · sky-blue scarf",
+    desc: "Energetic scout Â· sky-blue scarf",
   },
   {
     name: "Dax Stoneward",
     skin: "#624433",
     hair: "#28231f",
     coat: "#829195",
-    desc: "Gentle protector · stone armor",
+    desc: "Gentle protector Â· stone armor",
   },
   {
     name: "Nyra Moonveil",
     skin: "#bb9e73",
     hair: "#674674",
     coat: "#7b537c",
-    desc: "Curious ruins scholar · plum cape",
+    desc: "Curious ruins scholar Â· plum cape",
   },
   {
     name: "Elian Dawnspire",
     skin: "#c58e62",
     hair: "#d4b35e",
     coat: "#e0ddc4",
-    desc: "Optimistic healer · ivory coat",
+    desc: "Optimistic healer Â· ivory coat",
   },
   {
     name: "Vesper Quill",
     skin: "#664333",
     hair: "#ece5d7",
     coat: "#374759",
-    desc: "Playful inventor · brass goggles",
+    desc: "Playful inventor Â· brass goggles",
   },
 ];
 export const REGIONS = [

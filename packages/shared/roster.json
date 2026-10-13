@@ -772,5 +772,23 @@
     "role": "striker",
     "appearance": "Midnight blue lynx with tall gold ear tufts, pearl star spots and three flowing aurora tails",
     "signature": "Constellation Pounce deals piercing damage and marks an enemy row"
+  },
+  {
+    "id": "cairnfin",
+    "name": "Cairnfin",
+    "tier": "B",
+    "element": "Stone",
+    "role": "tank",
+    "appearance": "Floating sandstone ray with broad layered ochre fins, turquoise geode stones and a long copper ribbon tail",
+    "signature": "Cairn Shelter grants guard and shields allies"
+  },
+  {
+    "id": "inkwisp",
+    "name": "Inkwisp",
+    "tier": "A",
+    "element": "Shadow",
+    "role": "support",
+    "appearance": "Violet ink jelly spirit with a pearl bell, six flowing teal tentacles and a halo of golden memory runes",
+    "signature": "Memory Wash cleanses allies and grants shields and haste"
   }
 ]

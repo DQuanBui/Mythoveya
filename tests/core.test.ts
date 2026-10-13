@@ -22,16 +22,16 @@ const team = (start = 0) =>
 describe("content and economy", () => {
   it("has complete, stable content with executable actions", () => {
     // Base roster with the Wildwood and canyon arrivals.
-    expect(SPECIES).toHaveLength(86);
-    expect(new Set(SPECIES.map((s) => s.id)).size).toBe(86);
+    expect(SPECIES).toHaveLength(88);
+    expect(new Set(SPECIES.map((s) => s.id)).size).toBe(88);
     for (const tier of TIERS)
       expect(SPECIES.filter((s) => s.tier === tier)).toHaveLength(
-        ({ E: 11, D: 11, C: 11, B: 16, A: 19, S: 18 })[tier],
+        ({ E: 11, D: 11, C: 11, B: 17, A: 20, S: 18 })[tier],
       );
     expect(
       new Set(SPECIES.flatMap((s) => s.actions.map((a) => a.id))).size,
-    ).toBe(258);
-    expect(new Set(SPECIES.map((s) => s.passive.id)).size).toBe(86);
+    ).toBe(264);
+    expect(new Set(SPECIES.map((s) => s.passive.id)).size).toBe(88);
     expect(new Set(SPECIES.map((s) => s.family)).size).toBe(12);
     for (const s of SPECIES) {
       expect(

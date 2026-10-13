@@ -1422,6 +1422,26 @@
         "attack",
         "hurt"
       ]
+    },
+    {
+      "species": "cairnfin",
+      "family": "aquatic",
+      "profile": "aquatic:86",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "inkwisp",
+      "family": "spirit",
+      "profile": "spirit:87",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
     }
   ]
 }
