@@ -90,7 +90,7 @@ test("walk canyon routes, solve inscriptions, calm sentinel and save restoration
   await expect(page.locator(".location")).toContainText("Emberglass Canyon");
   await page.getByRole("button", { name: "Travel map", exact: true }).click();
   await expect(page.getByLabel("Emberglass trail map")).toBeVisible();
-  await expect(page.locator(".haven-destinations button")).toHaveCount(13);
+  await expect(page.locator(".haven-destinations button")).toHaveCount(15);
   await page.screenshot({ path: "artifacts/canyon-map.png" });
   await page.getByLabel("Close panel").click();
   await travel(page, "Ashkeeper Camp", "camp");

@@ -1,3 +1,4 @@
+import { atlasStops } from "../../../packages/shared/atlas";
 import { conservancyStops } from "../../../packages/shared/conservancy";
 import { rallyHost } from "../../../packages/shared/rally";
 import { useState } from "react";
@@ -13,7 +14,7 @@ import {
   meadowObjective,
   meadowOf,
 } from "../../../packages/shared/meadow";
-const MEADOW_STOPS=[...REGION_STOPS,rallyHost("meadow")!,...conservancyStops("meadow")];
+const MEADOW_STOPS=[...atlasStops("meadow"),...REGION_STOPS,rallyHost("meadow")!,...conservancyStops("meadow")];
 export function MeadowMap({
   profile,
   position,

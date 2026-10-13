@@ -105,7 +105,7 @@ test("gather with companions, craft lanterns, walk Moonfrost and persist its res
   await expect(page.locator(".location")).toContainText("Moonfrost Hollow");
   await page.getByRole("button", { name: "Travel map", exact: true }).click();
   await expect(page.getByLabel("Moonfrost trail map")).toBeVisible();
-  await expect(page.locator(".haven-destinations button")).toHaveCount(14);
+  await expect(page.locator(".haven-destinations button")).toHaveCount(16);
   await page.screenshot({ path: "artifacts/hollow-map.png" });
   await travel(page, "Mira's lantern workshop", "workshop");
   await page

@@ -1,3 +1,4 @@
+import { atlasStops } from "../../../packages/shared/atlas";
 import { conservancyStops } from "../../../packages/shared/conservancy";
 import { rallyHost } from "../../../packages/shared/rally";
 import { EXPEDITION_STOPS, FIELD_HOUSES, WILDWOOD_LAKE } from "../../../packages/shared/wildwood";
@@ -25,6 +26,7 @@ import {
 import { Portrait } from "./portraits";
 import { SHOPS } from "../../../packages/shared/shops";
 export const MAP_DESTINATIONS = [
+  ...atlasStops("haven").map(s=>({...s,short:s.name,color:"#dec190",species:[] as string[]})),
   ...conservancyStops("haven").map(s=>({...s,short:s.name,color:"#acd4a0",species:[] as string[]})),
   {...rallyHost("haven")!,short:"Sky-post",species:[] as string[]},
   ...HAVEN_PLACES,

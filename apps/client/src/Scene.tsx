@@ -1,5 +1,5 @@
 import { AtlasSites } from "./AtlasSites";
-import { atlasBlocked } from "../../../packages/shared/atlas";
+import { atlasBlocked, atlasStops } from "../../../packages/shared/atlas";
 import { ConservancySites } from "./ConservancySites";
 import { conservancyStops, conservancyBlocked } from "../../../packages/shared/conservancy";
 import { RallyCamp } from "./RallyCamp";
@@ -615,7 +615,7 @@ export const INTERACTABLES = [
 // Interaction points sit on the terrain (using each region's ground height).
 for (const o of INTERACTABLES) o.p[1] = groundHeight(o.p[0], o.p[2]);
 export const getInteractables = (region: string) =>
-  [...conservancyStops(region).map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],groundFor(region)(...s.point),s.point[1]]})), ...(rallyHost(region) ? [{id:rallyHost(region)!.id,name:rallyHost(region)!.name,hint:rallyHost(region)!.description,p:[rallyHost(region)!.point[0],groundFor(region)(...rallyHost(region)!.point),rallyHost(region)!.point[1]]}] : []), ...(region === "meadow" ? MEADOW_STOPS.map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],meadowHeight(...s.point),s.point[1]]})) : []), ...(region === "hollow" ? HOLLOW_STOPS.map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],hollowHeight(...s.point),s.point[1]]})) : []), ...(region === "canyon" ? CANYON_STOPS.map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],canyonHeight(...s.point),s.point[1]]})) : []), ...INTERACTABLES.filter(
+  [...atlasStops(region).map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],groundFor(region)(...s.point),s.point[1]]})), ...conservancyStops(region).map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],groundFor(region)(...s.point),s.point[1]]})), ...(rallyHost(region) ? [{id:rallyHost(region)!.id,name:rallyHost(region)!.name,hint:rallyHost(region)!.description,p:[rallyHost(region)!.point[0],groundFor(region)(...rallyHost(region)!.point),rallyHost(region)!.point[1]]}] : []), ...(region === "meadow" ? MEADOW_STOPS.map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],meadowHeight(...s.point),s.point[1]]})) : []), ...(region === "hollow" ? HOLLOW_STOPS.map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],hollowHeight(...s.point),s.point[1]]})) : []), ...(region === "canyon" ? CANYON_STOPS.map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],canyonHeight(...s.point),s.point[1]]})) : []), ...INTERACTABLES.filter(
     (o) =>
       (region === "haven" ||
         (!o.id.startsWith("exp-") && !o.id.startsWith("trail-") &&

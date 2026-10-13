@@ -1,3 +1,4 @@
+import { atlasStops } from "../../../packages/shared/atlas";
 import { conservancyStops } from "../../../packages/shared/conservancy";
 import { rallyHost } from "../../../packages/shared/rally";
 import { useState } from "react";
@@ -12,7 +13,7 @@ import {
   canyonOf,
   canyonObjective,
 } from "../../../packages/shared/canyon";
-const CANYON_STOPS=[...REGION_STOPS,rallyHost("canyon")!,...conservancyStops("canyon")];
+const CANYON_STOPS=[...atlasStops("canyon"),...REGION_STOPS,rallyHost("canyon")!,...conservancyStops("canyon")];
 export function CanyonMap({
   profile,
   position,
