@@ -18,5 +18,21 @@ export function atlasMutation(p:Profile,kind:string,v:{id?:string;inputs?:number
   if(r.read.includes(c.region))throw Error("This memory is already recorded.");
   r.read.push(c.region);p.atlas=r;return {message:"Memory recorded. Return to the archivist to arrange its glyphs."};
  }
+ if(kind==="atlas-solve"){
+  if(v.id!==c.id)throw Error("Visit the archivist in this region.");
+  if(!ATLAS_CHAPTERS.slice(0,index).every(c=>r.chapters.includes(c.region))||!r.read.includes(c.region))throw Error("Record this chapter and restore the earlier pages first.");
+  if(r.chapters.includes(c.region))throw Error("This chapter is already restored.");
+  if(v.inputs?.length!==3||!c.code.every((n,i)=>n===v.inputs![i]))throw Error("The glyphs do not follow the memory yet. Read the inscription again.");
+  r.chapters.push(c.region);p.atlas=r;p.gold+=80;p.diamonds+=25;gainXp(p,40);
+  const companion=index===1?own(p,"cairnfin",random):index===3?own(p,"inkwisp",random):undefined;
+  return {message:c.ending+" +80 Gold, 25 Diamonds and 40 XP.",companion};
+ }
+ if(kind==="atlas-finish"){
+  if(c.region!=="haven"||v.id!==c.id)throw Error("Return to Aster in Havenreach.");
+  if(r.finished)throw Error("The atlas is already complete.");
+  if(!ATLAS_CHAPTERS.every(c=>r.chapters.includes(c.region)))throw Error("Restore all four chapters first.");
+  r.finished=true;p.atlas=r;p.diamonds+=80;gainXp(p,80);
+  return {message:"The sky-road was the welcome you carried between its people. Atlas complete! +80 Diamonds, 80 XP and the Lorekeeper badge. Daily echo readings are now available."};
+ }
  throw Error("Unknown atlas action.");
 }
