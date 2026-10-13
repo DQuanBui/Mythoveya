@@ -10,7 +10,7 @@ export const ATLAS_CHAPTERS = [
     color: "#e4b96e",
     point: [8, -25] as [number, number],
     join: [2, -33] as [number, number],
-    field: [16, -22] as [number, number],
+    field: [14, -30] as [number, number],
     fieldName: "The river's first page",
     title: "A map that remembers",
     species: "cairnfin",
@@ -32,7 +32,7 @@ export const ATLAS_CHAPTERS = [
     color: "#91c7a1",
     point: [-23, 25] as [number, number],
     join: [-20, 24] as [number, number],
-    field: [-30, 28] as [number, number],
+    field: [-28, 22] as [number, number],
     fieldName: "The canopy's hidden page",
     title: "The weight of kindness",
     species: "cairnfin",
@@ -54,7 +54,7 @@ export const ATLAS_CHAPTERS = [
     color: "#e6a37e",
     point: [10, -26] as [number, number],
     join: [4, -19] as [number, number],
-    field: [18, -29] as [number, number],
+    field: [12, -33] as [number, number],
     fieldName: "The kiln's sheltered page",
     title: "What the storm left behind",
     species: "cairnfin",
@@ -119,7 +119,7 @@ export const ATLAS_PATHS: Record<string, [number, number][][]> =
   );
 export const atlasProp = (c: AtlasChapter): [number, number] => [
   c.point[0] + 2.5,
-  c.point[1] - 1.5,
+  c.point[1] + 1.5,
 ];
 export const tabletProp = (c: AtlasChapter): [number, number] => [
   c.field[0] + 1.2,

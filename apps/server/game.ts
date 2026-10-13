@@ -405,7 +405,7 @@ function startMission(p: Profile, mission: Mission) {
       "pve",
       randomInt(0, 10000000),
     );
-    b.title = `Rift Tower Â· Floor ${floor}${t.boss ? " Â· Warden" : ""}`;
+    b.title = `Rift Tower · Floor ${floor}${t.boss ? " · Warden" : ""}`;
     b.arena = t.boss ? "throne" : "rift";
     if (t.boss) {
       const u = b.units.find((u) => u.side === 1 && u.species === t.boss)!;
@@ -424,7 +424,7 @@ function startMission(p: Profile, mission: Mission) {
       "pve",
       randomInt(0, 10000000),
     );
-    b.title = stage.boss?.title || `Chapter ${stage.ci + 1} Â· ${stage.name}`;
+    b.title = stage.boss?.title || `Chapter ${stage.ci + 1} · ${stage.name}`;
     b.arena = CHAPTER_ARENAS[stage.ci] || "grove";
     if (stage.ease)
       for (const u of b.units.filter((u) => u.side === 1)) {
@@ -458,7 +458,7 @@ function startMission(p: Profile, mission: Mission) {
       "pve",
       randomInt(0, 10000000),
     );
-    b.title = `${d.name} Â· Tier ${["I", "II", "III", "IV", "V"][tier]}`;
+    b.title = `${d.name} · Tier ${["I", "II", "III", "IV", "V"][tier]}`;
     b.arena = d.name.startsWith("Crystal")
       ? "rift"
       : d.name.startsWith("Ember")

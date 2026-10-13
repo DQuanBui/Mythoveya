@@ -1,3 +1,4 @@
+import { atlasBlocked } from "../../../packages/shared/atlas";
 import { ConservancySites } from "./ConservancySites";
 import { conservancyStops, conservancyBlocked } from "../../../packages/shared/conservancy";
 import { RallyCamp } from "./RallyCamp";
@@ -755,7 +756,7 @@ export function Explorer({
           !((x + 6) ** 2 + (z + 3) ** 2 < 1.1) &&
           !(Math.abs(x - 1) > 1.6 && Math.abs(x - 1) < 2.4 && Math.abs(z + 6) < 0.5) &&
           !PEBBLES.some((p) => p.size > 0.2 && Math.hypot(x - p.x, z - p.z) < p.size + 0.12)) &&
-      !blocksLandmark(profile.region, x, z) && !rallyBlocked(profile.region,x,z) && !conservancyBlocked(profile.region,x,z),
+      !blocksLandmark(profile.region, x, z) && !rallyBlocked(profile.region,x,z) && !conservancyBlocked(profile.region,x,z) && !atlasBlocked(profile.region,x,z),
     [profile.region],
   );
   const allowed = area?.allowed ?? regionAllowed;

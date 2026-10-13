@@ -1,3 +1,4 @@
+import { ATLAS_PATHS } from "./atlas";
 import { CONSERVANCY_PATHS } from "./conservancy";
 import { RALLY_PATHS } from "./rally";
 import { WILDWOOD_PATHS, WILDWOOD_PLACES, FIELD_HOUSES, FIELD_NODES, inReedwater, fieldStructureBlocked } from "./wildwood";
@@ -161,6 +162,7 @@ export const HAVEN_PLACES = [
   },
 ] as const;
 export const HAVEN_PATHS: Point[][] = [
+  ...ATLAS_PATHS.haven,
   ...CONSERVANCY_PATHS.haven,
   ...RALLY_PATHS.haven,
   [
