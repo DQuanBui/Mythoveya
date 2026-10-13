@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import {
   rallyHost,
@@ -82,6 +82,8 @@ function Camp({
     k.pop();
     return k.build();
   }, [h]);
+  // This merged geometry belongs to this camp mount, not the shared shape kit.
+  useEffect(() => () => mesh.dispose(), [mesh]);
   useFrame(({ clock }) =>
     animateAvatar(host, clock.elapsedTime, false, false, settings.reduced),
   );
@@ -95,7 +97,7 @@ function Camp({
   );
   return (
     <group name={`wayfarer-camp-${h.region}`}>
-      <mesh geometry={mesh} dispose={null} castShadow receiveShadow>
+      <mesh geometry={mesh} castShadow receiveShadow>
         <meshStandardMaterial vertexColors roughness={0.85} />
       </mesh>
       <WorldInteraction

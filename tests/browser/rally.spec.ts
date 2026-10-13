@@ -33,15 +33,42 @@ async function stop(page: Page, region: string) {
     .locator(".haven-destinations")
     .getByRole("button", { name: h.name, exact: true })
     .click();
-  await page
-    .getByRole("button", { name: /^Set walking waypoint/ })
-    .click();
+  await page.getByRole("button", { name: /^Set walking waypoint/ }).click();
   await page
     .getByRole("button", { name: "Walk to waypoint", exact: true })
     .click();
   await expect(page.locator(`section[aria-label="${h.id}"]`)).toBeVisible({
     timeout: 90000,
   });
+}
+async function watchCampDisposal(page: Page, region: string) {
+  await page.evaluate(async (region) => {
+    const url = performance
+      .getEntriesByType("resource")
+      .map((r) => r.name)
+      .find((n) => n.includes("@react-three_fiber.js"))!;
+    const { _roots } = await import(/* @vite-ignore */ url);
+    const scene = _roots
+      .get(document.querySelector("canvas"))
+      ?.store.getState().scene;
+    const camp = scene?.getObjectByName(`wayfarer-camp-${region}`);
+    const mesh = camp?.children.find((o: any) => o.isMesh);
+    if (!mesh?.geometry) throw Error(`Missing rendered camp for ${region}`);
+    (window as any).__rallyDisposed ||= {};
+    mesh.geometry.addEventListener("dispose", () => {
+      (window as any).__rallyDisposed[region] = true;
+    });
+  }, region);
+}
+async function expectCampDisposed(page: Page, region: string) {
+  await expect
+    .poll(() =>
+      page.evaluate(
+        (region) => (window as any).__rallyDisposed?.[region] === true,
+        region,
+      ),
+    )
+    .toBe(true);
 }
 test("visit four rally hosts, complete daily activities and persist a full passport", async ({
   page,
@@ -97,8 +124,12 @@ test("visit four rally hosts, complete daily activities and persist a full passp
 
   await page.reload();
   await page.getByRole("button", { name: "Continue your journey" }).click();
+  let previousRegion = "";
   for (const h of RALLY_HOSTS) {
     await stop(page, h.region);
+    if (previousRegion) await expectCampDisposed(page, previousRegion);
+    await watchCampDisposal(page, h.region);
+    previousRegion = h.region;
     await page.getByText(`Talk with ${h.host}`, { exact: true }).click();
     await expect(page.locator(".rally-journal")).toContainText(h.story);
     const event = rallyActivity(h.region);
@@ -162,6 +193,7 @@ test("visit four rally hosts, complete daily activities and persist a full passp
     await page.screenshot({ path: `artifacts/rally-${h.region}.png` });
   }
   await stop(page, "haven");
+  await expectCampDisposed(page, "hollow");
   await page
     .getByRole("button", { name: "Complete passport with Piper", exact: true })
     .click();
