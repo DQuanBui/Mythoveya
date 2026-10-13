@@ -10,13 +10,15 @@ Mythoveya is a locally playable, browser-based 3D creature-collection RPG. Its w
 
 ## The game
 
+- **The Wayfarer Rally:** meet Piper, Nessa, Orrin and Edda at new camps across all four regions. Follow their approach trails, help with rotating daily activities, collect four new companions and finish a permanent travel passport. [Read the rally guide](docs/WAYFARER.md).
+
 - **The Forest Choir:** explore Whisperleaf's pond, woodland lodges and elevated heartroot clearing. Solve three accessible chime verses, discover wildlife notes and earn Fernibble plus the Grove Listener badge. [Read the Whisperleaf guide](docs/WHISPERLEAF.md).
 
 - **The Lantern Road:** explore Moonfrost's snowy lake, fir forests, mountain observatory and shelters. Gather with companions, craft three trail lanterns, restore the migration road and earn Rimeowl plus the Lantern Keeper badge. [Read the Moonfrost guide](docs/MOONFROST.md).
 
 - **Signals in the Stone:** explore Emberglass's basalt terraces, hot springs and ranger camp; solve three companion-powered beacon inscriptions, calm the Glass Sentinel, earn Thermala and collect a Canyon Naturalist badge. [Read the canyon guide](docs/CANYON.md).
 - **The Silent Windmill:** explore the western lake and hillside cottages, use Flame, Tide and Grove companions in the field, calm a guardian with alternating defenses, and restore the village windmill. Earn Galehart, discover rain tracks and starlight, and keep every reward in your saved journey.
-- **80 Wildbound, plus 16 evolved forms:** eleven species each in E/D/C, twelve in B, eighteen in A and seventeen in S, eight elements, twelve body families, 240 actions and 80 passives. Every species builds its own look from its description: palette, ears, tail, markings and anatomy such as manes, trunks, sails, owl faces and nine fanned tails.
+- **84 Wildbound, plus 16 evolved forms:** eleven species each in E/D/C, sixteen in B, eighteen in A and seventeen in S, eight elements, twelve body families, 252 actions and 84 passives. Every species builds its own look from its description: palette, ears, tail, markings and anatomy such as manes, trunks, sails, owl faces and nine fanned tails.
 - **Eight keepers:** choose a recognizable character and change your appearance later without losing progress.
 - **Eight village friends:** meet Liora, Sella, Bram, Kael, Oren, Tali, Pip, and Wren. Explore 24 conversation topics, complete 16 missions, and unlock their daily help.
 - **Make yourself at home:** trade supplies at Pip's rotating market, grow Sunseed, craft treats, nurture friendship, name companions, and dress your following friend with a ribbon or bell.
