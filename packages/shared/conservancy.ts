@@ -38,12 +38,12 @@ export const OUTPOSTS = [
     name: "Juniper's orchard refuge",
     host: "Juniper",
     avatar: 4,
-    point: [-15, 24] as [number, number],
+    point: [-15, 31] as [number, number],
     color: "#d2b776",
     species: "mossloom",
     story:
       "Fallen branches can become a roof. Leave the living trees standing and let their smallest neighbors do the gardening.",
-    join: [-22, 22] as [number, number],
+    join: [-22, 30] as [number, number],
   },
   {
     region: "meadow",
@@ -56,7 +56,7 @@ export const OUTPOSTS = [
     species: "mossloom",
     story:
       "Mossloom weaves safe paths through the roots. Give it a quiet garden and it will stitch the forest back together.",
-    join: [-20, -20] as [number, number],
+    join: [0, -27] as [number, number],
   },
   {
     region: "canyon",
@@ -77,7 +77,7 @@ export const OUTPOSTS = [
     name: "Elowen's snow garden",
     host: "Elowen",
     avatar: 5,
-    point: [17, 7] as [number, number],
+    point: [19, -12] as [number, number],
     color: "#98bccf",
     species: "astralynx",
     story:

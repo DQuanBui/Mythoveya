@@ -1,3 +1,4 @@
+import { CONSERVANCY_PATHS } from "./conservancy";
 import { RALLY_PATHS } from "./rally";
 import type { Profile } from "./types";
 import { PEBBLES, type Point } from "./haven";
@@ -6,6 +7,7 @@ export const MEADOW_EXTENT = 46;
 export const MEADOW_POND = { x: -23, z: 8, rx: 6, rz: 5 };
 export const MEADOW_LODGE: Point = [19, 12];
 export const MEADOW_PATHS: Point[][] = [
+  ...CONSERVANCY_PATHS.meadow,
   ...RALLY_PATHS.meadow,
   [
     [0, 5],
