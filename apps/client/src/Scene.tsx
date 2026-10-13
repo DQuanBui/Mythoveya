@@ -1,3 +1,4 @@
+import { AtlasSites } from "./AtlasSites";
 import { atlasBlocked } from "../../../packages/shared/atlas";
 import { ConservancySites } from "./ConservancySites";
 import { conservancyStops, conservancyBlocked } from "../../../packages/shared/conservancy";
@@ -1186,7 +1187,8 @@ export function WorldScene({
       <WalkContext.Provider value={walker}>
       <ModelLighting intensity={0.35} />
       <Environment region={profile.region} expedition={expeditionOf(profile)} />
-      <ConservancySites profile={profile} onInteract={onInteract} disabled={blocked}/>
+      <AtlasSites profile={profile} onInteract={onInteract} disabled={blocked}/>
+          <ConservancySites profile={profile} onInteract={onInteract} disabled={blocked}/>
       <RallyCamp region={profile.region} onInteract={onInteract} disabled={blocked}/>
       {profile.region === "meadow" && <><MeadowScenery journey={meadowOf(profile)} onInteract={onInteract} disabled={blocked} /><MeadowWildlife onInteract={onInteract} disabled={blocked}/></>}
       {profile.region === "hollow" && <><HollowScenery journey={hollowOf(profile)} onInteract={onInteract} disabled={blocked} /><HollowWildlife onInteract={onInteract} disabled={blocked}/></>}
