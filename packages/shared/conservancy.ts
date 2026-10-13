@@ -113,7 +113,7 @@ export const CONSERVANCY_PATHS = Object.fromEntries(
   OUTPOSTS.map((h) => [
     h.region,
     [
-      [h.join, h.point],
+      h.region === "hollow" ? [h.join, [27,-9] as [number,number], [26,-12] as [number,number], h.point] : [h.join, h.point],
       ...[...SUPPLY_NODES.filter((n) => n.region === h.region)].map((n) => [
         h.point,
         n.point,
@@ -124,11 +124,20 @@ export const CONSERVANCY_PATHS = Object.fromEntries(
 export const conservancyProp = (s: {
   point: [number, number];
 }): [number, number] => [s.point[0] + 2.4, s.point[1] - 1.8];
+export const supplyProp = (s: {
+  point: [number, number];
+}): [number, number] => [s.point[0] - 0.9, s.point[1] + 0.8];
 export function conservancyBlocked(region: string, x: number, z: number) {
   const h = OUTPOSTS.find((h) => h.region === region);
   if (!h) return false;
   const [a, b] = conservancyProp(h);
-  return Math.abs(x - a) < 1.2 && Math.abs(z - b) < 0.9;
+  return (
+    (Math.abs(x - a) < 1.2 && Math.abs(z - b) < 0.9) ||
+    SUPPLY_NODES.filter((n) => n.region === region).some((n) => {
+      const [a, b] = supplyProp(n);
+      return Math.hypot(x - a, z - b) < 0.5;
+    })
+  );
 }
 export type ConservancyState = {
   day: string;

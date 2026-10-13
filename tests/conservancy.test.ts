@@ -64,7 +64,7 @@ it("resets daily supply and care claims while retaining materials kits restorati
       installed: { haven: ["lantern"] },
       claims: ["mossloom"],
     },
-  } as Profile;
+  } as unknown as Profile;
   const r = conservancyOf(p, Date.parse("2026-10-13T00:00:01Z"));
   expect(r.gathered).toEqual([]);
   expect(r.tended).toEqual([]);

@@ -1,3 +1,5 @@
+import { ConservancySites } from "./ConservancySites";
+import { conservancyStops, conservancyBlocked } from "../../../packages/shared/conservancy";
 import { RallyCamp } from "./RallyCamp";
 import { rallyHost, rallyBlocked } from "../../../packages/shared/rally";
 import { MeadowWildlife } from "./MeadowWildlife";
@@ -611,7 +613,7 @@ export const INTERACTABLES = [
 // Interaction points sit on the terrain (using each region's ground height).
 for (const o of INTERACTABLES) o.p[1] = groundHeight(o.p[0], o.p[2]);
 export const getInteractables = (region: string) =>
-  [...(rallyHost(region) ? [{id:rallyHost(region)!.id,name:rallyHost(region)!.name,hint:rallyHost(region)!.description,p:[rallyHost(region)!.point[0],groundFor(region)(...rallyHost(region)!.point),rallyHost(region)!.point[1]]}] : []), ...(region === "meadow" ? MEADOW_STOPS.map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],meadowHeight(...s.point),s.point[1]]})) : []), ...(region === "hollow" ? HOLLOW_STOPS.map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],hollowHeight(...s.point),s.point[1]]})) : []), ...(region === "canyon" ? CANYON_STOPS.map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],canyonHeight(...s.point),s.point[1]]})) : []), ...INTERACTABLES.filter(
+  [...conservancyStops(region).map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],groundFor(region)(...s.point),s.point[1]]})), ...(rallyHost(region) ? [{id:rallyHost(region)!.id,name:rallyHost(region)!.name,hint:rallyHost(region)!.description,p:[rallyHost(region)!.point[0],groundFor(region)(...rallyHost(region)!.point),rallyHost(region)!.point[1]]}] : []), ...(region === "meadow" ? MEADOW_STOPS.map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],meadowHeight(...s.point),s.point[1]]})) : []), ...(region === "hollow" ? HOLLOW_STOPS.map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],hollowHeight(...s.point),s.point[1]]})) : []), ...(region === "canyon" ? CANYON_STOPS.map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],canyonHeight(...s.point),s.point[1]]})) : []), ...INTERACTABLES.filter(
     (o) =>
       (region === "haven" ||
         (!o.id.startsWith("exp-") && !o.id.startsWith("trail-") &&
@@ -753,7 +755,7 @@ export function Explorer({
           !((x + 6) ** 2 + (z + 3) ** 2 < 1.1) &&
           !(Math.abs(x - 1) > 1.6 && Math.abs(x - 1) < 2.4 && Math.abs(z + 6) < 0.5) &&
           !PEBBLES.some((p) => p.size > 0.2 && Math.hypot(x - p.x, z - p.z) < p.size + 0.12)) &&
-      !blocksLandmark(profile.region, x, z) && !rallyBlocked(profile.region,x,z),
+      !blocksLandmark(profile.region, x, z) && !rallyBlocked(profile.region,x,z) && !conservancyBlocked(profile.region,x,z),
     [profile.region],
   );
   const allowed = area?.allowed ?? regionAllowed;
@@ -1183,6 +1185,7 @@ export function WorldScene({
       <WalkContext.Provider value={walker}>
       <ModelLighting intensity={0.35} />
       <Environment region={profile.region} expedition={expeditionOf(profile)} />
+      <ConservancySites profile={profile} onInteract={onInteract} disabled={blocked}/>
       <RallyCamp region={profile.region} onInteract={onInteract} disabled={blocked}/>
       {profile.region === "meadow" && <><MeadowScenery journey={meadowOf(profile)} onInteract={onInteract} disabled={blocked} /><MeadowWildlife onInteract={onInteract} disabled={blocked}/></>}
       {profile.region === "hollow" && <><HollowScenery journey={hollowOf(profile)} onInteract={onInteract} disabled={blocked} /><HollowWildlife onInteract={onInteract} disabled={blocked}/></>}
