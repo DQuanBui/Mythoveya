@@ -263,7 +263,7 @@ export function createCreature(id: string, shimmer = false) {
         const l = new T.Group();
         l.position.set(x, 0.55, z);
         rig.add(l);
-        part(l, "capsule", dark, [x * 0.4, -0.14, 0], [0.05, 0.24, 0.05], [0, 0, x * 1.4]);
+        if(s.id!=="mossloom") part(l, "capsule", dark, [x * 0.4, -0.14, 0], [0.05, 0.24, 0.05], [0, 0, x * 1.4]);
         limbs.push(l);
       }
     if (s.id === "lanternmoth") {
@@ -273,8 +273,7 @@ export function createCreature(id: string, shimmer = false) {
       wing(1, 1.3, accent);
     } else
       for (const side of [-1, 1]) body([side * 0.2, 0.86, -0.15], [0.23, 0.12, 0.45], dna.marking === "spots" ? accent : dark);
-    horn(-0.2, 1.3, 0.6, 0.5);
-    horn(0.2, 1.3, 0.6, 0.5);
+    if(s.id!=="mossloom"){horn(-0.2, 1.3, 0.6, 0.5);horn(0.2, 1.3, 0.6, 0.5);}
   }
   if (s.family === "shell") {
     body([0, 0.73, -0.1], [0.7 * bx, 0.55 * by, 0.75 * bz], dark);
@@ -482,7 +481,7 @@ export function createCreature(id: string, shimmer = false) {
     tails.push(tail);
   }
   // Signature anatomy is derived from the authored species description.
-  if (/crown/.test(s.appearance)) {
+  if (s.id!=="mossloom" && /crown/.test(s.appearance)) {
     part(rig, "ring", light, [0, headY + 0.27 * hs, headZ - 0.02], [0.2 * hs, 0.2 * hs, 0.6], [Math.PI / 2 - 0.25, 0, 0], true);
     for (let i = 0; i < 5; i++) {
       const a = (i / 5) * Math.PI * 2;
@@ -624,8 +623,13 @@ export function createCreature(id: string, shimmer = false) {
     for(let i=0;i<4;i++) part(rig,"ring",cream,[0,.85,-.5],[.2+i*.1,.2+i*.1,.22],[Math.PI/2,0,i*.2]);
     for(const l of limbs){
       const side=Math.sign(l.position.x);
-      part(l,"capsule","#ddb56e",[side*.3,-.1,0],[.06,.45,.06],[0,0,side*1.15]);
-      part(l,"capsule",light,[side*.51,-.23,0],[.05,.32,.05],[0,0,-side*.25]);
+      const points=[new T.Vector3(0,0,0),new T.Vector3(side*.48,.08,l.position.z*.3),new T.Vector3(side*.68,-.5,l.position.z*.4)];
+      for(let i=1;i<points.length;i++){
+        const a=points[i-1],b=points[i],delta=b.clone().sub(a),midpoint=a.clone().add(b).multiplyScalar(.5);
+        const segment=part(l,"capsule",i===1?"#ddb56e":light,midpoint.toArray(),[.11,delta.length()/2,.11]);
+        segment.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),delta.normalize());
+      }
+      part(l,"orb",accent,points[1].toArray(),[.09,.09,.09]);
     }
     for(let i=0;i<3;i++) part(rig,"orb",light,[(i-1)*.13,headY+.27,headZ-.04],[.08,.06,.23],[.3,0,(i-1)*.5]);
   }
