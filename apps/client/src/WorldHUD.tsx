@@ -123,6 +123,7 @@ export function WorldHUD({
           <img src="/emblem.svg" alt="" />
           <div>
             <strong>{profile.name}</strong>
+            {profile.atlas?.finished && <small className="lantern-badge">LOREKEEPER</small>}
             {profile.conservancy?.claims.includes("astralynx") && <small className="lantern-badge">CONSERVATOR</small>}
             {profile.rally?.finished && <small className="lantern-badge">WAYFARER</small>}
             {profile.region === "meadow" && profile.meadow?.finished && <small className="lantern-badge">GROVE LISTENER</small>}

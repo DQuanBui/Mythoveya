@@ -574,3 +574,16 @@ button.world-label:hover {
 .conservancy-awards {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
 .conservancy-awards img {width:96px;height:96px;float:right;}
 @media(max-width:650px){.conservancy-recipes,.conservancy-awards{grid-template-columns:1fr;}}
+
+/* The saved Atlas story keeps clues and controls together at every screen size. */
+.atlas-tabs,.atlas-navigation,.atlas-glyphs{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
+.atlas-tabs button[aria-pressed="true"]{border-color:#c7a66d;background:#4d493c}
+.atlas-journal button,.atlas-journal select{min-height:44px}
+.atlas-chapter{padding:18px;background:#ffffff05;border:1px solid #d9c79d30;border-radius:14px}
+.atlas-chapter h3{font-size:1.4rem}.atlas-chapter h4{margin:14px 0 8px}
+.atlas-inscription,.atlas-ending,.atlas-echo{padding:12px 16px;margin:16px 0;background:#d9c79d09;border-radius:10px}
+.atlas-inscription blockquote{margin:10px 0;border-left:3px solid #b99d6e;padding-left:14px;line-height:1.65}
+.atlas-glyphs label{display:grid;gap:6px;flex:1;min-width:140px}.atlas-journal select{width:100%;margin:6px 0 10px}
+.atlas-companion{display:flex;align-items:center;gap:12px}.atlas-progress,.atlas-notice{color:#dfc994}.atlas-echo label{display:block;max-width:300px}
+.atlas-journal details{margin:10px 0}.atlas-journal summary{cursor:pointer;padding:10px 0}
+@media(max-width:650px){.atlas-glyphs{display:grid;grid-template-columns:1fr}.atlas-chapter{padding:12px}.atlas-tabs{display:grid;grid-template-columns:1fr 1fr}.atlas-inscription,.atlas-ending,.atlas-echo{padding:12px}}
