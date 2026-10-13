@@ -315,7 +315,7 @@ export function createCreature(id: string, shimmer = false) {
     body([0, 0.82, 0.12], [0.34 * bx, 0.3, 0.62 * bz], cream);
     headY = 0.99;
     headZ = 0.61;
-    if (s.id !== "bloomanta") { wing(-1, 1.15, accent); wing(1, 1.15, accent); }
+    if (s.id !== "bloomanta" && s.id !== "cairnfin") { wing(-1, 1.15, accent); wing(1, 1.15, accent); }
     if (/jellyfish|cuttlefish/.test(s.appearance)) {
       body([0, 1.05, 0], [0.66, 0.42, 0.65]);
       for (let i = 0; i < 6; i++) {
@@ -333,7 +333,7 @@ export function createCreature(id: string, shimmer = false) {
       headZ = 0.24;
     }
   }
-  if (s.family === "spirit") {
+  if (s.family === "spirit" && s.id !== "inkwisp") {
     body([0, 1, 0], [0.52 * bx, 0.6 * by, 0.44]);
     headY = 1.25;
     headZ = 0.27;
@@ -342,6 +342,7 @@ export function createCreature(id: string, shimmer = false) {
     for (let i = 0; i < 3; i++)
       body([Math.sin(i * 2) * 0.5, 0.5, Math.cos(i * 2) * 0.3], [0.12, 0.2, 0.13], i % 2 ? accent : light);
   }
+  if (s.id === "inkwisp") { headY=1.26; headZ=.4; }
   if (s.family === "golem") {
     body([0, 1.1, 0], [0.73 * bx, 0.7, 0.45], dark);
     headY = 1.8;
@@ -618,6 +619,25 @@ export function createCreature(id: string, shimmer = false) {
     for(let i=0;i<7;i++) {const a=(i-3)*.27;part(crescent,"orb",i%2?light:cream,[Math.sin(a)*.5,0,-Math.cos(a)*.45],[.1,.06,.44],[0,-a,0]);}
   }
 
+  if (s.id === "cairnfin") {
+    for (const side of [-1,1]) {
+      const fin=new T.Group();fin.name="cairnfin-stone-fin";fin.position.set(side*.25,.9,-.1);rig.add(fin);wings.push(fin);
+      for(let i=0;i<3;i++)part(fin,"orb",[mid,c,light][i],[side*(.35+i*.25),-.015*i,-.15*i],[.65-i*.12,.09,.65-i*.1],[0,side*.4,side*.1]);
+      for(let i=0;i<3;i++)part(rig,"cone",accent,[side*(.15+i*.15),1.15-i*.035,-.15-i*.19],[.09,.22,.09],[0,0,side*.2],true);
+    }
+    const ribbon=new T.Group();ribbon.name="cairnfin-ribbon";ribbon.position.set(0,.85,-.85);rig.add(ribbon);tails.push(ribbon);
+    for(let i=0;i<5;i++)part(ribbon,"orb",i%2?light:mid,[Math.sin(i*.65)*.12,-i*.035,-i*.2],[.075,.04,.19]);
+  }
+  if (s.id === "inkwisp") {
+    body([0,1.25,0],[.66,.38,.55],light);
+    body([0,1.08,0],[.64,.11,.54],c);
+    for(let i=0;i<6;i++){
+      const a=i*Math.PI/3,t=new T.Group();t.name="inkwisp-tentacle";t.position.set(Math.cos(a)*.37,.97,Math.sin(a)*.32);rig.add(t);tails.push(t);
+      for(let j=0;j<4;j++)part(t,"orb",j%2?accent:c,[Math.sin(j*.7+a)*.07,-j*.16,0],[.055,.14,.055]);
+      part(rig,"box",cream,[Math.cos(a)*.77,1.85,Math.sin(a)*.63],[.08,.16,.035],[0,-a,.3],true);
+    }
+    part(rig,"ring",accent,[0,1.82,0],[.77,.63,1],[Math.PI/2,0,0],true);
+  }
   if (s.id === "mossloom") {
     part(rig,"orb",accent,[0,.8,-.5],[.6,.48,.6]);
     for(let i=0;i<4;i++) part(rig,"ring",cream,[0,.85,-.5],[.2+i*.1,.2+i*.1,.22],[Math.PI/2,0,i*.2]);

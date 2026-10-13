@@ -94,6 +94,8 @@ const tiers = ["E", "D", "C", "B", "A", "S"];
 
 // Art-directed palettes and proportions for the western habitats.
 const WILDWOOD_DNA: Record<string, Partial<Dna>> = {
+  cairnfin:{base:"#c89a73",mid:"#92745f",light:"#edcea0",cream:"#f7e6c4",dark:"#535e69",accent:"#6fc5bf",iris:"#605187",body:[1.1,.65,1.2],head:.85,ears:"none",marking:"none"},
+  inkwisp:{base:"#9983c7",mid:"#695488",light:"#e0d5f5",cream:"#f2e6e6",dark:"#494366",accent:"#85d2c8",iris:"#e4c67f",body:[1,.8,1],head:.8,ears:"none",marking:"none"},
   mossloom:{base:"#528c79",mid:"#38675f",light:"#b9d7ae",cream:"#f6dfbc",dark:"#375262",accent:"#d995ad",iris:"#edc46c",body:[1.15,1,1.15],head:.85,ears:"none",marking:"none"},
   astralynx:{base:"#465f9c",mid:"#364373",light:"#b7d8eb",cream:"#f5e4c3",dark:"#303654",accent:"#e9bf69",iris:"#8ce5d9",body:[1.1,1.1,1.35],head:1,legs:1.1,ears:"tufted",earSize:1.3,tail:"fluffy",marking:"spots"},
   sunquill:{base:"#3ab7ad",mid:"#287f87",light:"#a7e5d3",cream:"#fff0c5",dark:"#385b7c",accent:"#edbd55",iris:"#6c5378",body:[.8,.85,1.1],head:.9,ears:"none",tail:"plume",marking:"none"},
