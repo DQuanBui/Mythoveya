@@ -97,6 +97,7 @@ export const FAMILIES = [
   "amphibian", "insect", "shell", "aquatic", "antler", "bird",
   "insect", "amphibian",
   "bird", "quadruped", "shell", "insect",
+  "insect", "quadruped",
 ] as const;
 export type Effect =
   | "damage"
@@ -216,8 +217,11 @@ const mechanics: Effect[][] = [
   ["heal", "regen"],
   ["guard", "reflect"],
   ["damage", "slow", "mark"],
+  ["shield", "cleanse", "regen"],
+  ["damage", "pierce", "mark"],
 ];
 const targets: Record<number, Action["target"]> = {
+  84: "allies", 85: "row",
   80: "allies", 81: "allies", 82: "self", 83: "row",
   3: "self",
   20: "self",

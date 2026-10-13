@@ -1402,6 +1402,26 @@
         "attack",
         "hurt"
       ]
+    },
+    {
+      "species": "mossloom",
+      "family": "insect",
+      "profile": "insect:84",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "astralynx",
+      "family": "quadruped",
+      "profile": "quadruped:85",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
     }
   ]
 }

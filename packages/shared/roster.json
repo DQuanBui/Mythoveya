@@ -754,5 +754,23 @@
     "role": "controller",
     "appearance": "Violet moth with four broad ice-blue wings, snowflake eye spots and feathery antennae",
     "signature": "Rime Veil deals damage and slows marked enemies"
+  },
+  {
+    "id": "mossloom",
+    "name": "Mossloom",
+    "tier": "A",
+    "element": "Grove",
+    "role": "support",
+    "appearance": "Jade velvet spider with eight amber jointed legs, a rose silk abdomen and a woven leaf crown",
+    "signature": "Silken Sanctuary shields allies, cleanses ailments and grants regeneration"
+  },
+  {
+    "id": "astralynx",
+    "name": "Astralynx",
+    "tier": "S",
+    "element": "Light",
+    "role": "striker",
+    "appearance": "Midnight blue lynx with tall gold ear tufts, pearl star spots and three flowing aurora tails",
+    "signature": "Constellation Pounce deals piercing damage and marks an enemy row"
   }
 ]
