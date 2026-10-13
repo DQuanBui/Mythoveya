@@ -6,11 +6,12 @@ export const WILDWOOD_EFFECTS = [
   "bloomanta",
   "galehart",
   "auroroc", "cindervane", "thermala",
-  "sunquill", "bramblebun", "kilnback", "frostmoth",
+  "sunquill", "bramblebun", "kilnback", "frostmoth", "mossloom", "astralynx",
 ];
 export function WildwoodEffect({ id }: { id: string }) {
   if (!WILDWOOD_EFFECTS.includes(id)) return null;
   const colors: Record<string, string[]> = {
+    mossloom:["#b9d7ae","#efb6cb"],astralynx:["#e9c777","#98dfea"],
     sunquill:["#f5cf75","#a2e6d5"],bramblebun:["#e6a9bd","#b9df97"],kilnback:["#ebae6c","#f5d395"],frostmoth:["#b3e5ed","#bca9ea"],
     cindervane: ["#efb160", "#c97eac"],
     thermala: ["#94e0cd", "#f2cca1"],
@@ -36,7 +37,11 @@ export function WildwoodEffect({ id }: { id: string }) {
             ]}
             rotation={[0, -a, 0]}
           >
-            {(id === "reedlet" || id === "thermala" || id === "bramblebun") ? (
+            {id === "mossloom" ? (
+              <group><mesh rotation={[Math.PI/2,0,a]}><torusGeometry args={[.3,.025,5,18]}/><meshBasicMaterial color={c} transparent opacity={.8}/></mesh><mesh rotation={[0,a,.4]} scale={[.12,.025,.4]}><sphereGeometry args={[1,8,5]}/><meshBasicMaterial color="#eac2cc" transparent opacity={.7}/></mesh></group>
+            ) : id === "astralynx" ? (
+              <group><mesh rotation={[0,a,.5]}><octahedronGeometry args={[.18]}/><meshBasicMaterial color={c}/></mesh><mesh rotation={[0,a,.5]}><torusGeometry args={[.35,.03,5,14,Math.PI]}/><meshBasicMaterial color="#b6b4ed" transparent opacity={.8}/></mesh></group>
+            ) : (id === "reedlet" || id === "thermala" || id === "bramblebun") ? (
               <mesh>
                 <sphereGeometry args={[0.16, 10, 8]} />
                 <meshBasicMaterial color={c} transparent opacity={0.6} />
