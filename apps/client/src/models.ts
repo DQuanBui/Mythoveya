@@ -634,7 +634,7 @@ export function createCreature(id: string, shimmer = false) {
     for(let i=0;i<6;i++){
       const a=i*Math.PI/3,t=new T.Group();t.name="inkwisp-tentacle";t.position.set(Math.cos(a)*.37,.97,Math.sin(a)*.32);rig.add(t);tails.push(t);
       for(let j=0;j<4;j++)part(t,"orb",j%2?accent:c,[Math.sin(j*.7+a)*.07,-j*.16,0],[.055,.14,.055]);
-      part(rig,"box",cream,[Math.cos(a)*.77,1.85,Math.sin(a)*.63],[.08,.16,.035],[0,-a,.3],true);
+      part(rig,"box",dna.iris,[Math.cos(a)*.77,1.85,Math.sin(a)*.63],[.08,.16,.035],[0,-a,.3],true);
     }
     part(rig,"ring",accent,[0,1.82,0],[.77,.63,1],[Math.PI/2,0,0],true);
   }

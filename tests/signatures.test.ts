@@ -25,6 +25,18 @@ function fixture(id: string) {
   return b;
 }
 describe("signature behavior and presentation contracts", () => {
+  it("Cairnfin guards its allies and Inkwisp cleanses and hastens them without damaging opponents",()=>{
+    for(const id of ["cairnfin","inkwisp"]){
+      const b=fixture(id),enemyHp=b.units.filter(u=>u.side===1).map(u=>u.hp);
+      b.units.filter(u=>u.side===0).forEach(u=>u.statuses.push({kind:"burn",turns:2,value:.05}));
+      act(b,0,2,"0:0",0);
+      const allies=b.units.filter(u=>u.side===0);
+      expect(allies.every(u=>u.shield>0)).toBe(true);
+      expect(allies.every(u=>u.statuses.some(s=>s.kind===(id==="cairnfin"?"guard":"haste")))).toBe(true);
+      if(id==="inkwisp")expect(allies.every(u=>!u.statuses.some(s=>s.kind==="burn"))).toBe(true);
+      expect(b.units.filter(u=>u.side===1).map(u=>u.hp)).toEqual(enemyHp);
+    }
+  });
   it("keeps attack bonuses on the attacker and revival never damages its owner", () => {
     for (const id of ["zippinch", "raijora", "ignivara"]) {
       const b = fixture(id);

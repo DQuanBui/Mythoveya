@@ -214,3 +214,22 @@ test("Conservancy species have distinct models and rendered signature skills", a
   }
   expect(errors).toEqual([]);
 });
+
+test("Atlas species have distinct models and rendered signature skills", async ({ page }) => {
+  const errors = await openGallery(page);
+  for (const s of SPECIES.filter((s) => ["cairnfin", "inkwisp"].includes(s.id))) {
+    await page.locator(".gallery-list").getByRole("button", { name: `${s.tier} · ${s.name}`, exact: true }).click();
+    await page.waitForTimeout(150);
+    await page.locator(".gallery-preview").screenshot({ path: `artifacts/atlas-model-${s.id}.png` });
+    await page.getByRole("button", { name: "Preview ultimate", exact: true }).click();
+    await page.getByRole("button", { name: "Pause", exact: true }).click();
+    await expect.poll(() => page.evaluate(async (id) => {
+      const url = performance.getEntriesByType("resource").map((r) => r.name).find((n) => n.includes("@react-three_fiber.js"))!;
+      const { _roots } = await import(/* @vite-ignore */ url);
+      return _roots.get(document.querySelector(".gallery-preview canvas"))?.store.getState().scene.getObjectByName(`signature-${id}`)?.children.length;
+    }, s.id)).toBe(6);
+    await page.locator(".gallery-preview").screenshot({ path: `artifacts/atlas-skill-${s.id}.png` });
+    await page.getByRole("button", { name: "Play", exact: true }).click();
+  }
+  expect(errors).toEqual([]);
+});

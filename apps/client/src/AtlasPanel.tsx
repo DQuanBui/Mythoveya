@@ -152,7 +152,7 @@ function Chapter({
           <p>80 Gold, 25 Diamonds and 40 XP awarded.</p>
           {(index === 1 || index === 3) && (
             <div className="atlas-companion">
-              <Portrait id={index === 1 ? "cairnfin" : "inkwisp"} size={72} />
+              <Portrait id={index === 1 ? "cairnfin" : "inkwisp"} className="atlas-portrait" />
               <span>
                 {index === 1 ? "Cairnfin" : "Inkwisp"} joined your collection
                 (or granted a duplicate shard).

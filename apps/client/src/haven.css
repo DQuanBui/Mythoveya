@@ -587,3 +587,5 @@ button.world-label:hover {
 .atlas-companion{display:flex;align-items:center;gap:12px}.atlas-progress,.atlas-notice{color:#dfc994}.atlas-echo label{display:block;max-width:300px}
 .atlas-journal details{margin:10px 0}.atlas-journal summary{cursor:pointer;padding:10px 0}
 @media(max-width:650px){.atlas-glyphs{display:grid;grid-template-columns:1fr}.atlas-chapter{padding:12px}.atlas-tabs{display:grid;grid-template-columns:1fr 1fr}.atlas-inscription,.atlas-ending,.atlas-echo{padding:12px}}
+
+.atlas-portrait{width:72px;height:72px;flex:0 0 72px}
