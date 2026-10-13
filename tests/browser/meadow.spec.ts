@@ -92,7 +92,7 @@ test("restore woodland choirs, retry melodies, explore Whisperleaf and preserve 
   await expect(page.locator(".location")).toContainText("Whisperleaf Meadow");
   await page.getByRole("button", { name: "Travel map", exact: true }).click();
   await expect(page.getByLabel("Whisperleaf trail map")).toBeVisible();
-  await expect(page.locator(".haven-destinations button")).toHaveCount(7);
+  await expect(page.locator(".haven-destinations button")).toHaveCount(11);
   await page.screenshot({ path: "artifacts/meadow-map.png" });
   await travel(page, "Rowan's woodland lodge", "lodge");
   await page
