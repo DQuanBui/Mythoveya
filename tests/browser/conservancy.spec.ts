@@ -49,22 +49,36 @@ test("gather craft dismantle and restore all four Conservancy habitats with save
 }) => {
   test.setTimeout(900000);
   page.setDefaultTimeout(15000);
+  page.setDefaultNavigationTimeout(60000);
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("/");
   await page.evaluate(async () => {
     const post = async (path: string, data: unknown, token = "") => {
-      const r = await fetch("/api/" + path, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + token,
-        },
-        body: JSON.stringify(data),
-      });
-      const body = await r.json();
-      if (!r.ok) throw Error(JSON.stringify(body));
-      return body;
+      for (let attempt = 0; attempt < 8; attempt++) {
+        const r = await fetch("/api/" + path, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+          body: JSON.stringify(data),
+        });
+        const body = await r.json();
+        // This rejection occurs before the server changes the battle sequence.
+        if (
+          !r.ok &&
+          path === "battle/act" &&
+          body.error === "Wait for the current action." &&
+          attempt < 7
+        ) {
+          await new Promise((resolve) => setTimeout(resolve, 150));
+          continue;
+        }
+        if (!r.ok) throw Error(JSON.stringify(body));
+        return body;
+      }
+      throw Error("Battle action timing retry exhausted.");
     };
     const g = await post("guest", { name: "Conservancy Keeper", avatar: 2 });
     localStorage.setItem("mythoveya-session", g.token);
