@@ -1,4 +1,5 @@
-import { RESCUES } from "../../../packages/shared/rescue";
+import { RescuePanel } from "./RescuePanel";
+import { rescueStops } from "../../../packages/shared/rescue";
 import { AtlasPanel } from "./AtlasPanel";
 import { ATLAS_STOPS } from "../../../packages/shared/atlas";
 import { ConservancyPanel } from "./ConservancyPanel";
@@ -202,7 +203,7 @@ export default function App() {
       audio.cue("confirm");
       if (kind === "resource") notify("Gathered +1 Sunseed · +25 Gold");
       if (
-        (kind.startsWith("atlas-") || kind.startsWith("cons-") || kind.startsWith("rally-") || kind.startsWith("mea-") || kind.startsWith("hol-") || kind.startsWith("can-") || kind.startsWith("exp-") || kind.startsWith("town-") || kind.startsWith("home-") || kind.startsWith("island-")) &&
+        (kind.startsWith("rescue-") || kind.startsWith("atlas-") || kind.startsWith("cons-") || kind.startsWith("rally-") || kind.startsWith("mea-") || kind.startsWith("hol-") || kind.startsWith("can-") || kind.startsWith("exp-") || kind.startsWith("town-") || kind.startsWith("home-") || kind.startsWith("island-")) &&
         result.value?.message &&
         kind !== "town-talk" &&
         kind !== "town-fish"
@@ -394,7 +395,7 @@ export default function App() {
     } else setPanel(id);
   }
   const destination =
-    trail?.startsWith("rescue-") ? RESCUES.find(s=>s.id===trail && s.region===profile?.region) : trail?.startsWith("atlas-") ? ATLAS_STOPS.find(s=>s.id===trail && s.region===profile?.region) : trail?.startsWith("cons-") ? CONSERVANCY_STOPS.find(s=>s.id===trail && s.region===profile?.region) : trail?.startsWith("rally-") ? RALLY_HOSTS.find(h=>h.id===trail && h.region===profile?.region) : profile?.region === "haven"
+    trail?.startsWith("rescue-") ? rescueStops(profile?.region || "").find(s=>s.id===trail) : trail?.startsWith("atlas-") ? ATLAS_STOPS.find(s=>s.id===trail && s.region===profile?.region) : trail?.startsWith("cons-") ? CONSERVANCY_STOPS.find(s=>s.id===trail && s.region===profile?.region) : trail?.startsWith("rally-") ? RALLY_HOSTS.find(h=>h.id===trail && h.region===profile?.region) : profile?.region === "haven"
       ? MAP_DESTINATIONS.find((p) => p.id === trail)
       : profile?.region === "canyon" ? CANYON_STOPS.find(p=>p.id===trail) : profile?.region === "hollow" ? HOLLOW_STOPS.find(p=>p.id===trail) : profile?.region === "meadow" ? MEADOW_STOPS.find(p=>p.id===trail) : undefined;
   const objective = profile
@@ -701,7 +702,7 @@ export default function App() {
         <div className="modal-backdrop">
           <section
             key={panel}
-            className={`panel modal ${["collection", "formation", "gallery", "town", "map", "adventure", "training", "events", "smith", "apothecary", "home", "skyferry", "festival"].includes(panel) || panel.startsWith("atlas-") || panel.startsWith("cons-") || panel.startsWith("rally-") || panel.startsWith("mea-") || panel.startsWith("hol-") || panel.startsWith("can-") || panel.startsWith("exp-") || panel.startsWith("npc-") ? "wide" : ""}`}
+            className={`panel modal ${["collection", "formation", "gallery", "town", "map", "adventure", "training", "events", "smith", "apothecary", "home", "skyferry", "festival"].includes(panel) || panel.startsWith("rescue-") || panel.startsWith("atlas-") || panel.startsWith("cons-") || panel.startsWith("rally-") || panel.startsWith("mea-") || panel.startsWith("hol-") || panel.startsWith("can-") || panel.startsWith("exp-") || panel.startsWith("npc-") ? "wide" : ""}`}
             aria-label={panel}
           >
             <button
@@ -714,6 +715,7 @@ export default function App() {
             >
               ×
             </button>
+            {panel.startsWith("rescue-") && profile && <RescuePanel profile={profile} position={position} focus={panel} busy={busy} run={run} track={id=>{setTrail(id);setPanel("");}} travel={()=>setPanel("regions")} formation={()=>setPanel("formation")} />}
             {panel.startsWith("atlas-") && profile && <AtlasPanel profile={profile} position={position} focus={panel} busy={busy} run={run} track={id=>{setTrail(id);setPanel("");}} travel={()=>setPanel("regions")} />}
             {panel.startsWith("cons-") && profile && <ConservancyPanel profile={profile} position={position} focus={panel} busy={busy} run={run} track={id=>{setTrail(id);setPanel("");}} travel={()=>setPanel("regions")} />}
             {panel.startsWith("rally-") && profile && <RallyPanel profile={profile} position={position} focus={panel.slice(6)} busy={busy} run={run} track={id=>{setTrail(id);setPanel("");}} travel={()=>setPanel("regions")} />}
@@ -749,14 +751,14 @@ export default function App() {
               <SkyferryPanel profile={profile} run={run} />
             )}
             {panel === "adventure" && profile && (
-              <><button className="expedition-entry" onClick={()=>setPanel("atlas-journal")}>The Atlas of Echoes / A journey through four memories</button><button className="expedition-entry" onClick={()=>setPanel("cons-journal")}>Wildhaven Conservancy / Craft and restore habitats</button><button className="expedition-entry" onClick={()=>setPanel("rally-journal")}>The Wayfarer Rally / Daily regional activities</button><button className="expedition-entry" onClick={()=>setPanel("mea-journal")}>The Forest Choir / Explore Whisperleaf Meadow</button><button className="expedition-entry" onClick={()=>setPanel("hol-journal")}>The Lantern Road / Explore Moonfrost Hollow</button><button className="expedition-entry" onClick={()=>setPanel("can-journal")}>Signals in the Stone / Explore Emberglass Canyon</button><button className="expedition-entry" onClick={() => setPanel("exp-journal")}>The Silent Windmill · Explore western Havenreach</button><AdventurePanel
+              <><button className="expedition-entry" onClick={()=>setPanel("rescue-journal")}>Wildbound Rescues / Help wildlife with your companions</button><button className="expedition-entry" onClick={()=>setPanel("atlas-journal")}>The Atlas of Echoes / A journey through four memories</button><button className="expedition-entry" onClick={()=>setPanel("cons-journal")}>Wildhaven Conservancy / Craft and restore habitats</button><button className="expedition-entry" onClick={()=>setPanel("rally-journal")}>The Wayfarer Rally / Daily regional activities</button><button className="expedition-entry" onClick={()=>setPanel("mea-journal")}>The Forest Choir / Explore Whisperleaf Meadow</button><button className="expedition-entry" onClick={()=>setPanel("hol-journal")}>The Lantern Road / Explore Moonfrost Hollow</button><button className="expedition-entry" onClick={()=>setPanel("can-journal")}>Signals in the Stone / Explore Emberglass Canyon</button><button className="expedition-entry" onClick={() => setPanel("exp-journal")}>The Silent Windmill · Explore western Havenreach</button><AdventurePanel
                 profile={profile}
                 run={run}
                 begin={(m) => startBattle(false, false, m)}
               /></>
             )}
             {panel === "events" && profile && (
-              <><button className="expedition-entry" onClick={()=>setPanel("atlas-journal")}>The Atlas of Echoes / A journey through four memories</button><button className="expedition-entry" onClick={()=>setPanel("cons-journal")}>Wildhaven Conservancy / Craft and restore habitats</button><button className="expedition-entry" onClick={()=>setPanel("rally-journal")}>The Wayfarer Rally / Daily regional activities</button><EventsPanel profile={profile} run={run} /></>
+              <><button className="expedition-entry" onClick={()=>setPanel("rescue-journal")}>Wildbound Rescues / Help wildlife with your companions</button><button className="expedition-entry" onClick={()=>setPanel("atlas-journal")}>The Atlas of Echoes / A journey through four memories</button><button className="expedition-entry" onClick={()=>setPanel("cons-journal")}>Wildhaven Conservancy / Craft and restore habitats</button><button className="expedition-entry" onClick={()=>setPanel("rally-journal")}>The Wayfarer Rally / Daily regional activities</button><EventsPanel profile={profile} run={run} /></>
             )}
             {(panel === "smith" || panel === "apothecary") && profile && (
               <ShopPanel shop={panel} profile={profile} run={run} />
@@ -938,6 +940,7 @@ export default function App() {
                 <h2>Your story is safe.</h2>
                 <p>Progress is saved on the local server after each action.</p>
                 <div className="pause-buttons">
+                  <button onClick={() => setPanel("rescue-journal")}>Wildbound Rescues journal</button>
                   <button onClick={() => setPanel("atlas-journal")}>Atlas of Echoes journal</button>
                   <button onClick={() => setPanel("cons-journal")}>Conservancy journal</button>
                   <button onClick={() => setPanel("rally-journal")}>Wayfarer Rally journal</button>

@@ -1,3 +1,4 @@
+import { rescueCount } from "../../../packages/shared/rescue";
 import { MEADOW_EXTENT, MEADOW_PATHS, MEADOW_POND } from "../../../packages/shared/meadow";
 import { HOLLOW_EXTENT, HOLLOW_PATHS, HOLLOW_LAKE } from "../../../packages/shared/hollow";
 import { CANYON_EXTENT, CANYON_PATHS, CANYON_SPRINGS } from "../../../packages/shared/canyon";
@@ -123,6 +124,7 @@ export function WorldHUD({
           <img src="/emblem.svg" alt="" />
           <div>
             <strong>{profile.name}</strong>
+            {rescueCount(profile)===4 && <small className="lantern-badge">TRAILKEEPER</small>}
             {profile.atlas?.finished && <small className="lantern-badge">LOREKEEPER</small>}
             {profile.conservancy?.claims.includes("astralynx") && <small className="lantern-badge">CONSERVATOR</small>}
             {profile.rally?.finished && <small className="lantern-badge">WAYFARER</small>}
