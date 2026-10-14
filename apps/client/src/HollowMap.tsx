@@ -1,3 +1,4 @@
+import { rescueStops } from "../../../packages/shared/rescue";
 import { atlasStops } from "../../../packages/shared/atlas";
 import { conservancyStops } from "../../../packages/shared/conservancy";
 import { rallyHost } from "../../../packages/shared/rally";
@@ -13,7 +14,7 @@ import {
   hollowObjective,
   hollowOf,
 } from "../../../packages/shared/hollow";
-const HOLLOW_STOPS=[...atlasStops("hollow"),...REGION_STOPS,rallyHost("hollow")!,...conservancyStops("hollow")];
+const HOLLOW_STOPS=[...rescueStops("hollow"),...atlasStops("hollow"),...REGION_STOPS,rallyHost("hollow")!,...conservancyStops("hollow")];
 export function HollowMap({
   profile,
   position,
