@@ -790,5 +790,23 @@
     "role": "support",
     "appearance": "Violet ink jelly spirit with a pearl bell, six flowing teal tentacles and a halo of golden memory runes",
     "signature": "Memory Wash cleanses allies and grants shields and haste"
+  },
+  {
+    "id": "reedrake",
+    "name": "Reedrake",
+    "tier": "B",
+    "element": "Tide",
+    "role": "healer",
+    "appearance": "Small jade marsh dragon with coral webbed wings, cattail horns, a cream belly and a broad turquoise paddle tail",
+    "signature": "Reedwater Rest heals allies and grants regeneration"
+  },
+  {
+    "id": "solmole",
+    "name": "Solmole",
+    "tier": "A",
+    "element": "Flame",
+    "role": "controller",
+    "appearance": "Plump plum-colored mole with golden spade claws, a coral star nose and three amber lantern stones along its back",
+    "signature": "Sunspade Sweep deals damage and weakens an enemy row"
   }
 ]

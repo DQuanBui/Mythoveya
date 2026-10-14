@@ -22,16 +22,16 @@ const team = (start = 0) =>
 describe("content and economy", () => {
   it("has complete, stable content with executable actions", () => {
     // Base roster with the Wildwood and canyon arrivals.
-    expect(SPECIES).toHaveLength(88);
-    expect(new Set(SPECIES.map((s) => s.id)).size).toBe(88);
+    expect(SPECIES).toHaveLength(90);
+    expect(new Set(SPECIES.map((s) => s.id)).size).toBe(90);
     for (const tier of TIERS)
       expect(SPECIES.filter((s) => s.tier === tier)).toHaveLength(
-        ({ E: 11, D: 11, C: 11, B: 17, A: 20, S: 18 })[tier],
+        ({ E: 11, D: 11, C: 11, B: 18, A: 21, S: 18 })[tier],
       );
     expect(
       new Set(SPECIES.flatMap((s) => s.actions.map((a) => a.id))).size,
-    ).toBe(264);
-    expect(new Set(SPECIES.map((s) => s.passive.id)).size).toBe(88);
+    ).toBe(270);
+    expect(new Set(SPECIES.map((s) => s.passive.id)).size).toBe(90);
     expect(new Set(SPECIES.map((s) => s.family)).size).toBe(12);
     for (const s of SPECIES) {
       expect(
@@ -88,7 +88,7 @@ describe("combat", () => {
     expect(elementMultiplier("Light", "Shadow")).toBe(1.2);
     expect(elementMultiplier("Shadow", "Light")).toBe(1.2);
     expect(elementMultiplier("Grove", "Flame")).toBe(0.85);
-    expect(elo(1000, 1000, 1)).toEqual([1012, 988]);
+    expect(elo(1000, 1000, 1)).toEqual([1012, 990]);
     expect(elo(1000, 1000, 0.5)).toEqual([1000, 1000]);
   });
   it("runs every roster action definition", () => {

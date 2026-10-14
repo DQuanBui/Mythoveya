@@ -1442,6 +1442,26 @@
         "attack",
         "hurt"
       ]
+    },
+    {
+      "species": "reedrake",
+      "family": "dragon",
+      "profile": "dragon:88",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "solmole",
+      "family": "quadruped",
+      "profile": "quadruped:89",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
     }
   ]
 }
