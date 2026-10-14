@@ -1,3 +1,5 @@
+import { RescueSites } from "./RescueSites";
+import { rescueBlocked, rescueStops } from "../../../packages/shared/rescue";
 import { AtlasSites } from "./AtlasSites";
 import { atlasBlocked, atlasStops } from "../../../packages/shared/atlas";
 import { ConservancySites } from "./ConservancySites";
@@ -757,7 +759,7 @@ export function Explorer({
           !((x + 6) ** 2 + (z + 3) ** 2 < 1.1) &&
           !(Math.abs(x - 1) > 1.6 && Math.abs(x - 1) < 2.4 && Math.abs(z + 6) < 0.5) &&
           !PEBBLES.some((p) => p.size > 0.2 && Math.hypot(x - p.x, z - p.z) < p.size + 0.12)) &&
-      !blocksLandmark(profile.region, x, z) && !rallyBlocked(profile.region,x,z) && !conservancyBlocked(profile.region,x,z) && !atlasBlocked(profile.region,x,z),
+      !blocksLandmark(profile.region, x, z) && !rallyBlocked(profile.region,x,z) && !conservancyBlocked(profile.region,x,z) && !atlasBlocked(profile.region,x,z) && !rescueBlocked(profile.region,x,z),
     [profile.region],
   );
   const allowed = area?.allowed ?? regionAllowed;
@@ -1187,6 +1189,7 @@ export function WorldScene({
       <WalkContext.Provider value={walker}>
       <ModelLighting intensity={0.35} />
       <Environment region={profile.region} expedition={expeditionOf(profile)} />
+      <RescueSites profile={profile} onInteract={onInteract} disabled={blocked}/>
       <AtlasSites profile={profile} onInteract={onInteract} disabled={blocked}/>
           <ConservancySites profile={profile} onInteract={onInteract} disabled={blocked}/>
       <RallyCamp region={profile.region} onInteract={onInteract} disabled={blocked}/>
