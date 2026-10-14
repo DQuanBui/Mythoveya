@@ -50,7 +50,7 @@ const mutation = z.object({
   requestId: z.string().uuid(),
   companion: z.string().max(100).optional(),
   kind: z.enum([
-    "rescue-survey", "rescue-help",
+    "rescue-survey", "rescue-help", "rescue-finish", "rescue-claim",
     "atlas-start", "atlas-read", "atlas-solve", "atlas-finish", "atlas-echo",
     "cons-gather", "cons-craft", "cons-dismantle", "cons-install", "cons-tend", "cons-claim",
     "rally-complete", "rally-finish",
