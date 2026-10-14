@@ -123,7 +123,7 @@ export const atlasProp = (c: AtlasChapter): [number, number] => [
 ];
 export const tabletProp = (c: AtlasChapter): [number, number] => [
   c.field[0] + 1.2,
-  c.field[1] - 0.5,
+  c.field[1] + (c.region === "haven" ? 1.3 : -1.2),
 ];
 export function atlasBlocked(region: string, x: number, z: number) {
   const c = ATLAS_CHAPTERS.find((c) => c.region === region);
