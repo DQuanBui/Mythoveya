@@ -1,3 +1,4 @@
+import { rescueMutation } from "./rescue-game";
 import { atlasMutation } from "./atlas-game";
 import { conservancyMutation } from "./conservancy-game";
 import { rallyMutation } from "./rally-game";
@@ -115,6 +116,7 @@ const ADVENTURE_KINDS = [
 ];
 export function mutate(p: Profile, kind: string, v: any, now = Date.now()) {
   const town = ensureTown(p);
+  if (kind.startsWith("rescue-")) return rescueMutation(p, kind, v);
   if (kind.startsWith("atlas-")) return atlasMutation(p, kind, v, now, random);
   if (kind.startsWith("cons-")) return conservancyMutation(p, kind, v, now, random);
   if (kind.startsWith("rally-")) return rallyMutation(p, kind, v, now, random);

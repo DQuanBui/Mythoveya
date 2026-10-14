@@ -48,7 +48,9 @@ app.post("/api/guest", (req, res) => {
 app.get("/api/profile", (req, res) => res.json(authenticate(token(req))));
 const mutation = z.object({
   requestId: z.string().uuid(),
+  companion: z.string().max(100).optional(),
   kind: z.enum([
+    "rescue-survey", "rescue-help",
     "atlas-start", "atlas-read", "atlas-solve", "atlas-finish", "atlas-echo",
     "cons-gather", "cons-craft", "cons-dismantle", "cons-install", "cons-tend", "cons-claim",
     "rally-complete", "rally-finish",
