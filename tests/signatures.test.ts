@@ -25,6 +25,16 @@ function fixture(id: string) {
   return b;
 }
 describe("signature behavior and presentation contracts", () => {
+  it("Reedrake restores allies while Solmole weakens only the selected enemy row",()=>{
+    const healing=fixture("reedrake");healing.units.filter(u=>u.side===0).forEach(u=>u.hp-=40);
+    const hp=healing.units.map(u=>u.hp);act(healing,0,2,"0:0",0);
+    expect(healing.units.filter(u=>u.side===0).every((u,i)=>u.hp>hp[i]&&u.statuses.some(s=>s.kind==="regen"))).toBe(true);
+    expect(healing.units.filter(u=>u.side===1).map(u=>u.hp)).toEqual(hp.slice(6));
+    const sweeping=fixture("solmole"),before=sweeping.units.map(u=>u.hp);act(sweeping,0,2,"1:0",0);
+    expect(sweeping.units.filter(u=>u.statuses.some(s=>s.kind==="weaken")).map(u=>u.id)).toEqual(["1:0","1:1","1:2"]);
+    expect(sweeping.units.slice(6,9).every((u,i)=>u.hp<before[i+6])).toBe(true);
+    expect(sweeping.units.slice(0,6).map(u=>u.hp)).toEqual(before.slice(0,6));
+  });
   it("Cairnfin guards its allies and Inkwisp cleanses and hastens them without damaging opponents",()=>{
     for(const id of ["cairnfin","inkwisp"]){
       const b=fixture(id),enemyHp=b.units.filter(u=>u.side===1).map(u=>u.hp);
