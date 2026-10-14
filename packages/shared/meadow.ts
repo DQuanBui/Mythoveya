@@ -1,3 +1,4 @@
+import { RESCUE_PATHS } from "./rescue";
 import { ATLAS_PATHS } from "./atlas";
 import { CONSERVANCY_PATHS } from "./conservancy";
 import { RALLY_PATHS } from "./rally";
@@ -8,6 +9,7 @@ export const MEADOW_EXTENT = 46;
 export const MEADOW_POND = { x: -23, z: 8, rx: 6, rz: 5 };
 export const MEADOW_LODGE: Point = [19, 12];
 export const MEADOW_PATHS: Point[][] = [
+  ...RESCUE_PATHS.meadow,
   ...ATLAS_PATHS.meadow,
   ...CONSERVANCY_PATHS.meadow,
   ...RALLY_PATHS.meadow,

@@ -51,5 +51,8 @@ export const rescueRecord = (p:Profile,region:string):RescueRecord => rescueOf(p
 export const rescueCount = (p:Profile) => RESCUES.filter(s=>rescueRecord(p,s.region).outcome).length;
 export const rescueStops = (region:string) => RESCUES.filter(s=>s.region===region).map(s=>({...s,description:"Meet the field keeper and help wildlife with your companions' abilities."}));
 export const RESCUE_PATHS:Record<string,[number,number][][]> = Object.fromEntries(RESCUES.map(s=>[s.region,[[s.join,s.point]]]));
-export const rescueProp = (s:Rescue):[number,number] => [s.point[0]+2.5,s.point[1]-2.5];
+export const rescueProp = (s:Rescue):[number,number] => {
+ const offset:Record<string,[number,number]>={haven:[0,3],meadow:[-3,1],canyon:[1.5,-3],hollow:[-3,-1]};
+ const [x,z]=offset[s.region];return [s.point[0]+x,s.point[1]+z];
+};
 export const rescueBlocked = (region:string,x:number,z:number) => RESCUES.some(s=>s.region===region && Math.hypot(x-rescueProp(s)[0],z-rescueProp(s)[1])<1.55);

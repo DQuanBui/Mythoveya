@@ -1,3 +1,4 @@
+import { RESCUE_PATHS } from "./rescue";
 import { ATLAS_PATHS } from "./atlas";
 import { CONSERVANCY_PATHS } from "./conservancy";
 import { RALLY_PATHS } from "./rally";
@@ -162,6 +163,7 @@ export const HAVEN_PLACES = [
   },
 ] as const;
 export const HAVEN_PATHS: Point[][] = [
+  ...RESCUE_PATHS.haven,
   ...ATLAS_PATHS.haven,
   ...CONSERVANCY_PATHS.haven,
   ...RALLY_PATHS.haven,

@@ -1,3 +1,4 @@
+import { RESCUE_PATHS } from "./rescue";
 import { ATLAS_PATHS } from "./atlas";
 import { CONSERVANCY_PATHS } from "./conservancy";
 import { RALLY_PATHS } from "./rally";
@@ -11,6 +12,7 @@ export const CANYON_SPRINGS = [
   { x: 33, z: 8, rx: 3.5, rz: 2.5 },
 ];
 export const CANYON_PATHS: Point[][] = [
+  ...RESCUE_PATHS.canyon,
   ...ATLAS_PATHS.canyon,
   ...CONSERVANCY_PATHS.canyon,
   ...RALLY_PATHS.canyon,

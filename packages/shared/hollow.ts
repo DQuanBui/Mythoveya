@@ -1,3 +1,4 @@
+import { RESCUE_PATHS } from "./rescue";
 import { ATLAS_PATHS } from "./atlas";
 import { CONSERVANCY_PATHS } from "./conservancy";
 import { RALLY_PATHS } from "./rally";
@@ -8,6 +9,7 @@ export const HOLLOW_EXTENT = 52;
 export const HOLLOW_LAKE = { x: -23, z: 12, rx: 8, rz: 5 };
 export const HOLLOW_WORKSHOP: Point = [19, 12];
 export const HOLLOW_PATHS: Point[][] = [
+  ...RESCUE_PATHS.hollow,
   ...ATLAS_PATHS.hollow,
   ...CONSERVANCY_PATHS.hollow,
   ...RALLY_PATHS.hollow,
