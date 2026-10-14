@@ -1,6 +1,6 @@
 # Mythoveya handoff
 
-Updated October 13, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`. The Atlas of Echoes update began at `d39ee0c`. Player saves, previous regional quests, Wayfarer and Conservancy progress remain compatible.
+Updated October 14, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`. The Atlas of Echoes update began at `d39ee0c`. Player saves, previous regional quests, Wayfarer and Conservancy progress remain compatible.
 
 ## Implemented
 
@@ -41,7 +41,7 @@ Node 24.19.0 and npm 11.17.0 were verified. Preserve ignored `data/mythoveya.sql
 
 ## Verified
 
-- **137 unit/server tests in 30 files passed** in 102.99 seconds, including existing combat, network, regional layouts and persistence checks. Log: ignored `artifacts/atlas-unit-checks.log`.
+- **138 unit/server tests in 30 files passed** in 131.98 seconds, including existing combat, network, regional layouts and persistence checks. Log: ignored `artifacts/atlas-final-unit.log`.
 - Content audit passed for 88 species, 264 actions, 88 passives and twelve model families.
 - Three Atlas server tests passed, covering old saves, ordered discovery, wrong-region/island actions, free wrong-answer retries, full story rewards, durable companions, chapter/finale operation replay, all three daily question positions in every region, rollover and duplicate/stale daily requests.
 - The new layout check passed for all eight approaches, connecting trails, foundations and routes from the regional spawn. Initial placements overlapped an existing Havenreach cottage and two Canyon columns; positions were corrected before passing checks.
@@ -49,10 +49,12 @@ Node 24.19.0 and npm 11.17.0 were verified. Preserve ignored `data/mythoveya.sql
 - Companion combat checks passed: Cairnfin guards and shields allies; Inkwisp removes burns, shields and hastens allies; neither damages opponents with those skills.
 - The initial complete story browser journey passed in 3.3 minutes with no page errors: actual five-win regional unlock, all eight walking destinations, recorded clues, hints and wrong-answer retries, all chapter rewards, both companions, finale, daily reading and reload. All four landmarks, completed journal and mobile view were visually reviewed.
 - The final Atlas browser rerun passed in 2.9 minutes after journal refinements. It additionally exercised an actual puzzle at 390-pixel width, verified geometry disposal on all four region transitions, checked the final journal opens on the current region, and confirmed only one travel button appears for another region. The story ending remains available to reread.
-- Final production build and typecheck passed. Initial client JavaScript: 1,512.58 kB / 446.81 kB gzip. Vite retains its existing large-chunk warning. Log: ignored `artifacts/atlas-build.log`.
+- Final production build and typecheck passed. Initial client JavaScript: 1,512.61 kB / 446.82 kB gzip. Vite retains its existing large-chunk warning. Log: ignored `artifacts/atlas-final-build.log`.
 - Compiled production smoke passed with process exit 0: local assets, guest progression and two-human arena connections. It still logs the existing unregistered snapshot-message warning. A first PowerShell logging pipeline returned a nonzero wrapper status due to stderr; direct execution confirmed the successful process exit.
 - Local client and API health endpoints both returned HTTP 200.
-- Seven selected regional regression journeys are running; the final result will be recorded before committing this handoff.
+- The first regional regression pass found the Havenreach tablet base overlapping an older trail. The bases were moved beside the routes; an added regression sweeps a 0.9-metre corridor along every old and new trail in all four regions. All 27 targeted layout tests passed after correction. The final eight-journey browser run passed Atlas, Canyon, Havenreach, Moonfrost, first-player flow, Whisperleaf and Rally (seven passes in 14.6 minutes). Conservancy stopped during battle setup when an action arrived before the server allowed it. Log: ignored `artifacts/atlas-final-browser.log`.
+- Conservancy then passed its complete journey in 3.9 minutes: gathering, crafting, dismantling, all four habitat restorations, mobile layout, companion awards and persistence after reload. Its fixture now retries only the server's pre-mutation early-action rejection, with a strict bound; all other errors still fail immediately. A separate isolated attempt timed out loading the title page, so navigation has a 60-second allowance while interaction assertions remain at 15 seconds. No gameplay timing rule was changed. Final fixture typecheck passed. Log: ignored `artifacts/atlas-conservancy-final.log`.
+- All eight browser journeys therefore passed across the final regression run and targeted Conservancy rerun. Refreshed Meadow and Hollow guide screenshots were visually reviewed. The ignored player database remains present and was not replaced.
 
 ## Limits and next work
 
@@ -60,4 +62,4 @@ This update adds story destinations and paths inside current region boundaries. 
 
 Useful next work: walkable interiors, field encounters that use companion abilities, deeper story choices, and balance/playtesting of the accumulated daily rewards. Earlier handoffs are archived in `docs/DEVELOPMENT_HISTORY.md`.
 
-Git completion and final test results will be recorded before this handoff is committed. No push or deployment is planned: the original user handoff requires a separate explicit request to push. The player's ignored save remains preserved.
+Including this handoff, the Atlas update contains **17 commits after `d39ee0c`**: 16 implementation, art, testing and documentation commits made during this work, plus the separately committed `01be14f` documentation update. Remote `main` was verified at `01be14f` on October 14; the final three commits (trail clearance, fixture reliability and this handoff) remain local. No push or deployment was performed by this continuation: the original user handoff requires a separate explicit request to push. The player's ignored save remains preserved.
