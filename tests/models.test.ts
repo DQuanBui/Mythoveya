@@ -81,3 +81,13 @@ it("gives canyon companions articulated blades and a separate crescent tail",()=
  const before=colors('thermala');expect(colors('thermala',true)).not.toEqual(before);expect(colors('thermala')).toEqual(before);
  for(const model of [mantis,spring]) {animateCreature(model,4,'attack',.5);animateCreature(model,5,'idle');expect(model.userData.rig.position.z).toBe(0);}
 });
+
+it("gives rescue creatures webbed wings, a paddle and distinct digging anatomy",()=>{
+ const drake=createCreature("reedrake"),mole=createCreature("solmole");
+ expect(drake.getObjectsByProperty("name","reedrake-webwing")).toHaveLength(2);
+ expect(drake.getObjectsByProperty("name","reedrake-cattail")).toHaveLength(2);
+ expect(drake.getObjectsByProperty("name","reedrake-paddle")).toHaveLength(1);
+ expect(mole.getObjectsByProperty("name","solmole-spade")).toHaveLength(2);
+ expect(mole.getObjectsByProperty("name","solmole-lantern")).toHaveLength(3);
+ for(const id of ["reedrake","solmole"])expect(colors(id,true)).not.toEqual(colors(id));
+});

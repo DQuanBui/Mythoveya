@@ -208,7 +208,7 @@ export function createCreature(id: string, shimmer = false) {
         horn(side * 0.3, headY + 0.71, headZ - 0.18, 0.3);
       }
     }
-    if (s.family === "dragon") {
+    if (s.family === "dragon" && s.id !== "reedrake") {
       wing(-1, 1.2);
       wing(1, 1.2);
       for (let i = 0; i < (s.id === "solkarath" ? 0 : 3); i++)
@@ -619,6 +619,35 @@ export function createCreature(id: string, shimmer = false) {
     for(let i=0;i<7;i++) {const a=(i-3)*.27;part(crescent,"orb",i%2?light:cream,[Math.sin(a)*.5,0,-Math.cos(a)*.45],[.1,.06,.44],[0,-a,0]);}
   }
 
+  if (s.id === "reedrake") {
+    for(const side of [-1,1]) {
+      const web=new T.Group();web.name="reedrake-webwing";web.position.set(side*.25,.95,-.15);rig.add(web);wings.push(web);
+      for(let i=0;i<3;i++) {
+        part(web,"orb",i%2?light:accent,[side*(.34+i*.18),.1-i*.04,-i*.23],[.38,.055,.3],[0,side*.3,side*.2]);
+        part(web,"capsule",cream,[side*(.3+i*.15),.12,-i*.2],[.035,.27,.035],[0,0,side*1.2]);
+      }
+      const reed=new T.Group();reed.name="reedrake-cattail";reed.position.set(side*.22,headY+.2,headZ-.15);rig.add(reed);
+      part(reed,"capsule",mid,[side*.04,.22,0],[.045,.25,.045],[0,0,-side*.25]);
+      part(reed,"capsule",dna.iris,[side*.1,.46,0],[.08,.14,.08],[0,0,-side*.25]);
+    }
+    const paddle=new T.Group();paddle.name="reedrake-paddle";paddle.position.set(0,.65,-.8);rig.add(paddle);tails.push(paddle);
+    part(paddle,"orb",mid,[0,0,-.32],[.14,.12,.4]);
+    part(paddle,"orb",light,[0,.02,-.65],[.38,.06,.27]);
+    for(const side of [-1,1])part(paddle,"orb",accent,[side*.18,.06,-.65],[.13,.025,.18]);
+  }
+  if (s.id === "solmole") {
+    for(const side of [-1,1]) {
+      const paw=new T.Group();paw.name="solmole-spade";paw.position.set(side*.5,.27,.55);rig.add(paw);
+      part(paw,"orb",accent,[0,0,0],[.26,.11,.23]);
+      for(let i=0;i<3;i++)part(paw,"cone",cream,[(i-1)*.12,0,.22],[.065,.24,.06],[Math.PI/2,0,0]);
+    }
+    for(let i=0;i<3;i++) {
+      const lantern=new T.Group();lantern.name="solmole-lantern";lantern.position.set(0,.94,-.47+i*.28);rig.add(lantern);
+      part(lantern,"orb",accent,[0,0,0],[.22,.22,.18],undefined,true);
+      part(lantern,"ring",dark,[0,0,0],[.22,.22,.8],[Math.PI/2,0,0]);
+    }
+    for(let i=0;i<6;i++) {const a=i*Math.PI/3;part(rig,"orb","#eaa09c",[Math.cos(a)*.09,headY-.04+Math.sin(a)*.08,headZ+.32],[.07,.035,.045],[0,0,a]);}
+  }
   if (s.id === "cairnfin") {
     for (const side of [-1,1]) {
       const fin=new T.Group();fin.name="cairnfin-stone-fin";fin.position.set(side*.25,.9,-.1);rig.add(fin);wings.push(fin);

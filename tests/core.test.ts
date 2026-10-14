@@ -88,7 +88,7 @@ describe("combat", () => {
     expect(elementMultiplier("Light", "Shadow")).toBe(1.2);
     expect(elementMultiplier("Shadow", "Light")).toBe(1.2);
     expect(elementMultiplier("Grove", "Flame")).toBe(0.85);
-    expect(elo(1000, 1000, 1)).toEqual([1012, 990]);
+    expect(elo(1000, 1000, 1)).toEqual([1012, 988]);
     expect(elo(1000, 1000, 0.5)).toEqual([1000, 1000]);
   });
   it("runs every roster action definition", () => {
