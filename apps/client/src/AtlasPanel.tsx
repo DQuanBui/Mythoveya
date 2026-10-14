@@ -77,7 +77,7 @@ function Chapter({
       )}
       <div className="atlas-navigation">
         {trackButton(c.id, `Walk to ${c.host}`)}
-        {trackButton(c.id + "-tablet", "Track the inscription")}
+        {local && trackButton(c.id + "-tablet", "Track the inscription")}
       </div>
       <section className="atlas-inscription" aria-label="Recorded memory">
         <h4>{c.fieldName}</h4>
@@ -152,7 +152,10 @@ function Chapter({
           <p>80 Gold, 25 Diamonds and 40 XP awarded.</p>
           {(index === 1 || index === 3) && (
             <div className="atlas-companion">
-              <Portrait id={index === 1 ? "cairnfin" : "inkwisp"} className="atlas-portrait" />
+              <Portrait
+                id={index === 1 ? "cairnfin" : "inkwisp"}
+                className="atlas-portrait"
+              />
               <span>
                 {index === 1 ? "Cairnfin" : "Inkwisp"} joined your collection
                 (or granted a duplicate shard).
@@ -220,7 +223,14 @@ export function AtlasPanel(props: Props) {
     r = atlasOf(props.profile, now);
   const initial = ATLAS_CHAPTERS.findIndex((c) => props.focus.startsWith(c.id));
   const [selected, setSelected] = useState(
-    initial >= 0 ? initial : Math.min(r.chapters.length, 3),
+    initial >= 0
+      ? initial
+      : r.finished
+        ? Math.max(
+            0,
+            ATLAS_CHAPTERS.findIndex((c) => c.region === props.profile.region),
+          )
+        : Math.min(r.chapters.length, 3),
   );
   useEffect(() => {
     const i = ATLAS_CHAPTERS.findIndex((c) => props.focus.startsWith(c.id));
@@ -245,6 +255,12 @@ export function AtlasPanel(props: Props) {
         {r.chapters.length}/4 chapters restored{" "}
         {r.finished ? " / Lorekeeper journey complete" : ""}
       </p>
+      {r.finished && (
+        <p className="atlas-notice">
+          The sky-road was the welcome you carried between its people. Its
+          memories now travel with you.
+        </p>
+      )}
       <div className="atlas-tabs" aria-label="Atlas chapters">
         {ATLAS_CHAPTERS.map((c, i) => (
           <button
