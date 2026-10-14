@@ -49,6 +49,7 @@ export type TownState = {
   guardianClaimed?: string;
 };
 export type Profile = {
+  rescue?: import("./rescue").RescueState;
   atlas?: import("./atlas").AtlasState;
   conservancy?: import("./conservancy").ConservancyState;
   rally?: import("./rally").RallyState;
