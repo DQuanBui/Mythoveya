@@ -13,7 +13,13 @@ export type Owned = {
   accessory?: import("./town").Accessory;
   skills?: [number, number];
   /** Battle-only equipment bonus resolved by the server; never saved. */
-  bonus?: { hp: number; attack: number; defense: number; speed: number; crit: number };
+  bonus?: {
+    hp: number;
+    attack: number;
+    defense: number;
+    speed: number;
+    crit: number;
+  };
 };
 export type AdventureState = {
   stages: Record<string, number>;
@@ -49,6 +55,7 @@ export type TownState = {
   guardianClaimed?: string;
 };
 export type Profile = {
+  lodges?: import("./lodges").LodgeState;
   rescue?: import("./rescue").RescueState;
   atlas?: import("./atlas").AtlasState;
   conservancy?: import("./conservancy").ConservancyState;
