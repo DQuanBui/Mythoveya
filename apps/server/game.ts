@@ -1,3 +1,4 @@
+import { lodgeMutation } from "./lodge-game";
 import { rescueMutation } from "./rescue-game";
 import { atlasMutation } from "./atlas-game";
 import { conservancyMutation } from "./conservancy-game";
@@ -116,6 +117,7 @@ const ADVENTURE_KINDS = [
 ];
 export function mutate(p: Profile, kind: string, v: any, now = Date.now()) {
   const town = ensureTown(p);
+  if (kind.startsWith("lodge-")) return lodgeMutation(p, kind, v, random);
   if (kind.startsWith("rescue-")) return rescueMutation(p, kind, v, random);
   if (kind.startsWith("atlas-")) return atlasMutation(p, kind, v, now, random);
   if (kind.startsWith("cons-")) return conservancyMutation(p, kind, v, now, random);
