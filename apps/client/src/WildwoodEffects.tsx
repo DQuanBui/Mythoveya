@@ -1,5 +1,6 @@
 /** Small, bounded silhouettes for the western species' special skills. */
 export const WILDWOOD_EFFECTS = [
+  "lumeswallow", "velvetmoth",
   "reedrake", "solmole",
   "cairnfin", "inkwisp",
   "reedlet",
@@ -13,6 +14,7 @@ export const WILDWOOD_EFFECTS = [
 export function WildwoodEffect({ id }: { id: string }) {
   if (!WILDWOOD_EFFECTS.includes(id)) return null;
   const colors: Record<string, string[]> = {
+    lumeswallow:["#f3d78b","#b5dcde"],velvetmoth:["#b9dbe9","#bea4d3"],
     reedrake:["#8de0ca","#eab5b0"],solmole:["#f2c36b","#cf9bb0"],
     cairnfin:["#dcb68a","#77cbbd"],inkwisp:["#b9a4dd","#edce87"],
     mossloom:["#b9d7ae","#efb6cb"],astralynx:["#e9c777","#98dfea"],
@@ -41,7 +43,11 @@ export function WildwoodEffect({ id }: { id: string }) {
             ]}
             rotation={[0, -a, 0]}
           >
-            {id === "reedrake" ? (
+            {id === "lumeswallow" ? (
+              <group><mesh rotation={[.4,a,.5]} scale={[.1,.025,.45]}><sphereGeometry args={[1,10,6]}/><meshBasicMaterial color={c}/></mesh><mesh rotation={[Math.PI/2,0,a]}><torusGeometry args={[.25,.02,5,18]}/><meshBasicMaterial color="#ffe9b5" transparent opacity={.6}/></mesh></group>
+            ) : id === "velvetmoth" ? (
+              <group><mesh rotation={[0,a,.5]}><octahedronGeometry args={[.16]}/><meshBasicMaterial color={c}/></mesh><mesh rotation={[0,a,0]}><torusGeometry args={[.28,.025,5,18,Math.PI*1.5]}/><meshBasicMaterial color="#d7bddf" transparent opacity={.7}/></mesh></group>
+            ) : id === "reedrake" ? (
               <group><mesh rotation={[Math.PI/2,0,0]}><torusGeometry args={[.3,.025,5,20]}/><meshBasicMaterial color={c} transparent opacity={.75}/></mesh><mesh position={[0,.17,0]} scale={[.1,.22,.1]}><sphereGeometry args={[1,8,6]}/><meshBasicMaterial color="#a9e5d5" transparent opacity={.8}/></mesh></group>
             ) : id === "solmole" ? (
               <group><mesh rotation={[.4,0,a]}><coneGeometry args={[.13,.55,5]}/><meshBasicMaterial color={c}/></mesh><mesh rotation={[0,a,.4]}><torusGeometry args={[.32,.035,5,20,Math.PI]}/><meshBasicMaterial color="#f3d591" transparent opacity={.8}/></mesh></group>

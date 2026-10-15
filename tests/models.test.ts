@@ -93,3 +93,9 @@ it("gives rescue creatures webbed wings, a paddle and distinct digging anatomy",
  expect(mole.getObjectsByProperty("name","solmole-star-nose")).toHaveLength(1);
  for(const id of ["reedrake","solmole"])expect(colors(id,true)).not.toEqual(colors(id));
 });
+
+it("gives lodge companions paired swept wings, forked tails and feather antennae",()=>{
+ const swallow=createCreature("lumeswallow"),moth=createCreature("velvetmoth");
+ for(const name of ["lumeswallow-swept-wing","lumeswallow-fork"]) expect(swallow.getObjectsByProperty("name",name)).toHaveLength(2);
+ for(const name of ["velvetmoth-eyespot-wing","velvetmoth-feather-antenna"]) expect(moth.getObjectsByProperty("name",name)).toHaveLength(2);
+});

@@ -229,7 +229,7 @@ export function createCreature(id: string, shimmer = false) {
     }
     limb(-0.16, 0.1, 0.33 + up, 0.6 + up);
     limb(0.16, 0.1, 0.33 + up, 0.6 + up);
-    for (const w of [wing(-1, 0.9 * bx, dna.marking === "none" ? light : accent), wing(1, 0.9 * bx, dna.marking === "none" ? light : accent)])
+    for (const w of s.id === "lumeswallow" ? [] : [wing(-1, 0.9 * bx, dna.marking === "none" ? light : accent), wing(1, 0.9 * bx, dna.marking === "none" ? light : accent)])
       w.position.y += up;
     if (!f.bat)
       part(
@@ -249,7 +249,7 @@ export function createCreature(id: string, shimmer = false) {
       for (const side of [-1, 1])
         part(rig, "cone", c, [side * 0.2, headY + 0.38, headZ - 0.02], [0.13, 0.42, 0.1], [0, 0, -side * 0.35]);
     // A crest of feathers on top of the head.
-    if (!f.owl && !f.bat)
+    if (!f.owl && !f.bat && s.id !== "lumeswallow")
       for (let i = 0; i < 3; i++)
         part(rig, "cone", i === 1 ? accent : c, [(i - 1) * 0.08, headY + 0.4, headZ - 0.08 - i * 0.04], [0.05, 0.22 + (i === 1 ? 0.08 : 0), 0.05], [-0.5, 0, (i - 1) * 0.3]);
   }
@@ -266,14 +266,14 @@ export function createCreature(id: string, shimmer = false) {
         if(s.id!=="mossloom") part(l, "capsule", dark, [x * 0.4, -0.14, 0], [0.05, 0.24, 0.05], [0, 0, x * 1.4]);
         limbs.push(l);
       }
-    if (s.id === "lanternmoth") {
+    if (s.id === "lanternmoth" || s.id === "velvetmoth") {
       // Broad luna wings are added by the authored anatomy below.
     } else if (/moth|mantis|winged|wing/i.test(s.appearance)) {
       wing(-1, 1.3, accent);
       wing(1, 1.3, accent);
     } else
       for (const side of [-1, 1]) body([side * 0.2, 0.86, -0.15], [0.23, 0.12, 0.45], dna.marking === "spots" ? accent : dark);
-    if(s.id!=="mossloom"){horn(-0.2, 1.3, 0.6, 0.5);horn(0.2, 1.3, 0.6, 0.5);}
+    if(s.id!=="mossloom" && s.id!=="velvetmoth"){horn(-0.2, 1.3, 0.6, 0.5);horn(0.2, 1.3, 0.6, 0.5);}
   }
   if (s.family === "shell") {
     body([0, 0.73, -0.1], [0.7 * bx, 0.55 * by, 0.75 * bz], dark);
@@ -438,7 +438,7 @@ export function createCreature(id: string, shimmer = false) {
       part(rig, "capsule", dark, [ex, ey + 0.13 * es, ez + 0.02], [0.025, 0.07, 0.02], [0, 0, Math.PI / 2 + side * 0.35]);
   }
   // Tails: each species' tail follows its description.
-  const tailCount = ["reedrake","solmole"].includes(s.id) ? 0 : s.id === "astralynx" ? 3 : ["fox", "quadruped", "dragon", "antler", "bird"].includes(s.family) ? f.tailCount : 0;
+  const tailCount = ["reedrake","solmole","lumeswallow"].includes(s.id) ? 0 : s.id === "astralynx" ? 3 : ["fox", "quadruped", "dragon", "antler", "bird"].includes(s.family) ? f.tailCount : 0;
   for (let n = 0; n < tailCount; n++) {
     const tail = new T.Group(),
       spread = tailCount > 1 ? (n / (tailCount - 1) - 0.5) * (tailCount > 3 ? 2.2 : 1.1) : 0;
@@ -620,6 +620,33 @@ export function createCreature(id: string, shimmer = false) {
     for(let i=0;i<7;i++) {const a=(i-3)*.27;part(crescent,"orb",i%2?light:cream,[Math.sin(a)*.5,0,-Math.cos(a)*.45],[.1,.06,.44],[0,-a,0]);}
   }
 
+  if (s.id === "lumeswallow") {
+    part(rig,"orb",accent,[0,headY-.19,headZ+.24],[.25,.12,.16]);
+    for(const side of [-1,1]) {
+      const fin=new T.Group();fin.name="lumeswallow-swept-wing";fin.position.set(side*.22,1,0);rig.add(fin);wings.push(fin);
+      for(let i=0;i<4;i++) {
+        part(fin,"orb",i===3?accent:mid,[side*(.3+i*.15),-.025*i,-.12-i*.12],[.18,.055,.48-i*.035],[0,-side*.45,side*.12]);
+        part(fin,"orb",light,[side*(.3+i*.15),.025-.025*i,-.45-i*.12],[.105,.025,.12],[0,-side*.45,0]);
+      }
+      const tail=new T.Group();tail.name="lumeswallow-fork";tail.position.set(side*.1,.65,-.35);rig.add(tail);tails.push(tail);
+      part(tail,"orb",mid,[side*.14,0,-.65],[.1,.055,.75],[0,-side*.22,0]);
+      part(tail,"orb",accent,[side*.25,.015,-1.15],[.055,.025,.22],[0,-side*.22,0]);
+    }
+  }
+  if (s.id === "velvetmoth") {
+    for(const side of [-1,1]) {
+      const fin=new T.Group();fin.name="velvetmoth-eyespot-wing";fin.position.set(side*.2,.92,-.05);rig.add(fin);wings.push(fin);
+      part(fin,"orb",dark,[side*.55,0,.05],[.75,.065,.58],[0,-side*.25,side*.13]);
+      part(fin,"orb",mid,[side*.45,-.01,-.62],[.54,.06,.43],[0,side*.3,0]);
+      for(let i=0;i<5;i++) part(fin,"orb",light,[side*(.48+Math.sin(i*.65)*.58),.01,.43-i*.23],[.16,.045,.14]);
+      part(fin,"orb",accent,[side*.56,.075,.05],[.24,.025,.23]);
+      part(fin,"orb",dark,[side*.56,.105,.05],[.13,.025,.14]);
+      part(fin,"orb",light,[side*.55,.13,.08],[.045,.02,.055],undefined,true);
+      const ant=new T.Group();ant.name="velvetmoth-feather-antenna";ant.position.set(side*.15,headY+.2,headZ);rig.add(ant);
+      part(ant,"capsule",cream,[side*.1,.2,0],[.025,.45,.025],[0,0,-side*.4]);
+      for(let i=0;i<4;i++) part(ant,"orb",light,[side*(.05+i*.045),.08+i*.09,0],[.13,.02,.045],[0,0,-side*.2]);
+    }
+  }
   if (s.id === "reedrake") {
     for(const side of [-1,1]) {
       const web=new T.Group();web.name="reedrake-webwing";web.position.set(side*.25,.95,-.15);rig.add(web);wings.push(web);
