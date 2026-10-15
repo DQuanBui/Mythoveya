@@ -35,6 +35,10 @@ The site changes as you help: frames straighten, plants recover, and lamps glow.
 
 Both give **70 Gold, 20 Diamonds and 25 XP**, once per site. The ending is permanent. These incidents have no daily timer or repeatable reward. Normal level-up bonuses can add Diamonds.
 
+![Mira's nursery with a sheltered-rest canopy](screenshots/rescue-haven.png)
+
+![Oren's restored crossing with an open wildlife route](screenshots/rescue-meadow.png)
+
 ## Welcome new companions
 
 At any regional rescue keeper, complete two rescues to **Welcome Reedrake**, then all four to **Welcome Solmole**. Each reward can be claimed once; owning the species already grants its normal duplicate shard without changing its shimmering appearance. Four rescues also earn the **Trailkeeper** HUD badge.
@@ -42,6 +46,10 @@ At any regional rescue keeper, complete two rescues to **Welcome Reedrake**, the
 **Reedrake** is a B-tier Tide healer with a jade body, coral webbed wings, cattail horns and a turquoise paddle tail. **Reedwater Rest** heals allies and grants regeneration.
 
 **Solmole** is an A-tier Flame controller with plum fur, golden spade claws, a coral star nose and amber lantern stones. **Sunspade Sweep** damages and weakens the selected enemy row.
+
+![Reedrake with coral webbed wings and cattail horns](screenshots/rescue-model-reedrake.png)
+
+![Solmole with a coral star nose and golden digging claws](screenshots/rescue-model-solmole.png)
 
 Both also appear in normal recruitment. Tier odds are unchanged. The roster now contains 90 base species and 16 evolved forms.
 
