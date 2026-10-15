@@ -1462,6 +1462,26 @@
         "attack",
         "hurt"
       ]
+    },
+    {
+      "species": "lumeswallow",
+      "family": "bird",
+      "profile": "bird:90",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
+    },
+    {
+      "species": "velvetmoth",
+      "family": "insect",
+      "profile": "insect:91",
+      "variants": [
+        "call",
+        "attack",
+        "hurt"
+      ]
     }
   ]
 }

@@ -808,5 +808,23 @@
     "role": "controller",
     "appearance": "Plump plum-colored mole with golden spade claws, a coral star nose and three amber lantern stones along its back",
     "signature": "Sunspade Sweep deals damage and weakens an enemy row"
+  },
+  {
+    "id": "lumeswallow",
+    "name": "Lumeswallow",
+    "tier": "B",
+    "element": "Light",
+    "role": "support",
+    "appearance": "Small midnight blue swallow with ivory cheeks, a golden throat, long forked ribbon tail and luminous feather tips",
+    "signature": "Hearthflight shields allies and grants regeneration"
+  },
+  {
+    "id": "velvetmoth",
+    "name": "Velvetmoth",
+    "tier": "A",
+    "element": "Frost",
+    "role": "controller",
+    "appearance": "Plush lavender moth with broad midnight velvet wings, copper eyespots, powder blue scalloped edges and feathery antennae",
+    "signature": "Quietfall deals damage, slows and silences an enemy row"
   }
 ]

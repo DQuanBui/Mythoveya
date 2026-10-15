@@ -25,6 +25,15 @@ function fixture(id: string) {
   return b;
 }
 describe("signature behavior and presentation contracts", () => {
+  it("Lumeswallow protects allies and Velvetmoth quiets only the targeted enemy row",()=>{
+    const b=fixture("lumeswallow"),hp=b.units.map(u=>u.hp);act(b,0,2,"0:0",0);
+    expect(b.units.slice(0,6).every(u=>u.shield>0 && u.statuses.some(s=>s.kind==="regen"))).toBe(true);
+    expect(b.units.map(u=>u.hp)).toEqual(hp);
+    const f=fixture("velvetmoth"),before=f.units.map(u=>u.hp);act(f,0,2,"1:0",0);
+    expect(f.units.filter(u=>u.statuses.some(s=>s.kind==="silence")).map(u=>u.id)).toEqual(["1:0","1:1","1:2"]);
+    expect(f.units.slice(6,9).every((u,i)=>u.hp<before[6+i] && u.statuses.some(s=>s.kind==="slow"))).toBe(true);
+    expect(f.units.slice(0,6).map(u=>u.hp)).toEqual(before.slice(0,6));
+  });
   it("Reedrake restores allies while Solmole weakens only the selected enemy row",()=>{
     const healing=fixture("reedrake");healing.units.filter(u=>u.side===0).forEach(u=>u.hp-=40);
     const hp=healing.units.map(u=>u.hp);act(healing,0,2,"0:0",0);
