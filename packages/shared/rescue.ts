@@ -245,3 +245,15 @@ export const rescueBlocked = (region: string, x: number, z: number) =>
       s.region === region &&
       Math.hypot(x - rescueProp(s)[0], z - rescueProp(s)[1]) < 1.55,
   );
+
+/** Keep the initial resident away from props even before its first walking frame. */
+export function rescueWildlifePoint(s: Rescue): [number, number] {
+  const offsets: Record<string, [number, number]> = {
+    haven: [-2, 0],
+    meadow: [2, 1],
+    canyon: [3, 1.5],
+    hollow: [1.5, 1.5],
+  };
+  const [x, z] = offsets[s.region];
+  return [s.point[0] + x, s.point[1] + z];
+}

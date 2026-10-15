@@ -7,6 +7,7 @@ import {
   rescueRecord,
   rescueProp,
   rescueBlocked,
+  rescueWildlifePoint,
 } from "../../../packages/shared/rescue";
 import { groundHeight, havenWalkable } from "../../../packages/shared/haven";
 import { meadowHeight, meadowWalkable } from "../../../packages/shared/meadow";
@@ -159,7 +160,7 @@ function Site({ profile, onInteract, disabled }: Props) {
   const wildlife = useMemo(
     () => ({
       species: s.species,
-      point: [s.point[0] - 0.6, s.point[1] + 1.2] as [number, number],
+      point: rescueWildlifePoint(s),
       radius: record.outcome === "wild" ? 1.1 : record.outcome ? 0.4 : 0.2,
     }),
     [s, record.outcome],

@@ -4,6 +4,7 @@ import {
   RESCUE_PATHS,
   rescueProp,
   rescueBlocked,
+  rescueWildlifePoint,
 } from "../packages/shared/rescue";
 import { atlasBlocked } from "../packages/shared/atlas";
 import { conservancyBlocked } from "../packages/shared/conservancy";
@@ -90,4 +91,25 @@ it("keeps every old and new trail clear of rescue structures", () => {
               s.name + " corridor " + x + "," + z,
             ).toBe(false);
           }
+});
+
+it("spawns rescue wildlife on clear ground with room around each body", () => {
+  for (const [i, s] of RESCUES.entries()) {
+    const [base] = rules[i],
+      [x, z] = rescueWildlifePoint(s);
+    for (const radius of [0, 0.4, 1.1])
+      for (let k = 0; k < 16; k++) {
+        const a = (k * Math.PI) / 8,
+          px = x + radius * Math.cos(a),
+          pz = z + radius * Math.sin(a);
+        expect(
+          base(px, pz) &&
+            !rescueBlocked(s.region, px, pz) &&
+            !atlasBlocked(s.region, px, pz) &&
+            !conservancyBlocked(s.region, px, pz) &&
+            !rallyBlocked(s.region, px, pz),
+          s.region + " wildlife " + px + "," + pz,
+        ).toBe(true);
+      }
+  }
 });

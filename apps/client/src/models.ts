@@ -195,7 +195,7 @@ export function createCreature(id: string, shimmer = false) {
     if (f.sail)
       for (let i = 0; i < 5; i++)
         part(rig, "orb", i % 2 ? accent : light, [0, ty + 0.42 * by + Math.sin((i / 4) * Math.PI) * 0.12, (-0.45 + i * 0.22) * bz], [0.03, 0.2 + Math.sin((i / 4) * Math.PI) * 0.12, 0.13], undefined, f.molten);
-    if (f.claws)
+    if (f.claws && s.id !== "solmole")
       for (const x of [-0.29, 0.29])
         for (let k = 0; k < 3; k++)
           part(rig, "cone", f.molten ? "#ffb04a" : accent, [x * bx + (k - 1) * 0.06, 0.08, 0.4 * bz + 0.18], [0.035, 0.14, 0.035], [Math.PI / 2, 0, 0], f.molten);
@@ -359,6 +359,7 @@ export function createCreature(id: string, shimmer = false) {
     }
     part(rig, "orb", accent, [0, 1.2, 0.43], [0.24, 0.32, 0.06], undefined, true);
   }
+  if (s.id === "solmole") headY -= .1;
   // Head, ears, muzzle and a face with its own eyes.
   const hs = dna.head,
     headW = (s.family === "fox" ? 0.33 : 0.36) * hs;
@@ -417,7 +418,7 @@ export function createCreature(id: string, shimmer = false) {
         part(rig, "capsule", dark, [ex * 1.25, ey - 0.1, headZ - 0.02], [0.09 * es, 0.2 * es, 0.06], [0.2, 0, -side * 0.9]);
     }
     body([0, headY - 0.1 * hs, headZ + 0.28 * hs], [0.22 * hs, 0.15 * hs, 0.25 * hs], cream);
-    part(rig, "orb", "#2a2422", [0, headY - 0.03 * hs, headZ + 0.5 * hs], [0.07, 0.055, 0.05], undefined, false, true);
+    if (s.id !== "solmole") part(rig, "orb", "#2a2422", [0, headY - 0.03 * hs, headZ + 0.5 * hs], [0.07, 0.055, 0.05], undefined, false, true);
   }
   for (const side of [-1, 1]) {
     const ex = side * 0.18 * hs,
@@ -437,7 +438,7 @@ export function createCreature(id: string, shimmer = false) {
       part(rig, "capsule", dark, [ex, ey + 0.13 * es, ez + 0.02], [0.025, 0.07, 0.02], [0, 0, Math.PI / 2 + side * 0.35]);
   }
   // Tails: each species' tail follows its description.
-  const tailCount = s.id === "astralynx" ? 3 : ["fox", "quadruped", "dragon", "antler", "bird"].includes(s.family) ? f.tailCount : 0;
+  const tailCount = ["reedrake","solmole"].includes(s.id) ? 0 : s.id === "astralynx" ? 3 : ["fox", "quadruped", "dragon", "antler", "bird"].includes(s.family) ? f.tailCount : 0;
   for (let n = 0; n < tailCount; n++) {
     const tail = new T.Group(),
       spread = tailCount > 1 ? (n / (tailCount - 1) - 0.5) * (tailCount > 3 ? 2.2 : 1.1) : 0;
@@ -490,7 +491,7 @@ export function createCreature(id: string, shimmer = false) {
     }
   } else if (/halo|ring|orbit|sun-disc/.test(s.appearance))
     part(rig, "ring", light, [0, headY + 0.55 * hs, headZ - 0.1], [0.36 + s.variant * 0.04, 0.36 + s.variant * 0.04, 0.46], [0.3, 0, 0], true);
-  if (/crystal|ice|icicle|quill|plate|slate|stone|basalt/.test(s.appearance))
+  if (s.id !== "solmole" && /crystal|ice|icicle|quill|plate|slate|stone|basalt/.test(s.appearance))
     for (let i = 0; i < 3 + s.variant; i++)
       part(rig, "cone", i % 2 ? light : accent, [(i % 2 ? 1 : -1) * 0.25, 1.02 + lift, -0.5 + i * 0.15], [0.12, 0.3 + (i % 3) * 0.08, 0.14], [0.3, 0, (i % 2 ? 1 : -1) * 0.4]);
   if (/leaf|fern|petal|flor|garden|canopy|bloom|sprout/.test(s.appearance))
@@ -498,14 +499,14 @@ export function createCreature(id: string, shimmer = false) {
       const a = i * 2.4;
       part(rig, "orb", i % 2 ? accent : "#91c878", [Math.sin(a) * 0.32, 1.2 + lift + (i % 3) * 0.13, Math.cos(a) * 0.35 - 0.2], [0.15, 0.27, 0.06], [0.3, 0, a]);
     }
-  if (/horn|tusk/.test(s.appearance) && !f.mouthTusks && s.family !== "antler" && s.id !== "solkarath")
+  if (/horn|tusk/.test(s.appearance) && !f.mouthTusks && s.family !== "antler" && s.id !== "solkarath" && s.id !== "reedrake")
     for (const side of [-1, 1]) horn(side * 0.3 * hs, headY + 0.36 * hs, headZ + 0.12, 0.4, rare ? accent : cream);
   if (/winged/i.test(s.appearance) && ["quadruped", "fox"].includes(s.family)) {
     wing(-1, 1.2);
     wing(1, 1.2);
   }
   // Rare species wear a ruff; mythic ones add a forehead gem and orbiting motes.
-  if (rank === 4 && four)
+  if (rank === 4 && four && s.id !== "solmole")
     for (let i = 0; i < 8; i++) {
       const a = (i / 7 - 0.5) * 2.6;
       part(rig, "cone", i % 2 ? accent : light, [Math.sin(a) * 0.32, headY - 0.22 + Math.cos(a) * 0.08, headZ - 0.12], [0.1, 0.32, 0.1], [-1.25, 0, -a * 0.8]);
@@ -646,7 +647,11 @@ export function createCreature(id: string, shimmer = false) {
       part(lantern,"orb",accent,[0,0,0],[.22,.22,.18],undefined,true);
       part(lantern,"ring",dark,[0,0,0],[.22,.22,.8],[Math.PI/2,0,0]);
     }
-    for(let i=0;i<6;i++) {const a=i*Math.PI/3;part(rig,"orb","#eaa09c",[Math.cos(a)*.09,headY-.04+Math.sin(a)*.08,headZ+.32],[.07,.035,.045],[0,0,a]);}
+    const nose=new T.Group();nose.name="solmole-star-nose";nose.position.set(0,headY-.03*hs,headZ+.5*hs+.025);rig.add(nose);
+    part(nose,"orb","#eaa09c",[0,0,0],[.085,.07,.045]);
+    for(let i=0;i<6;i++){const a=i*Math.PI/3;part(nose,"orb","#eaa09c",[Math.cos(a)*.09,Math.sin(a)*.075,.005],[.065,.027,.035],[0,0,a]);}
+    const tail=new T.Group();tail.name="solmole-short-tail";tail.position.set(0,.38,-.7);rig.add(tail);tails.push(tail);
+    part(tail,"capsule",light,[0,.02,-.18],[.055,.2,.055],[Math.PI/2,0,0]);
   }
   if (s.id === "cairnfin") {
     for (const side of [-1,1]) {

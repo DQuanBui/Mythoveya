@@ -89,5 +89,7 @@ it("gives rescue creatures webbed wings, a paddle and distinct digging anatomy",
  expect(drake.getObjectsByProperty("name","reedrake-paddle")).toHaveLength(1);
  expect(mole.getObjectsByProperty("name","solmole-spade")).toHaveLength(2);
  expect(mole.getObjectsByProperty("name","solmole-lantern")).toHaveLength(3);
+ expect(mole.getObjectsByProperty("name","solmole-short-tail")).toHaveLength(1);
+ expect(mole.getObjectsByProperty("name","solmole-star-nose")).toHaveLength(1);
  for(const id of ["reedrake","solmole"])expect(colors(id,true)).not.toEqual(colors(id));
 });
