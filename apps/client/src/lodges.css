@@ -143,3 +143,14 @@
     left: 1rem;
   }
 }
+
+main:has(.lodge-visit) .toast {
+  bottom: auto;
+  top: 7.5rem;
+}
+@media (max-width: 700px) {
+  main:has(.lodge-visit) .toast {
+    top: 7rem;
+    font-size: 0.75rem;
+  }
+}

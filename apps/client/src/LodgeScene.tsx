@@ -74,8 +74,35 @@ function Room({
     () =>
       [2, 5].map((a, i) => {
         const m = createAvatar(a);
-        m.position.set(-5.85, 0.86, 1.25 + i * 1.5);
-        m.userData.groundY = 0.86;
+        m.position.set(-5.5, 0.08, 1.25 + i * 1.5);
+        m.userData.groundY = 0.08;
+        // Seated legs bend over the cushion edge; the walking limbs stay hidden.
+        m.userData.limbs[0].visible = false;
+        m.userData.limbs[2].visible = false;
+        for (const side of [-1, 1]) {
+          part(
+            m,
+            "capsule",
+            "#6a6170",
+            [side * 0.11, 0.78, 0.2],
+            [0.14, 0.2, 0.14],
+            [Math.PI / 2, 0, 0],
+          );
+          part(
+            m,
+            "capsule",
+            "#6a6170",
+            [side * 0.11, 0.47, 0.4],
+            [0.14, 0.24, 0.14],
+          );
+          part(
+            m,
+            "box",
+            "#5b4334",
+            [side * 0.11, 0.14, 0.44],
+            [0.15, 0.1, 0.23],
+          );
+        }
         m.rotation.y = Math.PI / 2;
         return m;
       }),

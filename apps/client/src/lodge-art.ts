@@ -94,6 +94,21 @@ export function buildLodge(s: Lodge, r: LodgeRecord) {
             [f.x - 0.76, 0.55 + row * 0.75, f.z - 0.8 + i * 0.3],
             [0.06, 0.5, 0.22],
           );
+      k.box("#493f3b", [f.x, 0.9, f.z + f.d / 2 + 0.01], [1.25, 1.55, 0.04]);
+      for (let row = 0; row < 2; row++) {
+        k.box(
+          "#a27f5e",
+          [f.x, 0.1 + row * 0.78, f.z + f.d / 2 + 0.05],
+          [1.35, 0.08, 0.12],
+        );
+        for (let i = 0; i < 5; i++) {
+          const x = f.x - 0.48 + i * 0.24,
+            y = 0.45 + row * 0.78,
+            z = f.z + f.d / 2 + 0.065;
+          k.box(i % 2 ? s.color : "#cba77f", [x, y, z], [0.19, 0.55, 0.05]);
+          k.box("#e8d6ac", [x, y + 0.15, z + 0.03], [0.14, 0.025, 0.02]);
+        }
+      }
       k.box("#e9d7b5", [f.x, 1.86, f.z], [0.7, 0.08, 0.9], [0, 0.2, 0]);
     } else if (f.id === "bench") {
       k.box("#795947", [f.x, 0.4, f.z], [f.w, 0.65, f.d]);
