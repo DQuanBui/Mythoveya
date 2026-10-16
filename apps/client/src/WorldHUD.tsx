@@ -519,7 +519,7 @@ function HoverTip({ blocked }: { blocked: boolean }) {
     </div>
   );
 }
-function TouchPad({
+export function TouchPad({
   input,
   blocked,
 }: {

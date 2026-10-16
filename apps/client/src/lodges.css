@@ -1,0 +1,141 @@
+.lodge-hud {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  color: #f7ead2;
+  z-index: 5;
+}
+.lodge-hud header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(#282730e8, transparent);
+}
+.lodge-hud h1 {
+  font-size: 1.6rem;
+  margin: 0.2rem 0;
+}
+.lodge-hud header p {
+  max-width: 40rem;
+  margin: 0.3rem 0;
+}
+.lodge-hud button {
+  pointer-events: auto;
+}
+.lodge-hud nav {
+  position: absolute;
+  bottom: 3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.6rem;
+  background: #292832e8;
+  border: 1px solid #8f8263;
+  border-radius: 16px;
+  max-width: 95vw;
+}
+.lodge-hud nav button {
+  white-space: nowrap;
+}
+.lodge-controls {
+  position: absolute;
+  bottom: 0.4rem;
+  text-align: center;
+  width: 100%;
+  font-size: 0.75rem;
+  color: #d9cbb7;
+}
+.lodge-marker {
+  background: #292832dd;
+  color: #f5e6ca;
+  font-size: 11px;
+  padding: 4px 7px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+.lodge-dialog h2 {
+  padding-right: 2rem;
+}
+.lodge-choice {
+  display: block;
+  width: 100%;
+  text-align: left;
+  margin: 0.6rem 0;
+}
+.lodge-dialog select {
+  display: block;
+  width: 100%;
+  margin: 0.7rem 0;
+  padding: 0.7rem;
+}
+.lodge-dialog {
+  max-height: 85dvh;
+  overflow: auto;
+}
+.lodge-hud .touch-movement {
+  pointer-events: auto;
+}
+.lodge-entry-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+.lodge-entry-grid article {
+  padding: 1rem;
+  border: 1px solid #94856a;
+  border-radius: 12px;
+}
+.lodge-entry-grid h3 {
+  margin: 0.2rem 0;
+}
+.lodge-entry-grid p {
+  line-height: 1.5;
+}
+@media (max-width: 700px) {
+  .lodge-hud header {
+    padding: 0.75rem;
+  }
+  .lodge-hud h1 {
+    font-size: 1.1rem;
+  }
+  .lodge-hud header p {
+    font-size: 0.75rem;
+    max-width: 16rem;
+  }
+  .lodge-hud header button {
+    font-size: 0.75rem;
+    padding: 0.5rem;
+  }
+  .lodge-hud nav {
+    bottom: 1rem;
+    left: auto;
+    right: 0.6rem;
+    transform: none;
+    display: grid;
+    grid-template-columns: 1fr;
+    max-width: 54vw;
+    gap: 0.2rem;
+    padding: 0.35rem;
+  }
+  .lodge-hud nav button {
+    font-size: 0.72rem;
+    padding: 0.45rem;
+    min-height: 36px;
+  }
+  .lodge-controls {
+    display: none;
+  }
+  .lodge-entry-grid {
+    grid-template-columns: 1fr;
+  }
+  .lodge-dialog {
+    max-height: 82dvh;
+  }
+  .lodge-hud .touch-movement {
+    bottom: 1.5rem;
+    left: 1rem;
+  }
+}

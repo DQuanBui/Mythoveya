@@ -138,7 +138,7 @@ export const lodgeStops = (region: string) =>
     description:
       "Enter a walkable lodge: meet its host, cook, and help with a companion.",
   }));
-export const ROOM_SPAWN: [number, number] = [0, 5.8];
+export const ROOM_SPAWN: [number, number] = [0, 5.5];
 export const ROOM_STATIONS = [
   { id: "host", name: "Meet the host", point: [-4, -4] as [number, number] },
   { id: "kitchen", name: "Prepare supper", point: [4, -4] as [number, number] },
