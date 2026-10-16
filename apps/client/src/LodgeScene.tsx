@@ -1,10 +1,4 @@
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type MutableRefObject,
-} from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import type { Profile } from "../../../packages/shared/types";
@@ -26,6 +20,7 @@ import {
   animateAvatar,
   createCreature,
   animateCreature,
+  part,
 } from "./models";
 import { ModelLighting } from "./ModelLighting";
 import { WorldInteraction } from "./WorldInteraction";
@@ -65,6 +60,8 @@ function Room({
     const m = createAvatar(site.avatar);
     m.position.set(-4, 0, -5.4);
     m.userData.groundY = 0;
+    part(m, "box", site.color, [0, 1.19, 0.2], [0.4, 0.14, 0.08]);
+    part(m, "box", "#dfc69e", [-0.24, 0.85, 0.18], [0.15, 0.2, 0.08]);
     return m;
   }, [site]);
   const resident = useMemo(() => {
@@ -194,10 +191,10 @@ export function LodgeScene({
     const key = (e: KeyboardEvent) => {
       if (
         e.target instanceof HTMLElement &&
-        e.target.matches("input,select,textarea,button")
+        e.target.matches("input,select,textarea")
       )
         return;
-      if (e.code === "Escape") setPanel("");
+      if (e.code === "Escape" && !busy) setPanel("");
       if (e.code === "KeyE" && !panel && near) walk(near);
     };
     window.addEventListener("keydown", key);

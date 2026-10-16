@@ -1,3 +1,7 @@
+.lodge-visit {
+  position: fixed;
+  inset: 0;
+}
 .lodge-hud {
   position: fixed;
   inset: 0;
