@@ -10,6 +10,7 @@ Mythoveya is a locally playable, browser-based 3D creature-collection RPG. Its w
 
 ## The game
 
+- **Wayfarer Lodges:** step inside four regional rooms, meet Perrin, Junie, Saff and Nell, prepare local suppers, help with companions and leave permanent decorations. Welcome Lumeswallow and Velvetmoth. [Read the lodge guide](docs/LODGES.md).
 - **Wildbound Rescues:** help Mira, Oren, Tavi and Edda with your active companions' elemental abilities. Restore four wildlife clearings, choose their permanent endings, and welcome Reedrake and Solmole. [Read the rescue guide](docs/RESCUES.md).
 - **The Atlas of Echoes:** follow a connected four-region story with Aster, Fenn, Suri and Niva. Discover inscriptions, restore memory monuments, earn Cairnfin and Inkwisp, and unlock daily echo readings. [Read the Atlas guide](docs/ATLAS.md).
 
@@ -23,7 +24,7 @@ Mythoveya is a locally playable, browser-based 3D creature-collection RPG. Its w
 
 - **Signals in the Stone:** explore Emberglass's basalt terraces, hot springs and ranger camp; solve three companion-powered beacon inscriptions, calm the Glass Sentinel, earn Thermala and collect a Canyon Naturalist badge. [Read the canyon guide](docs/CANYON.md).
 - **The Silent Windmill:** explore the western lake and hillside cottages, use Flame, Tide and Grove companions in the field, calm a guardian with alternating defenses, and restore the village windmill. Earn Galehart, discover rain tracks and starlight, and keep every reward in your saved journey.
-- **90 Wildbound, plus 16 evolved forms:** eleven species each in E/D/C, eighteen in B, twenty-one in A and eighteen in S, eight elements, twelve body families, 270 actions and 90 passives. Every species builds its own look from its description: palette, ears, tail, markings and anatomy such as manes, trunks, sails, owl faces and nine fanned tails.
+- **92 Wildbound, plus 16 evolved forms:** eleven species each in E/D/C, nineteen in B, twenty-two in A and eighteen in S, eight elements, twelve body families, 276 actions and 92 passives. Every species builds its own look from its description: palette, ears, tail, markings and anatomy such as manes, trunks, sails, owl faces and nine fanned tails.
 - **Eight keepers:** choose a recognizable character and change your appearance later without losing progress.
 - **Eight village friends:** meet Liora, Sella, Bram, Kael, Oren, Tali, Pip, and Wren. Explore 24 conversation topics, complete 16 missions, and unlock their daily help.
 - **Make yourself at home:** trade supplies at Pip's rotating market, grow Sunseed, craft treats, nurture friendship, name companions, and dress your following friend with a ribbon or bell.
@@ -227,4 +228,4 @@ In `npm run dev`, press **Esc → Asset gallery** to inspect species, keeper mod
 
 Add or balance creatures in `packages/shared/roster.json` and `content.ts`; avatars and regions also live in `content.ts`. Economy curves and pity rules live in `economy.ts`. Server reward and quest configuration lives in `apps/server/game.ts`. Keep species IDs stable to preserve existing collections.
 
-Next development priorities are reusable regional materials and crafting, walkable house interiors, individual creature-art refinement, deeper manual balance playtesting, and a listening pass on the synthesized score. Longer-term work includes accounts, shared exploration, cooperative guardians, and a branching campaign.
+Next development priorities are deeper regional crafting, more varied room layouts and companion behavior, individual creature-art refinement, deeper manual balance playtesting, and a listening pass on the synthesized score. Longer-term work includes accounts, shared exploration, cooperative guardians, and a branching campaign.
