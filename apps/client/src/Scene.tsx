@@ -1,3 +1,5 @@
+import { LodgeDoors } from "./LodgeDoors";
+import { lodgeStops } from "../../../packages/shared/lodges";
 import { RescueSites } from "./RescueSites";
 import { rescueBlocked, rescueStops } from "../../../packages/shared/rescue";
 import { AtlasSites } from "./AtlasSites";
@@ -617,7 +619,7 @@ export const INTERACTABLES = [
 // Interaction points sit on the terrain (using each region's ground height).
 for (const o of INTERACTABLES) o.p[1] = groundHeight(o.p[0], o.p[2]);
 export const getInteractables = (region: string) =>
-  [...rescueStops(region).map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],groundFor(region)(...s.point),s.point[1]]})), ...atlasStops(region).map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],groundFor(region)(...s.point),s.point[1]]})), ...conservancyStops(region).map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],groundFor(region)(...s.point),s.point[1]]})), ...(rallyHost(region) ? [{id:rallyHost(region)!.id,name:rallyHost(region)!.name,hint:rallyHost(region)!.description,p:[rallyHost(region)!.point[0],groundFor(region)(...rallyHost(region)!.point),rallyHost(region)!.point[1]]}] : []), ...(region === "meadow" ? MEADOW_STOPS.map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],meadowHeight(...s.point),s.point[1]]})) : []), ...(region === "hollow" ? HOLLOW_STOPS.map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],hollowHeight(...s.point),s.point[1]]})) : []), ...(region === "canyon" ? CANYON_STOPS.map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],canyonHeight(...s.point),s.point[1]]})) : []), ...INTERACTABLES.filter(
+  [...lodgeStops(region).map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],groundFor(region)(...s.point),s.point[1]]})), ...rescueStops(region).map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],groundFor(region)(...s.point),s.point[1]]})), ...atlasStops(region).map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],groundFor(region)(...s.point),s.point[1]]})), ...conservancyStops(region).map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],groundFor(region)(...s.point),s.point[1]]})), ...(rallyHost(region) ? [{id:rallyHost(region)!.id,name:rallyHost(region)!.name,hint:rallyHost(region)!.description,p:[rallyHost(region)!.point[0],groundFor(region)(...rallyHost(region)!.point),rallyHost(region)!.point[1]]}] : []), ...(region === "meadow" ? MEADOW_STOPS.map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],meadowHeight(...s.point),s.point[1]]})) : []), ...(region === "hollow" ? HOLLOW_STOPS.map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],hollowHeight(...s.point),s.point[1]]})) : []), ...(region === "canyon" ? CANYON_STOPS.map(s=>({id:s.id,name:s.name,hint:s.description,p:[s.point[0],canyonHeight(...s.point),s.point[1]]})) : []), ...INTERACTABLES.filter(
     (o) =>
       (region === "haven" ||
         (!o.id.startsWith("exp-") && !o.id.startsWith("trail-") &&
@@ -1189,6 +1191,7 @@ export function WorldScene({
       <WalkContext.Provider value={walker}>
       <ModelLighting intensity={0.35} />
       <Environment region={profile.region} expedition={expeditionOf(profile)} />
+      <LodgeDoors region={profile.region} onInteract={onInteract} disabled={blocked}/>
       <RescueSites profile={profile} onInteract={onInteract} disabled={blocked}/>
       <AtlasSites profile={profile} onInteract={onInteract} disabled={blocked}/>
           <ConservancySites profile={profile} onInteract={onInteract} disabled={blocked}/>

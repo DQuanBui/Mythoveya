@@ -1,3 +1,4 @@
+import { lodgeStops } from "../../../packages/shared/lodges";
 import { rescueStops } from "../../../packages/shared/rescue";
 import { atlasStops } from "../../../packages/shared/atlas";
 import { conservancyStops } from "../../../packages/shared/conservancy";
@@ -14,7 +15,7 @@ import {
   canyonOf,
   canyonObjective,
 } from "../../../packages/shared/canyon";
-const CANYON_STOPS=[...rescueStops("canyon"),...atlasStops("canyon"),...REGION_STOPS,rallyHost("canyon")!,...conservancyStops("canyon")];
+const CANYON_STOPS=[...lodgeStops("canyon"),...rescueStops("canyon"),...atlasStops("canyon"),...REGION_STOPS,rallyHost("canyon")!,...conservancyStops("canyon")];
 export function CanyonMap({
   profile,
   position,

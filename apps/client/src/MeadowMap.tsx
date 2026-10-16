@@ -1,3 +1,4 @@
+import { lodgeStops } from "../../../packages/shared/lodges";
 import { rescueStops } from "../../../packages/shared/rescue";
 import { atlasStops } from "../../../packages/shared/atlas";
 import { conservancyStops } from "../../../packages/shared/conservancy";
@@ -15,7 +16,7 @@ import {
   meadowObjective,
   meadowOf,
 } from "../../../packages/shared/meadow";
-const MEADOW_STOPS=[...rescueStops("meadow"),...atlasStops("meadow"),...REGION_STOPS,rallyHost("meadow")!,...conservancyStops("meadow")];
+const MEADOW_STOPS=[...lodgeStops("meadow"),...rescueStops("meadow"),...atlasStops("meadow"),...REGION_STOPS,rallyHost("meadow")!,...conservancyStops("meadow")];
 export function MeadowMap({
   profile,
   position,
