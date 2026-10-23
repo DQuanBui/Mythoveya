@@ -5,6 +5,8 @@ export type LodgeRecord = {
   meal?: string;
   helper?: { id: string; species: string };
   keepsake?: "lantern" | "banner";
+  /** Permanent regional display, crafted once after hosting the gathering. */
+  workshop?: boolean;
 };
 export type LodgeState = {
   rooms: Record<string, LodgeRecord>;
