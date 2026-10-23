@@ -21,7 +21,8 @@ export const LODGE_WORKSHOPS: Record<string, LodgeWorkshop> = {
   },
   meadow: {
     name: "Seedling cradle",
-    description: "Weave a planter for glowing herbs and tiny woodland seedlings.",
+    description:
+      "Weave a planter for glowing herbs and tiny woodland seedlings.",
     cost: { timber: 1, fiber: 2 },
     stories: [
       "Junie gathers fallen seeds after the choir rehearses. She thinks the quietest notes help the smallest roots find their way through the soil.",

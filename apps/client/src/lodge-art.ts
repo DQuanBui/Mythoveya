@@ -13,7 +13,11 @@ export function buildLodge(s: Lodge, r: LodgeRecord) {
   if (s.region === "canyon")
     for (let x = -6; x <= 6; x += 1.5)
       for (let z = -6.7; z <= 6.8; z += 1.5)
-        k.box((Math.round(x + z) % 2) ? "#c99d73" : "#ba8c69", [x, 0.005, z], [1.43, 0.025, 1.43]);
+        k.box(
+          Math.round(x + z) % 2 ? "#c99d73" : "#ba8c69",
+          [x, 0.005, z],
+          [1.43, 0.025, 1.43],
+        );
   k.box(s.wall, [0, 1.7, -7.7], [14.4, 3.4, 0.25]);
   k.box(s.wall, [-7.1, 1.7, 0], [0.25, 3.4, 15.4]);
   // Low foreground walls keep the keeper and small companions visible.
@@ -32,15 +36,31 @@ export function buildLodge(s: Lodge, r: LodgeRecord) {
   if (s.region === "hollow") {
     for (const z of [1.6, 3.2, 4.8])
       for (const x of [-1.4, 0, 1.4])
-        k.box("#d7d5e5", [x, 0.04, z], [0.45, 0.015, 0.45], [0, Math.PI / 4, 0]);
+        k.box(
+          "#d7d5e5",
+          [x, 0.04, z],
+          [0.45, 0.015, 0.45],
+          [0, Math.PI / 4, 0],
+        );
   } else if (s.region === "meadow") {
     for (let i = 0; i < 12; i++) {
-      const a = i * Math.PI / 6;
-      k.add(SHAPES.BALL, "#b4c697", [Math.cos(a) * 1.65, 0.05, 3.4 + Math.sin(a) * 1.65], [0.22, 0.025, 0.45], [0, -a, 0]);
+      const a = (i * Math.PI) / 6;
+      k.add(
+        SHAPES.BALL,
+        "#b4c697",
+        [Math.cos(a) * 1.65, 0.05, 3.4 + Math.sin(a) * 1.65],
+        [0.22, 0.025, 0.45],
+        [0, -a, 0],
+      );
     }
   } else if (s.region === "haven") {
     for (let i = 0; i < 4; i++)
-      k.box("#dfc795", [0, 0.04, 3.4], [0.07, 0.015, 3.2], [0, i * Math.PI / 4, 0]);
+      k.box(
+        "#dfc795",
+        [0, 0.04, 3.4],
+        [0.07, 0.015, 3.2],
+        [0, (i * Math.PI) / 4, 0],
+      );
   }
   // Window alcove, with a different regional view.
   k.box("#65524a", [2.6, 2, -7.52], [3.7, 2.2, 0.2]);
@@ -142,31 +162,77 @@ export function buildLodge(s: Lodge, r: LodgeRecord) {
       } else if (s.region === "haven") {
         k.box("#d9caa0", [f.x, 1.07, f.z], [1.9, 0.1, 0.7], [-0.25, 0, 0]);
         for (let i = 0; i < 5; i++)
-          k.add(SHAPES.BALL, i % 2 ? "#8cb39c" : "#709caa", [f.x - 0.65 + i * 0.32, 1.14, f.z - 0.12 + (i % 2) * 0.24], [0.18, 0.025, 0.13]);
-        k.add(SHAPES.CYL, "#c8aa62", [f.x + 0.9, 1.17, f.z], [0.23, 0.08, 0.23]);
-        k.box("#ebdfb4", [f.x + 0.9, 1.23, f.z], [0.04, 0.02, 0.34], [0, 0.7, 0]);
+          k.add(
+            SHAPES.BALL,
+            i % 2 ? "#8cb39c" : "#709caa",
+            [f.x - 0.65 + i * 0.32, 1.14, f.z - 0.12 + (i % 2) * 0.24],
+            [0.18, 0.025, 0.13],
+          );
+        k.add(
+          SHAPES.CYL,
+          "#c8aa62",
+          [f.x + 0.9, 1.17, f.z],
+          [0.23, 0.08, 0.23],
+        );
+        k.box(
+          "#ebdfb4",
+          [f.x + 0.9, 1.23, f.z],
+          [0.04, 0.02, 0.34],
+          [0, 0.7, 0],
+        );
       } else if (s.region === "meadow") {
         for (let i = 0; i < 4; i++) {
           const x = f.x - 0.85 + i * 0.55;
           k.add(SHAPES.CYL6, "#b37e5b", [x, 1.02, f.z], [0.24, 0.3, 0.24]);
           k.box("#648d61", [x, 1.36, f.z], [0.04, 0.55, 0.04]);
-          k.add(SHAPES.BUSH, "#87ae74", [x - 0.12, 1.35, f.z], [0.2, 0.1, 0.17]);
-          k.add(SHAPES.BUSH, i % 2 ? "#d8c38a" : "#b5c5a4", [x, 1.62, f.z], [0.15, 0.17, 0.15]);
+          k.add(
+            SHAPES.BUSH,
+            "#87ae74",
+            [x - 0.12, 1.35, f.z],
+            [0.2, 0.1, 0.17],
+          );
+          k.add(
+            SHAPES.BUSH,
+            i % 2 ? "#d8c38a" : "#b5c5a4",
+            [x, 1.62, f.z],
+            [0.15, 0.17, 0.15],
+          );
         }
       } else if (s.region === "canyon") {
         k.box("#695349", [f.x, 1.42, f.z - 0.25], [2.4, 1.05, 0.12]);
         for (let i = 0; i < 18; i++) {
-          const a = i * 0.55, radius = 0.05 + i * 0.018;
-          k.add(SHAPES.BALL, "#d9bd8c", [f.x - 0.45 + Math.cos(a) * radius, 1.43 + Math.sin(a) * radius, f.z - 0.12], [0.07, 0.07, 0.04]);
+          const a = i * 0.55,
+            radius = 0.05 + i * 0.018;
+          k.add(
+            SHAPES.BALL,
+            "#d9bd8c",
+            [
+              f.x - 0.45 + Math.cos(a) * radius,
+              1.43 + Math.sin(a) * radius,
+              f.z - 0.12,
+            ],
+            [0.07, 0.07, 0.04],
+          );
         }
         for (let i = 0; i < 3; i++)
-          k.add(SHAPES.CONE4, ["#9bbec4", "#c8a2bc", "#e1bb7e"][i], [f.x + 0.4 + i * 0.3, 1.15, f.z + 0.1], [0.16, 0.45, 0.16]);
+          k.add(
+            SHAPES.CONE4,
+            ["#9bbec4", "#c8a2bc", "#e1bb7e"][i],
+            [f.x + 0.4 + i * 0.3, 1.15, f.z + 0.1],
+            [0.16, 0.45, 0.16],
+          );
       } else {
         k.box("#b7b7c9", [f.x, 2.7, f.z], [2.3, 0.05, 0.07]);
         for (let i = 0; i < 5; i++) {
-          const x = f.x - 0.9 + i * 0.45, y = 1.7 + (i % 2) * 0.35;
+          const x = f.x - 0.9 + i * 0.45,
+            y = 1.7 + (i % 2) * 0.35;
           k.box("#b9b7b1", [x, (y + 2.7) / 2, f.z], [0.012, 2.7 - y, 0.012]);
-          k.add(SHAPES.ROCK, i % 2 ? "#d5c6ea" : "#b3dce4", [x, y, f.z], [0.16, 0.23, 0.1]);
+          k.add(
+            SHAPES.ROCK,
+            i % 2 ? "#d5c6ea" : "#b3dce4",
+            [x, y, f.z],
+            [0.16, 0.23, 0.1],
+          );
         }
       }
     } else if (f.id === "hearth") {

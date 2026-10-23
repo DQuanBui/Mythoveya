@@ -169,7 +169,10 @@ export const ROOM_FURNITURE = [
  * must use this same layout to avoid invisible obstacles or stale path grids. */
 export function roomLayout(region: string) {
   const furniture = ROOM_FURNITURE.map((f) => ({ ...f }));
-  const stations = ROOM_STATIONS.map((s) => ({ ...s, point: [...s.point] as [number, number] }));
+  const stations = ROOM_STATIONS.map((s) => ({
+    ...s,
+    point: [...s.point] as [number, number],
+  }));
   const move = (id: string, x: number, z: number) => {
     Object.assign(furniture.find((f) => f.id === id)!, { x, z });
   };
@@ -177,25 +180,41 @@ export function roomLayout(region: string) {
     stations.find((s) => s.id === id)!.point = [x, z];
   };
   if (region === "meadow") {
-    move("table", -1, -1); move("counter", 5.9, -2.5);
-    move("shelf", 5.9, 3); move("bench", -5.9, 0.8);
-    stop("host", -2, -4.2); stop("kitchen", 4, -2.5);
-    stop("guestbook", 4, 3); stop("companion", -4, 2.5);
+    move("table", -1, -1);
+    move("counter", 5.9, -2.5);
+    move("shelf", 5.9, 3);
+    move("bench", -5.9, 0.8);
+    stop("host", -2, -4.2);
+    stop("kitchen", 4, -2.5);
+    stop("guestbook", 4, 3);
+    stop("companion", -4, 2.5);
   } else if (region === "canyon") {
-    move("table", 1, -0.5); move("shelf", -5.9, -2.2);
+    move("table", 1, -0.5);
+    move("shelf", -5.9, -2.2);
     move("bench", -5.9, 2.8);
-    stop("host", -3, -4.8); stop("guestbook", -4, -2.2);
+    stop("host", -3, -4.8);
+    stop("guestbook", -4, -2.2);
     stop("companion", -4, 3);
   } else if (region === "hollow") {
-    move("table", 0, -3); move("counter", 5.9, -3);
-    move("shelf", 5.9, 2.2); move("bench", -5.9, 0.8);
-    stop("host", -4, -4.5); stop("kitchen", 4, -3);
-    stop("companion", -4, 1); stop("guestbook", 4, 2.2);
+    move("table", 0, -3);
+    move("counter", 5.9, -3);
+    move("shelf", 5.9, 2.2);
+    move("bench", -5.9, 0.8);
+    stop("host", -4, -4.5);
+    stop("kitchen", 4, -3);
+    stop("companion", -4, 1);
+    stop("guestbook", 4, 2.2);
   }
   const host = stations.find((s) => s.id === "host")!.point;
-  return { furniture, stations, host: [host[0], host[1] - 0.9] as [number, number] };
+  return {
+    furniture,
+    stations,
+    host: [host[0], host[1] - 0.9] as [number, number],
+  };
 }
-const layouts = Object.fromEntries(LODGES.map((s) => [s.region, roomLayout(s.region)]));
+const layouts = Object.fromEntries(
+  LODGES.map((s) => [s.region, roomLayout(s.region)]),
+);
 export function roomWalkable(x: number, z: number, region = "haven") {
   return (
     Number.isFinite(x) &&

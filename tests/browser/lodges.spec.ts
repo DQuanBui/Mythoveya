@@ -1,6 +1,8 @@
 import { test, expect, type Page } from "@playwright/test";
-import { LODGES, ROOM_STATIONS } from "../../packages/shared/lodges";
+import { LODGES, roomLayout } from "../../packages/shared/lodges";
 import { REGIONS, COMPANIONS, byId } from "../../packages/shared/content";
+import { SUPPLY_NODES } from "../../packages/shared/conservancy";
+import { LODGE_WORKSHOPS } from "../../packages/shared/lodge-workshops";
 import { FIELD_ABILITIES, fieldAbility } from "../../packages/shared/rescue";
 async function stop(page: Page, id: string) {
   const h = LODGES.find((s) => s.id === id)!;
@@ -59,7 +61,9 @@ async function playerPoint(page: Page) {
   });
 }
 async function station(page: Page, id: string) {
-  const s = ROOM_STATIONS.find((s) => s.id === id)!;
+  const name = await page.locator(".lodge-visit").getAttribute("aria-label");
+  const site = LODGES.find((s) => s.name === name)!;
+  const s = roomLayout(site.region).stations.find((s) => s.id === id)!;
   await page
     .getByRole("navigation", { name: "Walk around the lodge" })
     .getByRole("button", { name: s.name, exact: true })
@@ -79,7 +83,7 @@ test("walk inside four lodges host gatherings and preserve rooms and creature re
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("/");
-  await page.evaluate(async () => {
+  await page.evaluate(async (supplyNodes) => {
     const post = async (path: string, data: unknown, token = "") => {
       for (let attempt = 0; attempt < 8; attempt++) {
         const r = await fetch("/api/" + path, {
@@ -134,7 +138,31 @@ test("walk inside four lodges host gatherings and preserve rooms and creature re
       if (b.winner === 0) wins++;
     }
     if (wins < 5) throw Error("Could not earn Moonfrost unlock");
-  });
+    // Gather real supplies through validated region travel, not injected balances.
+    for (const region of ["haven", "meadow", "canyon", "hollow"]) {
+      await post(
+        "mutate",
+        { kind: "travel", region, requestId: crypto.randomUUID() },
+        g.token,
+      );
+      for (const node of supplyNodes.filter((n) => n.region === region))
+        await post(
+          "mutate",
+          {
+            kind: "cons-gather",
+            id: node.id,
+            quest: new Date().toISOString().slice(0, 10),
+            requestId: crypto.randomUUID(),
+          },
+          g.token,
+        );
+    }
+    await post(
+      "mutate",
+      { kind: "travel", region: "haven", requestId: crypto.randomUUID() },
+      g.token,
+    );
+  }, SUPPLY_NODES);
 
   await page.reload();
   await page.getByRole("button", { name: "Continue your journey" }).click();
@@ -191,6 +219,12 @@ test("walk inside four lodges host gatherings and preserve rooms and creature re
       });
     });
     await station(page, "host");
+    await expect(
+      page.getByRole("button", {
+        name: `Build ${LODGE_WORKSHOPS[s.region].name}`,
+        exact: true,
+      }),
+    ).toBeDisabled();
     await expect(page.locator(".lodge-dialog")).toContainText(s.story);
     await page
       .getByRole("button", { name: "Offer to help", exact: true })
@@ -265,7 +299,58 @@ test("walk inside four lodges host gatherings and preserve rooms and creature re
           exact: true,
         })
         .click();
+    const original = i % 2 ? "banner" : "lantern",
+      alternate = i % 2 ? "lantern" : "banner";
+    await page
+      .getByRole("button", { name: `Display ${alternate}`, exact: true })
+      .click();
+    await expect(page.locator(".lodge-dialog")).toContainText(
+      `Saved decoration: ${alternate}`,
+    );
+    await page
+      .getByRole("button", { name: `Display ${original}`, exact: true })
+      .click();
     await page.getByLabel("Close lodge panel").click();
+    await station(page, "host");
+    const workshop = LODGE_WORKSHOPS[s.region];
+    await page
+      .getByRole("button", { name: `Build ${workshop.name}`, exact: true })
+      .click();
+    await expect(page.getByLabel("Lodge workshop")).toContainText(
+      "Display built",
+    );
+    for (let story = 0; story < 3; story++) {
+      await page
+        .getByRole("button", { name: `Story ${story + 1}`, exact: true })
+        .click();
+      await expect(page.locator(".lodge-story")).toHaveText(
+        workshop.stories[story],
+      );
+    }
+    await page.screenshot({ path: `artifacts/workshop-story-${s.region}.png` });
+    await page.getByLabel("Close lodge panel").click();
+    if (i === 0) {
+      const resident = () =>
+        page.evaluate(async () => {
+          const url = performance
+            .getEntriesByType("resource")
+            .map((r) => r.name)
+            .find((n) => n.includes("@react-three_fiber.js"))!;
+          const { _roots } = await import(/* @vite-ignore */ url);
+          const m = _roots
+            .get(document.querySelector("canvas"))
+            .store.getState()
+            .scene.getObjectByName("lodge-resident");
+          return [m.position.x, m.position.z];
+        });
+      const initial = await resident();
+      await expect
+        .poll(async () => {
+          const p = await resident();
+          return Math.hypot(p[0] - initial[0], p[1] - initial[1]);
+        })
+        .toBeGreaterThan(0.3);
+    }
     await page.keyboard.press("KeyR");
     await page.waitForTimeout(400);
     await page.screenshot({ path: `artifacts/lodge-${s.region}.png` });
@@ -327,6 +412,9 @@ test("walk inside four lodges host gatherings and preserve rooms and creature re
   await expect(page.locator("section[aria-label=lodges]")).toContainText(
     "Companions welcomed: 2 / 2",
   );
+  await expect(page.locator("section[aria-label=lodges]")).toContainText(
+    "4 / 4 workshop displays built",
+  );
   await stop(page, LODGES[3].id);
   await station(page, "guestbook");
   await expect(page.locator(".lodge-dialog")).toContainText(
@@ -343,6 +431,10 @@ test("walk inside four lodges host gatherings and preserve rooms and creature re
     }).then((r) => r.json()),
   );
   expect(p.lodges.claims).toEqual(["lumeswallow", "velvetmoth"]);
-  for (const s of LODGES) expect(p.lodges.rooms[s.region].meal).toBe(s.recipe);
+  for (const s of LODGES) {
+    expect(p.lodges.rooms[s.region].meal).toBe(s.recipe);
+    expect(p.lodges.rooms[s.region].workshop).toBe(true);
+  }
+  expect(p.conservancy.materials).toEqual({ timber: 7, fiber: 8, crystal: 9 });
   expect(errors).toEqual([]);
 });

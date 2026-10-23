@@ -82,10 +82,25 @@
   padding-top: 1rem;
   border-top: 1px solid #94856a;
 }
-.lodge-materials { padding-left: 1.3rem; line-height: 1.8; }
-.lodge-story-tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-.lodge-story-tabs [aria-pressed="true"] { border-color: #eed398; background: #36545c; }
-.lodge-story { padding: 1rem; background: #314b5233; border-left: 3px solid #bba375; line-height: 1.7; }
+.lodge-materials {
+  padding-left: 1.3rem;
+  line-height: 1.8;
+}
+.lodge-story-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.lodge-story-tabs [aria-pressed="true"] {
+  border-color: #eed398;
+  background: #36545c;
+}
+.lodge-story {
+  padding: 1rem;
+  background: #314b5233;
+  border-left: 3px solid #bba375;
+  line-height: 1.7;
+}
 .lodge-dialog {
   max-height: 85dvh;
   overflow: auto;

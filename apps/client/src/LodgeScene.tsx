@@ -30,7 +30,10 @@ import { LodgeWorkshop } from "./LodgeWorkshop";
 import type { ExplorationInput } from "./world-guide";
 import { audio, settings } from "./audio";
 import "./lodges.css";
-import { lodgeResidentRoute, residentPose } from "../../../packages/shared/lodge-life";
+import {
+  lodgeResidentRoute,
+  residentPose,
+} from "../../../packages/shared/lodge-life";
 function Room({
   site,
   profile,
@@ -44,7 +47,10 @@ function Room({
 }) {
   const r = lodgeRecord(profile, site.region);
   const layout = useMemo(() => roomLayout(site.region), [site.region]);
-  const residentRoute = useMemo(() => lodgeResidentRoute(site.region), [site.region]);
+  const residentRoute = useMemo(
+    () => lodgeResidentRoute(site.region),
+    [site.region],
+  );
   const residentTime = useRef(0);
   const geometry = useMemo(
     () => buildLodge(site, r),
@@ -107,12 +113,19 @@ function Room({
   );
   useFrame(({ clock }, dt) => {
     animateAvatar(host, clock.elapsedTime, false, false, settings.reduced);
-    if (!blocked && !settings.reduced) residentTime.current += Math.min(dt, 0.05);
+    if (!blocked && !settings.reduced)
+      residentTime.current += Math.min(dt, 0.05);
     const pose = residentPose(residentRoute, residentTime.current);
     resident.position.x = pose.x;
     resident.position.z = pose.z;
     resident.rotation.y = pose.yaw;
-    animateCreature(resident, clock.elapsedTime, pose.walking && !settings.reduced ? "walk" : "idle", 0, settings.reduced);
+    animateCreature(
+      resident,
+      clock.elapsedTime,
+      pose.walking && !settings.reduced ? "walk" : "idle",
+      0,
+      settings.reduced,
+    );
     if (r.keepsake)
       guests.forEach((m) =>
         animateAvatar(m, clock.elapsedTime, false, false, settings.reduced),
@@ -189,12 +202,19 @@ export function LodgeScene({
   exit: () => void;
 }) {
   const layout = useMemo(() => roomLayout(site.region), [site.region]);
-  const area = useMemo<WalkArea>(() => ({
-    key: `lodge-room-v2-${site.region}`,
-    allowed: (x, z) => roomWalkable(x, z, site.region),
-    extent: 9, home: ROOM_SPAWN,
-    points: layout.stations.map((s) => ({ id: s.id, p: [s.point[0], 0, s.point[1]] })),
-  }), [site.region, layout]);
+  const area = useMemo<WalkArea>(
+    () => ({
+      key: `lodge-room-v2-${site.region}`,
+      allowed: (x, z) => roomWalkable(x, z, site.region),
+      extent: 9,
+      home: ROOM_SPAWN,
+      points: layout.stations.map((s) => ({
+        id: s.id,
+        p: [s.point[0], 0, s.point[1]],
+      })),
+    }),
+    [site.region, layout],
+  );
   const [panel, setPanel] = useState(""),
     [near, setNear] = useState(""),
     [chosen, setChosen] = useState("");
@@ -289,7 +309,9 @@ export function LodgeScene({
             <h1>{site.name}</h1>
             <p>
               {r.keepsake
-                ? r.workshop ? "Your display is ready. Visit the host for stories." : "The gathering is remembered here. Visit the host's workshop."
+                ? r.workshop
+                  ? "Your display is ready. Visit the host for stories."
+                  : "The gathering is remembered here. Visit the host's workshop."
                 : !r.met
                   ? `Meet ${site.host} to begin.`
                   : !r.meal
@@ -439,11 +461,19 @@ export function LodgeScene({
                       {r.helper && byId[r.helper.species].name}.
                     </p>
                     <h3>Change the room decoration</h3>
-                    <p>Switch freely between your lantern and banner. Gathering rewards are granted only once.</p>
+                    <p>
+                      Switch freely between your lantern and banner. Gathering
+                      rewards are granted only once.
+                    </p>
                     {(["lantern", "banner"] as const).map((choice) => (
-                      <button className="lodge-choice" key={choice} disabled={busy || r.keepsake === choice}
-                        onClick={() => act("lodge-decorate", { quest: choice })}>
-                        Display {choice}{r.keepsake === choice ? " / Selected" : ""}
+                      <button
+                        className="lodge-choice"
+                        key={choice}
+                        disabled={busy || r.keepsake === choice}
+                        onClick={() => act("lodge-decorate", { quest: choice })}
+                      >
+                        Display {choice}
+                        {r.keepsake === choice ? " / Selected" : ""}
                       </button>
                     ))}
                   </>

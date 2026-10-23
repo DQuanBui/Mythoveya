@@ -1,6 +1,9 @@
 import { expect, it } from "vitest";
 import { LODGES, roomWalkable } from "../packages/shared/lodges";
-import { lodgeResidentRoute, residentPose } from "../packages/shared/lodge-life";
+import {
+  lodgeResidentRoute,
+  residentPose,
+} from "../packages/shared/lodge-life";
 import { lineClear } from "../packages/shared/pathfind";
 
 it("keeps each resident's full stroll clear of furniture and inside its room", () => {

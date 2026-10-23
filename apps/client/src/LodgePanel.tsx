@@ -6,8 +6,15 @@ import {
   lodgeOf,
 } from "../../../packages/shared/lodges";
 import { REGIONS } from "../../../packages/shared/content";
-import { LODGE_WORKSHOPS, lodgeWorkshopCount } from "../../../packages/shared/lodge-workshops";
-import { conservancyOf, MATERIALS, type Material } from "../../../packages/shared/conservancy";
+import {
+  LODGE_WORKSHOPS,
+  lodgeWorkshopCount,
+} from "../../../packages/shared/lodge-workshops";
+import {
+  conservancyOf,
+  MATERIALS,
+  type Material,
+} from "../../../packages/shared/conservancy";
 import "./lodges.css";
 export function LodgePanel({
   profile,
@@ -31,7 +38,11 @@ export function LodgePanel({
         {lodgeCount(profile)} / 4 gatherings hosted. Welcome Lumeswallow after
         two, and Velvetmoth after all four, from any lodge's gathering book.
       </p>
-      <p>{lodgeWorkshopCount(profile)} / 4 workshop displays built. Completed gatherings open the hosts' workshops: craft regional displays and discover twelve stories.</p>
+      <p>
+        {lodgeWorkshopCount(profile)} / 4 workshop displays built. Completed
+        gatherings open the hosts' workshops: craft regional displays and
+        discover twelve stories.
+      </p>
       <div className="lodge-entry-grid">
         {LODGES.map((s) => {
           const r = lodgeRecord(profile, s.region),
@@ -50,10 +61,29 @@ export function LodgePanel({
                   ? `Gathering complete / ${r.keepsake}`
                   : `${r.met ? "Host met" : "Meet the host"} / ${r.meal ? "Supper ready" : "Prepare supper"} / ${r.helper ? "Companion helped" : "Help with a companion"}`}
               </p>
-              <p><strong>{LODGE_WORKSHOPS[s.region].name}</strong>: {r.workshop ? "Built / 3 stories available" : r.keepsake ? "Workshop open" : "Host a gathering first"}</p>
-              {!r.workshop && <p>
-                {(Object.entries(LODGE_WORKSHOPS[s.region].cost) as [Material, number][]).map(([m, n]) => `${MATERIALS[m]} ${conservancyOf(profile).materials[m]}/${n}`).join(" / ")}
-              </p>}
+              <p>
+                <strong>{LODGE_WORKSHOPS[s.region].name}</strong>:{" "}
+                {r.workshop
+                  ? "Built / 3 stories available"
+                  : r.keepsake
+                    ? "Workshop open"
+                    : "Host a gathering first"}
+              </p>
+              {!r.workshop && (
+                <p>
+                  {(
+                    Object.entries(LODGE_WORKSHOPS[s.region].cost) as [
+                      Material,
+                      number,
+                    ][]
+                  )
+                    .map(
+                      ([m, n]) =>
+                        `${MATERIALS[m]} ${conservancyOf(profile).materials[m]}/${n}`,
+                    )
+                    .join(" / ")}
+                </p>
+              )}
               <button onClick={() => (local ? track(s.id) : travel())}>
                 {local ? `Walk to ${s.name}` : "Travel to this region"}
               </button>

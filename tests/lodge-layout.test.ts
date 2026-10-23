@@ -43,10 +43,19 @@ it("connects every room station around furniture and keeps the companion spawn i
     for (const a of layout.stations)
       for (const b of layout.stations) {
         expect(walk(...a.point), site.region + a.id).toBe(true);
-        expect(findPath(grid, a.point, b.point, walk), site.region + a.id + " to " + b.id).not.toBeNull();
+        expect(
+          findPath(grid, a.point, b.point, walk),
+          site.region + a.id + " to " + b.id,
+        ).not.toBeNull();
       }
     for (const f of layout.furniture) expect(walk(f.x, f.z), f.id).toBe(false);
-    for (const [x, z] of [[7, 0], [-7, 0], [0, 8], [NaN, 0], [0, Infinity]])
+    for (const [x, z] of [
+      [7, 0],
+      [-7, 0],
+      [0, 8],
+      [NaN, 0],
+      [0, Infinity],
+    ])
       expect(walk(x, z)).toBe(false);
   }
   expect(footprints.size).toBe(4);
@@ -54,18 +63,18 @@ it("connects every room station around furniture and keeps the companion spawn i
 it("builds finite room geometry for every theme and saved decoration", () => {
   for (const s of LODGES)
     for (const keepsake of [undefined, "lantern", "banner"] as const)
-     for (const workshop of [false, true]) {
-      const g = buildLodge(s, {
-        met: true,
-        meal: s.recipe,
-        helper: { id: "test", species: s.species },
-        keepsake,
-        workshop,
-      });
-      g.computeBoundingBox();
-      expect(g.boundingBox!.isEmpty()).toBe(false);
-      for (const v of g.getAttribute("position").array)
-        expect(Number.isFinite(v)).toBe(true);
-      g.dispose();
-    }
+      for (const workshop of [false, true]) {
+        const g = buildLodge(s, {
+          met: true,
+          meal: s.recipe,
+          helper: { id: "test", species: s.species },
+          keepsake,
+          workshop,
+        });
+        g.computeBoundingBox();
+        expect(g.boundingBox!.isEmpty()).toBe(false);
+        for (const v of g.getAttribute("position").array)
+          expect(Number.isFinite(v)).toBe(true);
+        g.dispose();
+      }
 });
