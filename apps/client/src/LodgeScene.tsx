@@ -304,7 +304,7 @@ export function LodgeScene({
               ))}
             </nav>
             <p className="lodge-controls">
-              WASD / arrows to move ? Click the floor to walk ? E to interact ?
+              WASD / arrows to move · Click the floor to walk · E to interact ·
               R to reset camera
             </p>
             <TouchPad input={input} blocked={busy} />
