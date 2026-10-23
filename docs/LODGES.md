@@ -2,6 +2,8 @@
 
 Four rooms now open from existing buildings. Use **Adventure > Wayfarer Lodges / Step inside and host a gathering**, or select a lodge on the regional travel map. Set its walking waypoint and follow it to enter.
 
+![Cloudwatch common room with supper, seated guests and a saved decoration](screenshots/lodge-haven.png)
+
 | Region | Room and host | Supper | Companion ability |
 | --- | --- | --- | --- |
 | Havenreach | Cloudwatch common room / Perrin | Cloudberry tea | Beacon: Flame or Light |
@@ -28,6 +30,10 @@ Host any two gatherings to welcome **Lumeswallow**, a B-tier Light support with 
 
 Host all four to welcome **Velvetmoth**, an A-tier Frost controller with broad eyespot wings and feathery antennae. **Quietfall** damages, slows and silences the selected enemy row.
 
+| Lumeswallow | Velvetmoth |
+| --- | --- |
+| ![Lumeswallow's luminous feather tips and forked tail](screenshots/lodge-model-lumeswallow.png) | ![Velvetmoth's eyespot wings and antennae](screenshots/lodge-model-velvetmoth.png) |
+
 Claim either companion once from any lodge's gathering book. Existing ownership grants a duplicate shard; new ownership uses the usual persistent 1-in-50 shimmer roll. Both species also join their existing recruitment tiers; tier probabilities are unchanged.
 
 ## Save behavior and scope
@@ -35,3 +41,13 @@ Claim either companion once from any lodge's gathering book. Existing ownership 
 Host introductions, recipes, helper identities/species, decorations and companion claims are saved by the server. Replayed requests cannot grant repeated rewards. Legacy saves initialize lodge progress only when needed. The precise indoor position is temporary: reloading starts outdoors in the saved region, with room progress preserved.
 
 The four rooms use a shared walkable floor plan with regional furnishings. They are personal scenes with finite authored gatherings, not shared multiplayer interiors or daily currency farms. Outdoor region boundaries are unchanged. Proximity and movement remain client-enforced, consistent with other exploration activities; the server checks mainland region, ownership, abilities, prerequisites and rewards.
+
+## Regional views
+
+![Copperkettle shelter with warm stone colors and fossil displays](screenshots/lodge-canyon.png)
+
+![Snowquilt reading room with frosty windows and Velvetmoth](screenshots/lodge-hollow.png)
+
+The room navigation becomes a vertical set of buttons beside the movement joystick on a narrow screen:
+
+<img src="screenshots/lodge-meadow.png" alt="Fernrest kitchen at a 390-pixel mobile viewport" width="390">

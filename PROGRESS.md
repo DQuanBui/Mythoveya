@@ -1,6 +1,6 @@
 # Mythoveya handoff
 
-Updated October 15, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`. Wayfarer Lodges began at `85860c3`. Preserve ignored `data/mythoveya.sqlite`.
+Updated October 22, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`. Wayfarer Lodges began at `85860c3`. Preserve ignored `data/mythoveya.sqlite`.
 
 ## Implemented
 
@@ -35,19 +35,28 @@ npm run test:e2e             # isolated services on 5174/2568
 
 Node 24.19.0/npm 11.17.0 verified. Client/API health at `http://127.0.0.1:5173/api/health` returned ok during this update. Browser runs must be sequential; do not edit game source during them. Tests use separate/disposable databases.
 
-## Verified so far
+## Link recovery
+
+The October 16 continuation found no listeners on client 5173 or backend 2567. The local link was offline because the development services had stopped. Restarted both as hidden background processes; both health endpoints returned `ok: true`. Added `Play Mythoveya.cmd` and `scripts/start-game.ps1`: readiness checks, reuse of a healthy server, clear dependency/port errors, logs, normal play ports and save path, and optional `-NoBrowser` for verification. No startup scheduled task, public hosting or deployment was added.
+
+The October 22 continuation verified that both normal-play services were still running and the launcher reused them successfully. The health endpoint returned `ok: true`. External commit `231ade9` captured the earlier pending tests/handoff and was already on GitHub; it remains intact.
+
+## Verified
 
 - Full unit/server suite: **157 tests across 34 files passed**, 114.79 seconds, `artifacts/lodge-unit.log` (ignored). Includes eight lodge save/layout tests, authored model anatomy and targeting assertions.
 - Content audit passed for 92 species, 276 actions, 92 passives and 12 families.
-- Production build passed: 750 modules, lodge chunk 10.69 kB; existing main-bundle size warning remains. An ensuing layout/keyboard fix passed typecheck and requires the final production rebuild.
-- Production smoke passed compiled assets, guest flow and two-human arena; existing unregistered snapshot warning remains.
+- Final production build passed: 750 modules, lodge chunk 11.37 kB; existing main-bundle size warning remains. Evidence: `artifacts/lodge-final-build-oct22.log`. Ten focused model/layout tests also passed after visual polish.
+- October 22 production smoke passed compiled assets, guest flow and two-human arena (`artifacts/lodge-production-oct22.log`); existing unregistered snapshot warning remains.
 - Lodge gallery passed both creatures and both six-group signature effects with no page errors; screenshots inspected. First journey exposed a zero-height outer room container despite visible fixed children. The container and keyboard focus behavior were fixed in `ede3e29`.
+- Final browser batch: nine scenarios passed, including all four lodges, saved rewards/reload, floor and keyboard movement, 390-pixel mobile layout, geometry disposal, creature/effect galleries, regional stories, first journey and two-player arena. Two Haven keyboard-route scenarios stalled (`artifacts/lodge-final-browser-oct16.log`). Their test driver now reads the live keeper position, follows waypoints more closely, and reasserts movement after focus loss; both targeted scenarios passed in 2.6 minutes (`artifacts/lodge-haven-final.log`). All eleven scenarios therefore have passing evidence across the batch and targeted rerun. Production collision geometry was unchanged.
+- Reviewed final screenshots of all four furnished rooms and both creatures, including seated guests, readable bookshelves and mobile navigation; copies are in `docs/screenshots` and the lodge guide.
+- October 22 typecheck passed. After the control-hint text correction, the complete four-lodge journey passed again in 3.5 minutes (`artifacts/lodge-journey-oct22-retry.log`), producing the final reviewed captures. Its preceding attempt lost a local fetch after a long interruption during battle setup and was stopped; it is not counted as a pass.
+- Final normal-play browser check: HTTP 200, expected title and start button/canvas, zero page errors at `http://127.0.0.1:5173/`.
 
-## In progress / not yet verified
+## Scope and remaining work
 
-- Final four-room browser journey, reload/mobile/geometry disposal, visual review and existing regional/PvP regressions are running or pending. Do not report these as passed until their logs confirm it.
 - Most buildings still have no interiors. These four rooms share a floor plan and use existing avatar bodies; they are personal finite gatherings, not shared multiplayer spaces or procedural/live events. Outdoor boundaries remain unchanged. Server-authoritative movement and long-term balance are future work.
-- At least ten meaningful local commits have been created after `85860c3`; final count and clean status need verification. Remote main was observed at `85860c3`; no push/deployment performed, following the original user's no-push constraint.
+- The user explicitly authorized committing and pushing on October 22, superseding the earlier no-push instruction. This continuing Wayfarer Lodges update spans fifteen development commits, including this illustrated handoff, plus the external `231ade9` commit after baseline `85860c3`. Publication target: `origin/main` at `https://github.com/DQuanBui/Mythoveya`. Recheck local and remote HEAD before the next continuation. Pre-existing README deletions/wording edits remain local; only this update's guide link and launcher instructions are included in the documentation commit.
 
 ## Next development candidates
 

@@ -10,7 +10,7 @@ Mythoveya is a locally playable, browser-based 3D creature-collection RPG. Its w
 
 ## The game
 
-- **Wayfarer Lodges:** step inside four regional rooms, meet Perrin, Junie, Saff and Nell, prepare local suppers, help with companions and leave permanent decorations. Welcome Lumeswallow and Velvetmoth. [Read the lodge guide](docs/LODGES.md).
+- **Wayfarer Lodges:** enter four regional rooms, meet their hosts, cook local suppers, help with companions and keep permanent decorations. Welcome Lumeswallow and Velvetmoth. [Read the illustrated lodge guide](docs/LODGES.md).
 - **Wildbound Rescues:** help Mira, Oren, Tavi and Edda with your active companions' elemental abilities. Restore four wildlife clearings, choose their permanent endings, and welcome Reedrake and Solmole. [Read the rescue guide](docs/RESCUES.md).
 - **The Atlas of Echoes:** follow a connected four-region story with Aster, Fenn, Suri and Niva. Discover inscriptions, restore memory monuments, earn Cairnfin and Inkwisp, and unlock daily echo readings. [Read the Atlas guide](docs/ATLAS.md).
 
@@ -63,6 +63,8 @@ This first playable version uses a compact procedural art style. See [KNOWN_ISSU
 ## Install and play
 
 Tested on **Windows, Node.js 24.19.0, npm 11.17.0**. Use Node 24 LTS. Python, Docker, an external database, and API keys are not needed to play.
+
+After installing dependencies, double-click **[Play Mythoveya.cmd](Play%20Mythoveya.cmd)** to start the game and open **http://127.0.0.1:5173/**. The launcher reuses healthy running services, keeps startup logs in `artifacts/local-game`, and uses your normal saved game. If the local link stops working after restarting Windows, run the launcher again. This address works on your computer; pushing the source to GitHub does not host the game publicly.
 
 Open a terminal in this folder:
 
