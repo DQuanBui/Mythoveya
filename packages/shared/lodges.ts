@@ -190,7 +190,7 @@ export function roomLayout(region: string) {
     stop("companion", -4, 1); stop("guestbook", 4, 2.2);
   }
   const host = stations.find((s) => s.id === "host")!.point;
-  return { furniture, stations, host: [host[0], host[1] - 1.2] as [number, number] };
+  return { furniture, stations, host: [host[0], host[1] - 0.9] as [number, number] };
 }
 const layouts = Object.fromEntries(LODGES.map((s) => [s.region, roomLayout(s.region)]));
 export function roomWalkable(x: number, z: number, region = "haven") {

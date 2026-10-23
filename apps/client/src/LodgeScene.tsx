@@ -5,7 +5,7 @@ import type { Profile } from "../../../packages/shared/types";
 import { byId } from "../../../packages/shared/content";
 import {
   ROOM_SPAWN,
-  ROOM_STATIONS,
+  roomLayout,
   roomWalkable,
   lodgeRecord,
   lodgeCount,
@@ -29,16 +29,6 @@ import { buildLodge } from "./lodge-art";
 import type { ExplorationInput } from "./world-guide";
 import { audio, settings } from "./audio";
 import "./lodges.css";
-const area: WalkArea = {
-  key: "lodge-room-v1",
-  allowed: roomWalkable,
-  extent: 9,
-  home: ROOM_SPAWN,
-  points: ROOM_STATIONS.map((s) => ({
-    id: s.id,
-    p: [s.point[0], 0, s.point[1]],
-  })),
-};
 function Room({
   site,
   profile,
@@ -51,6 +41,7 @@ function Room({
   interact: (id: string) => void;
 }) {
   const r = lodgeRecord(profile, site.region);
+  const layout = useMemo(() => roomLayout(site.region), [site.region]);
   const geometry = useMemo(
     () => buildLodge(site, r),
     [site, r.meal, r.helper?.id, r.keepsake],
@@ -58,7 +49,7 @@ function Room({
   useEffect(() => () => geometry.dispose(), [geometry]);
   const host = useMemo(() => {
     const m = createAvatar(site.avatar);
-    m.position.set(-4, 0, -5.4);
+    m.position.set(layout.host[0], 0, layout.host[1]);
     m.userData.groundY = 0;
     part(m, "box", site.color, [0, 1.19, 0.2], [0.4, 0.14, 0.08]);
     part(m, "box", "#dfc69e", [-0.24, 0.85, 0.18], [0.15, 0.2, 0.08]);
@@ -74,7 +65,8 @@ function Room({
     () =>
       [2, 5].map((a, i) => {
         const m = createAvatar(a);
-        m.position.set(-5.5, 0.08, 1.25 + i * 1.5);
+        const bench = layout.furniture.find((f) => f.id === "bench")!;
+        m.position.set(bench.x + 0.4, 0.08, bench.z - 0.75 + i * 1.5);
         m.userData.groundY = 0.08;
         // Seated legs bend over the cushion edge; the walking limbs stay hidden.
         m.userData.limbs[0].visible = false;
@@ -106,7 +98,7 @@ function Room({
         m.rotation.y = Math.PI / 2;
         return m;
       }),
-    [],
+    [layout],
   );
   useFrame(({ clock }) => {
     animateAvatar(host, clock.elapsedTime, false, false, settings.reduced);
@@ -129,7 +121,7 @@ function Room({
       <primitive object={host} />
       <primitive object={resident} />
       {r.keepsake && guests.map((g, i) => <primitive key={i} object={g} />)}
-      {ROOM_STATIONS.map((s) => (
+      {layout.stations.map((s) => (
         <WorldInteraction
           key={s.id}
           name={`room-${s.id}`}
@@ -186,6 +178,13 @@ export function LodgeScene({
   run: (kind: string, data?: Record<string, unknown>) => Promise<any>;
   exit: () => void;
 }) {
+  const layout = useMemo(() => roomLayout(site.region), [site.region]);
+  const area = useMemo<WalkArea>(() => ({
+    key: `lodge-room-v2-${site.region}`,
+    allowed: (x, z) => roomWalkable(x, z, site.region),
+    extent: 9, home: ROOM_SPAWN,
+    points: layout.stations.map((s) => ({ id: s.id, p: [s.point[0], 0, s.point[1]] })),
+  }), [site.region, layout]);
   const [panel, setPanel] = useState(""),
     [near, setNear] = useState(""),
     [chosen, setChosen] = useState("");
@@ -210,7 +209,7 @@ export function LodgeScene({
     audio.cue("confirm");
   };
   const walk = (id: string) => {
-    const s = ROOM_STATIONS.find((s) => s.id === id);
+    const s = layout.stations.find((s) => s.id === id);
     if (s && !panel && !busy)
       walker.current.go(s.point, 0.8, () => interact(id));
   };
@@ -297,7 +296,7 @@ export function LodgeScene({
         {!panel && (
           <>
             <nav aria-label="Walk around the lodge">
-              {ROOM_STATIONS.map((s) => (
+              {layout.stations.map((s) => (
                 <button key={s.id} disabled={busy} onClick={() => walk(s.id)}>
                   {s.name}
                 </button>

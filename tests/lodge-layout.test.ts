@@ -1,9 +1,8 @@
 import { expect, it } from "vitest";
 import {
   LODGES,
-  ROOM_STATIONS,
+  roomLayout,
   ROOM_SPAWN,
-  ROOM_FURNITURE,
   roomWalkable,
 } from "../packages/shared/lodges";
 import { havenWalkable } from "../packages/shared/haven";
@@ -33,26 +32,24 @@ it("connects each exterior lodge doorstep to its regional arrival", () => {
   }
 });
 it("connects every room station around furniture and keeps the companion spawn inside", () => {
-  const grid = buildGrid(roomWalkable, 9);
-  expect(roomWalkable(ROOM_SPAWN[0] - 1, ROOM_SPAWN[1] + 1.5)).toBe(true);
-  for (const a of ROOM_STATIONS)
-    for (const b of ROOM_STATIONS) {
-      expect(roomWalkable(...a.point)).toBe(true);
-      expect(
-        findPath(grid, a.point, b.point, roomWalkable),
-        a.id + " to " + b.id,
-      ).not.toBeNull();
-    }
-  for (const f of ROOM_FURNITURE)
-    expect(roomWalkable(f.x, f.z), f.id).toBe(false);
-  for (const [x, z] of [
-    [7, 0],
-    [-7, 0],
-    [0, 8],
-    [NaN, 0],
-    [0, Infinity],
-  ])
-    expect(roomWalkable(x, z)).toBe(false);
+  const footprints = new Set<string>();
+  for (const site of LODGES) {
+    const layout = roomLayout(site.region);
+    footprints.add(JSON.stringify(layout.furniture));
+    const walk = (x: number, z: number) => roomWalkable(x, z, site.region);
+    const grid = buildGrid(walk, 9);
+    expect(walk(...layout.host), site.region + " host").toBe(true);
+    expect(walk(ROOM_SPAWN[0] - 1, ROOM_SPAWN[1] + 1.5)).toBe(true);
+    for (const a of layout.stations)
+      for (const b of layout.stations) {
+        expect(walk(...a.point), site.region + a.id).toBe(true);
+        expect(findPath(grid, a.point, b.point, walk), site.region + a.id + " to " + b.id).not.toBeNull();
+      }
+    for (const f of layout.furniture) expect(walk(f.x, f.z), f.id).toBe(false);
+    for (const [x, z] of [[7, 0], [-7, 0], [0, 8], [NaN, 0], [0, Infinity]])
+      expect(walk(x, z)).toBe(false);
+  }
+  expect(footprints.size).toBe(4);
 });
 it("builds finite room geometry for every theme and saved decoration", () => {
   for (const s of LODGES)

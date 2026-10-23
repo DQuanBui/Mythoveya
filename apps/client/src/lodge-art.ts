@@ -1,6 +1,6 @@
 import { Kit, SHAPES } from "./village-kit";
 import {
-  ROOM_FURNITURE,
+  roomLayout,
   type Lodge,
   type LodgeRecord,
 } from "../../../packages/shared/lodges";
@@ -50,14 +50,14 @@ export function buildLodge(s: Lodge, r: LodgeRecord) {
   k.box("#dac4a0", [2.6, 2, -7.18], [0.09, 1.9, 0.08]);
   k.box("#dac4a0", [2.6, 2, -7.18], [3.4, 0.09, 0.08]);
   for (const x of [0.6, 4.6]) k.box(s.color, [x, 2, -7.13], [0.45, 2.3, 0.18]);
-  for (const f of ROOM_FURNITURE) {
+  for (const f of roomLayout(s.region).furniture) {
     if (f.id === "table") {
       k.box("#865d43", [f.x, 1.05, f.z], [f.w, 0.18, f.d]);
       for (const x of [-1.2, 1.2])
         for (const z of [-0.7, 0.7])
-          k.box("#6c5140", [x, 0.5, f.z + z], [0.15, 1, 0.15]);
+          k.box("#6c5140", [f.x + x, 0.5, f.z + z], [0.15, 1, 0.15]);
       for (let i = 0; i < 4; i++) {
-        const x = i % 2 ? 0.9 : -0.9,
+        const x = f.x + (i % 2 ? 0.9 : -0.9),
           z = f.z + (i < 2 ? -0.55 : 0.55);
         k.add(SHAPES.CYL, "#eee0c5", [x, 1.17, z], [0.28, 0.035, 0.28]);
         if (r.meal)
