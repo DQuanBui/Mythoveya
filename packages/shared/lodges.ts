@@ -162,13 +162,44 @@ export const ROOM_FURNITURE = [
   { id: "bench", x: -5.9, z: 2, w: 1.4, d: 3 },
   { id: "hearth", x: -4, z: -6.8, w: 2.6, d: 1 },
 ];
-export function roomWalkable(x: number, z: number) {
+/** Each region owns its furniture and station positions; rendering and walking
+ * must use this same layout to avoid invisible obstacles or stale path grids. */
+export function roomLayout(region: string) {
+  const furniture = ROOM_FURNITURE.map((f) => ({ ...f }));
+  const stations = ROOM_STATIONS.map((s) => ({ ...s, point: [...s.point] as [number, number] }));
+  const move = (id: string, x: number, z: number) => {
+    Object.assign(furniture.find((f) => f.id === id)!, { x, z });
+  };
+  const stop = (id: string, x: number, z: number) => {
+    stations.find((s) => s.id === id)!.point = [x, z];
+  };
+  if (region === "meadow") {
+    move("table", -1, -1); move("counter", 5.9, -2.5);
+    move("shelf", 5.9, 3); move("bench", -5.9, 0.8);
+    stop("host", -2, -4.2); stop("kitchen", 4, -2.5);
+    stop("guestbook", 4, 3); stop("companion", -4, 2.5);
+  } else if (region === "canyon") {
+    move("table", 1, -0.5); move("shelf", -5.9, -2.2);
+    move("bench", -5.9, 2.8);
+    stop("host", -3, -4.8); stop("guestbook", -4, -2.2);
+    stop("companion", -4, 3);
+  } else if (region === "hollow") {
+    move("table", 0, -3); move("counter", 5.9, -3);
+    move("shelf", 5.9, 2.2); move("bench", -5.9, 0.8);
+    stop("host", -4, -4.5); stop("kitchen", 4, -3);
+    stop("companion", -4, 1); stop("guestbook", 4, 2.2);
+  }
+  const host = stations.find((s) => s.id === "host")!.point;
+  return { furniture, stations, host: [host[0], host[1] - 1.2] as [number, number] };
+}
+const layouts = Object.fromEntries(LODGES.map((s) => [s.region, roomLayout(s.region)]));
+export function roomWalkable(x: number, z: number, region = "haven") {
   return (
     Number.isFinite(x) &&
     Number.isFinite(z) &&
     Math.abs(x) < 6.6 &&
     Math.abs(z) < 7.3 &&
-    !ROOM_FURNITURE.some(
+    !(layouts[region] || layouts.haven).furniture.some(
       (f) =>
         Math.abs(x - f.x) < f.w / 2 + 0.35 &&
         Math.abs(z - f.z) < f.d / 2 + 0.35,
