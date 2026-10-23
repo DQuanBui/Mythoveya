@@ -138,7 +138,7 @@ export const lodgeStops = (region: string) =>
   LODGES.filter((s) => s.region === region).map((s) => ({
     ...s,
     description:
-      "Enter a walkable lodge: meet its host, cook, and help with a companion.",
+      "Enter a regional lodge: host a gathering, craft a display and hear the host's stories.",
   }));
 export const ROOM_SPAWN: [number, number] = [0, 5.5];
 export const ROOM_STATIONS = [
