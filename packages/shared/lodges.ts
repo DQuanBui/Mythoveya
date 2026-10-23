@@ -142,7 +142,7 @@ export const lodgeStops = (region: string) =>
   }));
 export const ROOM_SPAWN: [number, number] = [0, 5.5];
 export const ROOM_STATIONS = [
-  { id: "host", name: "Meet the host", point: [-4, -4] as [number, number] },
+  { id: "host", name: "Host & workshop", point: [-4, -4] as [number, number] },
   { id: "kitchen", name: "Prepare supper", point: [4, -4] as [number, number] },
   {
     id: "companion",

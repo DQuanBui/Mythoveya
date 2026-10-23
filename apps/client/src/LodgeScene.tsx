@@ -26,6 +26,7 @@ import { ModelLighting } from "./ModelLighting";
 import { WorldInteraction } from "./WorldInteraction";
 import { TouchPad } from "./WorldHUD";
 import { buildLodge } from "./lodge-art";
+import { LodgeWorkshop } from "./LodgeWorkshop";
 import type { ExplorationInput } from "./world-guide";
 import { audio, settings } from "./audio";
 import "./lodges.css";
@@ -288,7 +289,7 @@ export function LodgeScene({
             <h1>{site.name}</h1>
             <p>
               {r.keepsake
-                ? "The gathering is remembered here."
+                ? r.workshop ? "Your display is ready. Visit the host for stories." : "The gathering is remembered here. Visit the host's workshop."
                 : !r.met
                   ? `Meet ${site.host} to begin.`
                   : !r.meal
@@ -348,6 +349,7 @@ export function LodgeScene({
                     corner, and gathering book.
                   </p>
                 )}
+                <LodgeWorkshop {...{ site, profile, busy, act }} />
               </>
             )}
             {panel === "kitchen" && (
@@ -436,6 +438,14 @@ export function LodgeScene({
                       Saved decoration: {r.keepsake}. Supper: {r.meal}. Helper:{" "}
                       {r.helper && byId[r.helper.species].name}.
                     </p>
+                    <h3>Change the room decoration</h3>
+                    <p>Switch freely between your lantern and banner. Gathering rewards are granted only once.</p>
+                    {(["lantern", "banner"] as const).map((choice) => (
+                      <button className="lodge-choice" key={choice} disabled={busy || r.keepsake === choice}
+                        onClick={() => act("lodge-decorate", { quest: choice })}>
+                        Display {choice}{r.keepsake === choice ? " / Selected" : ""}
+                      </button>
+                    ))}
                   </>
                 ) : (
                   <>
