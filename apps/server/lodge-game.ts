@@ -3,6 +3,8 @@ import { byId } from "../../packages/shared/content";
 import { gainXp, own } from "../../packages/shared/economy";
 import { LODGES, lodgeCount, lodgeOf } from "../../packages/shared/lodges";
 import { fieldAbility } from "../../packages/shared/rescue";
+import { conservancyOf, MATERIALS, type Material } from "../../packages/shared/conservancy";
+import { LODGE_WORKSHOPS } from "../../packages/shared/lodge-workshops";
 export function lodgeMutation(
   p: Profile,
   kind: string,
@@ -20,6 +22,32 @@ export function lodgeMutation(
     throw Error("Visit this lodge in its mainland region with a companion.");
   const state = structuredClone(lodgeOf(p)),
     r = state.rooms[lodge.region] || { met: false };
+  if (kind === "lodge-workshop" || kind === "lodge-decorate") {
+    if (!r.keepsake) throw Error("Host this lodge's gathering first.");
+    let message: string;
+    if (kind === "lodge-workshop") {
+      const recipe = LODGE_WORKSHOPS[lodge.region];
+      if (r.workshop) throw Error("This workshop display is already built.");
+      const supplies = structuredClone(conservancyOf(p));
+      const costs = Object.entries(recipe.cost) as [Material, number][];
+      const missing = costs.filter(([material, amount]) => supplies.materials[material] < amount);
+      if (missing.length)
+        throw Error("Gather more supplies: " + missing.map(([m]) => MATERIALS[m]).join(", ") + ".");
+      costs.forEach(([material, amount]) => { supplies.materials[material] -= amount; });
+      r.workshop = true;
+      p.conservancy = supplies;
+      message = recipe.name + " built. The host's three stories are now available.";
+    } else {
+      if (v.quest !== "lantern" && v.quest !== "banner")
+        throw Error("Choose a lantern or a woven banner.");
+      if (r.keepsake === v.quest) throw Error("This decoration is already displayed.");
+      r.keepsake = v.quest;
+      message = "Decoration changed. Your gathering and workshop are preserved.";
+    }
+    state.rooms[lodge.region] = r;
+    p.lodges = state;
+    return { message };
+  }
   if (kind === "lodge-claim") {
     const required =
       v.species === "lumeswallow" ? 2 : v.species === "velvetmoth" ? 4 : 0;
