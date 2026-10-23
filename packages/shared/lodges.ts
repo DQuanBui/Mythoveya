@@ -163,6 +163,7 @@ export const ROOM_FURNITURE = [
   { id: "shelf", x: 5.9, z: 2, w: 1.4, d: 2.2 },
   { id: "bench", x: -5.9, z: 2, w: 1.4, d: 3 },
   { id: "hearth", x: -4, z: -6.8, w: 2.6, d: 1 },
+  { id: "display", x: 2.6, z: -6.8, w: 2.6, d: 0.9 },
 ];
 /** Each region owns its furniture and station positions; rendering and walking
  * must use this same layout to avoid invisible obstacles or stale path grids. */

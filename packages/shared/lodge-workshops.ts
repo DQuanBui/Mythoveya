@@ -41,7 +41,7 @@ export const LODGE_WORKSHOPS: Record<string, LodgeWorkshop> = {
   },
   hollow: {
     name: "Constellation mobile",
-    description: "Hang a turning circle of crystal stars above the reading nook.",
+    description: "Hang a circle of crystal stars above the reading nook.",
     cost: { fiber: 1, crystal: 2 },
     stories: [
       "Nell calls the smallest constellation the Lost Mitten. Every winter the readers invent a new ending for the keeper who went looking for its other half.",

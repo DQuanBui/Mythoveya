@@ -44,7 +44,7 @@ function Room({
   const layout = useMemo(() => roomLayout(site.region), [site.region]);
   const geometry = useMemo(
     () => buildLodge(site, r),
-    [site, r.meal, r.helper?.id, r.keepsake],
+    [site, r.meal, r.helper?.id, r.keepsake, r.workshop],
   );
   useEffect(() => () => geometry.dispose(), [geometry]);
   const host = useMemo(() => {

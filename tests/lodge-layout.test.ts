@@ -53,12 +53,14 @@ it("connects every room station around furniture and keeps the companion spawn i
 });
 it("builds finite room geometry for every theme and saved decoration", () => {
   for (const s of LODGES)
-    for (const keepsake of [undefined, "lantern", "banner"] as const) {
+    for (const keepsake of [undefined, "lantern", "banner"] as const)
+     for (const workshop of [false, true]) {
       const g = buildLodge(s, {
         met: true,
         meal: s.recipe,
         helper: { id: "test", species: s.species },
         keepsake,
+        workshop,
       });
       g.computeBoundingBox();
       expect(g.boundingBox!.isEmpty()).toBe(false);
