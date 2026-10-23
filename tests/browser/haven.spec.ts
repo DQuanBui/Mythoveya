@@ -1,6 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 
 async function walkRoute(page: Page, points: number[][]) {
+  await page.bringToFront();
   await page.evaluate(async (points) => {
     const url = performance
       .getEntriesByType("resource")
@@ -9,6 +10,10 @@ async function walkRoute(page: Page, points: number[][]) {
     if (!url) throw Error("Renderer missing");
     const { _roots } = await import(/* @vite-ignore */ url);
     const root = _roots.get(document.querySelector(".scene canvas")).store;
+    const player = root.getState().scene.children.find(
+      (child: any) => child.userData.head && child.userData.limbs,
+    );
+    if (!player) throw Error("Keeper model missing");
     const held = new Set<string>();
     const setKeys = (next: string[]) => {
       for (const key of held)
@@ -16,25 +21,25 @@ async function walkRoute(page: Page, points: number[][]) {
           window.dispatchEvent(new KeyboardEvent("keyup", { code: key }));
           held.delete(key);
         }
-      for (const key of next)
-        if (!held.has(key)) {
-          window.dispatchEvent(new KeyboardEvent("keydown", { code: key }));
-          held.add(key);
-        }
+      // Blur correctly clears the game's input. Reassert movement so a focus
+      // change cannot leave this synthetic driver's held keys out of sync.
+      for (const key of next) {
+        window.dispatchEvent(new KeyboardEvent("keydown", { code: key }));
+        held.add(key);
+      }
     };
     await new Promise<void>((resolve, reject) => {
       let index = 0;
       const start = performance.now();
       const timer = setInterval(() => {
-        const dot = document.querySelector(".map-ring b") as HTMLElement;
-        // The minimap spans ±78 m (HAVEN.extent) across 0–100%.
-        const x = ((parseFloat(dot.style.left) - 50) * 78) / 50,
-          z = ((parseFloat(dot.style.top) - 50) * 78) / 50;
+        // Read the live keeper position; the minimap intentionally updates less
+        // often and can steer a sprint past narrow bridge approach waypoints.
+        const { x, z } = player.position;
         const [tx, tz] = points[index],
           dx = tx - x,
           dz = tz - z,
           length = Math.hypot(dx, dz);
-        if (length < 1.15) {
+        if (length < 0.45) {
           index++;
           if (index === points.length) {
             clearInterval(timer);
@@ -42,6 +47,7 @@ async function walkRoute(page: Page, points: number[][]) {
             resolve();
             return;
           }
+          return;
         }
         const camera = root.getState().camera,
           yaw = Math.atan2(camera.position.x - x, camera.position.z - z);
