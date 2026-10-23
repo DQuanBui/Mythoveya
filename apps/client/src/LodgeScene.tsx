@@ -29,6 +29,7 @@ import { buildLodge } from "./lodge-art";
 import type { ExplorationInput } from "./world-guide";
 import { audio, settings } from "./audio";
 import "./lodges.css";
+import { lodgeResidentRoute, residentPose } from "../../../packages/shared/lodge-life";
 function Room({
   site,
   profile,
@@ -42,6 +43,8 @@ function Room({
 }) {
   const r = lodgeRecord(profile, site.region);
   const layout = useMemo(() => roomLayout(site.region), [site.region]);
+  const residentRoute = useMemo(() => lodgeResidentRoute(site.region), [site.region]);
+  const residentTime = useRef(0);
   const geometry = useMemo(
     () => buildLodge(site, r),
     [site, r.meal, r.helper?.id, r.keepsake, r.workshop],
@@ -57,7 +60,8 @@ function Room({
   }, [site]);
   const resident = useMemo(() => {
     const m = createCreature(site.species);
-    m.position.set(-1.9, 0, -5.6);
+    m.name = "lodge-resident";
+    m.position.set(-2, 0, -5.5);
     m.scale.setScalar(0.75);
     return m;
   }, [site]);
@@ -100,9 +104,14 @@ function Room({
       }),
     [layout],
   );
-  useFrame(({ clock }) => {
+  useFrame(({ clock }, dt) => {
     animateAvatar(host, clock.elapsedTime, false, false, settings.reduced);
-    animateCreature(resident, clock.elapsedTime, "idle", 0, settings.reduced);
+    if (!blocked && !settings.reduced) residentTime.current += Math.min(dt, 0.05);
+    const pose = residentPose(residentRoute, residentTime.current);
+    resident.position.x = pose.x;
+    resident.position.z = pose.z;
+    resident.rotation.y = pose.yaw;
+    animateCreature(resident, clock.elapsedTime, pose.walking && !settings.reduced ? "walk" : "idle", 0, settings.reduced);
     if (r.keepsake)
       guests.forEach((m) =>
         animateAvatar(m, clock.elapsedTime, false, false, settings.reduced),
