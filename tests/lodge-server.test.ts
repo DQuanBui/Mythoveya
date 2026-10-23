@@ -10,6 +10,8 @@ import {
 } from "../packages/shared/lodges";
 import { STARTERS, byId } from "../packages/shared/content";
 import { fieldAbility } from "../packages/shared/rescue";
+import { conservancyOf, type Material } from "../packages/shared/conservancy";
+import { LODGE_WORKSHOPS, lodgeWorkshopCount } from "../packages/shared/lodge-workshops";
 process.env.DB_PATH = join(
   mkdtempSync(join(tmpdir(), "mythoveya-lodges-")),
   "save.sqlite",
@@ -51,6 +53,60 @@ function finish(t: string, s: (typeof LODGES)[number], choice = "lantern") {
   op(t, "lodge-help", { id: s.id, companion: helping(t, s).id });
   op(t, "lodge-finish", { id: s.id, quest: choice });
 }
+it("crafts four permanent displays with exact material costs and replay-safe saves", () => {
+  const t = keeper();
+  for (const s of LODGES) {
+    finish(t, s);
+    const before = authenticate(t);
+    const supplies = structuredClone(conservancyOf(before));
+    supplies.materials = { timber: 9, fiber: 9, crystal: 9 };
+    before.conservancy = supplies;
+    save(before);
+    const id = crypto.randomUUID();
+    op(t, "lodge-workshop", { id: s.id }, id);
+    const after = authenticate(t);
+    for (const m of ["timber", "fiber", "crystal"] as Material[])
+      expect(after.conservancy!.materials[m]).toBe(9 - (LODGE_WORKSHOPS[s.region].cost[m] || 0));
+    expect(after.gold).toBe(before.gold);
+    expect(after.diamonds).toBe(before.diamonds);
+    expect(after.owned).toEqual(before.owned);
+    op(t, "lodge-workshop", { id: s.id }, id);
+    expect(authenticate(t)).toEqual(after);
+    expect(() => op(t, "lodge-workshop", { id: s.id })).toThrow(/already/);
+    expect(authenticate(t)).toEqual(after);
+    const decorate = crypto.randomUUID();
+    op(t, "lodge-decorate", { id: s.id, quest: "banner" }, decorate);
+    const changed = authenticate(t);
+    expect(lodgeRecord(changed, s.region)).toEqual({ ...lodgeRecord(after, s.region), keepsake: "banner" });
+    expect(changed.gold).toBe(after.gold);
+    expect(changed.conservancy).toEqual(after.conservancy);
+    op(t, "lodge-decorate", { id: s.id, quest: "banner" }, decorate);
+    expect(authenticate(t)).toEqual(changed);
+  }
+  expect(lodgeWorkshopCount(authenticate(t))).toBe(4);
+});
+it("rejects locked workshops missing materials foreign regions and invalid decoration choices atomically", () => {
+  const t = keeper(), s = LODGES[0];
+  const rejected = (kind: string, data: object) => {
+    const before = authenticate(t);
+    expect(() => op(t, kind, data)).toThrow();
+    expect(authenticate(t)).toEqual(before);
+  };
+  rejected("lodge-workshop", { id: s.id });
+  rejected("lodge-decorate", { id: s.id, quest: "banner" });
+  finish(t, s);
+  rejected("lodge-workshop", { id: s.id });
+  rejected("lodge-workshop", { id: LODGES[1].id });
+  rejected("lodge-decorate", { id: s.id, quest: "gold" });
+  rejected("lodge-decorate", { id: s.id, quest: "lantern" });
+  const p = authenticate(t);
+  p.conservancy = structuredClone(conservancyOf(p));
+  p.conservancy.materials = { timber: 2, fiber: 0, crystal: 99 };
+  save(p);
+  rejected("lodge-workshop", { id: s.id });
+  p.island = "home"; save(p);
+  rejected("lodge-decorate", { id: s.id, quest: "banner" });
+});
 it("supports legacy saves and every starter through four gatherings without inventory costs", () => {
   for (const starter of STARTERS) {
     const t = keeper(starter),
