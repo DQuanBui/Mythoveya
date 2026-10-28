@@ -42,6 +42,25 @@ try {
   await page.reload();
   await page.getByRole("button", { name: "Continue your journey" }).click({ timeout: 30000 });
   await page.locator(".keeper-badge").getByText("Pages Smoke").waitFor({ timeout: 30000 });
+  // Back up the save, wipe this browser's storage, and restore it.
+  await page.reload();
+  await page.getByRole("button", { name: "Sound & settings" }).click();
+  const [download] = await Promise.all([
+    page.waitForEvent("download"),
+    page.getByRole("button", { name: "Download save" }).click(),
+  ]);
+  const file = await download.path();
+  await page.evaluate(() => localStorage.clear());
+  await page.reload();
+  await page.getByRole("button", { name: "Begin your journey" }).waitFor({ timeout: 30000 });
+  await page.getByRole("button", { name: "Sound & settings" }).click();
+  page.once("dialog", (d) => d.accept());
+  await Promise.all([
+    page.waitForEvent("load"),
+    page.getByLabel("Restore from file").setInputFiles(file),
+  ]);
+  await page.getByRole("button", { name: "Continue your journey" }).click({ timeout: 30000 });
+  await page.locator(".keeper-badge").getByText("Pages Smoke").waitFor({ timeout: 30000 });
   if (problems.length) throw Error(problems.join("\n"));
   console.log(`Pages smoke passed: ${url}`);
 } finally {

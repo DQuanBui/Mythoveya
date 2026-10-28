@@ -72,6 +72,22 @@ describe("standalone browser server", () => {
     expect(await call(token, "battle")).toMatchObject({ id: b.id, winner: b.winner });
   });
 
+  it("moves a save to a fresh browser through an exported file", async () => {
+    const api = await import("../apps/client/src/api");
+    const token = await keeper();
+    api.setSession(token);
+    const file = api.exportSave();
+    saved.clear();
+    store.reloadStandaloneStore();
+    api.setSession("");
+    expect(() => api.importSave("{}")).toThrow("not a Mythoveya save");
+    expect(() => api.importSave("not json")).toThrow("not a Mythoveya save");
+    api.importSave(file);
+    store.reloadStandaloneStore();
+    expect(api.session).toBe(token);
+    expect((await call(api.session, "profile")).name).toBe("Pages Keeper");
+  });
+
   it("serves local rankings and festival boards", async () => {
     const token = await keeper();
     const board = await call(token, "leaderboard");

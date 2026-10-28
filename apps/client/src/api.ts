@@ -32,3 +32,25 @@ export const mutate = (kind: string, data: Record<string, unknown> = {}) =>
     kind,
     ...data,
   });
+// The online build's save (see apps/server/browser-store.ts) can be moved
+// between browsers as a file. It includes the session token for that save.
+const SAVE_KEY = "mythoveya-standalone-save";
+export function exportSave() {
+  return JSON.stringify({
+    game: "Mythoveya",
+    version: 1,
+    exported: new Date().toISOString(),
+    session,
+    save: JSON.parse(localStorage.getItem(SAVE_KEY) || "{}"),
+  });
+}
+export function importSave(text: string) {
+  let data: any;
+  try {
+    data = JSON.parse(text);
+  } catch {}
+  if (data?.game !== "Mythoveya" || !data.save?.tokens?.[data.session])
+    throw Error("This file is not a Mythoveya save.");
+  localStorage.setItem(SAVE_KEY, JSON.stringify(data.save));
+  setSession(data.session);
+}
