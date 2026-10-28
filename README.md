@@ -6,7 +6,9 @@
 
 Become a Riftkeeper in a world of floating islands, forgotten waystones, and extraordinary companions. Begin in Havenreach, choose the creature that speaks to you, and build a team of six Wildbound. Explore the reaches, discover new species, face their guardians, and challenge another keeper in the Rift Arena.
 
-Mythoveya is a locally playable, browser-based 3D creature-collection RPG. Its world, characters, portraits, music, and effects are created from assets and recipes included in this project. Once installed, it plays without third-party asset downloads or an online service.
+Mythoveya is a browser-based 3D creature-collection RPG. Its world, characters, portraits, music, and effects are created from assets and recipes included in this project. It plays without third-party asset downloads or an online service.
+
+**▶ [Play online](https://dquanbui.github.io/Mythoveya/)**: single-player, saved in your browser, no install. To battle another keeper, [run it locally](#install-and-play).
 
 ## The game
 
@@ -50,9 +52,9 @@ Mythoveya is a locally playable, browser-based 3D creature-collection RPG. Its w
 - **Tactical battles:** elemental advantages, energy, cooldowns, shields, healing, status effects, delayed attacks, revivals, and a visible turn queue. Manual and automatic controls are available in PvE.
 - **A growing collection:** recruit with earned diamonds, bond with wild creatures, train companions, collect shards, and claim story and daily rewards.
 - **Meet each new bond:** watch your recruited Wildbound arrive on the 3D shrine stage, and select any result from a ten-bond reveal to meet it up close.
-- **Human arena battles:** friendly room codes and ranked matchmaking, separate Power and Tactical ratings, authoritative turns, and reconnect support.
+- **Human arena battles:** friendly room codes and ranked matchmaking, separate Power and Tactical ratings, authoritative turns, and reconnect support when you run the game locally.
 - **A living presentation:** articulated creatures and keepers, model-rendered portraits, eight synthesized music arrangements, elemental effects, species voices, and eleven mythic ultimate recipes.
-- **Saved adventures:** SQLite stores profiles, formations, inventory, currency, pity counters, quests, completed results, and competitive ratings.
+- **Saved adventures:** SQLite stores profiles, formations, inventory, currency, pity counters, quests, completed results, and competitive ratings. The online build keeps the same save in browser storage.
 
 Explore the [Havenreach starting-island guide](docs/STARTING_ISLAND.md) for the trail map, western lake district, Silent Windmill journey and visitor-book activity.
 
@@ -62,9 +64,23 @@ This first playable version uses a compact procedural art style. See [KNOWN_ISSU
 
 ## Install and play
 
+### Play online
+
+Open **https://dquanbui.github.io/Mythoveya/** in a desktop browser with WebGL. Every push to `main` publishes this single-player build through GitHub Actions.
+
+The online build runs the game's server rules inside the page, so there is nothing to install. It differs from local play in three ways:
+
+- **Your save lives in this browser.** Clearing site data erases it. It is separate from the local `data/mythoveya.sqlite` save, and it does not follow you to another browser or device.
+- **Rift Arena human matches need the local server.** Friendly room codes and ranked matchmaking are disabled online; **Practice vs computer** still works.
+- **Rankings and festival leaderboards only list keepers saved in this browser.** Festival ghosts are your own best runs.
+
+Everything else is the same: exploration, quests, battles, recruitment, lodges, islands, and the festival.
+
+### Run locally
+
 Tested on **Windows, Node.js 24.19.0, npm 11.17.0**. Use Node 24 LTS. Python, Docker, an external database, and API keys are not needed to play.
 
-After installing dependencies, double-click **[Play Mythoveya.cmd](Play%20Mythoveya.cmd)** to start the game and open **http://127.0.0.1:5173/**. The launcher reuses healthy running services, keeps startup logs in `artifacts/local-game`, and uses your normal saved game. If the local link stops working after restarting Windows, run the launcher again. This address works on your computer; pushing the source to GitHub does not host the game publicly.
+After installing dependencies, double-click **[Play Mythoveya.cmd](Play%20Mythoveya.cmd)** to start the game and open **http://127.0.0.1:5173/**. The launcher reuses healthy running services, keeps startup logs in `artifacts/local-game`, and uses your normal saved game. If the local link stops working after restarting Windows, run the launcher again. The local address only works on the computer running the game.
 
 Open a terminal in this folder:
 
@@ -93,6 +109,8 @@ npm start
 ```
 
 Open **http://127.0.0.1:2567/** for the compiled build. This command serves the built game and its backend from one port. The development asset gallery is omitted from the compiled interface.
+
+To try the online build locally, run `npm run build:pages` and `npm run preview:pages`, then open **http://127.0.0.1:4173/Mythoveya/**. `node scripts/smoke-pages.mjs` builds it and plays the opening in Chromium; pass a URL to check a deployed copy instead.
 
 ## Your first five minutes
 
