@@ -1773,3 +1773,52 @@ html[data-contrast="true"] select:focus-visible {
   height: 1px;
   opacity: 0;
 }
+/* Phone-width battles: one compact header row, the turn order below it. */
+@media (max-width: 600px) {
+  .battle-top {
+    left: 10px;
+    right: 10px;
+    top: 10px;
+    gap: 6px;
+  }
+  .battle-top > div {
+    padding: 7px 10px;
+  }
+  .battle-top .eyebrow {
+    display: block;
+    max-width: 28vw;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    letter-spacing: 1px;
+  }
+  .battle-top h2 {
+    font-size: 18px;
+    white-space: nowrap;
+  }
+  .energy {
+    font-size: 18px;
+    white-space: nowrap;
+  }
+  .energy small {
+    letter-spacing: 1px;
+  }
+  .battle-top .button-row {
+    margin: 0;
+    padding: 5px;
+    gap: 4px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .battle-top .button-row button {
+    padding: 5px 9px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .turn-queue {
+    left: 10px;
+    top: 84px;
+    max-width: calc(100% - 20px);
+    overflow-x: auto;
+  }
+}

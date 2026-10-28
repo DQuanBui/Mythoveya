@@ -1557,7 +1557,14 @@ function BattleCamera({
             (byId[battle.units.find((u) => u.id === e!.actor)!.species].index %
               3))
         : 0;
-    cam.fov = (preview ? 38 : 42) - amount;
+    // Portrait screens widen the view so both teams' outer columns fit.
+    const base = preview ? 38 : 42,
+      aspect = size.width / size.height,
+      fit =
+        aspect < 1
+          ? Math.min(78, (2 * Math.atan(Math.tan((base * Math.PI) / 360) * 0.62 / aspect) * 180) / Math.PI)
+          : base;
+    cam.fov = Math.max(base, fit) - amount;
     cam.setViewOffset(
       size.width,
       size.height,
