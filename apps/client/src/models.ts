@@ -4,39 +4,77 @@ import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeom
 import { AVATARS, byId } from "../../../packages/shared/content";
 import { dnaOf } from "./creature-dna";
 
+// Low graphics quality keeps the lighter geometry and plain materials.
+// (Read directly: this module also runs in Node tests, without audio.ts.)
+const fine = (() => {
+  try {
+    return JSON.parse(localStorage.getItem("mythoveya-settings") || "{}").quality !== "Low";
+  } catch {
+    return true;
+  }
+})();
 // Smooth, rounded primitives give creatures and keepers a clean, soft finish.
 const geometry = {
-  // Resolution is tuned so a whole creature stays near 3-4k triangles.
-  orb: new T.SphereGeometry(1, 14, 10),
-  smooth: new T.SphereGeometry(1, 10, 8),
-  cone: new T.ConeGeometry(1, 1, 9),
-  box: new RoundedBoxGeometry(1, 1, 1, 1, 0.18),
+  // About 3-4k triangles per creature on Low, roughly double otherwise.
+  orb: fine ? new T.SphereGeometry(1, 20, 14) : new T.SphereGeometry(1, 14, 10),
+  smooth: fine ? new T.SphereGeometry(1, 14, 10) : new T.SphereGeometry(1, 10, 8),
+  cone: new T.ConeGeometry(1, 1, fine ? 12 : 9),
+  box: new RoundedBoxGeometry(1, 1, 1, fine ? 2 : 1, 0.18),
   ring: new T.TorusGeometry(1, 0.055, 6, 32),
-  capsule: new T.CapsuleGeometry(0.5, 1, 3, 9),
+  capsule: fine ? new T.CapsuleGeometry(0.5, 1, 4, 12) : new T.CapsuleGeometry(0.5, 1, 3, 9),
 };
 type Kind = keyof typeof geometry;
 const materials = new Map<string, T.MeshStandardMaterial>();
+// Fur and cloth get a soft sheen at the silhouette; eyes and noses a wet clearcoat.
+function finish(base: T.MeshStandardMaterialParameters, gloss: boolean) {
+  if (!fine) return new T.MeshStandardMaterial(base);
+  return new T.MeshPhysicalMaterial({
+    ...base,
+    ...(gloss
+      ? { clearcoat: 0.7, clearcoatRoughness: 0.08 }
+      : { roughness: 0.68, sheen: 0.55, sheenRoughness: 0.5, sheenColor: new T.Color("#fff3e2") }),
+  });
+}
 function material(color: string, glow = false, gloss = false) {
   const key = color + glow + gloss;
   if (!materials.has(key))
     materials.set(
       key,
-      new T.MeshStandardMaterial({
-        color,
-        roughness: gloss ? 0.12 : 0.6,
-        emissive: glow ? color : "#000",
-        emissiveIntensity: glow ? 0.55 : 0,
-        envMapIntensity: gloss ? 1.6 : 0.8,
-      }),
+      finish(
+        {
+          color,
+          roughness: gloss ? 0.12 : 0.6,
+          emissive: glow ? color : "#000",
+          emissiveIntensity: glow ? 0.55 : 0,
+          envMapIntensity: gloss ? 1.6 : 0.8,
+        },
+        gloss,
+      ),
     );
   return materials.get(key)!;
 }
 // Merged static parts share one vertex-colored skin material.
-const skin = new T.MeshStandardMaterial({
-  vertexColors: true,
-  roughness: 0.6,
-  envMapIntensity: 0.8,
-});
+const skin = finish({ vertexColors: true, roughness: 0.6, envMapIntensity: 0.8 }, false);
+// Painted shading baked into merged parts: undersides a little darker,
+// with faint mottling so large surfaces read as fur or cloth, not plastic.
+function shade(g: T.BufferGeometry, color: T.Color) {
+  const pos = g.attributes.position,
+    nor = g.attributes.normal,
+    out = new Float32Array(pos.count * 3);
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i),
+      y = pos.getY(i),
+      z = pos.getZ(i),
+      up = fine ? 0.88 + 0.12 * (nor.getY(i) * 0.5 + 0.5) : 1,
+      // Smooth, low-frequency mottling (a few patches per body length).
+      grain = fine ? 1 + 0.035 * Math.sin(x * 7.1 + y * 5.3) * Math.sin(z * 6.7 - y * 3.1) : 1,
+      k = up * grain;
+    out[i * 3] = color.r * k;
+    out[i * 3 + 1] = color.g * k;
+    out[i * 3 + 2] = color.b * k;
+  }
+  g.setAttribute("color", new T.BufferAttribute(out, 3));
+}
 export function part(
   parent: T.Object3D,
   kind: Kind,
@@ -80,10 +118,7 @@ function consolidate(root: T.Object3D, key: string) {
             m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone()
           ).applyMatrix4(m.matrix);
           color.set(m.userData.color);
-          const colors = new Float32Array(g.attributes.position.count * 3);
-          for (let i = 0; i < colors.length; i += 3)
-            colors.set([color.r, color.g, color.b], i);
-          g.setAttribute("color", new T.BufferAttribute(colors, 3));
+          shade(g, color);
           return g;
         }),
       )!;
@@ -877,7 +912,9 @@ export function createAvatar(index: number) {
     leg.position.set(side * 0.11, 0.8, 0);
     g.add(leg);
     part(leg, "capsule", pants, [0, -0.34, 0], [0.15, 0.31, 0.16]);
-    part(leg, "box", shoe, [0, -0.72, 0.045], [0.15, 0.1, 0.26]);
+    // Rounded shoe on a darker sole.
+    part(leg, "orb", shoe, [0, -0.7, 0.05], [0.085, 0.07, 0.14]);
+    part(leg, "box", "#3e2e24", [0, -0.755, 0.05], [0.16, 0.035, 0.27]);
     limbs.push(leg);
     const arm = new T.Group();
     arm.position.set(side * (w + 0.06), 1.34, 0);
@@ -890,11 +927,13 @@ export function createAvatar(index: number) {
   part(g, "orb", pants, [0, 0.84, 0], [w * 0.95, 0.13, 0.17]);
   part(g, "capsule", a.coat, [0, 1.12, 0], [w * 2, 0.22, 0.34]);
   part(g, "cone", a.coat, [0, 0.95, 0], [w * 1.08, 0.36, 0.2]);
-  part(g, "box", "#4c4038", [0, 0.88, 0], [w * 2.05, 0.06, 0.36]);
-  part(g, "box", "#e0c680", [0.07, 0.88, 0.18], [0.07, 0.05, 0.02], undefined, false, true);
+  // Belt sized to the waist, with its buckle on the front.
+  part(g, "box", "#4c4038", [0, 0.88, 0], [w * 1.85, 0.065, 0.33]);
+  part(g, "box", "#e0c680", [0.06, 0.88, 0.168], [0.07, 0.05, 0.02], undefined, false, true);
   part(g, "box", "#a57951", [0, 1.12, -0.22], [0.32, 0.4, 0.15]);
   part(g, "capsule", "#c9b38a", [0, 1.36, -0.22], [0.09, 0.15, 0.09], [0, 0, Math.PI / 2]);
-  part(g, "orb", index % 2 ? "#d9b479" : "#c5d6b6", [0, 1.36, 0.03], [w * 0.95, 0.045, 0.15]);
+  // A soft collar that hugs the neck.
+  part(g, "orb", index % 2 ? "#d9b479" : "#c5d6b6", [0, 1.37, 0.01], [0.135, 0.055, 0.125]);
   // Neck and head.
   part(g, "capsule", a.skin, [0, 1.42, 0], [0.09, 0.05, 0.09]);
   const head = new T.Group();
