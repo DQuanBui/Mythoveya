@@ -25,7 +25,8 @@ async function start() {
   );
   server.stdout!.on("data", (d) => (output += d.toString()));
   server.stderr!.on("data", (d) => (output += d.toString()));
-  for (let i = 0; i < 100; i++) {
+  // tsx compiles the server on start; allow 30 s when the suite is busy.
+  for (let i = 0; i < 300; i++) {
     try {
       if ((await fetch(base + "/api/health")).ok) return;
     } catch {}
@@ -40,7 +41,7 @@ async function stop() {
     server.kill();
   });
 }
-beforeAll(start, 20000);
+beforeAll(start, 40000);
 afterAll(async () => {
   for (const r of rooms) if (r.connection.isOpen) await r.leave();
   await stop();
