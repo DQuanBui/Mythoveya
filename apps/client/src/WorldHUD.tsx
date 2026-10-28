@@ -4,6 +4,7 @@ import { HOLLOW_EXTENT, HOLLOW_PATHS, HOLLOW_LAKE } from "../../../packages/shar
 import { CANYON_EXTENT, CANYON_PATHS, CANYON_SPRINGS } from "../../../packages/shared/canyon";
 import { WILDWOOD_LAKE } from "../../../packages/shared/wildwood";
 import { useEffect, useRef, useState, type MutableRefObject } from "react";
+import { worldHeading } from "./village-materials";
 import { byId, REGIONS } from "../../../packages/shared/content";
 import type { Profile } from "../../../packages/shared/types";
 import { getInteractables } from "./Scene";
@@ -436,8 +437,10 @@ export function WorldHUD({
             style={{
               left: `${pct(position[0])}%`,
               top: `${pct(position[1])}%`,
+              // Map x runs right and z runs down; the arrow points where the keeper faces.
+              transform: `translate(-50%, -50%) rotate(${Math.PI - worldHeading.yaw}rad)`,
             }}
-            title="Your position"
+            title="Your position and facing"
           >
             ▲
           </b>

@@ -19,3 +19,5 @@ export function setNightGlow(glow: number) {
 }
 // The keeper's live position, used to keep sun shadows around the player.
 export const worldFocus = new T.Vector3(0, 0, 5);
+// The keeper's facing (avatar yaw), shown by the minimap arrow.
+export const worldHeading = { yaw: Math.PI };

@@ -42,7 +42,7 @@ import { HavenTownsfolk } from "./HavenTownsfolk";
 import { HavenShops } from "./HavenShops";
 import { DayNight, SkyLife } from "./Atmosphere";
 import { WalkContext, type Walker } from "./hover";
-import { worldFocus } from "./village-materials";
+import { worldFocus, worldHeading } from "./village-materials";
 import { buildGrid, findPath, type WalkGrid } from "../../../packages/shared/pathfind";
 import { useMemo, useRef, useEffect, useState, useCallback } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
@@ -967,6 +967,7 @@ export function Explorer({
       camera.position.z += nz - player.current.z;
       player.current.set(nx, ny, nz);
       avatar.rotation.y = Math.atan2(v.x, v.z);
+      worldHeading.yaw = avatar.rotation.y;
       if (clock.elapsedTime - foot.current > (sprinting ? 0.27 : 0.32)) {
         audio.cue(stepSound(profile.region, nx, nz, ny));
         foot.current = clock.elapsedTime;
