@@ -370,7 +370,7 @@ function Environment({
       >
         <circleGeometry args={[7, 48]} />
         <meshStandardMaterial
-          color={snow ? "#dce2db" : canyon ? "#bc8c6c" : "#c2c29a"}
+          color={snow ? "#dce2db" : canyon ? "#bc8c6c" : "#b7ad8a"}
           roughness={1}
         />
       </mesh>
@@ -382,7 +382,7 @@ function Environment({
           rotation={[-Math.PI / 2, 0, 0.2 + i]}
         >
           <circleGeometry args={[2.1, 7]} />
-          <meshStandardMaterial color={snow ? "#d3dfe1" : "#b6b991"} />
+          <meshStandardMaterial color={snow ? "#d3dfe1" : "#a89f7f"} />
         </mesh>
       ))}
       {trees

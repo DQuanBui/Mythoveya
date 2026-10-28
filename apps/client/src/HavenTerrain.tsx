@@ -25,8 +25,8 @@ function terrainGeometry() {
     tone = (hex: string) => c.set(hex);
   const sand = new T.Color("#e2d3a6"),
     bed = new T.Color("#8fb3a6"),
-    grassA = new T.Color("#9ab389"),
-    grassB = new T.Color("#8eae82"),
+    grassA = new T.Color("#8bb179"),
+    grassB = new T.Color("#7fa66f"),
     alpine = new T.Color("#86a383"),
     rock = new T.Color("#8a8f84"),
     rockDark = new T.Color("#757b72"),
