@@ -12,6 +12,7 @@ Mythoveya is a browser-based 3D creature-collection RPG. Its world, characters, 
 
 ## The game
 
+- **Featured Weeks:** every Monday a new themed event begins: Tidewater Week, Guardian's Vigil, Kindred Week or Forgefire Week. Finish its three missions, open the theme chest, and collect all four event stamps. Find it first in the Events panel (❖).
 - **Wayfarer Lodges:** enter four regional rooms, meet their hosts, cook local suppers, help with companions and keep permanent decorations. Welcome Lumeswallow and Velvetmoth. [Read the illustrated lodge guide](docs/LODGES.md).
 - **Wildbound Rescues:** help Mira, Oren, Tavi and Edda with your active companions' elemental abilities. Restore four wildlife clearings, choose their permanent endings, and welcome Reedrake and Solmole. [Read the rescue guide](docs/RESCUES.md).
 - **The Atlas of Echoes:** follow a connected four-region story with Aster, Fenn, Suri and Niva. Discover inscriptions, restore memory monuments, earn Cairnfin and Inkwisp, and unlock daily echo readings. [Read the Atlas guide](docs/ATLAS.md).
@@ -40,7 +41,7 @@ Mythoveya is a browser-based 3D creature-collection RPG. Its world, characters, 
 - **Six welcoming homes:** visit the bakery, workshop, glasshouse, orchard cottage, ranger lodge, and woodland refuge. Sign each porch visitor book for Gold and XP; collect all six stamps for 50 Diamonds. Your book survives reloads.
 - **Your own walking route:** choose a destination on the illustrated local map, follow its gold waypoint, sprint along the trails, and return to the village from the pause menu.
 - **Point and click:** click the ground to walk there along the trails, or click a villager, home, crystal, or cache and your keeper walks over and interacts. Hover anything clickable for a ring and a short tooltip.
-- **A living village:** timber cottages, a windmill, a well, lamp-lit trails, festival bunting, chimney smoke, drifting clouds, birds, and six islanders who stroll the paths by day and go home at night.
+- **A living village:** timber cottages with dormers, weathervanes, laundry lines and nameplates, a windmill, a well, lamp-lit trails, festival bunting, chimney smoke, drifting clouds, birds, and six islanders who stroll the paths by day, go home at night, and stop to wave when you walk up. Footsteps change on wood, sand, stone and snow, and birdsong gives way to crickets after dark.
 - **Skyferry and Hearthfall Isle:** a trail from the meadow leads to the Skyferry dock on Havenreach's southern cliff. The ferry sails to your own home island, and the dock there, the island card or the pause menu always bring you back. On the island you build from a catalog of decorations and elemental habitats, then move, rotate or pack pieces away. You can upgrade your house through five levels to allow more pieces, and expand the land from 14 m to 30 m. Companions you move into habitats wander and can be greeted for friendship. They also earn a little Gold each hour, stored for up to eight hours and paid half again for a matching element. The server validates every placement, and the layout is saved with your profile.
 - **Lanternfair Isle:** after your first win, the Skyferry also sails to the festival island. It has a lantern tree plaza, a race track, a tournament pond, a Ferris wheel, and a carousel, high striker and confetti cannon you can play with. Five lanterns are hidden around the fair each day, with clues on the festival board, and the board also gives a few welcome tickets on each visit. Three games earn tickets: the Sprint Stakes companion race, the Hop Hollow obstacle course and a 45-second fishing tournament on the lantern pond. One game is featured each day for double tickets. Each game's results are rescored on the server from your recorded inputs, and they go on daily and all-time leaderboards. Today's top three runs race beside you as ghosts. Festival tickets buy decorations for your home island, keeper outfits, companion accessories and a few weekly supplies. None of it is needed for the main story.
 - **Town shops:** Brannoc's Ironbloom Smithy sells a daily rotation of equipment (an Epic piece every third day) and forge dust; Mother Sage's Willowroot Apothecary sells growth elixirs, skill tomes, one-battle Vigor and Swiftness tonics, and brews Rift crystals from Skyfin. Both have daily limits and appear on the travel map.
@@ -70,7 +71,7 @@ Open **https://dquanbui.github.io/Mythoveya/** in a desktop browser with WebGL. 
 
 The online build runs the game's server rules inside the page, so there is nothing to install. It differs from local play in three ways:
 
-- **Your save lives in this browser.** Clearing site data erases it. It is separate from the local `data/mythoveya.sqlite` save, and it does not follow you to another browser or device.
+- **Your save lives in this browser.** Clearing site data erases it, so use **Sound & settings → Download save** for a backup file, and **Restore from file** to bring it back or move it to another browser. It is separate from the local `data/mythoveya.sqlite` save, and it does not follow you to another browser or device.
 - **Rift Arena human matches need the local server.** Friendly room codes and ranked matchmaking are disabled online; **Practice vs computer** still works.
 - **Rankings and festival leaderboards only list keepers saved in this browser.** Festival ghosts are your own best runs.
 
@@ -143,9 +144,11 @@ In Havenreach, **Travel map** opens the island's local trail guide. Select a pla
 | Heart beside the party | Greet your following companion |
 | Click a battle model or target selector | Choose an ability target |
 
-Use **Sound & settings** on the title screen or the settings button in the world. Master, Music, Sound effects, Ambience, and Creature voices each have their own slider. Mute, reduced motion, camera shake, and graphics quality are saved in the browser. Audio starts after a deliberate click; use **Play sound test** to resume a suspended browser audio context. Background audio suspends when the tab is hidden.
+Use **Sound & settings** on the title screen or the settings button in the world. Master, Music, Sound effects, Ambience, and Creature voices each have their own slider. Mute, reduced motion, camera shake, day and night, a **high-contrast interface**, **world brightness**, and graphics quality are saved in the browser. Audio starts after a deliberate click; use **Play sound test** to resume a suspended browser audio context. Background audio suspends when the tab is hidden.
 
-Low quality reduces decorative scenery and particles. Quality changes take full effect on the next scene entry. On touch screens, drag the movement joystick and tap the interaction prompt. Desktop keyboard-and-mouse play remains the most thoroughly tested way to battle.
+The quest tracker's round button collapses it to the current objective and distance, which keeps the view clear on small screens. The minimap arrow points the way your keeper faces.
+
+Low quality reduces decorative scenery and particles. Quality changes take full effect on the next scene entry. On touch screens, drag the movement joystick and tap the interaction prompt. Battles fit portrait phone screens, though desktop keyboard-and-mouse play remains the most thoroughly tested way to battle.
 
 Push the touch joystick farther to run. Trees, buildings, the pond, and the cliff edge keep your keeper on safe ground; approach the pond along the bridge. Returning from a battle keeps your current exploration position during the session. Reloading starts you at the current region's starting point, with your saved companions, inventory, and progression intact.
 

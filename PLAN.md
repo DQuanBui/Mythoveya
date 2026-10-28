@@ -7,3 +7,5 @@
 5. Presentation and verification: portraits, music, voices, effects, gallery, accessibility, tests and project documentation. Check: build/typecheck/tests and browser acceptance path; record review limits.
 
 Use meaningful Git commits at at least ten implementation boundaries. Keep saves out of source control. Create a private GitHub repository if authenticated access permits; never deploy a server.
+
+Since October 28, 2026 a static single-player build (`npm run build:pages`, game rules running in the page, save in browser storage) is published to GitHub Pages at https://dquanbui.github.io/Mythoveya/. No server is deployed; human arena matches still require local play.

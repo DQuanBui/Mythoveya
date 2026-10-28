@@ -23,7 +23,7 @@ npm run test:e2e         # Playwright, tests/browser, own services on :5174/:256
 
 `Play Mythoveya.cmd` -> `scripts/start-game.ps1`: health-checked launcher for normal play (5173/2567, `data/mythoveya.sqlite`).
 
-Playwright runs are long (tens of minutes), single worker, and use `npm run dev` with HMR: **do not edit source while they run**. Run them from a separate `git worktree` (junction `node_modules`) if you need to keep working. Known flakes: `tests/network.test.ts` server start under full-suite load.
+Playwright runs are long (tens of minutes), single worker, and use `npm run dev` with HMR: **do not edit source while they run**. Run them from a separate `git worktree` (junction `node_modules`) if you need to keep working. Last full run: see `PROGRESS.md`. Verify UI changes with a throwaway Playwright script against `npm run preview:pages` (no backend needed); keep such scripts in ignored `artifacts/`.
 
 ## Layout
 
@@ -33,7 +33,7 @@ Playwright runs are long (tens of minutes), single worker, and use `npm run dev`
 - `apps/client/src/` — `main.tsx`, `App.tsx` (screens, panels, lazy chunks), `api.ts` (`api()`, `mutate()`, `STANDALONE`), `Scene.tsx` + region files (`Haven*`, `Meadow*`, `Canyon*`, `Hollow*`, `Rally*`, `Conservancy*`, `Atlas*`, `Rescue*`, `Lodge*`), `models.ts` + `creature-dna.ts` (procedural creature/keeper geometry), `Arena.tsx` (battle UI + human arena lobby), `Panels.tsx`, `WorldHUD.tsx`, `audio.ts` (Web Audio synthesis), CSS per area.
 - `tests/*.test.ts` — vitest unit/server tests; server tests set `DB_PATH` to a temp file then dynamic-import `store`/`game`. `tests/standalone.test.ts` mocks `store` with `browser-store`. `tests/browser/*.spec.ts` — Playwright journeys.
 - `scripts/` — content audit, smoke tests, launcher, layout/profile helpers.
-- `.github/workflows/pages.yml` — typecheck, standalone tests, `build:pages`, deploy to GitHub Pages on push to `main`.
+- `.github/workflows/pages.yml` — typecheck, standalone tests, `build:pages`, deploy to GitHub Pages on push to `main`. `.github/workflows/tests.yml` — typecheck, content audit, full vitest, both builds and `smoke-production` on pushes and PRs. Playwright is local only.
 - Ignored: `data/` (saves), `dist/`, `artifacts/` (logs, screenshots), `test-results/`.
 
 ## How a gameplay action flows
@@ -47,6 +47,7 @@ The server is authoritative for currencies, rewards, ownership, progression and 
 - Match surrounding style: terse functional TS, few comments, Prettier-ish formatting (some feature files are deliberately compact). No new dependencies without need.
 - New optional `Profile` fields must be optional and initialised lazily (`xxxOf(p)` / `ensureTown(p)` pattern) so legacy saves load.
 - Keep species IDs, mutation kinds, and localStorage keys stable (`mythoveya-session`, settings keys, `mythoveya-standalone-save`).
+- Shared live state for HUD/audio lives in `village-materials.ts` (`worldFocus` keeper position, `worldHeading` yaw). Weekly events: `packages/shared/events.ts` (`FEATURED_WEEKS`, ids start `w-` so they reset weekly).
 - Client 3D objects own and dispose their geometry/materials; heavy panels and scenes are `lazy()` chunks.
 - Use `import.meta.env.BASE_URL` for public assets (the Pages build lives under `/Mythoveya/`).
 - Conventional Commits with a short what/why body. Update `PROGRESS.md` / `KNOWN_ISSUES.md` / player guides with each meaningful change.
