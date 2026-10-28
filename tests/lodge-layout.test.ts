@@ -73,8 +73,9 @@ it("builds finite room geometry for every theme and saved decoration", () => {
         });
         g.computeBoundingBox();
         expect(g.boundingBox!.isEmpty()).toBe(false);
-        for (const v of g.getAttribute("position").array)
-          expect(Number.isFinite(v)).toBe(true);
+        // One assertion per geometry: an expect() per vertex made this test
+        // exceed vitest's 5 s limit once workshop displays were added.
+        expect(Array.from(g.getAttribute("position").array).every(Number.isFinite)).toBe(true);
         g.dispose();
       }
 });
