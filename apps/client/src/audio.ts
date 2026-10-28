@@ -11,6 +11,8 @@ export type Settings = {
   shake: boolean;
   quality: string;
   daynight: boolean;
+  contrast: boolean;
+  brightness: number;
 };
 export const defaults: Settings = {
   master: 0.6,
@@ -23,6 +25,8 @@ export const defaults: Settings = {
   shake: false,
   quality: "Medium",
   daynight: true,
+  contrast: false,
+  brightness: 1,
 };
 function storedSettings() {
   try {
@@ -35,6 +39,12 @@ export const settings: Settings = {
   ...defaults,
   ...storedSettings(),
 };
+/** Page-wide preferences that CSS reads from the root element. */
+function applyDocument() {
+  document.documentElement.dataset.reduced = String(settings.reduced);
+  document.documentElement.dataset.contrast = String(settings.contrast);
+}
+applyDocument();
 class AudioEngine {
   ctx?: AudioContext;
   master?: GainNode;
@@ -104,7 +114,7 @@ class AudioEngine {
     await this.ctx.resume();
   }
   update() {
-    document.documentElement.dataset.reduced = String(settings.reduced);
+    applyDocument();
     localStorage.setItem("mythoveya-settings", JSON.stringify(settings));
     if (!this.ctx || !this.master) return;
     this.master.gain.setTargetAtTime(

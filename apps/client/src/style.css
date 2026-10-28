@@ -1716,3 +1716,35 @@ main {
 
 .shimmer-badge { color: #ffe8a6; font-size: 0.78rem; letter-spacing: 0.04em; }
 .shimmer-portrait { filter: drop-shadow(0 0 5px #ddbb7660); }
+/* High-contrast interface (Sound & settings). Solid surfaces, brighter
+   secondary text and stronger outlines; the 3D scene is unchanged. */
+html[data-contrast="true"] {
+  --muted: #e2ece8;
+  --gold: #ffdc95;
+}
+html[data-contrast="true"] .panel {
+  background: #0b2027;
+  border-color: #f1e2b8b0;
+}
+html[data-contrast="true"] .modal-backdrop {
+  background: #031217d9;
+  backdrop-filter: none;
+}
+html[data-contrast="true"] .world-label {
+  color: #ffffff;
+  text-shadow: none;
+  background: #081a1ff5;
+  border: 1px solid #f5efd9c0;
+}
+html[data-contrast="true"] .notice,
+html[data-contrast="true"] .toast {
+  color: #ffffff;
+  background: #0b2027;
+  border-color: #ffdc95c0;
+}
+html[data-contrast="true"] button:focus-visible,
+html[data-contrast="true"] input:focus-visible,
+html[data-contrast="true"] select:focus-visible {
+  outline: 3px solid #ffdc95;
+  outline-offset: 2px;
+}

@@ -1,7 +1,8 @@
 import { useEffect } from "react";
-import { useThree } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import * as T from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
+import { settings } from "./audio";
 
 /** A locally generated studio environment for soft, believable reflections. */
 export function environmentFor(gl: T.WebGLRenderer) {
@@ -26,5 +27,9 @@ export function ModelLighting({ intensity = 0.4 }: { intensity?: number }) {
   useEffect(() => {
     scene.environmentIntensity = intensity;
   }, [scene, intensity]);
+  // The player's World brightness setting.
+  useFrame(({ gl }) => {
+    gl.toneMappingExposure = settings.brightness;
+  });
   return null;
 }

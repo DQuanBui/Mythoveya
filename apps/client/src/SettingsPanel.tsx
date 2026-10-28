@@ -38,7 +38,7 @@ export function SettingsPanel() {
         )}
       </div>
       <div className="settings-grid">
-        {(["mute", "reduced", "shake", "daynight"] as const).map((key) => (
+        {(["mute", "reduced", "shake", "daynight", "contrast"] as const).map((key) => (
           <label className="toggle" key={key}>
             <input
               type="checkbox"
@@ -51,9 +51,25 @@ export function SettingsPanel() {
                 ? "Reduced motion"
                 : key === "daynight"
                   ? "Day and night cycle"
-                  : "Camera shake"}
+                  : key === "contrast"
+                    ? "High-contrast interface"
+                    : "Camera shake"}
           </label>
         ))}
+        <label className="slider">
+          <span>
+            World brightness <b>{Math.round(settings.brightness * 100)}%</b>
+          </span>
+          <input
+            aria-label="World brightness"
+            type="range"
+            min="0.7"
+            max="1.4"
+            step=".05"
+            value={settings.brightness}
+            onChange={(e) => change("brightness", Number(e.target.value))}
+          />
+        </label>
         <label className="slider">
           Graphics quality
           <select
