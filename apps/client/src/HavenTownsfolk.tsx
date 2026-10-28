@@ -12,6 +12,7 @@ import { animateAvatar, createAvatar } from "./models";
 import { WorldInteraction } from "./WorldInteraction";
 import { daylight, islandHour } from "./daytime";
 import { settings } from "./audio";
+import { worldFocus } from "./village-materials";
 
 // Islanders who stroll between homes and landmarks, then head home at night.
 export const TOWNSFOLK = [
@@ -108,6 +109,8 @@ function Villager({
     path: [] as Point[],
     wait: 2 + index,
     inside: false,
+    greet: 0,
+    greeted: false,
   });
   useEffect(() => {
     const [x, z] = SPOTS[(index * 2) % SPOTS.length];
@@ -122,7 +125,19 @@ function Villager({
     model.visible = near && !s.inside;
     if (!grid) return;
     let walking = false;
-    if (s.path.length) {
+    // Pause, face the keeper and wave once each time they come close.
+    const kx = worldFocus.x - s.pos.x,
+      kz = worldFocus.z - s.pos.z,
+      kd = Math.hypot(kx, kz);
+    if (kd < 3.2 && !s.greeted && !s.inside) {
+      s.greeted = true;
+      s.greet = 2.4;
+    } else if (kd > 6) s.greeted = false;
+    if (s.greet > 0) {
+      s.greet -= dt;
+      const turn = Math.atan2(kx, kz) - model.rotation.y;
+      model.rotation.y += Math.atan2(Math.sin(turn), Math.cos(turn)) * Math.min(1, dt * 6);
+    } else if (s.path.length) {
       const [tx, tz] = s.path[0],
         dx = tx - s.pos.x,
         dz = tz - s.pos.z,
@@ -150,7 +165,8 @@ function Villager({
       }
     }
     model.position.copy(s.pos);
-    if (near) animateAvatar(model, clock.elapsedTime + index, walking, false, settings.reduced);
+    if (near)
+      animateAvatar(model, clock.elapsedTime + index, walking, s.greet > 0.6, settings.reduced);
   });
   return (
     <WorldInteraction
