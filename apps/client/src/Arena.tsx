@@ -2,7 +2,7 @@ import { guardianIntent } from "../../../packages/shared/guardian";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Client, type Room } from "@colyseus/sdk";
 import type { Battle, Profile } from "../../../packages/shared/types";
-import { session } from "./api";
+import { session, STANDALONE } from "./api";
 import { byId } from "../../../packages/shared/content";
 import { targets } from "../../../packages/shared/combat";
 import { BattleScene } from "./Scene";
@@ -512,15 +512,25 @@ export function Arena({
               </button>
             ))}
           </div>
+          {STANDALONE && (
+            <p role="note" className="notice">
+              Live keeper matches need the local game server. Practice
+              against the computer here, or run Mythoveya locally to battle
+              another keeper.
+            </p>
+          )}
           <div className="button-row">
             <button
               className="primary"
-              disabled={busy}
+              disabled={busy || STANDALONE}
               onClick={() => connect("queue")}
             >
               Find ranked opponent
             </button>
-            <button disabled={busy} onClick={() => connect("create")}>
+            <button
+              disabled={busy || STANDALONE}
+              onClick={() => connect("create")}
+            >
               Create friendly room
             </button>
           </div>
@@ -533,7 +543,7 @@ export function Arena({
               onChange={(e) => setCode(e.target.value)}
             />
             <button
-              disabled={busy || !code.trim()}
+              disabled={busy || STANDALONE || !code.trim()}
               onClick={() => connect("join")}
             >
               Join room

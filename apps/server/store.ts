@@ -3,7 +3,8 @@ import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import { randomBytes, randomUUID, createHash } from "node:crypto";
 import type { Profile } from "../../packages/shared/types";
-import { day, resetDaily } from "../../packages/shared/economy";
+import { resetDaily } from "../../packages/shared/economy";
+import { newProfile } from "./new-profile";
 import { ensureTown } from "../../packages/shared/town";
 const path = process.env.DB_PATH || "data/mythoveya.sqlite";
 mkdirSync(dirname(path), { recursive: true });
@@ -16,29 +17,7 @@ const hash = (token: string) =>
 export function createProfile(name: string, avatar: number) {
   const id = randomUUID(),
     token = randomBytes(32).toString("hex");
-  const p: Profile = {
-    id,
-    name,
-    avatar,
-    version: 1,
-    level: 1,
-    xp: 0,
-    gold: 200,
-    diamonds: 0,
-    tokens: 3,
-    owned: [],
-    team: [],
-    pity: { as: 0, s: 0 },
-    quests: {},
-    claims: [],
-    daily: { date: day(), wins: 0, train: 0, resources: 0, claimed: false },
-    ratings: { power: 1000, tactical: 1000 },
-    ranked: { power: 0, tactical: 0 },
-    wins: 0,
-    region: "haven",
-    resources: [],
-    bosses: [],
-  };
+  const p = newProfile(id, name, avatar);
   db.prepare("INSERT INTO profiles VALUES(?,?,?)").run(
     id,
     hash(token),

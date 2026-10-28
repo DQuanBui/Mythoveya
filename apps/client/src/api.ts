@@ -1,10 +1,14 @@
 import type { Profile } from "../../../packages/shared/types";
+/** True in the GitHub Pages build, which runs the game without a server. */
+export const STANDALONE = import.meta.env.MODE === "pages";
 export let session = localStorage.getItem("mythoveya-session") || "";
 export function setSession(token: string) {
   session = token;
   localStorage.setItem("mythoveya-session", token);
 }
 export async function api<T = any>(path: string, body?: unknown): Promise<T> {
+  if (STANDALONE)
+    return (await import("./local-server")).localApi(path, body, session);
   const response = await fetch(`/api/${path}`, {
     method: body === undefined ? "GET" : "POST",
     headers: {
