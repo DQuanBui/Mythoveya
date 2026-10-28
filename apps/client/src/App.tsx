@@ -1,23 +1,11 @@
-import { LodgePanel } from "./LodgePanel";
 import { LODGES, lodgeStops } from "../../../packages/shared/lodges";
-import { RescuePanel } from "./RescuePanel";
 import { rescueStops } from "../../../packages/shared/rescue";
-import { AtlasPanel } from "./AtlasPanel";
 import { ATLAS_STOPS } from "../../../packages/shared/atlas";
-import { ConservancyPanel } from "./ConservancyPanel";
 import { CONSERVANCY_STOPS } from "../../../packages/shared/conservancy";
-import { RallyPanel } from "./RallyPanel";
 import { RALLY_HOSTS } from "../../../packages/shared/rally";
-import { MeadowPanel } from "./MeadowPanel";
-import { MeadowMap } from "./MeadowMap";
 import { MEADOW_STOPS } from "../../../packages/shared/meadow";
-import { HollowPanel } from "./HollowPanel";
-import { HollowMap } from "./HollowMap";
 import { HOLLOW_STOPS } from "../../../packages/shared/hollow";
-import { CanyonPanel } from "./CanyonPanel";
-import { CanyonMap } from "./CanyonMap";
 import { CANYON_STOPS } from "../../../packages/shared/canyon";
-import { ExpeditionPanel } from "./ExpeditionPanel";
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import {
   ALL_SPECIES,
@@ -33,15 +21,11 @@ import { Preview, TitleScene, WorldScene } from "./Scene";
 import { Portrait } from "./portraits";
 import { WorldHUD } from "./WorldHUD";
 import { NPCS } from "../../../packages/shared/town";
-import { NpcPanel, TownDirectory } from "./TownPanels";
 import { HavenMap, MAP_DESTINATIONS } from "./HavenMap";
 import { HouseVisit } from "./HavenHouses";
-import { FishingPanel } from "./FishingPanel";
-import { ShopPanel } from "./ShopPanel";
 import { weatherFx } from "./Weather";
-import { EventsPanel } from "./EventsPanel";
 import { TOWNSFOLK } from "./HavenTownsfolk";
-import { AdventurePanel, type MissionStart } from "./AdventurePanel";
+import type { MissionStart } from "./AdventurePanel";
 import { currentObjective, type ExplorationInput } from "./world-guide";
 import { SettingsPanel } from "./SettingsPanel";
 import type { Placing } from "./HomeIsland";
@@ -54,6 +38,25 @@ import {
   homeRadius,
   islandArrival,
 } from "../../../packages/shared/islands";
+// Panels and region maps load when first opened.
+const LodgePanel = lazy(() => import("./LodgePanel").then((m) => ({ default: m.LodgePanel })));
+const RescuePanel = lazy(() => import("./RescuePanel").then((m) => ({ default: m.RescuePanel })));
+const AtlasPanel = lazy(() => import("./AtlasPanel").then((m) => ({ default: m.AtlasPanel })));
+const ConservancyPanel = lazy(() => import("./ConservancyPanel").then((m) => ({ default: m.ConservancyPanel })));
+const RallyPanel = lazy(() => import("./RallyPanel").then((m) => ({ default: m.RallyPanel })));
+const MeadowPanel = lazy(() => import("./MeadowPanel").then((m) => ({ default: m.MeadowPanel })));
+const MeadowMap = lazy(() => import("./MeadowMap").then((m) => ({ default: m.MeadowMap })));
+const HollowPanel = lazy(() => import("./HollowPanel").then((m) => ({ default: m.HollowPanel })));
+const HollowMap = lazy(() => import("./HollowMap").then((m) => ({ default: m.HollowMap })));
+const CanyonPanel = lazy(() => import("./CanyonPanel").then((m) => ({ default: m.CanyonPanel })));
+const CanyonMap = lazy(() => import("./CanyonMap").then((m) => ({ default: m.CanyonMap })));
+const ExpeditionPanel = lazy(() => import("./ExpeditionPanel").then((m) => ({ default: m.ExpeditionPanel })));
+const FishingPanel = lazy(() => import("./FishingPanel").then((m) => ({ default: m.FishingPanel })));
+const ShopPanel = lazy(() => import("./ShopPanel").then((m) => ({ default: m.ShopPanel })));
+const EventsPanel = lazy(() => import("./EventsPanel").then((m) => ({ default: m.EventsPanel })));
+const NpcPanel = lazy(() => import("./TownPanels").then((m) => ({ default: m.NpcPanel })));
+const TownDirectory = lazy(() => import("./TownPanels").then((m) => ({ default: m.TownDirectory })));
+const AdventurePanel = lazy(() => import("./AdventurePanel").then((m) => ({ default: m.AdventurePanel })));
 const Appearance = lazy(() => import("./Panels").then((m) => ({ default: m.Appearance })));
 const Collection = lazy(() => import("./Panels").then((m) => ({ default: m.Collection })));
 const Formation = lazy(() => import("./Panels").then((m) => ({ default: m.Formation })));
@@ -723,6 +726,8 @@ export default function App() {
             >
               ×
             </button>
+            {/* Panel chunks load here without hiding the world behind them. */}
+            <Suspense fallback={<p className="muted" role="status">Opening…</p>}>
             {panel === "lodges" && profile && <LodgePanel profile={profile} track={id=>{setTrail(id);setPanel("");}} travel={()=>setPanel("regions")}/>}
             {panel.startsWith("rescue-") && profile && <RescuePanel profile={profile} position={position} focus={panel} busy={busy} run={run} track={id=>{setTrail(id);setPanel("");}} travel={()=>setPanel("regions")} formation={()=>setPanel("formation")} />}
             {panel.startsWith("atlas-") && profile && <AtlasPanel profile={profile} position={position} focus={panel} busy={busy} run={run} track={id=>{setTrail(id);setPanel("");}} travel={()=>setPanel("regions")} />}
@@ -1030,6 +1035,7 @@ export default function App() {
                 </details>
               </>
             )}
+            </Suspense>
           </section>
         </div>
       )}

@@ -45,5 +45,17 @@ export default defineConfig(({ mode }) => ({
   build: {
     outDir: mode === "pages" ? "../../dist/pages" : "../../dist/client",
     emptyOutDir: true,
+    // Libraries change rarely, so they get their own long-cached files and
+    // a redeploy only re-downloads the game's own code.
+    chunkSizeWarningLimit: 800,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (/node_modules[\\/]three[\\/]/.test(id)) return "three";
+          if (/node_modules[\\/](react|react-dom|react-reconciler|scheduler|@react-three|three-stdlib)[\\/]/.test(id))
+            return "react";
+        },
+      },
+    },
   },
 }));
