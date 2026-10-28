@@ -1,6 +1,7 @@
 /* The Riftgate: story chapters and daily dungeons */
 .adventure-tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   margin: 18px 0 20px;
 }
@@ -542,4 +543,66 @@
   .tower-layout {
     grid-template-columns: 1fr;
   }
+}
+/* Featured week (Events panel). --theme is the week's colour. */
+.featured-week {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 16px 18px;
+  margin: 14px 0 4px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--theme) 55%, transparent);
+  background: linear-gradient(110deg, color-mix(in srgb, var(--theme) 24%, #102731), #102731 75%);
+}
+.featured-week > span {
+  font-size: 38px;
+  color: var(--theme);
+  line-height: 1;
+}
+.featured-week small {
+  letter-spacing: 2.4px;
+  font-size: 10px;
+  color: var(--theme);
+}
+.featured-week h3 {
+  margin: 2px 0 4px;
+  font-size: 22px;
+}
+.featured-week p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+.event-stamps {
+  margin-top: 14px;
+}
+.event-stamps small {
+  letter-spacing: 2px;
+  font-size: 10px;
+  color: var(--muted);
+}
+.event-stamps > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.event-stamps span {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  border: 1px dashed #b2d4c240;
+  color: #afc1bd99;
+}
+.event-stamps span.earned {
+  border: 1px solid var(--theme);
+  color: #f1ecdb;
+  background: color-mix(in srgb, var(--theme) 18%, transparent);
+}
+.event-stamps span b {
+  color: var(--theme);
 }

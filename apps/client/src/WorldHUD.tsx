@@ -202,7 +202,7 @@ export function WorldHUD({
           <button
             className="events-button"
             aria-label="Events and missions"
-            title="Events: login gifts, weekly and monthly missions"
+            title="Events: featured week, login gifts, weekly and monthly missions"
             onClick={() => open("events")}
           >
             ❖{eventsReady(profile, utcDay()) && <i className="ready-dot" />}

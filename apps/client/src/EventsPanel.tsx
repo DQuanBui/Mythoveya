@@ -8,6 +8,9 @@ import {
   MONTHLY_CHEST,
   WEEKLY,
   WEEKLY_CHEST,
+  FEATURED_CHEST,
+  FEATURED_WEEKS,
+  featuredWeek,
   type EventMission,
   type EventReward,
   missionDone,
@@ -30,7 +33,7 @@ export function EventsPanel({
   profile: Profile;
   run: (kind: string, value?: any) => Promise<any>;
 }) {
-  const [tab, setTab] = useState<"login" | "weekly" | "monthly">("login");
+  const [tab, setTab] = useState<"featured" | "login" | "weekly" | "monthly">("featured");
   const now = Date.now(),
     today = utcDay(now);
   // Mirror the server's period resets so stale counters never show.
@@ -47,6 +50,8 @@ export function EventsPanel({
       week: weekKey(now),
       month: utcMonth(now),
     };
+  const featured = featuredWeek(now),
+    stamps = raw?.stamps || [];
   const ready = e.login.last !== today,
     next = nextLoginDay(e);
   const resets = (days: number) => `${days} day${days === 1 ? "" : "s"}`;
@@ -65,6 +70,7 @@ export function EventsPanel({
       <div className="adventure-tabs" role="tablist">
         {(
           [
+            ["featured", `${featured.icon} ${featured.name}`],
             ["login", "✦ 30-day login"],
             ["weekly", "◈ Weekly missions"],
             ["monthly", "❂ Monthly missions"],
@@ -114,7 +120,47 @@ export function EventsPanel({
           </button>
         </>
       )}
-      {tab !== "login" && (
+      {tab === "featured" && (
+        <>
+          <div
+            className="featured-week"
+            style={{ "--theme": featured.color } as React.CSSProperties}
+          >
+            <span aria-hidden="true">{featured.icon}</span>
+            <div>
+              <small>THIS WEEK'S EVENT</small>
+              <h3>{featured.name}</h3>
+              <p>{featured.blurb}</p>
+            </div>
+          </div>
+          <Missions
+            list={featured.missions}
+            counts={e.weekly}
+            claimed={e.claimed}
+            chest={featured.chest}
+            chestId={FEATURED_CHEST}
+            resets={`A new event begins Monday 00:00 UTC · ${resets(toMonday)} left`}
+            run={run}
+          />
+          <div className="event-stamps" aria-label="Event stamps">
+            <small>EVENT STAMPS · {stamps.length}/{FEATURED_WEEKS.length}</small>
+            <div>
+              {FEATURED_WEEKS.map((w) => (
+                <span
+                  key={w.id}
+                  className={stamps.includes(w.id) ? "earned" : ""}
+                  style={{ "--theme": w.color } as React.CSSProperties}
+                  title={`${w.name}${stamps.includes(w.id) ? " · stamp earned" : " · open its chest to earn this stamp"}`}
+                >
+                  <b aria-hidden="true">{w.icon}</b>
+                  {w.name}
+                </span>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+      {(tab === "weekly" || tab === "monthly") && (
         <Missions
           list={tab === "weekly" ? WEEKLY : MONTHLY}
           counts={tab === "weekly" ? e.weekly : e.monthly}

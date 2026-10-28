@@ -3,7 +3,7 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { eventMutation } from "../apps/server/events-game";
-import { LOGIN_REWARDS, WEEKLY, MONTHLY, track, eventsReady } from "../packages/shared/events";
+import { LOGIN_REWARDS, WEEKLY, MONTHLY, track, eventsReady, featuredWeek, FEATURED_WEEKS, FEATURED_CHEST } from "../packages/shared/events";
 
 process.env.DB_PATH = join(mkdtempSync(join(tmpdir(), "mythoveya-events-")), "save.sqlite");
 const { createProfile, authenticate, operation, save, db } = await import("../apps/server/store");
@@ -74,5 +74,40 @@ describe("weekly and monthly missions", () => {
     const e = authenticate(token).events!;
     expect(e.weekly).toMatchObject({ train: 1, resources: 1, wins: 1, stages: 1, stars: 3 });
     expect(eventsReady(authenticate(token), "2000-01-01")).toBe(true);
+  });
+});
+
+describe("featured weeks", () => {
+  it("rotates through every theme, one per UTC week, changing on Monday", () => {
+    const seen = [0, 1, 2, 3].map((w) => featuredWeek(start + w * 7 * DAY).id);
+    expect(new Set(seen).size).toBe(FEATURED_WEEKS.length);
+    expect(featuredWeek(start + 6.5 * DAY - 1).id).toBe(seen[0]); // Sunday 23:59:59
+    expect(featuredWeek(start + 4 * 7 * DAY).id).toBe(seen[0]);
+    for (const w of FEATURED_WEEKS)
+      for (const m of w.missions) expect(m.id.startsWith("w-f-")).toBe(true);
+  });
+  it("pays this week's missions and chest once, keeps the stamp after the reset", () => {
+    const token = keeper(),
+      f = featuredWeek(start),
+      p = authenticate(token);
+    expect(() => ev(token, "event-claim", { quest: f.missions[0].id })).toThrow("Finish");
+    const other = FEATURED_WEEKS.find((w) => w.id !== f.id)!;
+    expect(() => ev(token, "event-claim", { quest: other.missions[0].id })).toThrow("Unknown mission");
+    for (const m of f.missions) track(p, m.metric, m.goal, start);
+    save(p);
+    expect(eventsReady(authenticate(token), "2026-10-05", start)).toBe(true);
+    expect(() => ev(token, "event-chest", { quest: FEATURED_CHEST })).toThrow("every mission");
+    for (const m of f.missions) ev(token, "event-claim", { quest: m.id });
+    expect(() => ev(token, "event-claim", { quest: f.missions[0].id })).toThrow("already");
+    const before = authenticate(token).diamonds;
+    expect(ev(token, "event-chest", { quest: FEATURED_CHEST }).message).toContain("stamp");
+    expect(authenticate(token).diamonds).toBe(before + f.chest.diamonds!);
+    expect(() => ev(token, "event-chest", { quest: FEATURED_CHEST })).toThrow("already");
+    // The next week brings a new theme and fresh claims; the stamp stays.
+    const next = start + 7 * DAY,
+      g = featuredWeek(next);
+    expect(g.id).not.toBe(f.id);
+    expect(() => ev(token, "event-chest", { quest: FEATURED_CHEST }, next)).toThrow("every mission");
+    expect(authenticate(token).events!.stamps).toEqual([f.id]);
   });
 });

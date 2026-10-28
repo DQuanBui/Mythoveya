@@ -31,6 +31,8 @@ export type EventState = {
   weekly: Record<string, number>;
   monthly: Record<string, number>;
   claimed: string[];
+  /** Featured-week themes whose chest was opened at least once (permanent). */
+  stamps?: string[];
 };
 
 /** Thirty login rewards; gear values are the guaranteed rarity (1 Rare, 2 Epic, 3 Legendary). */
@@ -70,6 +72,79 @@ export const MONTHLY: EventMission[] = [
   { id: "m-arena", title: "Finish 5 arena matches", metric: "arena", goal: 5, reward: { diamonds: 120, gold: 300 } },
 ];
 export const MONTHLY_CHEST: EventReward = { diamonds: 400, gear: 3, crystal: 4 };
+
+/** One themed week, rotating every Monday 00:00 UTC. Mission ids start with
+ * "w-" so they reset with the regular weekly missions. */
+export type FeaturedWeek = {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  blurb: string;
+  missions: EventMission[];
+  chest: EventReward;
+};
+export const FEATURED_WEEKS: FeaturedWeek[] = [
+  {
+    id: "tidewater",
+    name: "Tidewater Week",
+    icon: "≈",
+    color: "#7fd0e6",
+    blurb: "The rivers run high. Anglers and gatherers share the season's bounty.",
+    missions: [
+      { id: "w-f-tide-fish", title: "Catch 10 fish", metric: "fish", goal: 10, reward: { gold: 160, elixir: 1 } },
+      { id: "w-f-tide-gather", title: "Gather 15 resources", metric: "resources", goal: 15, reward: { gold: 140, diamonds: 20 } },
+      { id: "w-f-tide-wins", title: "Win 8 battles", metric: "wins", goal: 8, reward: { diamonds: 30 } },
+    ],
+    chest: { diamonds: 80, crystal: 1 },
+  },
+  {
+    id: "vigil",
+    name: "Guardian's Vigil",
+    icon: "⛨",
+    color: "#e9b07a",
+    blurb: "Old guardians stir along the rift. Keepers stand watch together.",
+    missions: [
+      { id: "w-f-vigil-wins", title: "Win 25 battles", metric: "wins", goal: 25, reward: { gold: 200, diamonds: 30 } },
+      { id: "w-f-vigil-dungeons", title: "Complete 6 dungeon runs", metric: "dungeons", goal: 6, reward: { dust: 8, gold: 100 } },
+      { id: "w-f-vigil-train", title: "Train companions 4 times", metric: "train", goal: 4, reward: { tome: 1 } },
+    ],
+    chest: { diamonds: 80, gear: 1 },
+  },
+  {
+    id: "kindred",
+    name: "Kindred Week",
+    icon: "❦",
+    color: "#e7a6c8",
+    blurb: "The shrine glows warmly. New bonds and old friends grow closer.",
+    missions: [
+      { id: "w-f-kin-recruit", title: "Make 5 bonds at the shrine", metric: "recruits", goal: 5, reward: { diamonds: 40 } },
+      { id: "w-f-kin-train", title: "Train companions 6 times", metric: "train", goal: 6, reward: { gold: 160, elixir: 1 } },
+      { id: "w-f-kin-wins", title: "Win 10 battles", metric: "wins", goal: 10, reward: { gold: 150, diamonds: 20 } },
+    ],
+    chest: { diamonds: 80, crystal: 1 },
+  },
+  {
+    id: "forgefire",
+    name: "Forgefire Week",
+    icon: "♨",
+    color: "#f0875f",
+    blurb: "Brannoc stokes the smithy hot. Every hammer blow rings truer.",
+    missions: [
+      { id: "w-f-forge-forge", title: "Forge equipment 6 times", metric: "forge", goal: 6, reward: { dust: 10, gold: 100 } },
+      { id: "w-f-forge-dungeons", title: "Complete 8 dungeon runs", metric: "dungeons", goal: 8, reward: { diamonds: 30 } },
+      { id: "w-f-forge-gather", title: "Gather 10 resources", metric: "resources", goal: 10, reward: { gold: 140, diamonds: 20 } },
+    ],
+    chest: { diamonds: 80, gear: 1 },
+  },
+];
+export const FEATURED_CHEST = "w-featured-chest";
+const WEEK = 7 * 86400000;
+/** This week's theme: a fixed rotation counted in whole UTC weeks. */
+export function featuredWeek(now = Date.now()) {
+  const n = Math.floor(Date.parse(weekKey(now)) / WEEK);
+  return FEATURED_WEEKS[((n % FEATURED_WEEKS.length) + FEATURED_WEEKS.length) % FEATURED_WEEKS.length];
+}
 
 export const utcMonth = (now = Date.now()) =>
   new Date(now).toISOString().slice(0, 7);
@@ -120,5 +195,13 @@ export function eventsReady(p: Profile, today: string, now = Date.now()) {
   const e = { ...p.events };
   if (e.week !== weekKey(now) || e.month !== utcMonth(now)) return true;
   if (loginReady(e, today)) return true;
-  return [...WEEKLY, ...MONTHLY].some((m) => missionDone(e, m) && !e.claimed.includes(m.id));
+  const featured = featuredWeek(now);
+  if (
+    featured.missions.every((m) => e.claimed.includes(m.id)) &&
+    !e.claimed.includes(FEATURED_CHEST)
+  )
+    return true;
+  return [...WEEKLY, ...MONTHLY, ...featured.missions].some(
+    (m) => missionDone(e, m) && !e.claimed.includes(m.id),
+  );
 }

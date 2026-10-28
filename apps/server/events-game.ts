@@ -6,7 +6,9 @@ import {
   MONTHLY_CHEST,
   WEEKLY,
   WEEKLY_CHEST,
+  FEATURED_CHEST,
   ensureEvents,
+  featuredWeek,
   missionDone,
   nextLoginDay,
   type EventReward,
@@ -47,7 +49,9 @@ export function eventMutation(
       return { message: `Day ${day} gift: ${pay(p, LOGIN_REWARDS[day - 1], random)}.`, day };
     }
     case "event-claim": {
-      const m = [...WEEKLY, ...MONTHLY].find((m) => m.id === v.quest);
+      const m = [...WEEKLY, ...MONTHLY, ...featuredWeek(now).missions].find(
+        (m) => m.id === v.quest,
+      );
       if (!m) throw Error("Unknown mission.");
       if (e.claimed.includes(m.id)) throw Error("Mission reward already claimed.");
       if (!missionDone(e, m)) throw Error("Finish the mission first.");
@@ -55,6 +59,15 @@ export function eventMutation(
       return { message: `${m.title}: ${pay(p, m.reward, random)}.` };
     }
     case "event-chest": {
+      if (v.quest === FEATURED_CHEST) {
+        const f = featuredWeek(now);
+        if (e.claimed.includes(FEATURED_CHEST)) throw Error("Chest already opened.");
+        if (!f.missions.every((m) => e.claimed.includes(m.id)))
+          throw Error("Claim every mission in the list first.");
+        e.claimed.push(FEATURED_CHEST);
+        e.stamps = [...new Set([...(e.stamps || []), f.id])];
+        return { message: `${f.name} chest: ${pay(p, f.chest, random)}. Event stamp earned!` };
+      }
       const weekly = v.quest === "weekly-chest",
         list = weekly ? WEEKLY : MONTHLY;
       if (!weekly && v.quest !== "monthly-chest") throw Error("Unknown chest.");
