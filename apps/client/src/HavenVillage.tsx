@@ -25,7 +25,8 @@ const TIMBER = "#6d5847",
   FENCE = "#c1ad87",
   PLANTER = "#93694c",
   IRON = "#4f5552",
-  FLOWERS = ["#e7a9a0", "#f0d48a", "#b9a7d8", "#f4efe2"];
+  FLOWERS = ["#e7a9a0", "#f0d48a", "#b9a7d8", "#f4efe2"],
+  LAUNDRY = ["#f1ece0", "#9fc4d6", "#e2b0a4"];
 const TAPER = new T.CylinderGeometry(0.75, 1, 1, 8);
 
 export const villageMaterial = new T.MeshStandardMaterial({
@@ -106,6 +107,34 @@ function cottage(
       [s * angle, 0, 0],
     );
   k.box(TIMBER_DARK, [0, ridge + 0.1, 0], [w + 0.7, 0.15, 0.17]);
+  // Shingle courses in a darker shade of the roof.
+  const course = `#${new T.Color(c.roof).multiplyScalar(0.78).getHexString()}`;
+  for (const s of [-1, 1])
+    for (const t of [0.34, 0.68])
+      k.box(
+        course,
+        [0, ridge - drop * t + 0.19, s * half * t],
+        [w + 0.62, 0.05, 0.1],
+        [s * angle, 0, 0],
+      );
+  // Dormer window on the front slope of some single-storey homes.
+  if (!tall && i % 3 !== 2) {
+    const dx = long ? 0.9 : 0,
+      dz = half * 0.42,
+      dy = ridge - drop * 0.42;
+    k.box(c.wall, [dx, dy + 0.12, dz], [0.9, 0.62, 0.7]);
+    k.add(SHAPES.GABLE, c.roof, [dx, dy + 0.42, dz + 0.02], [0.84, 0.36, 1.12], [0, Math.PI / 2, 0]);
+    k.box(FRAME, [dx, dy + 0.12, dz + 0.36], [0.5, 0.44, 0.04]);
+    g.box(GLASS, [dx, dy + 0.12, dz + 0.38], [0.38, 0.32, 0.02]);
+  }
+  // Weathervane on every fourth ridge.
+  if (i % 4 === 1) {
+    const vx = -w * 0.3;
+    k.box(IRON, [vx, ridge + 0.55, 0], [0.04, 0.8, 0.04]);
+    k.box(IRON, [vx, ridge + 0.72, 0], [0.5, 0.03, 0.03]);
+    k.box(IRON, [vx, ridge + 0.72, 0], [0.03, 0.03, 0.5]);
+    k.add(SHAPES.GABLE, "#b88a3e", [vx + 0.05, ridge + 0.88, 0], [0.5, 0.22, 0.04]);
+  }
   // Chimney
   const cx = w * 0.26 * (i % 2 ? -1 : 1),
     cz = -d * 0.2;
@@ -142,6 +171,19 @@ function cottage(
   fenceLine(k, [fx, back], [fx, front - 0.35]);
   for (let l = 0; l < 3; l++)
     k.add(SHAPES.CYL6, "#8a6a4a", [-w * 0.2 + l * 0.05, 0.13 + l * 0.2, back + 0.25], [0.12, w * 0.5, 0.12], [0, 0, Math.PI / 2]);
+  // Laundry drying across the back yard of some homes.
+  if (i % 3 === 0) {
+    for (const s of [-1, 1]) k.box(FENCE, [s * (fx - 0.1), 0.65, back + 0.2], [0.06, 1.3, 0.06]);
+    k.box("#e9dfc6", [0, 1.24, back + 0.2], [2 * fx - 0.2, 0.02, 0.02]);
+    LAUNDRY.forEach((cloth, n) =>
+      k.box(cloth, [-fx * 0.6 + n * fx * 0.6, 1.02, back + 0.2], [0.42, 0.42 - (n % 2) * 0.12, 0.03]),
+    );
+  }
+  // A carved nameplate beside the door.
+  if (i % 2 === 1) {
+    k.box(TIMBER_DARK, [doorX - 0.68, base + 1.25, front + 0.07], [0.5, 0.26, 0.05]);
+    k.box(c.shutter, [doorX - 0.68, base + 1.25, front + 0.1], [0.42, 0.18, 0.02]);
+  }
   k.add(SHAPES.CYL, "#8b6a4a", [w / 2 + 0.2, 0.3, front + 0.38], [0.26, 0.6, 0.26]);
   for (const y of [0.12, 0.48])
     k.add(SHAPES.CYL, "#5d554c", [w / 2 + 0.2, y, front + 0.38], [0.27, 0.05, 0.27]);
