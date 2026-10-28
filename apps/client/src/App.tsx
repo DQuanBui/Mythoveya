@@ -441,7 +441,7 @@ export default function App() {
           <div className="title-shade" />
           <header className="title-top">
             <span className="small-brand">
-              <img src="/emblem.svg" /> MYTHOVEYA
+              <img src={`${import.meta.env.BASE_URL}emblem.svg`} /> MYTHOVEYA
             </span>
             <button
               className="text-button"
@@ -454,7 +454,7 @@ export default function App() {
             <p className="eyebrow">A WORLD WORTH GETTING LOST IN</p>
             <img
               className="title-emblem"
-              src="/emblem.svg"
+              src={`${import.meta.env.BASE_URL}emblem.svg`}
               alt="Six-point bond emblem"
             />
             <h1>MYTHOVEYA</h1>

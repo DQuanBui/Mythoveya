@@ -121,7 +121,7 @@ export function WorldHUD({
     >
       <header className="hud-top">
         <div className="keeper-badge">
-          <img src="/emblem.svg" alt="" />
+          <img src={`${import.meta.env.BASE_URL}emblem.svg`} alt="" />
           <div>
             <strong>{profile.name}</strong>
             {rescueCount(profile)===4 && <small className="lantern-badge">TRAILKEEPER</small>}

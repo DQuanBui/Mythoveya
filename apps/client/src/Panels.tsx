@@ -527,7 +527,7 @@ export function Recruitment({
         </>
       ) : (
         <div className="shrine-art">
-          <img src="/emblem.svg" alt="Six-point bond emblem" />
+          <img src={`${import.meta.env.BASE_URL}emblem.svg`} alt="Six-point bond emblem" />
           <span>✧</span>
           <p>Find your wild.</p>
         </div>

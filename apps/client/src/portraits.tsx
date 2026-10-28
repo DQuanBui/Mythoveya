@@ -95,7 +95,7 @@ export function Portrait({
       ref={element}
       className={`portrait ${shimmer ? "shimmer-portrait" : ""} ${className}`}
       data-shimmer={shimmer}
-      src={cache.get(key) || (image.key === key ? image.src : undefined) || "/emblem.svg"}
+      src={cache.get(key) || (image.key === key ? image.src : undefined) || `${import.meta.env.BASE_URL}emblem.svg`}
       alt={`${shimmer ? "Shimmering " : ""}${byId[id].name}`}
       style={{
         background: `radial-gradient(ellipse,${byId[id].color}30,transparent 70%)`,
