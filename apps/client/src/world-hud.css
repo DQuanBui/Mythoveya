@@ -572,3 +572,30 @@
     display: none;
   }
 }
+/* Quest tracker collapse: keep only the objective title and distance. */
+.world-hud .quest-tracker .tracker-toggle {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 30px;
+  height: 30px;
+  min-height: 0;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 16px;
+  line-height: 1;
+}
+.world-hud .quest-tracker strong {
+  padding-right: 30px;
+}
+.world-hud .quest-tracker.compact {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+.world-hud .quest-tracker.compact > :not(strong, .objective-distance, .tracker-toggle) {
+  display: none;
+}
+.world-hud .quest-tracker.compact strong {
+  margin: 0;
+  font-size: 16px;
+}

@@ -105,6 +105,20 @@ export function WorldHUD({
   const time = timeLabel(islandHour());
   const weather = currentWeather(profile.region);
   const [currency, setCurrency] = useState("");
+  // A remembered per-browser preference: show only the objective and distance.
+  const [compact, setCompact] = useState(() => {
+    try {
+      return localStorage.getItem("mythoveya-tracker-compact") === "1";
+    } catch {
+      return false;
+    }
+  });
+  function toggleCompact() {
+    setCompact(!compact);
+    try {
+      localStorage.setItem("mythoveya-tracker-compact", compact ? "0" : "1");
+    } catch {}
+  }
   const wallet = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const close = (e: PointerEvent) => {
@@ -260,7 +274,19 @@ export function WorldHUD({
           </button>
         </aside>
       )}
-      <aside className="quest-tracker" hidden={!!home || fair}>
+      <aside
+        className={`quest-tracker${compact ? " compact" : ""}`}
+        hidden={!!home || fair}
+      >
+        <button
+          className="tracker-toggle"
+          aria-expanded={!compact}
+          aria-label={compact ? "Show quest details" : "Hide quest details"}
+          title={compact ? "Show quest details" : "Hide quest details"}
+          onClick={toggleCompact}
+        >
+          {compact ? "+" : "–"}
+        </button>
         <div className="quest-heading">
           <span className="eyebrow">
             {objective.waypoint
