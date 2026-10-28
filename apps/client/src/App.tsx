@@ -57,6 +57,22 @@ const EventsPanel = lazy(() => import("./EventsPanel").then((m) => ({ default: m
 const NpcPanel = lazy(() => import("./TownPanels").then((m) => ({ default: m.NpcPanel })));
 const TownDirectory = lazy(() => import("./TownPanels").then((m) => ({ default: m.TownDirectory })));
 const AdventurePanel = lazy(() => import("./AdventurePanel").then((m) => ({ default: m.AdventurePanel })));
+const StoryScene = lazy(() => import("./StoryScene").then((m) => ({ default: m.StoryScene })));
+// Chapter scenes already shown, per keeper; a viewing convenience only.
+const STORY_KEY = "mythoveya-story-seen";
+function storySeen(id: string) {
+  try {
+    return (JSON.parse(localStorage.getItem(STORY_KEY) || "[]") as string[]).includes(id);
+  } catch {
+    return false;
+  }
+}
+function markStory(id: string) {
+  try {
+    const seen = JSON.parse(localStorage.getItem(STORY_KEY) || "[]") as string[];
+    localStorage.setItem(STORY_KEY, JSON.stringify([...new Set([...seen, id])]));
+  } catch {}
+}
 const Appearance = lazy(() => import("./Panels").then((m) => ({ default: m.Appearance })));
 const Collection = lazy(() => import("./Panels").then((m) => ({ default: m.Collection })));
 const Formation = lazy(() => import("./Panels").then((m) => ({ default: m.Formation })));
@@ -100,7 +116,13 @@ export default function App() {
     [festTab, setFestTab] = useState<FestivalTab>("today"),
     [fairGame, setFairGame] = useState<"race" | "course" | "fishing">("race");
   const input = useRef<ExplorationInput>({ x: 0, z: 0 });
-  const mission = useRef(false);
+  const mission = useRef(false),
+    missionStage = useRef<string | undefined>(undefined);
+  const [story, setStory] = useState<{
+    chapter: string;
+    kind: "intro" | "outro";
+    then?: () => void;
+  } | null>(null);
   const [trail, setTrail] = useState<string | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined),
     inFlight = useRef(false);
@@ -278,6 +300,15 @@ export default function App() {
     setProfile(p);
     if (p.owned.length) setScreen("world");
   }
+  /** Story stages open with their chapter's prologue the first time. */
+  function beginMission(m: MissionStart) {
+    const chapter = m.stage?.match(/^(c\d+)-1$/)?.[1],
+      key = chapter && `${profile?.id}:${chapter}:intro`;
+    if (!chapter || !key || storySeen(key)) return void startBattle(false, false, m);
+    markStory(key);
+    setPanel("");
+    setStory({ chapter, kind: "intro", then: () => startBattle(false, false, m) });
+  }
   async function startBattle(
     boss = false,
     practice = false,
@@ -295,6 +326,7 @@ export default function App() {
         ...adventure,
       });
       mission.current = !!(adventure.expedition || adventure.stage || adventure.dungeon || adventure.tower);
+      missionStage.current = adventure.stage;
       setBattle(b);
       setPanel("");
       setAuto(false);
@@ -697,6 +729,14 @@ export default function App() {
             refresh();
             setScreen("world");
             setBattle(null);
+            // A first boss victory closes its chapter with an epilogue.
+            const chapter = missionStage.current?.match(/^(c\d+)-4$/)?.[1],
+              outro = chapter && `${profile?.id}:${chapter}:outro`;
+            if (chapter && outro && battle.winner === 0 && !storySeen(outro)) {
+              markStory(outro);
+              setStory({ chapter, kind: "outro" });
+            }
+            missionStage.current = undefined;
             setPanel(
               battle.encounter === "canyon" ? "can-journal" : battle.encounter === "windmill" ? "exp-journal" : mission.current
                 ? "adventure"
@@ -707,6 +747,19 @@ export default function App() {
             mission.current = false;
           }}
         />
+      )}
+      {story && (
+        <Suspense fallback={null}>
+          <StoryScene
+            chapter={story.chapter}
+            kind={story.kind}
+            onDone={() => {
+              const then = story.then;
+              setStory(null);
+              then?.();
+            }}
+          />
+        </Suspense>
       )}
       {screen === "fair-game" && profile && (
         <FestivalGame
@@ -789,7 +842,11 @@ export default function App() {
               <><button className="expedition-entry" onClick={()=>setPanel("lodges")}>Wayfarer Lodges / Step inside and host a gathering</button><button className="expedition-entry" onClick={()=>setPanel("rescue-journal")}>Wildbound Rescues / Help wildlife with your companions</button><button className="expedition-entry" onClick={()=>setPanel("atlas-journal")}>The Atlas of Echoes / A journey through four memories</button><button className="expedition-entry" onClick={()=>setPanel("cons-journal")}>Wildhaven Conservancy / Craft and restore habitats</button><button className="expedition-entry" onClick={()=>setPanel("rally-journal")}>The Wayfarer Rally / Daily regional activities</button><button className="expedition-entry" onClick={()=>setPanel("mea-journal")}>The Forest Choir / Explore Whisperleaf Meadow</button><button className="expedition-entry" onClick={()=>setPanel("hol-journal")}>The Lantern Road / Explore Moonfrost Hollow</button><button className="expedition-entry" onClick={()=>setPanel("can-journal")}>Signals in the Stone / Explore Emberglass Canyon</button><button className="expedition-entry" onClick={() => setPanel("exp-journal")}>The Silent Windmill · Explore western Havenreach</button><AdventurePanel
                 profile={profile}
                 run={run}
-                begin={(m) => startBattle(false, false, m)}
+                begin={beginMission}
+                story={(chapter, kind) => {
+                  setPanel("");
+                  setStory({ chapter, kind, then: () => setPanel("adventure") });
+                }}
               /></>
             )}
             {panel === "events" && profile && (

@@ -606,3 +606,83 @@
 .event-stamps span b {
   color: var(--theme);
 }
+/* Riftgate chapter scenes. --chapter is the chapter colour. */
+.story-scene {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 520px);
+  align-items: end;
+  gap: 24px;
+  padding: 40px;
+  background:
+    radial-gradient(circle at 30% 45%, color-mix(in srgb, var(--chapter) 38%, transparent), transparent 60%),
+    linear-gradient(180deg, #0b1f25d9, #081a1ff2);
+}
+.story-stage {
+  align-self: stretch;
+  min-height: 0;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--chapter) 45%, transparent);
+  box-shadow: 0 25px 80px #03191c80, inset 0 0 60px #0008;
+}
+.story-stage canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+.story-card {
+  margin-bottom: 4vh;
+  padding: 26px 28px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--chapter) 60%, transparent);
+  background: linear-gradient(135deg, #183a42f7, #102731fa);
+  box-shadow: 0 25px 80px #03191c80;
+}
+.story-card h3 {
+  margin: 4px 0 10px;
+  font-size: 26px;
+  color: color-mix(in srgb, var(--chapter) 45%, #fff4d6);
+}
+.story-line {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 19px;
+  line-height: 1.55;
+  min-height: 3.2em;
+  margin: 0 0 18px;
+}
+.story-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.story-dots {
+  display: flex;
+  gap: 6px;
+  margin-right: auto;
+}
+.story-dots i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #b2d4c240;
+}
+.story-dots i.on {
+  background: var(--chapter);
+}
+@media (max-width: 700px) {
+  .story-scene {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr) auto;
+    padding: 16px;
+    gap: 8px;
+  }
+  .story-card {
+    margin-bottom: 8px;
+    padding: 18px;
+  }
+  .story-line {
+    font-size: 16px;
+  }
+}

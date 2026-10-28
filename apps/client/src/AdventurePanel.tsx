@@ -36,10 +36,13 @@ export function AdventurePanel({
   profile,
   run,
   begin,
+  story,
 }: {
   profile: Profile;
   run: (kind: string, value?: any) => Promise<any>;
   begin: (mission: MissionStart) => void;
+  /** Replays a chapter's prologue or epilogue. */
+  story?: (chapter: string, kind: "intro" | "outro") => void;
 }) {
   const a = profile.adventure,
     stars = a?.stages || {};
@@ -113,6 +116,18 @@ export function AdventurePanel({
             </p>
             <h3>{c.name}</h3>
             <p className="muted">{c.story}</p>
+            {story && (
+              <div className="button-row story-replay">
+                <button className="text-button" onClick={() => story(c.id, "intro")}>
+                  ❧ Replay prologue
+                </button>
+                {!!stars[c.stages[3].id] && (
+                  <button className="text-button" onClick={() => story(c.id, "outro")}>
+                    ❧ Replay epilogue
+                  </button>
+                )}
+              </div>
+            )}
             <div className="stage-list">
               {c.stages.map((s, i) => {
                 const open = stageUnlocked(profile, s.id),
