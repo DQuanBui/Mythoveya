@@ -2,7 +2,7 @@ import { z } from "zod";
 import { allProfiles, authenticate, createProfile, operation, topRuns } from "./store";
 import { utcDay } from "../../packages/shared/town";
 import { ACTIVITIES, featuredActivity } from "../../packages/shared/festival-games";
-import { mutate, pve, pveAction, ranking, startPve } from "./game";
+import { mutate, pve, pveAction, pveBond, ranking, startPve } from "./game";
 // Request validation and handlers shared by the Express server and the
 // standalone browser build. Handlers throw; callers turn errors into
 // responses with errorMessage().
@@ -194,6 +194,15 @@ export function battleAct(t: string, body: unknown) {
       : undefined,
     v.fast,
   );
+}
+export function battleBond(t: string, body: unknown) {
+  const p = authenticate(t);
+  const v = z
+    .object({ target: z.string().max(10), sequence: z.number().int().min(0) })
+    .parse(body);
+  if (pve.get(p.id)?.sequence !== v.sequence)
+    throw Error("Battle updated; refresh the action.");
+  return pveBond(p, v.target);
 }
 export const leaderboard = () =>
   allProfiles()

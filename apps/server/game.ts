@@ -20,7 +20,9 @@ import { formation, gainXp, own, pull } from "../../packages/shared/economy";
 import {
   act,
   autoAction,
+  bondChance,
   makeBattle,
+  passTurn,
   power,
 } from "../../packages/shared/combat";
 import type { Battle, Owned, Profile } from "../../packages/shared/types";
@@ -346,6 +348,7 @@ export function startPve(
     b.units[6].species = s;
     b.units[6].hp = b.units[6].maxHp = Math.round(b.units[6].maxHp * 1.7);
   }
+  b.wild = !practice && !boss;
   pve.set(p.id, b);
   battleMeta.set(b.id, { region: practice ? "practice" : p.region, boss });
   return b;
@@ -641,6 +644,44 @@ export function pveAction(
   if (choice && u.side !== 0) throw Error("The opponent is deciding.");
   const a = choice || autoAction(b);
   act(b, u.side, a.action, a.target, Date.now(), fast);
+  finishPve(p.id, b);
+  return b;
+}
+/** Spend a bond token and the keeper's turn to befriend a tired wild creature. */
+export function pveBond(p: Profile, target: string) {
+  const b = pve.get(p.id);
+  if (!b || b.winner !== null) throw Error("No active battle.");
+  if (!b.wild) throw Error("Only wild creatures can be befriended in battle.");
+  if (Date.now() < b.readyAt) throw Error("Wait for the current action.");
+  const actor = b.units.find((u) => u.id === b.queue[0])!;
+  if (actor.side !== 0) throw Error("The opponent is deciding.");
+  const u = b.units.find((u) => u.id === target);
+  if (!u || u.side !== 1 || u.hp <= 0) throw Error("Choose a wild creature that is still standing.");
+  if (!["E", "D", "C"].includes(byId[u.species].tier))
+    throw Error("This creature is too proud to bond in battle.");
+  const chance = bondChance(u),
+    name = byId[u.species].name;
+  let joined = false;
+  atomic(() => {
+    const q = getProfile(p.id);
+    if (q.tokens < 1) throw Error("You need a bond token.");
+    q.tokens--;
+    joined = random() < chance;
+    if (joined) own(q, u.species, random);
+    save(q);
+  });
+  if (joined) {
+    u.hp = 0;
+    u.statuses = [];
+    b.bonded = [...(b.bonded || []), u.species];
+  }
+  passTurn(
+    b,
+    u.id,
+    joined
+      ? `${name} accepted your bond and joined your companions!`
+      : `${name} broke free (${Math.round(chance * 100)}% chance).`,
+  );
   finishPve(p.id, b);
   return b;
 }

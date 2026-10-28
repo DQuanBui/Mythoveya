@@ -535,6 +535,35 @@ export function act(
   b.deadline = b.readyAt + 20000;
   return b;
 }
+/** Chance that a wild creature accepts a mid-battle bond: 20% at full
+ * health rising to 90% as it tires. */
+export function bondChance(u: Unit) {
+  return Math.round((0.2 + 0.7 * (1 - Math.max(0, u.hp) / u.maxHp)) * 100) / 100;
+}
+/** Ends the current actor's turn without an ability (used by bond attempts). */
+export function passTurn(b: Battle, target: string, message: string, now = Date.now()) {
+  const actor = b.units.find((u) => u.id === b.queue[0])!;
+  b.sequence++;
+  b.event = {
+    id: b.sequence,
+    actor: actor.id,
+    target,
+    action: "bond-0",
+    name: "Bond",
+    amounts: [],
+    duration: 1100,
+    at: now,
+    message,
+  };
+  b.log = [...b.log, message].slice(-30);
+  b.queue.shift();
+  b.queue = b.queue.filter((id) => b.units.find((u) => u.id === id)!.hp > 0);
+  checkWinner(b);
+  if (!b.queue.length && b.winner === null) nextRound(b);
+  b.readyAt = now + 1100;
+  b.deadline = b.readyAt + 20000;
+  return b;
+}
 export function autoAction(b: Battle) {
   const actor = b.units.find((u) => u.id === b.queue[0])!;
   for (const n of [2, 1, 0]) {

@@ -38,6 +38,9 @@ app.post("/api/battle/start", (req, res) =>
 app.post("/api/battle/act", (req, res) =>
   res.json(routes.battleAct(token(req), req.body)),
 );
+app.post("/api/battle/bond", (req, res) =>
+  res.json(routes.battleBond(token(req), req.body)),
+);
 app.get("/api/leaderboard", (_, res) => res.json(routes.leaderboard()));
 app.use(express.static(resolve("dist/client")));
 app.use(

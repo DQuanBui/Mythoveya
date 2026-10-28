@@ -157,6 +157,10 @@ export type Battle = {
   delayed: { actor: string; target: string; action: number; round: number }[];
   mode: string;
   title?: string;
+  /** Wild encounters allow mid-battle bond attempts. */
+  wild?: boolean;
+  /** Species that joined the keeper during this battle. */
+  bonded?: string[];
   /** Which themed arena the battle is staged in. */
   arena?: string;
   rewards?: {

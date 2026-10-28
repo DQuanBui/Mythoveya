@@ -306,6 +306,26 @@ export default function App() {
       setBusy(false);
     }
   }
+  async function bondAttempt(target: string) {
+    if (!battle || inFlight.current) return;
+    inFlight.current = true;
+    try {
+      const b = await api<Battle>("battle/bond", { target, sequence: battle.sequence });
+      setBattle(b);
+      const joined = b.bonded?.length !== battle.bonded?.length;
+      audio.cue(joined ? "rare" : "break");
+      notify(b.log[b.log.length - 1]);
+      refresh();
+      if (b.winner !== null) audio.cue(b.winner === 0 ? "victory" : "defeat");
+    } catch (e) {
+      notify((e as Error).message);
+      api<Battle>("battle")
+        .then(setBattle)
+        .catch(() => {});
+    } finally {
+      inFlight.current = false;
+    }
+  }
   async function battleAction(action?: number, target?: string) {
     if (!battle || inFlight.current) return;
     inFlight.current = true;
@@ -668,6 +688,7 @@ export default function App() {
         <BattleUI
           battle={battle}
           send={battleAction}
+          bond={profile ? { tokens: profile.tokens, attempt: bondAttempt } : undefined}
           auto={auto}
           setAuto={setAuto}
           fast={fast}

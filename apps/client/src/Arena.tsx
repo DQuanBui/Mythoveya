@@ -4,7 +4,7 @@ import { Client, type Room } from "@colyseus/sdk";
 import type { Battle, Profile } from "../../../packages/shared/types";
 import { session, STANDALONE } from "./api";
 import { byId } from "../../../packages/shared/content";
-import { targets } from "../../../packages/shared/combat";
+import { bondChance, targets } from "../../../packages/shared/combat";
 import { BattleScene } from "./Scene";
 import { audio, settings } from "./audio";
 import { Portrait } from "./portraits";
@@ -56,6 +56,7 @@ export function BattleUI({
   human = false,
   rating,
   finish,
+  bond,
 }: {
   battle: Battle;
   side?: number;
@@ -67,6 +68,8 @@ export function BattleUI({
   human?: boolean;
   rating?: { before: number; after: number };
   finish: () => void;
+  /** Wild encounters: spend a bond token and this turn to befriend the target. */
+  bond?: { tokens: number; attempt: (target: string) => void };
 }) {
   const [action, setAction] = useState(0),
     [target, setTarget] = useState(""),
@@ -241,6 +244,7 @@ export function BattleUI({
             >
               Use ability →
             </button>
+            {bond && battle.wild && <BondButton battle={battle} target={chosen} ready={myTurn && now >= battle.readyAt && !auto} bond={bond} />}
           </div>
         </div>
       ) : (
@@ -302,6 +306,12 @@ export function BattleUI({
             <p>
               New guardian bond:{" "}
               {battle.rewards.newSpecies.map((id) => byId[id].name).join(", ")}
+            </p>
+          )}
+          {!!battle.bonded?.length && (
+            <p className="result-items">
+              ❦ Joined during battle:{" "}
+              {battle.bonded.map((id) => byId[id].name).join(", ")}
             </p>
           )}
           <button className="primary" onClick={finish}>
@@ -559,5 +569,48 @@ export function Arena({
         </>
       )}
     </div>
+  );
+}
+
+function BondButton({
+  battle,
+  target,
+  ready,
+  bond,
+}: {
+  battle: Battle;
+  target: string;
+  ready: boolean;
+  bond: { tokens: number; attempt: (target: string) => void };
+}) {
+  const u = battle.units.find((u) => u.id === target && u.side === 1 && u.hp > 0);
+  const tier = u && byId[u.species].tier,
+    eligible = !!u && ["E", "D", "C"].includes(tier!),
+    chance = eligible ? Math.round(bondChance(u!) * 100) : 0;
+  const hint = !u
+    ? "Choose a wild creature as the target to try a bond."
+    : !eligible
+      ? `${byId[u.species].name} (${tier} tier) is too proud to bond in battle.`
+      : bond.tokens < 1
+        ? "You need a bond token. Win battles to earn more."
+        : `Tire it out first: the chance rises as its health falls. Uses this turn and 1 token (${bond.tokens} left).`;
+  return (
+    <>
+      <button
+        className="bond-button"
+        disabled={!ready || !eligible || bond.tokens < 1}
+        onClick={() => bond.attempt(target)}
+        title={hint}
+        aria-describedby="bond-hint"
+      >
+        ❦ Bond{eligible ? ` · ${chance}%` : ""}
+        <small>
+          {bond.tokens} token{bond.tokens === 1 ? "" : "s"}
+        </small>
+      </button>
+      <span id="bond-hint" className="sr-only">
+        {hint}
+      </span>
+    </>
   );
 }

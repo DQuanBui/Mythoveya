@@ -210,3 +210,36 @@
 .guardian-intent strong { display:block; color:#edcf83; margin-bottom:3px; }
 .guardian-intent span { font-size:12px; }
 @media(max-width:600px) { .guardian-intent { top:96px; padding:6px 10px; } }
+/* Mid-battle bond attempt (wild encounters), under Use ability. */
+.bond-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+  border-color: #e7a6c8aa;
+  background: #4a2d4bd9;
+}
+.bond-button small {
+  font-size: 11px;
+  color: #e7c9da;
+}
+.bond-button:hover:not(:disabled) {
+  background: #6a3d63;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+@media (max-width: 850px) {
+  .target-controls {
+    flex-wrap: wrap;
+  }
+  .target-controls .bond-button {
+    flex: 1 0 100%;
+  }
+}

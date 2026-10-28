@@ -10,6 +10,7 @@ const handlers: Record<string, (token: () => string, body: any, query: URLSearch
   "GET battle": (token) => routes.currentBattle(token()),
   "POST battle/start": (token, body) => routes.battleStart(token(), body),
   "POST battle/act": (token, body) => routes.battleAct(token(), body),
+  "POST battle/bond": (token, body) => routes.battleBond(token(), body),
   "GET leaderboard": () => routes.leaderboard(),
 };
 export async function localApi(path: string, body: unknown, session: string) {
