@@ -437,12 +437,16 @@ export function WorldHUD({
             style={{
               left: `${pct(position[0])}%`,
               top: `${pct(position[1])}%`,
-              // Map x runs right and z runs down; the arrow points where the keeper faces.
-              transform: `translate(-50%, -50%) rotate(${Math.PI - worldHeading.yaw}rad)`,
             }}
             title="Your position and facing"
           >
-            ▲
+            {/* Map x runs right and z runs down; the arrow points where the keeper faces. */}
+            <span
+              className="map-heading"
+              style={{ transform: `rotate(${Math.PI - worldHeading.yaw}rad)` }}
+            >
+              ▲
+            </span>
           </b>
         </div>
         <span>N · {placeName.toUpperCase()}</span>

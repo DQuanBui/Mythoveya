@@ -599,3 +599,6 @@
   margin: 0;
   font-size: 16px;
 }
+.map-ring b .map-heading {
+  display: inline-block;
+}
