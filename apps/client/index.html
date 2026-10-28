@@ -13,9 +13,37 @@
     />
     <title>Mythoveya · Call of the Wildbound</title>
     <link rel="icon" href="/emblem.svg" />
+    <style>
+      /* Shown until the game script runs; React replaces #root's content. */
+      html { background: #112e36; }
+      .boot {
+        position: fixed;
+        inset: 0;
+        display: grid;
+        place-content: center;
+        justify-items: center;
+        gap: 14px;
+        color: #f1ecdb;
+        font-family: Georgia, "Times New Roman", serif;
+        text-align: center;
+        background: radial-gradient(circle at 50% 40%, #1d4a52, #112e36 70%);
+      }
+      .boot img { width: 72px; height: 72px; animation: boot-pulse 1.8s ease-in-out infinite; }
+      .boot strong { font-size: 22px; letter-spacing: 0.32em; }
+      .boot span { font: 14px "Segoe UI", Arial, sans-serif; color: #afc1bd; }
+      @keyframes boot-pulse { 50% { opacity: 0.55; transform: scale(0.94); } }
+      @media (prefers-reduced-motion: reduce) { .boot img { animation: none; } }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="boot" role="status">
+        <img src="/emblem.svg" alt="" />
+        <strong>MYTHOVEYA</strong>
+        <span>Opening the rift…</span>
+      </div>
+    </div>
+    <noscript>Mythoveya needs JavaScript and WebGL to play.</noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
