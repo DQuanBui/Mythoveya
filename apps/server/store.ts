@@ -146,3 +146,10 @@ export function allProfiles() {
     db.prepare("SELECT data FROM profiles").all() as { data: string }[]
   ).map((r) => JSON.parse(r.data) as Profile);
 }
+/** Whether a finished battle has already been settled. */
+export function matchRecorded(id: string) {
+  return !!db.prepare("SELECT id FROM matches WHERE id=?").get(id);
+}
+export function recordMatch(id: string, result: unknown) {
+  db.prepare("INSERT INTO matches VALUES(?,?)").run(id, JSON.stringify(result));
+}

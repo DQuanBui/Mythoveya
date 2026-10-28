@@ -24,7 +24,7 @@ import {
   power,
 } from "../../packages/shared/combat";
 import type { Battle, Owned, Profile } from "../../packages/shared/types";
-import { atomic, db, getProfile, save } from "./store";
+import { atomic, getProfile, matchRecorded, recordMatch, save } from "./store";
 import { ensureTown, utcDay, utcWeek } from "../../packages/shared/town";
 import { townMutation } from "./town-game";
 import { resourcesForRegion } from "../../packages/shared/haven";
@@ -531,7 +531,7 @@ function finishMission(p: Profile, b: Battle, meta: Mission) {
 export function finishPve(profileId: string, b: Battle) {
   if (b.winner === null) return;
   atomic(() => {
-    if (db.prepare("SELECT id FROM matches WHERE id=?").get(b.id)) return;
+    if (matchRecorded(b.id)) return;
     const p = getProfile(profileId);
     const before = {
       gold: p.gold,
@@ -545,7 +545,7 @@ export function finishPve(profileId: string, b: Battle) {
       const c=canyonOf(p), rewarded=b.winner===0 && !c.guardian;
       if(rewarded) { c.guardian=true;p.canyon=c;p.gold+=90;gainXp(p,100);p.wins++;p.daily.wins++;track(p,"wins"); }
       b.rewards={gold:p.gold-before.gold,diamonds:0,tokens:0,xp:rewarded?100:0,newSpecies:[],items:rewarded?["Sentinel calmed. Return to Ashkeeper Camp to restore the signals."]:[]};
-      db.prepare("INSERT INTO matches VALUES(?,?)").run(b.id,JSON.stringify({winner:b.winner,kind:"canyon",profileId}));save(p);return;
+      recordMatch(b.id,{winner:b.winner,kind:"canyon",profileId});save(p);return;
     }
     if (meta?.expedition) {
       const e = expeditionOf(p);
@@ -555,7 +555,7 @@ export function finishPve(profileId: string, b: Battle) {
         p.gold += 80; gainXp(p, 90); p.wins++; p.daily.wins++; track(p, "wins");
       }
       b.rewards = { gold: p.gold - before.gold, diamonds: p.diamonds - before.diamonds, tokens: 0, xp: rewarded ? 90 : 0, newSpecies: [], items: rewarded ? ["Guardian calmed. Return to the windmill to restore its sails."] : [] };
-      db.prepare("INSERT INTO matches VALUES(?,?)").run(b.id, JSON.stringify({ winner: b.winner, kind: "expedition", profileId }));
+      recordMatch(b.id, { winner: b.winner, kind: "expedition", profileId });
       save(p);
       return;
     }
@@ -583,10 +583,7 @@ export function finishPve(profileId: string, b: Battle) {
         items: result.items,
         stars: result.stars,
       };
-      db.prepare("INSERT INTO matches VALUES(?,?)").run(
-        b.id,
-        JSON.stringify({ winner: b.winner, kind: "mission", profileId }),
-      );
+      recordMatch(b.id, { winner: b.winner, kind: "mission", profileId });
       save(p);
       return;
     }
@@ -628,10 +625,7 @@ export function finishPve(profileId: string, b: Battle) {
         .filter((o) => !before.species.includes(o.species))
         .map((o) => o.species),
     };
-    db.prepare("INSERT INTO matches VALUES(?,?)").run(
-      b.id,
-      JSON.stringify({ winner: b.winner, kind: "pve", profileId }),
-    );
+    recordMatch(b.id, { winner: b.winner, kind: "pve", profileId });
     save(p);
   });
 }

@@ -2,12 +2,8 @@ import express from "express";
 import { createServer } from "node:http";
 import { Server } from "@colyseus/core";
 import { WebSocketTransport } from "@colyseus/ws-transport";
-import { z } from "zod";
 import { resolve } from "node:path";
-import { allProfiles, authenticate, createProfile, operation, topRuns } from "./store";
-import { utcDay } from "../../packages/shared/town";
-import { ACTIVITIES, featuredActivity } from "../../packages/shared/festival-games";
-import { mutate, pve, pveAction, ranking, startPve } from "./game";
+import * as routes from "./routes";
 import { ArenaRoom } from "./rooms";
 const app = express();
 app.use(express.json({ limit: "16kb" }));
@@ -25,208 +21,24 @@ app.use("/api", (req, res, next) => {
       .json({ error: "Too many requests. Please wait a moment." });
   next();
 });
-const token = (req: express.Request) =>
-  z
-    .string()
-    .length(64)
-    .parse((req.headers.authorization || "").replace("Bearer ", ""));
+const token = (req: express.Request) => routes.token(req.headers.authorization);
 app.get("/api/health", (_, res) => res.json({ ok: true, game: "Mythoveya" }));
-app.post("/api/guest", (req, res) => {
-  const v = z
-    .object({
-      name: z
-        .string()
-        .trim()
-        .min(2)
-        .max(24)
-        .regex(/^[\p{L}\p{N} _'-]+$/u),
-      avatar: z.number().int().min(0).max(7),
-    })
-    .parse(req.body);
-  res.json(createProfile(v.name, v.avatar));
-});
-app.get("/api/profile", (req, res) => res.json(authenticate(token(req))));
-const mutation = z.object({
-  requestId: z.string().uuid(),
-  companion: z.string().max(100).optional(),
-  kind: z.enum([
-    "lodge-meet", "lodge-cook", "lodge-help", "lodge-finish", "lodge-claim",
-    "lodge-workshop", "lodge-decorate",
-    "rescue-survey", "rescue-help", "rescue-finish", "rescue-claim",
-    "atlas-start", "atlas-read", "atlas-solve", "atlas-finish", "atlas-echo",
-    "cons-gather", "cons-craft", "cons-dismantle", "cons-install", "cons-tend", "cons-claim",
-    "rally-complete", "rally-finish",
-    "mea-start", "mea-sing", "mea-note", "mea-finish",
-    "hol-start", "hol-gather", "hol-craft", "hol-install", "hol-finish", "hol-note",
-    "can-start", "can-tune", "can-finish", "can-note", "can-field-reward",
-    "exp-start", "exp-field", "exp-restore", "exp-visit", "exp-discover",
-    "starter",
-    "guide",
-    "recruit",
-    "formation",
-    "claim",
-    "resource",
-    "train",
-    "upgrade",
-    "lock",
-    "avatar",
-    "travel",
-    "daily",
-    "bond",
-    "town-talk",
-    "town-visit",
-    "town-claim",
-    "town-helper",
-    "town-buy",
-    "town-sell",
-    "town-plant",
-    "town-harvest",
-    "town-craft",
-    "town-feed",
-    "town-rename",
-    "town-equip",
-    "town-spar",
-    "town-weekly",
-    "town-track",
-    "town-cache",
-    "town-fish",
-    "skill-up",
-    "gear-equip",
-    "gear-remove",
-    "gear-upgrade",
-    "gear-salvage",
-    "elixir",
-    "chapter-chest",
-    "evolve",
-    "town-shop",
-    "login-claim",
-    "event-claim",
-    "event-chest",
-    "island-travel",
-    "home-place",
-    "home-move",
-    "home-remove",
-    "home-expand",
-    "home-house",
-    "home-assign",
-    "home-unassign",
-    "home-collect",
-    "home-pet",
-    "fest-greet",
-    "fest-hunt",
-    "fest-buy",
-    "fest-outfit",
-    "fest-start",
-    "fest-run",
-  ]),
-  species: z.string().max(32).optional(),
-  count: z.union([z.literal(1), z.literal(10)]).optional(),
-  team: z.array(z.string().max(100)).length(6).optional(),
-  quest: z.string().max(30).optional(),
-  resource: z.string().max(30).optional(),
-  id: z.string().max(100).optional(),
-  avatar: z.number().int().min(0).max(7).optional(),
-  region: z.string().max(15).optional(),
-  npc: z.string().max(20).optional(),
-  item: z.string().max(20).optional(),
-  nickname: z.string().max(20).optional(),
-  success: z.boolean().optional(),
-  slot: z.number().int().min(1).max(2).optional(),
-  x: z.number().min(-40).max(40).optional(),
-  z: z.number().min(-40).max(40).optional(),
-  rot: z.number().int().min(0).max(3).optional(),
-  inputs: z.array(z.number().int()).max(400).optional(),
-});
-app.post("/api/mutate", (req, res) => {
-  const v = mutation.parse(req.body);
-  res.json(operation(token(req), v.requestId, (p) => mutate(p, v.kind, v)));
-});
-app.get("/api/festival", (req, res) => {
-  authenticate(token(req));
-  const activity = z.enum(["race", "course", "fishing"]).parse(req.query.activity);
-  const day = utcDay(),
-    lower = ACTIVITIES[activity].lowerIsBetter;
-  const strip = (rows: ReturnType<typeof topRuns>) =>
-    rows.map((r, i) => ({ rank: i + 1, profile: r.profile, name: r.name, score: r.score }));
-  const today = topRuns(day, activity, lower, 10);
-  res.json({
-    day,
-    featured: featuredActivity(day),
-    today: strip(today),
-    allTime: strip(topRuns("all", activity, lower, 10)),
-    // The three best runs today, replayed as ghosts.
-    ghosts: today.slice(0, 3).map((r) => ({ profile: r.profile, name: r.name, score: r.score, ...r.data })),
-  });
-});
-app.get("/api/battle", (req, res) => {
-  const p = authenticate(token(req));
-  res.json(pve.get(p.id) || null);
-});
-app.post("/api/battle/start", (req, res) => {
-  const p = authenticate(token(req));
-  const v = z
-    .object({
-      canyon: z.boolean().optional(),
-      expedition: z.boolean().optional(),
-      boss: z.boolean().default(false),
-      practice: z.boolean().default(false),
-      stage: z.string().max(10).optional(),
-      dungeon: z.string().max(10).optional(),
-      tier: z.number().int().min(0).max(4).optional(),
-      tower: z.number().int().min(1).max(60).optional(),
-    })
-    .parse(req.body);
-  res.json(
-    startPve(p, v.boss, v.practice, {
-      canyon: v.canyon,
-      expedition: v.expedition,
-      stage: v.stage,
-      dungeon: v.dungeon,
-      tier: v.tier,
-      tower: v.tower,
-    }),
-  );
-});
-app.post("/api/battle/act", (req, res) => {
-  const p = authenticate(token(req));
-  const v = z
-    .object({
-      action: z.number().int().min(0).max(2).optional(),
-      target: z.string().max(10).optional(),
-      fast: z.boolean().default(false),
-      auto: z.boolean().default(false),
-      sequence: z.number().int().min(0),
-    })
-    .parse(req.body);
-  const b = pve.get(p.id);
-  if (b?.sequence !== v.sequence)
-    throw Error("Battle updated; refresh the action.");
-  const actor = b?.units.find((u) => u.id === b.queue[0]);
-  if (!v.auto && actor?.side === 0 && (v.action === undefined || !v.target))
-    throw Error("Select an action and target.");
-  res.json(
-    pveAction(
-      p,
-      v.action !== undefined && v.target
-        ? { action: v.action, target: v.target }
-        : undefined,
-      v.fast,
-    ),
-  );
-});
-app.get("/api/leaderboard", (_, res) =>
-  res.json(
-    allProfiles()
-      .map((p) => ({
-        id: p.id,
-        name: p.name,
-        power: ranking(p),
-        ratings: p.ratings,
-        ranked: p.ranked,
-      }))
-      .sort((a, b) => b.power - a.power),
-  ),
+app.post("/api/guest", (req, res) => res.json(routes.guest(req.body)));
+app.get("/api/profile", (req, res) => res.json(routes.profile(token(req))));
+app.post("/api/mutate", (req, res) =>
+  res.json(routes.mutateRequest(token(req), req.body)),
 );
+app.get("/api/festival", (req, res) =>
+  res.json(routes.festivalBoard(token(req), req.query.activity)),
+);
+app.get("/api/battle", (req, res) => res.json(routes.currentBattle(token(req))));
+app.post("/api/battle/start", (req, res) =>
+  res.json(routes.battleStart(token(req), req.body)),
+);
+app.post("/api/battle/act", (req, res) =>
+  res.json(routes.battleAct(token(req), req.body)),
+);
+app.get("/api/leaderboard", (_, res) => res.json(routes.leaderboard()));
 app.use(express.static(resolve("dist/client")));
 app.use(
   (
@@ -235,12 +47,7 @@ app.use(
     res: express.Response,
     _next: express.NextFunction,
   ) =>
-    res.status(400).json({
-      error:
-        err instanceof z.ZodError
-          ? "Invalid request. Check the entered values."
-          : err.message,
-    }),
+    res.status(400).json({ error: routes.errorMessage(err) }),
 );
 const server = createServer(app);
 const gameServer = new Server({
