@@ -91,7 +91,12 @@ export function DayNight({
           .lerp(MIST, weatherFx.mist * 0.55 * day),
       );
       fogBase.current ||= { near: scene.fog.near, far: scene.fog.far };
-      scene.fog.near = fogBase.current.near * (1 - weatherFx.mist * 0.7 - weatherFx.rain * 0.35);
+      // Fog starts beyond the camera-to-keeper distance (about 15 m), so mist
+      // softens the distance without washing out the keeper's surroundings.
+      scene.fog.near = Math.max(
+        Math.min(18, fogBase.current.near),
+        fogBase.current.near * (1 - weatherFx.mist * 0.7 - weatherFx.rain * 0.35),
+      );
       // Keep at least ~55 m of visibility so exploring stays comfortable.
       scene.fog.far = Math.max(55, fogBase.current.far * (1 - weatherFx.mist * 0.45 - weatherFx.rain * 0.25));
     }
