@@ -69,6 +69,10 @@ import {
   PIER,
   PEBBLES,
   pathDistance,
+  lagoonDistance,
+  onBridge,
+  onDock,
+  onPier,
   SKYFERRY,
   slideStep,
   type Point,
@@ -630,6 +634,17 @@ export const getInteractables = (region: string) =>
   ).map(o=>region === "haven" ? o : ({...o,p:[o.p[0],region === "canyon" ? canyonHeight(o.p[0],o.p[2]) : region === "hollow" ? hollowHeight(o.p[0],o.p[2]) : region === "meadow" ? meadowHeight(o.p[0],o.p[2]) : 0,o.p[2]]}))];
 const grids = new Map<string, WalkGrid>();
 /** Ground height for a region; including expanded snowy and canyon terrain. */
+/** Footstep cue for the surface underfoot, matching how the ground is drawn. */
+function stepSound(region: string, x: number, z: number, y: number) {
+  if (region === "hollow") return "snowStep";
+  if (region === "canyon") return "stoneStep";
+  if (region !== "haven") return "grass";
+  if (onDock(x, z) || onPier(x, z) || onBridge(x, z)) return "woodStep";
+  if (y > 10.5) return "snowStep";
+  if (lagoonDistance(x, z) < 1.38) return "sandStep";
+  if (y > 2 || pathDistance(x, z) < 1.1) return "stoneStep";
+  return "grass";
+}
 const groundFor = (region: string) =>
   region === "haven" ? groundHeight : region === "canyon" ? canyonHeight : region === "hollow" ? hollowHeight : region === "meadow" ? meadowHeight : () => 0;
 /** Where a click ray meets the terrain, found by marching then bisecting. */
@@ -953,13 +968,7 @@ export function Explorer({
       player.current.set(nx, ny, nz);
       avatar.rotation.y = Math.atan2(v.x, v.z);
       if (clock.elapsedTime - foot.current > (sprinting ? 0.27 : 0.32)) {
-        audio.cue(
-          profile.region === "hollow"
-            ? "snowStep"
-            : profile.region === "canyon"
-              ? "stoneStep"
-              : "grass",
-        );
+        audio.cue(stepSound(profile.region, nx, nz, ny));
         foot.current = clock.elapsedTime;
       }
     }

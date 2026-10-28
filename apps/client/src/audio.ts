@@ -1,5 +1,6 @@
 import { MUSIC, CUES } from "../../../packages/shared/audio-content";
 import { byId } from "../../../packages/shared/content";
+import { worldHour } from "../../../packages/shared/world-time";
 export type Settings = {
   master: number;
   music: number;
@@ -57,6 +58,7 @@ class AudioEngine {
   last = new Map<string, number>();
   musicGain?: GainNode;
   ambientBeat = 0;
+  nextCall = 0;
   rainGain?: GainNode;
   windGain?: GainNode;
   /** Looping rain and mist-wind beds on the ambience bus, faded by weather amount. */
@@ -357,6 +359,30 @@ class AudioEngine {
         0,
         "ambience",
       );
+    if (this.ctx.currentTime > this.nextCall) {
+      this.nextCall = this.ctx.currentTime + 3 + Math.random() * 6;
+      this.wildlife();
+    }
+  }
+  /** Occasional regional wildlife: birdsong by day, crickets by night,
+   * canyon gusts and Moonfrost ice, panned around the listener. */
+  wildlife() {
+    const t = this.ctx!.currentTime,
+      pan = Math.random() * 1.4 - 0.7,
+      hour = settings.daynight ? worldHour() : 13,
+      day = hour > 6.5 && hour < 19.5;
+    if (["haven", "meadow", "home"].includes(this.scene)) {
+      if (day) {
+        const f = 2300 + Math.random() * 1400,
+          notes = 2 + Math.floor(Math.random() * 3);
+        for (let i = 0; i < notes; i++)
+          this.tone(f * (1 + (i % 2) * 0.18), f * 1.25, 0.07, "sine", 0.018, "ambience", t + i * 0.11, pan);
+      } else
+        for (let i = 0; i < 3; i++)
+          this.tone(4300, 4100, 0.035, "triangle", 0.008, "ambience", t + i * 0.07, pan);
+    } else if (this.scene === "canyon") this.noise(1.1, 0.05, "ambience", 320);
+    else if (this.scene === "hollow" && Math.random() < 0.5)
+      this.tone(95, 55, 0.35, "triangle", 0.025, "ambience", t, pan);
   }
 }
 export const audio = new AudioEngine();

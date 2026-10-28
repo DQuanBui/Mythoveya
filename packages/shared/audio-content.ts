@@ -82,6 +82,8 @@ export const CUES: Record<string, Cue> = {
   grass: ["triangle", 110, 50, 0.09, 0.7, []],
   stoneStep: ["sine", 170, 65, 0.075, 0.35, []],
   snowStep: ["sine", 220, 90, 0.12, 0.8, []],
+  woodStep: ["triangle", 150, 95, 0.08, 0.22, []],
+  sandStep: ["sine", 120, 70, 0.13, 0.9, []],
   interact: ["sine", 420, 630, 0.3, 0, [0, 4, 7]],
   collect: ["triangle", 660, 990, 0.24, 0.03, [0, 7, 12]],
   quest: ["sine", 440, 880, 0.65, 0, [0, 4, 7, 12]],
