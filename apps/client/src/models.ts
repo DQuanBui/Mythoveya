@@ -23,6 +23,7 @@ const geometry = {
   ring: new T.TorusGeometry(1, 0.055, 6, 32),
   // Half a ring, for smiles and eyelid lines.
   arc: new T.TorusGeometry(1, 0.16, 6, 16, Math.PI),
+  band: new T.CylinderGeometry(1, 1, 1, fine ? 20 : 14),
   capsule: fine ? new T.CapsuleGeometry(0.5, 1, 4, 12) : new T.CapsuleGeometry(0.5, 1, 3, 9),
 };
 type Kind = keyof typeof geometry;
@@ -959,7 +960,8 @@ const IRIS = ["#4a3020", "#2c5f63", "#5a7a3a", "#3f6f9a", "#3a2a20", "#6a4a80", 
 export function createAvatar(index: number) {
   const a = AVATARS[index],
     g = new T.Group(),
-    limbs: T.Group[] = [];
+    limbs: T.Group[] = [],
+    eyes: T.Group[] = [];
   const broad = index === 4,
     w = broad ? 0.27 : 0.21,
     pants = PANTS[index],
@@ -971,28 +973,41 @@ export function createAvatar(index: number) {
     leg.position.set(side * 0.11, 0.8, 0);
     g.add(leg);
     part(leg, "capsule", pants, [0, -0.34, 0], [0.15, 0.31, 0.16]);
-    // Rounded shoe on a darker sole.
-    part(leg, "orb", shoe, [0, -0.7, 0.05], [0.085, 0.07, 0.14]);
-    part(leg, "box", "#3e2e24", [0, -0.755, 0.05], [0.16, 0.035, 0.27]);
+    // A turned-up trouser cuff, and a rounded boot on a slim darker sole.
+    part(leg, "band", tint(pants, "#ffffff", 0.07), [0, -0.6, 0], [0.08, 0.035, 0.083]);
+    part(leg, "orb", shoe, [0, -0.69, 0.04], [0.085, 0.075, 0.14]);
+    part(leg, "box", "#3e2e24", [0, -0.75, 0.045], [0.15, 0.03, 0.26]);
     limbs.push(leg);
     const arm = new T.Group();
-    arm.position.set(side * (w + 0.06), 1.34, 0);
+    arm.position.set(side * (w + 0.045), 1.3, 0);
     g.add(arm);
-    part(arm, "capsule", a.coat, [side * 0.015, -0.22, 0], [0.11, 0.22, 0.11], [0, 0, side * 0.08]);
-    part(arm, "orb", a.skin, [side * 0.03, -0.47, 0.01], [0.065, 0.075, 0.065]);
+    part(arm, "capsule", a.coat, [side * 0.015, -0.2, 0], [0.11, 0.21, 0.11], [0, 0, side * 0.08]);
+    // Sleeve cuff, then a mitten hand with its thumb toward the front.
+    part(arm, "band", tint(a.coat, "#ffffff", 0.25), [side * 0.028, -0.385, 0], [0.06, 0.05, 0.06], [0, 0, side * 0.08]);
+    part(arm, "orb", a.skin, [side * 0.032, -0.45, 0.005], [0.055, 0.07, 0.048]);
+    part(arm, "orb", a.skin, [side * 0.004, -0.43, 0.04], [0.024, 0.036, 0.024], [0.3, 0, -side * 0.4]);
     limbs.push(arm);
   }
   // Torso, coat hem, belt and backpack.
   part(g, "orb", pants, [0, 0.84, 0], [w * 0.95, 0.13, 0.17]);
   part(g, "capsule", a.coat, [0, 1.12, 0], [w * 2, 0.22, 0.34]);
   part(g, "cone", a.coat, [0, 0.95, 0], [w * 1.08, 0.36, 0.2]);
-  // Belt sized to the waist, with its buckle on the front.
-  part(g, "box", "#4c4038", [0, 0.88, 0], [w * 1.85, 0.065, 0.33]);
-  part(g, "box", "#e0c680", [0.06, 0.88, 0.168], [0.07, 0.05, 0.02], undefined, false, true);
+  // Squared shoulders that the sleeves grow out of.
+  part(g, "orb", a.coat, [0, 1.26, 0], [w * 1.12, 0.1, 0.165]);
+  for (const side of [-1, 1]) part(g, "orb", a.coat, [side * (w + 0.015), 1.27, 0], [0.085, 0.085, 0.1]);
+  // A button placket down the front.
+  for (let k = 0; k < 3; k++)
+    part(g, "orb", tint(a.coat, "#2a1e18", 0.45), [0, 1.2 - k * 0.1, 0.168 - k * 0.004], [0.017, 0.017, 0.01], undefined, false, true);
+  // Belt hugging the waist, with its buckle on the front.
+  part(g, "band", "#4c4038", [0, 0.88, 0], [w * 0.92, 0.06, 0.175]);
+  part(g, "box", "#e0c680", [0.06, 0.88, 0.176], [0.07, 0.05, 0.02], undefined, false, true);
   part(g, "box", "#a57951", [0, 1.12, -0.22], [0.32, 0.4, 0.15]);
   part(g, "capsule", "#c9b38a", [0, 1.36, -0.22], [0.09, 0.15, 0.09], [0, 0, Math.PI / 2]);
-  // A soft collar that hugs the neck.
-  part(g, "orb", index % 2 ? "#d9b479" : "#c5d6b6", [0, 1.37, 0.01], [0.135, 0.055, 0.125]);
+  // A shirt collar: a neckband with two folded points at the front.
+  const collar = index % 2 ? "#d9b479" : "#c5d6b6";
+  part(g, "band", collar, [0, 1.37, 0], [0.105, 0.045, 0.1]);
+  for (const side of [-1, 1])
+    part(g, "box", collar, [side * 0.045, 1.345, 0.1], [0.075, 0.05, 0.016], [-0.35, 0, side * 0.7]);
   // Neck and head.
   part(g, "capsule", a.skin, [0, 1.42, 0], [0.09, 0.05, 0.09]);
   const head = new T.Group();
@@ -1001,10 +1016,19 @@ export function createAvatar(index: number) {
   part(head, "orb", a.skin, [0, 0, 0], [0.2, 0.225, 0.2]);
   for (const side of [-1, 1]) {
     part(head, "orb", a.skin, [side * 0.195, -0.01, -0.01], [0.04, 0.055, 0.035]);
-    part(head, "smooth", "#fffaf2", [side * 0.072, 0.015, 0.172], [0.04, 0.042, 0.02], undefined, false, true);
-    part(head, "smooth", IRIS[index], [side * 0.072, 0.012, 0.185], [0.026, 0.03, 0.012], undefined, false, true);
-    part(head, "smooth", "#0b1013", [side * 0.072, 0.012, 0.192], [0.013, 0.016, 0.008], undefined, false, true);
-    part(head, "smooth", "#ffffff", [side * 0.068, 0.022, 0.197], [0.006, 0.007, 0.004], undefined, true);
+    // Each eye is its own group so it can blink.
+    const eye = new T.Group();
+    eye.position.set(side * 0.072, 0.015, 0);
+    head.add(eye);
+    eyes.push(eye);
+    part(eye, "smooth", "#fffaf2", [0, 0, 0.172], [0.04, 0.042, 0.02], undefined, false, true);
+    part(eye, "smooth", tint(IRIS[index], "#000000", 0.45), [0, -0.003, 0.184], [0.028, 0.032, 0.012], undefined, false, true);
+    part(eye, "smooth", IRIS[index], [0, -0.004, 0.186], [0.023, 0.027, 0.012], undefined, false, true);
+    part(eye, "smooth", "#0b1013", [0, -0.003, 0.193], [0.012, 0.015, 0.008], undefined, false, true);
+    part(eye, "smooth", "#ffffff", [-side * 0.006, 0.009, 0.199], [0.006, 0.007, 0.004], undefined, true);
+    // Lashes along the upper lid, flicked out at the corner.
+    part(eye, "arc", "#24170f", [0, 0.002, 0.184], [0.042, 0.04, 0.03], [-0.25, 0, 0]);
+    part(eye, "capsule", "#24170f", [side * 0.043, 0.012, 0.176], [0.006, 0.014, 0.006], [0, 0, -side * 1]);
     part(head, "box", a.hair, [side * 0.075, 0.072, 0.17], [0.07, 0.016, 0.02], [0, 0, side * -0.12]);
     part(head, "orb", tint(a.skin, "#ff8f80", 0.35), [side * 0.11, -0.05, 0.15], [0.035, 0.022, 0.012]);
   }
@@ -1022,7 +1046,7 @@ export function createAvatar(index: number) {
     for (const side of [-1, 1])
       part(head, "ring", "#d6b775", [side * 0.075, 0.16, 0.13], [0.055, 0.055, 0.05], [0.3, 0, 0], false, true);
   consolidate(g, `avatar:${index}`);
-  g.userData = { limbs, index, head };
+  g.userData = { limbs, index, head, eyes };
   return g;
 }
 function hair(head: T.Group, index: number, color: string) {
@@ -1047,6 +1071,12 @@ function hair(head: T.Group, index: number, color: string) {
       h([Math.cos(a) * 0.17, 0.12 + Math.sin(a * 2) * 0.03, Math.sin(a) * 0.15 - 0.02], [0.07, 0.07, 0.07]);
     }
   if (index === 7) h([0, 0.0, -0.13], [0.18, 0.2, 0.1]);
+  // Soft fringe locks over the forehead, swept to one side.
+  if (index !== 0 && index !== 6)
+    for (let i = 0; i < 4; i++)
+      part(head, "capsule", color, [(i - 1.5) * 0.06, 0.135 - Math.abs(i - 1.5) * 0.012, 0.155 - Math.abs(i - 1.5) * 0.02], [0.05, 0.06, 0.035], [-0.45, 0, 0.35 + (i - 1.5) * 0.12]);
+  // A glossy highlight band across the crown.
+  part(head, "arc", tint(color, "#ffffff", 0.28), [0, 0.11, 0.035], [0.17, 0.13, 0.17], [-1.05, 0, 0], false, true);
 }
 export function animateAvatar(
   g: T.Group,
@@ -1063,6 +1093,11 @@ export function animateAvatar(
         : 0;
     if (gesture && i === 1) l.rotation.z = -1.8 + Math.sin(t * 5) * 0.15;
     else l.rotation.z = 0;
+  });
+  // A quick blink every few seconds, offset per keeper.
+  const blink = (t + g.userData.index * 0.83) % 3.9;
+  g.userData.eyes?.forEach((e: T.Group) => {
+    e.scale.y = reduced || blink < 3.75 ? 1 : Math.max(0.1, Math.abs(blink - 3.825) * 13);
   });
   const head = g.userData.head as T.Group | undefined;
   if (head) {
