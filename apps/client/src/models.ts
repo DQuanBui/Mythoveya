@@ -57,6 +57,16 @@ function material(color: string, glow = false, gloss = false) {
 }
 // Merged static parts share one vertex-colored skin material.
 const skin = finish({ vertexColors: true, roughness: 0.6, envMapIntensity: 0.8 }, false);
+// Light caught in fur and cloth brightens the silhouette, in proportion to
+// the light already falling there (so nothing glows at night).
+if (fine)
+  skin.onBeforeCompile = (shader) => {
+    shader.fragmentShader = shader.fragmentShader.replace(
+      "#include <opaque_fragment>",
+      `outgoingLight += totalDiffuse * pow(1.0 - saturate(dot(normal, normalize(vViewPosition))), 2.5) * 0.85;
+      #include <opaque_fragment>`,
+    );
+  };
 // Painted shading baked into merged parts: undersides a little darker,
 // with faint mottling so large surfaces read as fur or cloth, not plastic.
 function shade(g: T.BufferGeometry, color: T.Color) {
