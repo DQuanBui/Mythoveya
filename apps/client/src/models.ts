@@ -261,7 +261,11 @@ export function createCreature(id: string, shimmer = false) {
     part(l, "capsule", mid, [0, -len / 2 + 0.05, 0], [0.15, len / 2, 0.16]);
     // Socks give some species pale feet.
     const foot = dna.marking === "socks" ? "#fbf6ea" : cream;
-    part(l, "orb", foot, [0, -len + 0.02, 0.05], [0.12, 0.08, 0.16]);
+    // Birds stand on three slim forward toes and one behind.
+    if (s.family === "bird")
+      for (const yaw of [-0.5, 0, 0.5, Math.PI])
+        part(l, "capsule", "#d9a265", [Math.sin(yaw) * 0.07, -len + 0.02, Math.cos(yaw) * 0.07 + 0.02], [0.035, 0.09, 0.035], [Math.PI / 2, 0, -yaw]);
+    else part(l, "orb", foot, [0, -len + 0.02, 0.05], [0.12, 0.08, 0.16]);
     // Little rounded toes at the front of each paw.
     if (pawed)
       for (let k = -1; k <= 1; k++)
@@ -281,6 +285,30 @@ export function createCreature(id: string, shimmer = false) {
         [size * (0.42 - j * 0.04), 0.05, size * 0.27],
         [0, side * -0.4, side * 0.22],
       );
+    wings.push(w);
+    return w;
+  };
+  // Birds fan their flight feathers from a soft covert at the shoulder,
+  // sweeping from straight back to straight out, tips in the accent colour.
+  const featherWing = (side: number, size = 1, feather = light) => {
+    const w = new T.Group();
+    w.position.set(side * 0.3, 0.9 + lift, 0);
+    rig.add(w);
+    part(w, "orb", c, [side * 0.16, 0.03, -0.05], [0.2 * size, 0.08, 0.24 * size], [0, 0, side * 0.2]);
+    for (let j = 0; j < 6; j++) {
+      const a = Math.PI - 0.3 - j * 0.24,
+        len = (0.36 + j * 0.05) * size,
+        bx = side * (0.12 + j * 0.05),
+        bz = -0.06 - j * 0.015;
+      part(
+        w,
+        "orb",
+        j >= 4 ? accent : j % 2 ? feather : tint(c, feather, 0.5),
+        [bx + side * Math.sin(a) * len * 0.5, 0.02 - j * 0.008, bz + Math.cos(a) * len * 0.5],
+        [0.065 * size, 0.028, len * 0.5],
+        [0, side * a, side * 0.12],
+      );
+    }
     wings.push(w);
     return w;
   };
@@ -376,7 +404,7 @@ export function createCreature(id: string, shimmer = false) {
     }
     limb(-0.16, 0.1, 0.33 + up, 0.6 + up);
     limb(0.16, 0.1, 0.33 + up, 0.6 + up);
-    for (const w of s.id === "lumeswallow" ? [] : [wing(-1, 0.9 * bx, dna.marking === "none" ? light : accent), wing(1, 0.9 * bx, dna.marking === "none" ? light : accent)])
+    for (const w of s.id === "lumeswallow" ? [] : [featherWing(-1, 0.9 * bx, dna.marking === "none" ? light : accent), featherWing(1, 0.9 * bx, dna.marking === "none" ? light : accent)])
       w.position.y += up;
     if (!f.bat)
       part(
