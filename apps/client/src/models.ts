@@ -21,6 +21,8 @@ const geometry = {
   cone: new T.ConeGeometry(1, 1, fine ? 12 : 9),
   box: new RoundedBoxGeometry(1, 1, 1, fine ? 2 : 1, 0.18),
   ring: new T.TorusGeometry(1, 0.055, 6, 32),
+  // Half a ring, for smiles and eyelid lines.
+  arc: new T.TorusGeometry(1, 0.16, 6, 16, Math.PI),
   capsule: fine ? new T.CapsuleGeometry(0.5, 1, 4, 12) : new T.CapsuleGeometry(0.5, 1, 3, 9),
 };
 type Kind = keyof typeof geometry;
@@ -168,7 +170,11 @@ export function createCreature(id: string, shimmer = false) {
     wings: T.Group[] = [],
     tails: T.Group[] = [],
     eyes: T.Group[] = [];
-  const four = ["quadruped", "fox", "antler", "dragon"].includes(s.family);
+  const four = ["quadruped", "fox", "antler", "dragon"].includes(s.family),
+    pawed = four || s.family === "amphibian",
+    // Soft-coated species get cheek and chest tufts; scaled or stony ones do not.
+    furry = ["quadruped", "fox", "antler"].includes(s.family) &&
+      !/scale|stone|plate|shell|crystal|basalt|ice|magma|lava|metal|bark/.test(s.appearance);
   const [bx, by, bz] = dna.body;
   // Longer legs lift the whole body.
   const baseLeg = s.family === "antler" ? 0.62 : 0.46,
@@ -184,7 +190,12 @@ export function createCreature(id: string, shimmer = false) {
     rig.add(l);
     part(l, "capsule", mid, [0, -len / 2 + 0.05, 0], [0.15, len / 2, 0.16]);
     // Socks give some species pale feet.
-    part(l, "orb", dna.marking === "socks" ? "#fbf6ea" : cream, [0, -len + 0.02, 0.05], [0.12, 0.08, 0.16]);
+    const foot = dna.marking === "socks" ? "#fbf6ea" : cream;
+    part(l, "orb", foot, [0, -len + 0.02, 0.05], [0.12, 0.08, 0.16]);
+    // Little rounded toes at the front of each paw.
+    if (pawed)
+      for (let k = -1; k <= 1; k++)
+        part(l, "orb", foot, [k * 0.055, -len + 0.005, 0.175 - Math.abs(k) * 0.02], [0.042, 0.045, 0.05]);
     limbs.push(l);
   };
   const wing = (side: number, size = 1, feather = light) => {
@@ -220,6 +231,10 @@ export function createCreature(id: string, shimmer = false) {
       for (let i = 0; i < 5; i++)
         body([(i % 2 ? 1 : -1) * 0.22 * bx, ty + 0.3 * by - (i % 3) * 0.05, (-0.45 + i * 0.2) * bz], [0.09, 0.05, 0.09], accent);
     if (dna.marking === "saddle") body([0, ty + 0.3 * by, -0.12 * bz], [0.36 * bx, 0.16, 0.38 * bz], accent);
+    // A fluffy bib on the chest.
+    if (furry)
+      for (let k = -1; k <= 1; k++)
+        part(rig, "cone", cream, [k * 0.09 * bx, ty - 0.13 * by - Math.abs(k) * 0.03, 0.62 * bz], [0.075, 0.2, 0.06], [Math.PI - 0.5, 0, k * 0.35]);
     // Rare species carry a longer neck for a prouder stance.
     if (dna.neck) {
       part(rig, "capsule", c, [0, ty + 0.4, 0.42 * bz], [0.19, 0.24 + dna.neck, 0.2], [0.35, 0, 0]);
@@ -453,8 +468,23 @@ export function createCreature(id: string, shimmer = false) {
         part(rig, "capsule", dark, [ex * 1.25, ey - 0.1, headZ - 0.02], [0.09 * es, 0.2 * es, 0.06], [0.2, 0, -side * 0.9]);
     }
     body([0, headY - 0.1 * hs, headZ + 0.28 * hs], [0.22 * hs, 0.15 * hs, 0.25 * hs], cream);
-    if (s.id !== "solmole") part(rig, "orb", "#2a2422", [0, headY - 0.03 * hs, headZ + 0.5 * hs], [0.07, 0.055, 0.05], undefined, false, true);
-  }
+    if (s.id !== "solmole") {
+      part(rig, "orb", "#2a2422", [0, headY - 0.03 * hs, headZ + 0.5 * hs], [0.07, 0.055, 0.05], undefined, false, true);
+      // A gentle "w" smile beneath the nose.
+      if (!f.snout && !f.trunk && !f.mouthTusks) {
+        part(rig, "capsule", "#5a3c34", [0, headY - 0.085 * hs, headZ + 0.515 * hs], [0.012, 0.03 * hs, 0.012]);
+        for (const side of [-1, 1])
+          part(rig, "arc", "#3a2622", [side * 0.04 * hs, headY - 0.118 * hs, headZ + 0.51 * hs], [0.042 * hs, 0.036 * hs, 0.05], [0.15, 0, Math.PI]);
+      }
+    }
+    // Cheek tufts frame the face.
+    if (furry)
+      for (const side of [-1, 1])
+        for (let k = 0; k < 2; k++)
+          part(rig, "cone", k ? cream : c, [side * headW * (0.9 + k * 0.05), headY - (0.07 + k * 0.08) * hs, headZ + 0.04], [0.065 * hs, 0.17 * hs, 0.06], [0, 0, side * (Math.PI / 2 + 0.35 + k * 0.3)]);
+  } else if (!f.snout && !f.trunk && s.family !== "bird" && s.id !== "inkwisp")
+    // A small smile for everyone else without a beak.
+    part(rig, "arc", "#3e2a28", [0, headY - 0.15 * hs, headZ + 0.345 * hs], [0.06 * hs, 0.045 * hs, 0.05], [0.25, 0, Math.PI]);
   for (const side of [-1, 1]) {
     const ex = side * 0.18 * hs,
       ey = headY + 0.05 * hs,
@@ -462,11 +492,19 @@ export function createCreature(id: string, shimmer = false) {
       es = dna.eye * hs,
       tilt = [0, 0, side * dna.slant];
     const eye = new T.Group(); eye.position.set(0, ey, 0); rig.add(eye); eyes.push(eye);
+    // The iris, pupil and their shine sit in a "look" group so the eyes can glance about.
+    const look = new T.Group(); eye.add(look); eye.userData.look = look;
     part(eye, "smooth", "#fffaf0", [ex, ey, ez], [0.1 * es, 0.115 * es, 0.07], tilt, false, true);
-    part(eye, "smooth", dna.iris, [ex, ey - 0.005, ez + 0.042], [0.065 * es, 0.08 * es, 0.035], tilt, dna.glowEyes, true);
-    part(eye, "smooth", "#0d1418", [ex, ey - 0.005, ez + 0.06], [0.036 * es, 0.048 * es, 0.02], tilt, false, true);
-    part(eye, "smooth", "#ffffff", [ex - side * 0.02, ey + 0.035 * es, ez + 0.075], [0.018 * es, 0.02 * es, 0.01], undefined, true);
-    eye.children.forEach((p) => { p.position.y -= ey; });
+    // A dark rim around a brighter, lit-from-below iris gives the eye depth.
+    part(look, "smooth", tint(dna.iris, "#0d1418", 0.55), [ex, ey - 0.005, ez + 0.04], [0.07 * es, 0.085 * es, 0.035], tilt, false, true);
+    part(look, "smooth", dna.iris, [ex, ey - 0.005, ez + 0.045], [0.06 * es, 0.075 * es, 0.035], tilt, dna.glowEyes, true);
+    part(look, "smooth", tint(dna.iris, "#ffffff", 0.45), [ex, ey - 0.035 * es, ez + 0.058], [0.04 * es, 0.03 * es, 0.025], tilt, dna.glowEyes, true);
+    part(look, "smooth", "#0d1418", [ex, ey - 0.005, ez + 0.068], [0.034 * es, 0.046 * es, 0.02], tilt, false, true);
+    part(look, "smooth", "#ffffff", [ex - side * 0.02, ey + 0.035 * es, ez + 0.084], [0.018 * es, 0.02 * es, 0.01], undefined, true);
+    part(look, "smooth", "#ffffff", [ex + side * 0.022, ey - 0.03 * es, ez + 0.08], [0.008 * es, 0.009 * es, 0.006], undefined, true);
+    // A soft upper lid, a shade deeper than the coat.
+    part(eye, "smooth", tint(c, dark, 0.12), [ex, ey + 0.085 * es, ez - 0.004], [0.1 * es, 0.05 * es, 0.072], tilt);
+    for (const p of [...eye.children, ...look.children]) if (p !== look) p.position.y -= ey;
     part(rig, "orb", blush, [side * 0.27 * hs, headY - 0.07 * hs, headZ + 0.2 * hs], [0.07, 0.04, 0.03]);
     // A soft brow gives strikers and shadows a determined look.
     if (dna.slant > 0.1)
@@ -832,7 +870,18 @@ export function animateCreature(
   rig.position.set(0, (floating ? 0.15 : 0) + Math.sin(time * speed) * 0.035 * motion, 0);
   const blinkPhase = (time + index * .37) % 4.7;
   const blink = state === "sleep" ? .07 : reduced ? 1 : blinkPhase > 4.5 ? Math.max(.07, Math.abs(blinkPhase - 4.6) * 10) : 1;
-  eyes?.forEach((eye: T.Group) => { eye.scale.y = blink; });
+  // Every couple of seconds the eyes dart to a new spot, then hold it.
+  const glance = (time + index * 0.61) / 2.3,
+    spot = (n: number, k: number) => ((Math.sin(n * 12.9898 + k * 78.233 + index) * 43758.5453) % 1) * 0.5,
+    n = Math.floor(glance),
+    t = Math.min(1, (glance - n) * 19),
+    still = reduced || !["idle", "walk", "play", "victory"].includes(state),
+    lookX = still ? 0 : spot(n - 1, 0) + (spot(n, 0) - spot(n - 1, 0)) * t,
+    lookY = still ? 0 : spot(n - 1, 1) + (spot(n, 1) - spot(n - 1, 1)) * t;
+  eyes?.forEach((eye: T.Group) => {
+    eye.scale.y = blink;
+    eye.userData.look?.position.set(lookX * 0.036, lookY * 0.022, 0);
+  });
   rig.rotation.set(0, 0, 0);
   // A soft breathing swell and a slow head-to-tail sway.
   rig.scale.set(
