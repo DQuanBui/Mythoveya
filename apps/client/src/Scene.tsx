@@ -37,6 +37,7 @@ import { BattleArena } from "./BattleArena";
 import { WeatherEffects } from "./Weather";
 import { HavenTreasure } from "./HavenTreasure";
 import { SeasonalLanterns } from "./SeasonalLanterns";
+import { photo } from "./PhotoMode";
 import { activeSeason } from "../../../packages/shared/seasons";
 import { Riftgate } from "./Riftgate";
 import { ModelLighting } from "./ModelLighting";
@@ -734,8 +735,18 @@ export function Explorer({
   );
   const player = useRef(new T.Vector3(spawn[0], 0, spawn[1]));
   const keys = useRef(new Set<string>());
-  const { camera } = useThree();
+  const { camera, gl, scene } = useThree();
   const controls = useRef<any>(null);
+  // Photo mode renders a fresh frame and reads it back in the same task.
+  useEffect(() => {
+    photo.grab = () => {
+      gl.render(scene, camera);
+      return gl.domElement.toDataURL("image/png");
+    };
+    return () => {
+      photo.grab = null;
+    };
+  }, [gl, scene, camera]);
   const initialTarget = useMemo(() => new T.Vector3(spawn[0], 1, spawn[1]), []);
   const near = useRef("");
   const last = useRef(0);

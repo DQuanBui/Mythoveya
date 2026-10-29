@@ -222,6 +222,9 @@ export function WorldHUD({
           >
             ❖{eventsReady(profile, utcDay()) && <i className="ready-dot" />}
           </button>
+          <button aria-label="Photo mode" title="Photo mode (P)" onClick={() => open("photo")}>
+            ◉
+          </button>
           <button aria-label="Open settings" onClick={() => open("settings")}>
             ☷
           </button>

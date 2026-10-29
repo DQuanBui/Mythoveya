@@ -602,3 +602,70 @@
 .map-ring b .map-heading {
   display: inline-block;
 }
+
+/* Photo mode: a slim toolbar and an optional vignette frame over the live scene */
+.photo-frame {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(20, 12, 6, 0.55) 100%);
+}
+.photo-frame span {
+  position: absolute;
+  right: 24px;
+  bottom: 96px;
+  font: 600 1.05rem Georgia, serif;
+  color: rgba(255, 246, 226, 0.92);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+}
+.photo-bar {
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  max-width: calc(100vw - 32px);
+  padding: 10px 14px;
+  border-radius: 16px;
+  background: rgba(16, 28, 31, 0.86);
+  border: 1px solid rgba(233, 206, 148, 0.35);
+  backdrop-filter: blur(6px);
+}
+.photo-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.photo-filters button {
+  padding: 6px 10px;
+  font-size: 0.85rem;
+}
+.photo-filters button.selected {
+  outline: 2px solid #e9ce94;
+}
+.photo-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+}
+.photo-bar small {
+  flex-basis: 100%;
+  text-align: center;
+  opacity: 0.75;
+}
+@media (max-width: 600px) {
+  .photo-bar kbd {
+    display: none;
+  }
+}
+/* Name tags and markers (drei Html, siblings of the canvas) step aside for photos. */
+.scene.photo-shot canvas ~ div {
+  display: none;
+}

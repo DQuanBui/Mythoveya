@@ -33,6 +33,7 @@ import type { FestivalTab } from "./FestivalPanel";
 import { FESTIVAL_RADIUS } from "../../../packages/shared/festival";
 import { SKYFERRY, HAVEN_HOUSES, houseDoor } from "../../../packages/shared/haven";
 import { HOME_INTERIORS } from "../../../packages/shared/homes";
+import { PhotoMode, photoCss, type PhotoFilter } from "./PhotoMode";
 import {
   catalogEntry,
   defaultHome,
@@ -99,6 +100,8 @@ const FERRY_LANDING: number[] = [SKYFERRY.point[0] * 0.95, SKYFERRY.point[1] * 0
 export default function App() {
   const [lodge, setLodge] = useState<string | null>(null);
   const [home, setHome] = useState<string | null>(null);
+  const [photoMode, setPhotoMode] = useState(false),
+    [photoFilter, setPhotoFilter] = useState<PhotoFilter>("natural");
   const [screen, setScreen] = useState("title"),
     [profile, setProfile] = useState<Profile | null>(null),
     [loading, setLoading] = useState(true),
@@ -154,6 +157,16 @@ export default function App() {
   }, []);
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
+      // Photo mode handles its own keys.
+      if (photoMode) return;
+      if (
+        e.code === "KeyP" &&
+        screen === "world" &&
+        !panel &&
+        !placing &&
+        !(e.target instanceof HTMLElement && e.target.matches("input,select,textarea"))
+      )
+        setPhotoMode(true);
       if (e.code === "KeyQ" && placing && !panel)
         setPlacing({ ...placing, rot: (placing.rot + 1) % 4 });
       if (e.code === "Escape") {
@@ -164,7 +177,7 @@ export default function App() {
     };
     window.addEventListener("keydown", key);
     return () => window.removeEventListener("keydown", key);
-  }, [screen, panel, placing]);
+  }, [screen, panel, placing, photoMode]);
   useEffect(() => {
     audio.location(
       screen === "battle"
@@ -237,7 +250,7 @@ export default function App() {
       audio.cue("confirm");
       if (kind === "resource") notify("Gathered +1 Sunseed · +25 Gold");
       if (
-        (kind.startsWith("lodge-") || kind.startsWith("rescue-") || kind.startsWith("atlas-") || kind.startsWith("cons-") || kind.startsWith("rally-") || kind.startsWith("mea-") || kind.startsWith("hol-") || kind.startsWith("can-") || kind.startsWith("exp-") || kind.startsWith("town-") || kind.startsWith("home-") || kind.startsWith("island-")) &&
+        (kind.startsWith("lodge-") || kind.startsWith("rescue-") || kind.startsWith("atlas-") || kind.startsWith("cons-") || kind.startsWith("rally-") || kind.startsWith("mea-") || kind.startsWith("hol-") || kind.startsWith("can-") || kind.startsWith("exp-") || kind.startsWith("town-") || kind.startsWith("home-") || kind.startsWith("island-") || kind.startsWith("season-")) &&
         result.value?.message &&
         kind !== "town-talk" &&
         kind !== "town-fish"
@@ -455,7 +468,10 @@ export default function App() {
   );
   function open(id: string) {
     audio.cue("confirm");
-    if (id === "arena") {
+    if (id === "photo") {
+      setPanel("");
+      setPhotoMode(true);
+    } else if (id === "arena") {
       if (profile?.team.length !== 6) {
         notify("Meet Liora first to form a team of six.");
         return;
@@ -654,7 +670,7 @@ export default function App() {
       )}
       {screen === "world" && profile && (
         <>
-          <div className="scene full">
+          <div className={`scene full${photoMode ? " photo-shot" : ""}`} style={photoMode ? { filter: photoCss(photoFilter) } : undefined}>
             {profile.island === "festival" ? (
               <FestivalScene
                 profile={profile}
@@ -700,7 +716,15 @@ export default function App() {
               />
             )}
           </div>
-          <WorldHUD
+          {photoMode && (
+            <PhotoMode
+              filter={photoFilter}
+              setFilter={setPhotoFilter}
+              caption={`${profile.name} · ${profile.island === "festival" ? "Lanternfair Isle" : profile.island === "home" ? "Hearthfall Isle" : (REGIONS.find((r) => r.id === profile.region)?.name || "Havenreach")} · Mythoveya`}
+              close={() => setPhotoMode(false)}
+            />
+          )}
+          {!photoMode && <WorldHUD
             profile={profile}
             position={position}
             near={near}
@@ -719,8 +743,8 @@ export default function App() {
               audio.cue("pet");
               setTimeout(() => setPet(false), 1800);
             }}
-          />
-          {placing && !panel && (
+          />}
+          {placing && !panel && !photoMode && (
             <div className="placement-bar" role="toolbar" aria-label="Placing a piece">
               <strong>
                 {placing.uid ? "Moving" : "Placing"} {catalogEntry(placing.kind)?.name}
