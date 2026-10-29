@@ -20,14 +20,6 @@ export const MUSIC = {
     wave: "sine",
     pattern: [0, 7, 9, 12, 9, 7, 4, 2],
   },
-  // Inside homes and lodges: a slow, music-box lullaby by the fire.
-  indoors: {
-    steps: 128,
-    bpm: 68,
-    root: 62,
-    wave: "sine",
-    pattern: [0, 4, 7, 12, 11, 7, 4, 2],
-  },
   // Hearthfall Isle: unhurried and warm, for building and tending habitats.
   home: {
     steps: 128,

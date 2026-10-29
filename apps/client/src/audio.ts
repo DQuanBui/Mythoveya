@@ -306,7 +306,8 @@ class AudioEngine {
   }
   schedule() {
     if (!this.ctx || this.ctx.state !== "running") return;
-    const song = MUSIC[this.scene as keyof typeof MUSIC] || MUSIC.title;
+    // Indoors (homes, lodges) borrows Hearthfall Isle's warm, unhurried tune.
+    const song = MUSIC[(this.scene === "indoors" ? "home" : this.scene) as keyof typeof MUSIC] || MUSIC.title;
     const step = 60 / song.bpm / 2;
     if (this.next < this.ctx.currentTime - 0.2)
       this.next = this.ctx.currentTime;
