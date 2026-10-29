@@ -13,6 +13,31 @@ const fine = (() => {
     return true;
   }
 })();
+// Leading edge out to the wing tip, then a scalloped trailing edge that dips
+// between the finger tips and returns along the flank.
+const WING_WRIST: [number, number] = [0.5, -0.06],
+  WING_TIPS: [number, number][] = [
+    [1, 0.08],
+    [0.82, 0.5],
+    [0.5, 0.72],
+  ];
+function membrane(side: number) {
+  const sh = new T.Shape(),
+    at = (x: number, y: number): [number, number] => [x * side, y],
+    pts: [number, number][] = [...WING_TIPS, [0.06, 0.62]];
+  sh.moveTo(...at(0, 0));
+  sh.lineTo(...at(...WING_WRIST));
+  sh.lineTo(...at(...pts[0]));
+  for (let i = 1; i < pts.length; i++) {
+    const [ax, ay] = pts[i - 1],
+      [bx, by] = pts[i],
+      cx = (ax + bx) / 2 + (WING_WRIST[0] - (ax + bx) / 2) * 0.32,
+      cy = (ay + by) / 2 + (WING_WRIST[1] - (ay + by) / 2) * 0.32;
+    sh.quadraticCurveTo(...at(cx, cy), ...at(bx, by));
+  }
+  sh.lineTo(...at(0, 0));
+  return new T.ExtrudeGeometry(sh, { depth: 0.025, bevelEnabled: false, curveSegments: 6 }).translate(0, 0, -0.0125);
+}
 // Smooth, rounded primitives give creatures and keepers a clean, soft finish.
 const geometry = {
   // About 3-4k triangles per creature on Low, roughly double otherwise.
@@ -25,6 +50,9 @@ const geometry = {
   arc: new T.TorusGeometry(1, 0.16, 6, 16, Math.PI),
   band: new T.CylinderGeometry(1, 1, 1, fine ? 20 : 14),
   capsule: fine ? new T.CapsuleGeometry(0.5, 1, 4, 12) : new T.CapsuleGeometry(0.5, 1, 3, 9),
+  // A dragon's wing membrane (span along +x, chord along +y), mirrored for the left.
+  membraneR: membrane(1),
+  membraneL: membrane(-1),
 };
 type Kind = keyof typeof geometry;
 const materials = new Map<string, T.MeshStandardMaterial>();
@@ -256,6 +284,33 @@ export function createCreature(id: string, shimmer = false) {
     wings.push(w);
     return w;
   };
+  // Dragons get membrane wings: a scalloped membrane spread out and back from
+  // the shoulder, with an arm bone to the wrist and finger bones to each tip.
+  const dragonWing = (side: number, size = 1) => {
+    const w = new T.Group();
+    w.position.set(side * 0.3, 0.95 + lift, 0);
+    rig.add(w);
+    const bone = tint(dark, c, 0.3),
+      span = 1.05 * size,
+      euler = new T.Euler(-Math.PI / 2, side * -0.15, side * 0.32, "ZYX"),
+      place = new T.Matrix4().makeRotationFromEuler(euler).multiply(new T.Matrix4().makeScale(span, span, 1)),
+      to3 = ([x, y]: [number, number]) => new T.Vector3(x * side, y, 0.03).applyMatrix4(place);
+    const skin = part(w, side > 0 ? "membraneR" : "membraneL", tint(tint(c, accent, 0.4), dark, 0.12), [0, 0, 0], [span, span, 1]);
+    skin.rotation.copy(euler);
+    const strut = (a: T.Vector3, b: T.Vector3, r: number) => {
+      const d = b.clone().sub(a),
+        e = new T.Euler().setFromQuaternion(new T.Quaternion().setFromUnitVectors(new T.Vector3(0, 1, 0), d.clone().normalize()));
+      part(w, "capsule", bone, a.clone().add(b).multiplyScalar(0.5).toArray(), [r, d.length() / 2, r], [e.x, e.y, e.z]);
+    };
+    const wrist = to3(WING_WRIST);
+    strut(to3([0, 0]), wrist, 0.06);
+    part(w, "orb", bone, wrist.toArray(), [0.07, 0.07, 0.07]);
+    for (const tip of WING_TIPS) strut(wrist, to3(tip), 0.03);
+    // A small claw at the wrist.
+    part(w, "cone", cream, wrist.clone().add(new T.Vector3(0, 0.07, 0.04)).toArray(), [0.03, 0.1, 0.03], [0.4, 0, 0]);
+    wings.push(w);
+    return w;
+  };
   const horn = (x: number, y: number, z: number, sz = 0.4, color = cream) =>
     part(rig, "cone", color, [x, y, z], [0.09, sz, 0.1], [0.2, 0, -x * 0.7], s.tier === "S");
   if (four) {
@@ -301,8 +356,8 @@ export function createCreature(id: string, shimmer = false) {
       }
     }
     if (s.family === "dragon" && s.id !== "reedrake") {
-      wing(-1, 1.2);
-      wing(1, 1.2);
+      dragonWing(-1, 1.2);
+      dragonWing(1, 1.2);
       for (let i = 0; i < (s.id === "solkarath" ? 0 : 3); i++)
         horn((i - 1) * 0.2, headY + 0.46, headZ - 0.06, 0.3 + i * 0.07);
       for (let i = 0; i < 4; i++) horn(0, ty + 0.44, (-0.65 + i * 0.25) * bz, 0.28, accent);
