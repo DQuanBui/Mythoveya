@@ -205,6 +205,7 @@ export function LodgeScene({
   const area = useMemo<WalkArea>(
     () => ({
       key: `lodge-room-v2-${site.region}`,
+      step: "woodStep",
       allowed: (x, z) => roomWalkable(x, z, site.region),
       extent: 9,
       home: ROOM_SPAWN,

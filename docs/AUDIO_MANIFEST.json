@@ -52,6 +52,23 @@
       ],
       "seconds": 50
     },
+    "indoors": {
+      "steps": 128,
+      "bpm": 68,
+      "root": 62,
+      "wave": "sine",
+      "pattern": [
+        0,
+        4,
+        7,
+        12,
+        11,
+        7,
+        4,
+        2
+      ],
+      "seconds": 56.470588235294116
+    },
     "home": {
       "steps": 128,
       "bpm": 82,

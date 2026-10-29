@@ -174,7 +174,9 @@ export default function App() {
           ? "arena"
           : screen === "fair-game"
             ? "festival"
-            : screen === "world" || screen === "lodge" || screen === "home"
+            : screen === "lodge" || screen === "home"
+            ? "indoors"
+            : screen === "world"
             ? profile?.island === "festival"
               ? "festival"
               : profile?.island

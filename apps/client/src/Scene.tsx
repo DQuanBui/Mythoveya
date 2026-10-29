@@ -685,6 +685,8 @@ export type WalkArea = {
   extent: number;
   points: { id: string; p: number[] }[];
   home: Point;
+  /** Footstep cue for the whole area, e.g. plank floors indoors. */
+  step?: string;
 };
 type Route = {
   points: Point[];
@@ -971,7 +973,7 @@ export function Explorer({
       avatar.rotation.y = Math.atan2(v.x, v.z);
       worldHeading.yaw = avatar.rotation.y;
       if (clock.elapsedTime - foot.current > (sprinting ? 0.27 : 0.32)) {
-        audio.cue(stepSound(profile.region, nx, nz, ny));
+        audio.cue(area?.step || stepSound(profile.region, nx, nz, ny));
         foot.current = clock.elapsedTime;
       }
     }

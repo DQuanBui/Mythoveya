@@ -360,9 +360,18 @@ class AudioEngine {
         "ambience",
       );
     if (this.ctx.currentTime > this.nextCall) {
-      this.nextCall = this.ctx.currentTime + 3 + Math.random() * 6;
-      this.wildlife();
+      const indoors = this.scene === "indoors";
+      this.nextCall = this.ctx.currentTime + (indoors ? 0.5 + Math.random() * 1.8 : 3 + Math.random() * 6);
+      if (indoors) this.hearth();
+      else this.wildlife();
     }
+  }
+  /** Indoors: the crackle and pop of a fire, with a low settle now and then. */
+  hearth() {
+    const pops = 1 + Math.floor(Math.random() * 3);
+    for (let i = 0; i < pops; i++)
+      setTimeout(() => this.noise(0.015 + Math.random() * 0.03, 0.05, "ambience", 2400 + Math.random() * 2400), i * (40 + Math.random() * 90));
+    if (Math.random() < 0.15) this.noise(1.4, 0.035, "ambience", 180);
   }
   /** Occasional regional wildlife: birdsong by day, crickets by night,
    * canyon gusts and Moonfrost ice, panned around the listener. */

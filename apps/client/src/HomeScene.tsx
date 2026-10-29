@@ -223,6 +223,7 @@ export function HomeScene({
   const area = useMemo<WalkArea>(
     () => ({
       key: "home-room-v1",
+      step: "woodStep",
       allowed: homeWalkable,
       extent: 6,
       home: HOME_SPAWN,
