@@ -73,10 +73,13 @@ export function HouseVisit({
   id,
   profile,
   run,
+  enter,
 }: {
   id: string;
   profile: Profile;
   run: (kind: string, value?: any) => Promise<any>;
+  /** Shown on the porch: step inside the home. */
+  enter?: () => void;
 }) {
   const house = HAVEN_HOUSES.find((h) => h.id === id);
   if (!house) return null;
@@ -107,6 +110,11 @@ export function HouseVisit({
       >
         {stamps.includes(id) ? "Visitor book signed" : "Sign the visitor book"}
       </button>
+      {enter && (
+        <button className="home-enter" onClick={enter}>
+          Step inside →
+        </button>
+      )}
       <h3>Your island visitor book · {stamps.length}/6</h3>
       <div className="visitor-stamps">
         {HAVEN_HOUSES.map((h) => (

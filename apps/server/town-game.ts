@@ -5,6 +5,7 @@ import {
   CACHE_COMPLETION_DIAMONDS,
 } from "../../packages/shared/haven";
 import { gainXp } from "../../packages/shared/economy";
+import { HOME_INTERIORS } from "../../packages/shared/homes";
 import { track } from "../../packages/shared/events";
 import { BUFFS, SHOPS, shopStock, type ShopId } from "../../packages/shared/shops";
 import { addGear } from "./adventure-game";
@@ -144,6 +145,17 @@ export function townMutation(
           ? `Every Skyglass cache found! ${found}, plus ${CACHE_COMPLETION_DIAMONDS} bonus Diamonds.`
           : `${cache.name}: ${found}. (${t.caches!.length}/${HAVEN_CACHES.length})`,
       };
+    }
+    case "town-gift": {
+      const home = Object.hasOwn(HOME_INTERIORS, v.id) ? HOME_INTERIORS[v.id] : null;
+      if (!home || p.region !== "haven" || p.island)
+        throw Error("Visit a home in Havenreach.");
+      if (t.gifts?.date !== today) t.gifts = { date: today, ids: [] };
+      if (t.gifts.ids.includes(v.id))
+        throw Error(`${home.host} has nothing more to share today. Come back after 00:00 UTC.`);
+      t.gifts.ids.push(v.id);
+      grant(p, home.gift);
+      return { message: `${home.host}: ${home.giftText}` };
     }
     case "town-fish": {
       if (p.region !== "haven")

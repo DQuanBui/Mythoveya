@@ -31,7 +31,8 @@ import { SettingsPanel } from "./SettingsPanel";
 import type { Placing } from "./HomeIsland";
 import type { FestivalTab } from "./FestivalPanel";
 import { FESTIVAL_RADIUS } from "../../../packages/shared/festival";
-import { SKYFERRY } from "../../../packages/shared/haven";
+import { SKYFERRY, HAVEN_HOUSES, houseDoor } from "../../../packages/shared/haven";
+import { HOME_INTERIORS } from "../../../packages/shared/homes";
 import {
   catalogEntry,
   defaultHome,
@@ -85,6 +86,7 @@ const Arena = lazy(() => import("./Arena").then((m) => ({ default: m.Arena })));
 const BattleUI = lazy(() => import("./Arena").then((m) => ({ default: m.BattleUI })));
 // Islands and minigames are loaded only when the keeper travels there.
 const LodgeScene = lazy(() => import("./LodgeScene").then(m=>({default:m.LodgeScene})));
+const HomeScene = lazy(() => import("./HomeScene").then((m) => ({ default: m.HomeScene })));
 const IslandScene = lazy(() => import("./HomeIsland").then((m) => ({ default: m.IslandScene })));
 const HomePanel = lazy(() => import("./HomePanel").then((m) => ({ default: m.HomePanel })));
 const SkyferryPanel = lazy(() => import("./HomePanel").then((m) => ({ default: m.SkyferryPanel })));
@@ -96,6 +98,7 @@ const FestivalGame = lazy(() => import("./FestivalGames").then((m) => ({ default
 const FERRY_LANDING: number[] = [SKYFERRY.point[0] * 0.95, SKYFERRY.point[1] * 0.95];
 export default function App() {
   const [lodge, setLodge] = useState<string | null>(null);
+  const [home, setHome] = useState<string | null>(null);
   const [screen, setScreen] = useState("title"),
     [profile, setProfile] = useState<Profile | null>(null),
     [loading, setLoading] = useState(true),
@@ -171,7 +174,7 @@ export default function App() {
           ? "arena"
           : screen === "fair-game"
             ? "festival"
-            : screen === "world" || screen === "lodge"
+            : screen === "world" || screen === "lodge" || screen === "home"
             ? profile?.island === "festival"
               ? "festival"
               : profile?.island
@@ -633,6 +636,20 @@ export default function App() {
         </div>
       )}
       {screen === "lodge" && profile && lodge && <LodgeScene site={LODGES.find(s=>s.id===lodge)!} profile={profile} busy={busy} run={run} exit={()=>{setPosition(LODGES.find(s=>s.id===lodge)!.point);setLodge(null);setNear("");setScreen("world");}}/>}
+      {screen === "home" && profile && home && (
+        <HomeScene
+          id={home}
+          profile={profile}
+          busy={busy}
+          run={run}
+          exit={() => {
+            setPosition(houseDoor(HAVEN_HOUSES.find((h) => h.id === home)!));
+            setHome(null);
+            setNear("");
+            setScreen("world");
+          }}
+        />
+      )}
       {screen === "world" && profile && (
         <>
           <div className="scene full">
@@ -862,7 +879,24 @@ export default function App() {
               <FishingPanel profile={profile} run={run} />
             )}
             {panel.startsWith("porch-") && profile && (
-              <HouseVisit id={panel.slice(6)} profile={profile} run={run} />
+              <HouseVisit
+                id={panel.slice(6)}
+                profile={profile}
+                run={run}
+                enter={() => {
+                  const id = panel.slice(6);
+                  setPanel("");
+                  setNear("");
+                  // Cloudwatch Lodge's door opens onto the Wayfarer Lodge common room.
+                  if (HOME_INTERIORS[id]) {
+                    setHome(id);
+                    setScreen("home");
+                  } else {
+                    setLodge("lodge-haven");
+                    setScreen("lodge");
+                  }
+                }}
+              />
             )}
             {panel.startsWith("observe-") && byId[panel.slice(8)] && (
               <div className="wildlife-note">

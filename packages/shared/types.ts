@@ -39,6 +39,8 @@ export type TownState = {
   /** Pending one-battle tonics from the Apothecary. */
   buffs?: Record<string, number>;
   fishing?: { date: string; casts: number; caught: number };
+  /** Homes whose daily gift was taken on `date` (UTC). */
+  gifts?: { date: string; ids: string[] };
   trackedNpc?: string;
   inventory: Record<string, number>;
   met: string[];
