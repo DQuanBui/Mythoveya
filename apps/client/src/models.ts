@@ -56,18 +56,49 @@ function material(color: string, glow = false, gloss = false) {
     );
   return materials.get(key)!;
 }
-// Merged static parts share one vertex-colored skin material.
-const skin = finish({ vertexColors: true, roughness: 0.6, envMapIntensity: 0.8 }, false);
-// Light caught in fur and cloth brightens the silhouette, in proportion to
-// the light already falling there (so nothing glows at night).
-if (fine)
-  skin.onBeforeCompile = (shader) => {
-    shader.fragmentShader = shader.fragmentShader.replace(
-      "#include <opaque_fragment>",
-      `outgoingLight += totalDiffuse * pow(1.0 - saturate(dot(normal, normalize(vViewPosition))), 2.5) * 0.85;
-      #include <opaque_fragment>`,
-    );
-  };
+// Merged static parts share one vertex-colored skin material per surface:
+// soft fur and cloth, polished scales, wet amphibian skin, glossy chitin or
+// matte stone.
+type Surface = "fur" | "scale" | "wet" | "chitin" | "stone";
+const SURFACE: Record<Surface, { rim: number; params: T.MeshPhysicalMaterialParameters }> = {
+  fur: { rim: 0.85, params: {} },
+  scale: { rim: 0.4, params: { roughness: 0.42, clearcoat: 0.45, clearcoatRoughness: 0.32, sheen: 0 } },
+  wet: { rim: 0.3, params: { roughness: 0.35, clearcoat: 0.9, clearcoatRoughness: 0.1, sheen: 0 } },
+  chitin: { rim: 0.35, params: { roughness: 0.38, clearcoat: 0.75, clearcoatRoughness: 0.18, sheen: 0 } },
+  stone: { rim: 0.15, params: { roughness: 0.95, sheen: 0.2, sheenRoughness: 0.9 } },
+};
+const skins = new Map<Surface, T.MeshStandardMaterial>();
+function skinFor(surface: Surface) {
+  if (!skins.has(surface)) {
+    const m = finish({ vertexColors: true, roughness: 0.6, envMapIntensity: 0.8 }, false),
+      { rim, params } = SURFACE[surface];
+    if (fine) {
+      m.setValues(params);
+      // Light caught at the silhouette brightens it, in proportion to the
+      // light already falling there (so nothing glows at night).
+      m.onBeforeCompile = (shader) => {
+        shader.fragmentShader = shader.fragmentShader.replace(
+          "#include <opaque_fragment>",
+          `outgoingLight += totalDiffuse * pow(1.0 - saturate(dot(normal, normalize(vViewPosition))), 2.5) * ${rim.toFixed(2)};
+          #include <opaque_fragment>`,
+        );
+      };
+      m.customProgramCacheKey = () => `skin-${surface}`;
+    }
+    skins.set(surface, m);
+  }
+  return skins.get(surface)!;
+}
+const surfaceOf = (family: string): Surface =>
+  family === "dragon" || family === "serpent" || family === "shell"
+    ? "scale"
+    : family === "amphibian" || family === "aquatic"
+      ? "wet"
+      : family === "insect"
+        ? "chitin"
+        : family === "golem"
+          ? "stone"
+          : "fur";
 // Painted shading baked into merged parts: undersides a little darker,
 // with faint mottling so large surfaces read as fur or cloth, not plastic.
 function shade(g: T.BufferGeometry, color: T.Color) {
@@ -111,7 +142,7 @@ export function part(
 }
 const merged = new Map<string, T.BufferGeometry>();
 /** Bakes each group's plain parts into one cached mesh; glowing and glossy parts stay separate. */
-function consolidate(root: T.Object3D, key: string) {
+function consolidate(root: T.Object3D, key: string, surface: Surface = "fur") {
   let n = 0;
   const visit = (group: T.Object3D) => {
     const parts = group.children.filter(
@@ -139,7 +170,7 @@ function consolidate(root: T.Object3D, key: string) {
       merged.set(id, geo);
     }
     for (const m of parts) group.remove(m);
-    const mesh = new T.Mesh(geo, skin);
+    const mesh = new T.Mesh(geo, skinFor(surface));
     mesh.castShadow = mesh.receiveShadow = true;
     group.add(mesh);
   };
@@ -834,7 +865,7 @@ export function createCreature(id: string, shimmer = false) {
     }
   }
   tails.forEach((t) => { t.userData.restRotation = t.rotation.clone(); });
-  consolidate(rig, `creature:${id}:${shimmer ? "shimmer" : "normal"}`);
+  consolidate(rig, `creature:${id}:${shimmer ? "shimmer" : "normal"}`, surfaceOf(s.family));
   const glints = new T.Group();
   if (shimmer) {
     glints.name = "shimmer-glints";
