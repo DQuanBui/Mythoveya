@@ -911,10 +911,27 @@ export function animateCreature(
     w.rotation.z =
       Math.sin(time * (state === "walk" ? 8 : 3)) * ((i % 2) * 2 - 1) * 0.27 * motion;
   });
+  // Now and then an idle creature does something of its own: a play-bow
+  // stretch, a happy wiggle with a quick tail wag, or a little hop and flap.
+  const beat = (time + index * 1.7) / 9,
+    q = (beat % 1) * 9,
+    quirk = state === "idle" && !reduced && q < 1.6 ? Math.sin((q / 1.6) * Math.PI) : 0,
+    kind = (Math.floor(beat) + index) % 3;
   tails.forEach((t: T.Group, i: number) => {
-    t.rotation.y = (t.userData.restRotation?.y || 0) + Math.sin(time * 2 + i * 0.7) * 0.22 * motion;
+    const wag = quirk && kind === 1 ? Math.sin(time * 13 + i) * 0.45 * quirk : 0;
+    t.rotation.y = (t.userData.restRotation?.y || 0) + Math.sin(time * 2 + i * 0.7) * 0.22 * motion + wag;
     t.rotation.x = (t.userData.restRotation?.x || 0) + Math.sin(time * 2 + i) * 0.08 * motion;
   });
+  if (quirk) {
+    if (kind === 0) {
+      rig.rotation.x = 0.16 * quirk;
+      rig.scale.z = 1 + 0.06 * quirk;
+    } else if (kind === 1) rig.rotation.z = Math.sin(time * 11) * 0.07 * quirk;
+    else {
+      rig.position.y += Math.abs(Math.sin(q * Math.PI * 1.25)) * 0.14 * quirk;
+      wings.forEach((w: T.Group, i: number) => (w.rotation.z = Math.sin(time * 16) * ((i % 2) * 2 - 1) * 0.5 * quirk));
+    }
+  }
   if (state === "walk") {
     if (family === "amphibian") rig.position.y += Math.abs(Math.sin(time * 5)) * .16 * motion;
     if (family === "shell") rig.rotation.z = Math.sin(time * 5) * .07 * motion;
