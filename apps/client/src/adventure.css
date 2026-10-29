@@ -686,3 +686,28 @@
     font-size: 16px;
   }
 }
+
+/* Seasonal lantern hunt clues */
+.season-clues {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px;
+  display: grid;
+  gap: 6px;
+}
+.season-clues li {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+}
+.season-clues li span {
+  color: var(--theme, #e0782e);
+  font-weight: 700;
+}
+.season-clues li.found {
+  opacity: 0.6;
+  text-decoration: line-through;
+}

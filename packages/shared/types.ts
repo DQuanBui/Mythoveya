@@ -101,6 +101,8 @@ export type Profile = {
   island?: import("./islands").IslandId;
   home?: import("./islands").HomeState;
   festival?: import("./festival").FestivalState;
+  /** Seasonal lantern hunts (optional, created on first find). */
+  seasons?: import("./seasons").SeasonState;
 };
 export type Status = {
   kind: string;

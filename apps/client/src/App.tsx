@@ -430,7 +430,10 @@ export default function App() {
             `${folk.name}: “${folk.lines[Math.floor(Math.random() * folk.lines.length)]}”`,
           );
       }
-      else if (id.startsWith("cache-")) {
+      else if (id.startsWith("season-")) {
+        audio.cue("collect");
+        run("season-find", { id: id.slice(7) });
+      } else if (id.startsWith("cache-")) {
         if (profile?.town?.caches?.includes(id.slice(6)))
           notify("You already found this Skyglass cache.");
         else {

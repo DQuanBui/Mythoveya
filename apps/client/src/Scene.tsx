@@ -36,6 +36,8 @@ import { SkyferryDock } from "./Skyferry";
 import { BattleArena } from "./BattleArena";
 import { WeatherEffects } from "./Weather";
 import { HavenTreasure } from "./HavenTreasure";
+import { SeasonalLanterns } from "./SeasonalLanterns";
+import { activeSeason } from "../../../packages/shared/seasons";
 import { Riftgate } from "./Riftgate";
 import { ModelLighting } from "./ModelLighting";
 import { HavenTownsfolk } from "./HavenTownsfolk";
@@ -1188,6 +1190,7 @@ export function WorldScene({
 }) {
   const initialPosition = useMemo(() => position, [profile.region]);
   const walker = useRef<Walker>({ go: (_t, _r, act) => act?.() });
+  const season = useMemo(() => activeSeason(), []);
   return (
     <Canvas
       shadows
@@ -1224,6 +1227,14 @@ export function WorldScene({
       {profile.region === "haven" && (
         <HavenTreasure
           found={profile.town?.caches || []}
+          disabled={blocked}
+          onInteract={onInteract}
+        />
+      )}
+      {profile.region === "haven" && season && (
+        <SeasonalLanterns
+          season={season.season}
+          found={profile.seasons?.key === season.key ? profile.seasons.found : []}
           disabled={blocked}
           onInteract={onInteract}
         />

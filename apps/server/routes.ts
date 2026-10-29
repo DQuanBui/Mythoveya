@@ -75,6 +75,7 @@ const mutation = z.object({
     "town-track",
     "town-cache",
     "town-fish",
+    "season-find",
     "skill-up",
     "gear-equip",
     "gear-remove",

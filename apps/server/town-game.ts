@@ -26,7 +26,7 @@ import {
   type TownReward,
 } from "../../packages/shared/town";
 
-function grant(p: Profile, reward: TownReward) {
+export function grant(p: Profile, reward: TownReward) {
   const t = p.town!;
   p.gold += reward.gold || 0;
   p.diamonds += reward.diamonds || 0;

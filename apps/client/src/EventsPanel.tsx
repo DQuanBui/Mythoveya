@@ -18,6 +18,8 @@ import {
   utcMonth,
   weekKey,
 } from "../../../packages/shared/events";
+import { SEASONS, activeSeason } from "../../../packages/shared/seasons";
+import type { TownReward } from "../../../packages/shared/town";
 
 const describe = (r: EventReward) =>
   [rewardText(r), r.gear ? `${RARITIES[r.gear]} equipment` : ""]
@@ -26,6 +28,13 @@ const describe = (r: EventReward) =>
 const ICON = (r: EventReward) =>
   r.gear ? "⚔" : r.diamonds ? "◇" : r.crystal ? "✧" : r.tome ? "❖" : r.elixir ? "⚱" : r.dust ? "⁂" : "◉";
 
+const townReward = (r: TownReward) =>
+  Object.entries(r)
+    .map(([k, n]) =>
+      k === "tokens" ? `${n} bond token${n === 1 ? "" : "s"}` : k === "xp" ? `${n} keeper XP` : k === "treat" ? `${n} treat` : `${n} ${k[0].toUpperCase()}${k.slice(1)}`,
+    )
+    .join(" · ");
+
 export function EventsPanel({
   profile,
   run,
@@ -33,9 +42,10 @@ export function EventsPanel({
   profile: Profile;
   run: (kind: string, value?: any) => Promise<any>;
 }) {
-  const [tab, setTab] = useState<"featured" | "login" | "weekly" | "monthly">("featured");
   const now = Date.now(),
-    today = utcDay(now);
+    today = utcDay(now),
+    season = activeSeason(now);
+  const [tab, setTab] = useState<"season" | "featured" | "login" | "weekly" | "monthly">(season ? "season" : "featured");
   // Mirror the server's period resets so stale counters never show.
   const raw = profile.events,
     e = {
@@ -70,6 +80,7 @@ export function EventsPanel({
       <div className="adventure-tabs" role="tablist">
         {(
           [
+            ...(season ? [["season", `${season.season.prop === "gourd" ? "🎃" : "❄"} ${season.season.name}`] as const] : []),
             ["featured", `${featured.icon} ${featured.name}`],
             ["login", "✦ 30-day login"],
             ["weekly", "◈ Weekly missions"],
@@ -120,6 +131,45 @@ export function EventsPanel({
           </button>
         </>
       )}
+      {tab === "season" && season && (() => {
+        const found = profile.seasons?.key === season.key ? profile.seasons.found : [],
+          { season: s } = season;
+        return (
+          <>
+            <div className={`featured-week season-${s.id}`} style={{ "--theme": s.prop === "gourd" ? "#e0782e" : "#7cc8ff" } as React.CSSProperties}>
+              <span aria-hidden="true">{s.prop === "gourd" ? "🎃" : "❄"}</span>
+              <div>
+                <small>SEASONAL FESTIVAL · HAVENREACH</small>
+                <h3>{s.name}</h3>
+                <p>{s.blurb}</p>
+              </div>
+            </div>
+            <p className="muted">
+              Each lantern: {townReward(s.find)}. All {s.spots.length}: {townReward(s.complete)}. Walk up to a
+              glowing lantern in Havenreach and click it.
+            </p>
+            <h3>
+              Lanterns found · {found.length}/{s.spots.length}
+            </h3>
+            <ul className="season-clues">
+              {s.spots.map((spot) => (
+                <li key={spot.id} className={found.includes(spot.id) ? "found" : ""}>
+                  <span aria-hidden="true">{found.includes(spot.id) ? "✓" : "○"}</span>
+                  {spot.clue}
+                </li>
+              ))}
+            </ul>
+            {!!profile.seasons?.done.length && (
+              <p className="event-stamps">
+                Festivals completed:{" "}
+                {profile.seasons.done
+                  .map((k) => `${SEASONS.find((x) => k.startsWith(x.id))?.name || k} ${k.slice(-4)}`)
+                  .join(" · ")}
+              </p>
+            )}
+          </>
+        );
+      })()}
       {tab === "featured" && (
         <>
           <div
