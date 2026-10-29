@@ -751,7 +751,8 @@ export function Explorer({
   const near = useRef("");
   const last = useRef(0);
   const foot = useRef(0);
-  const follow = useRef(new T.Vector3(spawn[0] - 1, 0, spawn[1] + 1.5));
+  const follow = useRef(new T.Vector3(spawn[0] - 1, 0, spawn[1] + 1.5)),
+    rest = useRef(0);
   const route = useRef<Route | null>(null),
     marker = useRef<T.Group>(null);
   const resetSeen = useRef(input.current.resetCamera || 0),
@@ -1025,10 +1026,12 @@ export function Explorer({
       player.current.x - follow.current.x,
       player.current.z - follow.current.z,
     );
+    // Left waiting long enough, the companion curls up for a nap.
+    rest.current = following || moving || pet ? 0 : rest.current + dt;
     animateCreature(
       companion,
       clock.elapsedTime,
-      pet ? "victory" : following ? "walk" : "idle",
+      pet ? "victory" : following ? "walk" : rest.current > 14 ? "sleep" : "idle",
       0,
       settings.reduced,
     );
