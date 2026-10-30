@@ -1,13 +1,38 @@
 # Mythoveya handoff
 
-Updated October 29, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`, pushed to `origin/main` (https://github.com/DQuanBui/Mythoveya). This session started at `4619fdc`. Earlier handoffs (October 28 online-build session, October 22 Wayfarer Lodges) are archived in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md). Preserve ignored `data/mythoveya.sqlite`. `CLAUDE.md` is the quick project map for new sessions.
+Updated October 30, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`, pushed to `origin/main` (https://github.com/DQuanBui/Mythoveya). This handoff covers two rounds: October 29 (from `4619fdc`) and October 30 (from `b0d6c3d`). Earlier handoffs (October 28 online-build session, October 22 Wayfarer Lodges) are archived in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md). Preserve ignored `data/mythoveya.sqlite`. `CLAUDE.md` is the quick project map for new sessions.
 
 ## Play
 
 - **Online (single-player):** https://dquanbui.github.io/Mythoveya/. `.github/workflows/pages.yml` publishes it on every push to `main` (Pages source: GitHub Actions). Check a deployment with `node scripts/smoke-pages.mjs https://dquanbui.github.io/Mythoveya/`.
 - **Local (full game, including the human arena):** `npm install`, then run `Play Mythoveya.cmd` or `npm run dev` and open http://127.0.0.1:5173/. For the compiled build, run `npm run build && npm start` and open http://127.0.0.1:2567/.
 
-## Implemented this session
+## Implemented October 30
+
+- **Dragons and serpents:**
+  - Dragons have a reptile muzzle with a pale jaw, nostrils, fangs, brow ridges and a grin.
+  - Serpents taper from a pointed tail tip, with belly scales and a dorsal ridge.
+- **Sea creatures:** ribbed pectoral fins (the membrane shape with rays), a forked tail fin that sways, and a dorsal fin.
+- **Festival dressing:**
+  - Drifting leaves (Lantern Night) or snow (Frostlight), as instanced particles following the keeper.
+  - Gourds or star lanterns on every visitor-book home's step. These are not interactive.
+- **Homes that show your visits:**
+  - A wrapped gift waits until today's gift is taken.
+  - Your stamp is framed on the back wall once the book is signed.
+  - The resident walks `homeResidentRoute`.
+  - The pantry is now an open dresser.
+- **Battle:** `HitBurst.tsx` adds an element-tinted flash, ring and sparks on damage, drawn on top and timed from the event.
+- **Keeper titles** (`packages/shared/milestones.ts`, `MilestonesPanel.tsx`):
+  - 13 milestones derived from the save; nothing is stored.
+  - The best title shows on the keeper badge, which opens the Keeper Record.
+- **Sky** (`Atmosphere.tsx`):
+  - A rainbow after rain, placed ahead of the viewer and visible when the camera is tilted toward the horizon.
+  - Shooting stars on clear nights.
+- **Photo mode:** Pose (G).
+- **Greeting:** hearts float up from the companion (`Hearts.tsx`).
+- **Sound cues:** `lantern`, `gift` and `shutter`. The audio manifest is regenerated.
+
+## Implemented October 29
 
 - **Creature looks** (`apps/client/src/models.ts`):
   - Eyes have an iris rim, a lit lower iris, two catchlights and a soft upper lid. They glance to a new spot every ~2 s.
@@ -38,6 +63,14 @@ Updated October 29, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch
   - Indoor music reuses an existing theme, because `tests/signatures.test.ts` pins ten music themes.
 
 ## Verified (October 29)
+
+October 30 (final `HEAD`):
+- typecheck and content audit pass;
+- **41 test files, 182 passed** (new: `milestones.test.ts`);
+- both builds pass with no warning, entry 426 kB (146 kB gzipped);
+- Playwright: the full run (52 min) passed 31 of 33. `canyon.spec` lost one of the two auto-battles it must win, and `conservancy.spec` had its page reload mid-setup; both passed on a targeted rerun (7.1 min), so all 33 have passing evidence on `36d5e6a`.
+
+October 29:
 
 | Check | Session start (`4619fdc`) | Final |
 | --- | --- | --- |
