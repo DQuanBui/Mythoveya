@@ -60,11 +60,13 @@ export function PhotoMode({
   setFilter,
   caption,
   close,
+  pose,
 }: {
   filter: PhotoFilter;
   setFilter: (f: PhotoFilter) => void;
   caption: string;
   close: () => void;
+  pose: () => void;
 }) {
   const [frame, setFrame] = useState(true),
     [status, setStatus] = useState("");
@@ -83,6 +85,7 @@ export function PhotoMode({
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
       if (e.code === "Escape" || e.code === "KeyP") close();
+      else if (e.code === "KeyG") pose();
       else if (e.code === "Enter" && !(e.target instanceof HTMLButtonElement || e.target instanceof HTMLInputElement)) shoot();
     };
     window.addEventListener("keydown", key);
@@ -102,6 +105,9 @@ export function PhotoMode({
         <label className="photo-toggle">
           <input type="checkbox" checked={frame} onChange={(e) => setFrame(e.target.checked)} /> Frame
         </label>
+        <button onClick={pose} title="Your keeper waves and your companion cheers for about three seconds">
+          ✋ Pose <kbd>G</kbd>
+        </button>
         <button className="primary" onClick={shoot}>
           📷 Take photo <kbd>Enter</kbd>
         </button>

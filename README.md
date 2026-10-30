@@ -13,7 +13,7 @@ Mythoveya is a browser-based 3D creature-collection RPG. Its world, characters, 
 ## The game
 
 - **Seasonal festivals:** during Lantern Night (Oct 24 – Nov 7) eight carved glowgourds are hidden around Havenreach, and during Frostlight (Dec 18 – Jan 6) eight frost-glass star lanterns. The Events panel opens on the festival with a clue for each one; every find pays a little, and all eight pay 120 Diamonds and 2 bond tokens. [Read the festival guide](docs/SEASONS.md).
-- **Photo mode:** press **P** (or ◉ beside Events) to hide the interface, choose one of six filters, add a captioned frame and save a PNG of your keeper and companions.
+- **Photo mode:** press **P** (or ◉ beside Events) to hide the interface, choose one of six filters, add a captioned frame, press **Pose** (G) so your keeper waves and your companion cheers, and save a PNG.
 - **Featured Weeks:** every Monday a new themed event begins: Tidewater Week, Guardian's Vigil, Kindred Week or Forgefire Week. Finish its three missions, open the theme chest, and collect all four event stamps. Find it first in the Events panel (❖).
 - **Wayfarer Lodges:** enter four regional rooms, meet their hosts, cook local suppers, help with companions and keep permanent decorations. Welcome Lumeswallow and Velvetmoth. [Read the illustrated lodge guide](docs/LODGES.md).
 - **Wildbound Rescues:** help Mira, Oren, Tavi and Edda with your active companions' elemental abilities. Restore four wildlife clearings, choose their permanent endings, and welcome Reedrake and Solmole. [Read the rescue guide](docs/RESCUES.md).

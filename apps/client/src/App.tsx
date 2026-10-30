@@ -722,6 +722,12 @@ export default function App() {
               setFilter={setPhotoFilter}
               caption={`${profile.name} · ${profile.island === "festival" ? "Lanternfair Isle" : profile.island === "home" ? "Hearthfall Isle" : (REGIONS.find((r) => r.id === profile.region)?.name || "Havenreach")} · Mythoveya`}
               close={() => setPhotoMode(false)}
+              // A pose holds the keeper's wave and the companion's cheer a little longer.
+              pose={() => {
+                setPet(true);
+                audio.cue("pet");
+                setTimeout(() => setPet(false), 3200);
+              }}
             />
           )}
           {!photoMode && <WorldHUD
