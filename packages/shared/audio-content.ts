@@ -86,6 +86,11 @@ export const CUES: Record<string, Cue> = {
   sandStep: ["sine", 120, 70, 0.13, 0.9, []],
   interact: ["sine", 420, 630, 0.3, 0, [0, 4, 7]],
   collect: ["triangle", 660, 990, 0.24, 0.03, [0, 7, 12]],
+  // A bell-like rising chime for festival lanterns, a bright unwrapping
+  // flourish for home gifts, and a crisp camera shutter.
+  lantern: ["sine", 520, 1040, 0.55, 0, [0, 5, 9, 12, 17]],
+  gift: ["triangle", 600, 900, 0.4, 0.05, [0, 4, 7, 11]],
+  shutter: ["triangle", 1800, 900, 0.06, 0.6, []],
   quest: ["sine", 440, 880, 0.65, 0, [0, 4, 7, 12]],
   charge: ["triangle", 120, 480, 0.7, 0.12, [0, 7]],
   reveal: ["sine", 330, 660, 0.8, 0.04, [0, 4, 7, 12, 16]],

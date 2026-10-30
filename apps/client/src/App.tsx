@@ -450,7 +450,7 @@ export default function App() {
           );
       }
       else if (id.startsWith("season-")) {
-        audio.cue("collect");
+        audio.cue("lantern");
         run("season-find", { id: id.slice(7) });
       } else if (id.startsWith("cache-")) {
         if (profile?.town?.caches?.includes(id.slice(6)))

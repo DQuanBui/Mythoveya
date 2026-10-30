@@ -73,7 +73,7 @@ export function PhotoMode({
   const shoot = async () => {
     const data = photo.grab?.();
     if (!data) return setStatus("The camera isn't ready yet.");
-    audio.cue("collect");
+    audio.cue("shutter");
     setStatus("Saving…");
     try {
       await save(data, filter, frame, caption);

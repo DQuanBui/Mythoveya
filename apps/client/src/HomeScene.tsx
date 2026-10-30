@@ -395,7 +395,7 @@ export function HomeScene({
               <>
                 <h2>{h.featureName}</h2>
                 <p>{given ? `${h.host} has already shared today's gift. Come back after 00:00 UTC.` : `${h.host} sets something aside for every visitor, once a day.`}</p>
-                <button className="primary" disabled={busy || given} onClick={() => run("town-gift", { id })}>
+                <button className="primary" disabled={busy || given} onClick={() => run("town-gift", { id }).then((r) => r && audio.cue("gift"))}>
                   {given ? "Gift taken today" : "Accept today's gift"}
                 </button>
               </>
