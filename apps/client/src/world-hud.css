@@ -669,3 +669,66 @@
 .scene.photo-shot canvas ~ div {
   display: none;
 }
+
+/* Keeper title on the badge, and the milestones list */
+.keeper-badge .keeper-title {
+  display: block;
+  margin-top: 2px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #e9ce94;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.keeper-badge .keeper-title:hover,
+.keeper-badge .keeper-title:focus-visible {
+  text-decoration: underline;
+}
+.milestone-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.milestone-list li {
+  display: grid;
+  grid-template-columns: 24px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+}
+.milestone-list li > span {
+  color: #e9ce94;
+  font-size: 1.1rem;
+}
+.milestone-list li:not(.done) {
+  opacity: 0.8;
+}
+.milestone-list strong,
+.milestone-list small {
+  display: block;
+}
+.milestone-list i {
+  display: block;
+  height: 5px;
+  margin-top: 5px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+.milestone-list i b {
+  display: block;
+  height: 100%;
+  background: #e9ce94;
+}
+.milestone-list em {
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.8;
+}

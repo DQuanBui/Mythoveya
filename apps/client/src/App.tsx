@@ -34,6 +34,7 @@ import { FESTIVAL_RADIUS } from "../../../packages/shared/festival";
 import { SKYFERRY, HAVEN_HOUSES, houseDoor } from "../../../packages/shared/haven";
 import { HOME_INTERIORS } from "../../../packages/shared/homes";
 import { PhotoMode, photoCss, type PhotoFilter } from "./PhotoMode";
+import { MilestonesPanel } from "./MilestonesPanel";
 import {
   catalogEntry,
   defaultHome,
@@ -907,6 +908,7 @@ export default function App() {
             {(panel === "smith" || panel === "apothecary") && profile && (
               <ShopPanel shop={panel} profile={profile} run={run} />
             )}
+            {panel === "milestones" && profile && <MilestonesPanel profile={profile} />}
             {panel === "fishing" && profile && (
               <FishingPanel profile={profile} run={run} />
             )}

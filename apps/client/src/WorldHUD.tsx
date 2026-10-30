@@ -1,4 +1,5 @@
 import { rescueCount } from "../../../packages/shared/rescue";
+import { keeperTitle } from "../../../packages/shared/milestones";
 import { MEADOW_EXTENT, MEADOW_PATHS, MEADOW_POND } from "../../../packages/shared/meadow";
 import { HOLLOW_EXTENT, HOLLOW_PATHS, HOLLOW_LAKE } from "../../../packages/shared/hollow";
 import { CANYON_EXTENT, CANYON_PATHS, CANYON_SPRINGS } from "../../../packages/shared/canyon";
@@ -147,6 +148,9 @@ export function WorldHUD({
             {profile.region === "hollow" && profile.hollow?.finished && <small className="lantern-badge">LANTERN KEEPER</small>}
             {profile.region === "canyon" && profile.canyon?.fieldReward && <small className="naturalist-badge">CANYON NATURALIST</small>}
             <small>RIFTKEEPER · LEVEL {profile.level}</small>
+            <button className="keeper-title" onClick={() => open("milestones")} title="Milestones and titles">
+              ★ {keeperTitle(profile) || "Milestones"}
+            </button>
           </div>
         </div>
         <div className="location">
