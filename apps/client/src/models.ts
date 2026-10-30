@@ -474,11 +474,17 @@ export function createCreature(id: string, shimmer = false) {
       for (let i = 0; i < 4; i++) body([(i - 1.5) * 0.2, 0.92, -0.2 - (i % 2) * 0.15], [0.08, 0.04, 0.08], accent);
   }
   if (s.family === "serpent") {
+    // The body thickens from a fine tail tip toward the head, with pale belly
+    // scales underneath and a small dorsal ridge on alternate segments.
     for (let i = 0; i < 9; i++) {
-      const p = new T.Group();
-      p.position.set(Math.sin(i * 0.8) * 0.35, 0.42 + i * 0.077, -1 + i * 0.2);
+      const p = new T.Group(),
+        r = 0.11 + (i / 8) * 0.16;
+      p.position.set(Math.sin(i * 0.8) * 0.35, 0.3 + r * 0.6 + i * 0.07, -1 + i * 0.2);
       rig.add(p);
-      part(p, "orb", i % 2 ? c : dna.marking === "stripes" ? accent : mid, [0, 0, 0], [0.25 - i * 0.008, 0.24, 0.27]);
+      part(p, "orb", i % 2 ? c : dna.marking === "stripes" ? accent : mid, [0, 0, 0], [r, r * 0.95, 0.2 + r * 0.5]);
+      part(p, "orb", cream, [0, -r * 0.45, 0.01], [r * 0.82, r * 0.55, 0.12 + r * 0.4]);
+      if (i % 2) part(p, "cone", accent, [0, r * 0.9, 0], [0.04, 0.09 + r * 0.25, 0.08], [-0.3, 0, 0]);
+      if (i === 0) part(p, "cone", c, [0, 0, -0.2], [0.08, 0.3, 0.08], [-Math.PI / 2, 0, 0]);
       tails.push(p);
     }
     headY = 1.16;
@@ -592,8 +598,18 @@ export function createCreature(id: string, shimmer = false) {
       } else if (dna.ears === "floppy")
         part(rig, "capsule", dark, [ex * 1.25, ey - 0.1, headZ - 0.02], [0.09 * es, 0.2 * es, 0.06], [0.2, 0, -side * 0.9]);
     }
-    body([0, headY - 0.1 * hs, headZ + 0.28 * hs], [0.22 * hs, 0.15 * hs, 0.25 * hs], cream);
-    if (s.id !== "solmole") {
+    if (s.family === "dragon") {
+      // A longer reptilian muzzle with a pale jaw, nostrils, and brow ridges.
+      body([0, headY - 0.06 * hs, headZ + 0.33 * hs], [0.2 * hs, 0.14 * hs, 0.3 * hs]);
+      body([0, headY - 0.15 * hs, headZ + 0.3 * hs], [0.18 * hs, 0.08 * hs, 0.27 * hs], cream);
+      for (const side of [-1, 1]) {
+        part(rig, "orb", "#2a2422", [side * 0.06 * hs, headY + 0.01 * hs, headZ + 0.6 * hs], [0.022, 0.016, 0.02], undefined, false, true);
+        part(rig, "cone", tint(c, dark, 0.25), [side * 0.17 * hs, headY + 0.2 * hs, headZ + 0.2 * hs], [0.05 * hs, 0.16 * hs, 0.05 * hs], [-1.2, 0, -side * 0.5]);
+        part(rig, "cone", "#fbf8ee", [side * 0.09 * hs, headY - 0.2 * hs, headZ + 0.52 * hs], [0.018, 0.05, 0.018], [Math.PI, 0, 0]);
+      }
+      part(rig, "arc", "#3a2622", [0, headY - 0.11 * hs, headZ + 0.555 * hs], [0.09 * hs, 0.05 * hs, 0.05], [0.2, 0, Math.PI]);
+    } else body([0, headY - 0.1 * hs, headZ + 0.28 * hs], [0.22 * hs, 0.15 * hs, 0.25 * hs], cream);
+    if (s.id !== "solmole" && s.family !== "dragon") {
       part(rig, "orb", "#2a2422", [0, headY - 0.03 * hs, headZ + 0.5 * hs], [0.07, 0.055, 0.05], undefined, false, true);
       // A gentle "w" smile beneath the nose.
       if (!f.snout && !f.trunk && !f.mouthTusks) {
