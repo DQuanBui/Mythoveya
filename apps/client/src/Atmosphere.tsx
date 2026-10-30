@@ -6,6 +6,15 @@ import { daylight, islandHour } from "./daytime";
 import { setNightGlow, worldFocus } from "./village-materials";
 import { seeded } from "../../../packages/shared/haven";
 import { weatherFx } from "./Weather";
+import { weatherAt, WEATHER_SPELL_MS } from "../../../packages/shared/weather";
+
+const BOW = ["#ff6b6b", "#ffa94d", "#ffe066", "#8ce99a", "#74c0fc", "#b197fc"];
+/** For the first part of a clear spell that follows rain (by day), 0..1. */
+function rainbowStrength(now: number, night: number) {
+  const w = weatherAt(now);
+  if (w.weather !== "clear" || weatherAt(now - WEATHER_SPELL_MS).weather !== "rain" || night > 0.4) return 0;
+  return Math.max(0, Math.min(1, w.into * 12, (0.45 - w.into) * 8));
+}
 const STORM = new T.Color("#8b9ba3"),
   MIST = new T.Color("#cfd8d6");
 
@@ -236,7 +245,31 @@ export function SkyLife({
   birds?: boolean;
 }) {
   const ring = useRef<T.Group>(null),
-    birds = useRef<T.Group>(null);
+    birds = useRef<T.Group>(null),
+    shooting = useRef<T.Mesh>(null),
+    bowGroup = useRef<T.Group>(null),
+    nextStar = useRef({ at: 6, from: new T.Vector3(), dir: new T.Vector3() });
+  // A soft rainbow after rain: six thin half-rings, far to the north.
+  const bow = useMemo(
+    () =>
+      BOW.map((color, i) => {
+        const m = new T.Mesh(
+          new T.TorusGeometry(radius * 0.9 - i * radius * 0.018, radius * 0.009, 6, 64, Math.PI),
+          new T.MeshBasicMaterial({ color, transparent: true, opacity: 0, depthWrite: false, fog: false }),
+        );
+        m.name = "sky-rainbow";
+        return m;
+      }),
+    [radius],
+  );
+  useEffect(
+    () => () =>
+      bow.forEach((m) => {
+        m.geometry.dispose();
+        (m.material as T.Material).dispose();
+      }),
+    [bow],
+  );
   const clouds = useMemo(() => {
     const random = seeded(4242),
       total = settings.quality === "Low" ? 16 : 30,
@@ -281,10 +314,51 @@ export function SkyLife({
     },
     [clouds],
   );
-  useFrame(({ clock }, dt) => {
+  useFrame(({ clock, camera }, dt) => {
+    const night = daylight(islandHour()).glow,
+      strength = rainbowStrength(Date.now(), night),
+      arc = bowGroup.current;
+    if (arc) {
+      arc.visible = strength > 0;
+      // Like a real rainbow it keeps its place relative to the viewer: far
+      // ahead, low and wide, its crown just above the horizon.
+      if (arc.visible) {
+        const f = camera.getWorldDirection(new T.Vector3()).setY(0).normalize(),
+          d = radius * 1.6;
+        arc.position.set(camera.position.x + f.x * d, camera.position.y + d * 0.15 - radius * 0.9 * 0.55, camera.position.z + f.z * d);
+        arc.rotation.y = Math.atan2(-f.x, -f.z);
+        bow.forEach((m) => ((m.material as T.MeshBasicMaterial).opacity = strength * 0.4));
+      }
+    }
+    // On clear nights a shooting star crosses the sky every several seconds.
+    const star = shooting.current,
+      t = clock.elapsedTime,
+      n = nextStar.current;
+    if (star) {
+      const run = t - n.at,
+        clear = night > 0.55 && weatherFx.rain < 0.1 && weatherFx.mist < 0.3 && !settings.reduced;
+      if (run > 0.9) {
+        // Spawn far ahead of the viewer, low enough to cross the visible sky.
+        n.at = t + 6 + Math.random() * 9;
+        const f = camera.getWorldDirection(new T.Vector3()).setY(0).normalize(),
+          side = new T.Vector3(f.z, 0, -f.x),
+          across = Math.random() < 0.5 ? 1 : -1;
+        n.from
+          .copy(camera.position)
+          .addScaledVector(f, radius * 1.1)
+          .addScaledVector(side, -across * radius * (0.2 + Math.random() * 0.3))
+          .setY(camera.position.y + radius * (0.11 + Math.random() * 0.06));
+        n.dir.copy(side).multiplyScalar(across).setY(-0.3).normalize();
+      }
+      star.visible = clear && run >= 0 && run <= 0.9;
+      if (star.visible) {
+        star.position.copy(n.from).addScaledVector(n.dir, run * radius * 0.5);
+        star.quaternion.setFromUnitVectors(new T.Vector3(1, 0, 0), n.dir);
+        (star.material as T.MeshBasicMaterial).opacity = Math.sin((run / 0.9) * Math.PI);
+      }
+    }
     if (settings.reduced) return;
     if (ring.current) ring.current.rotation.y += Math.min(dt, 0.05) * 0.006;
-    const night = daylight(islandHour()).glow;
     if (birds.current) {
       birds.current.visible = showBirds && night < 0.5;
       birds.current.children.forEach((b, i) => {
@@ -303,6 +377,15 @@ export function SkyLife({
       <group ref={ring}>
         <primitive object={clouds} />
       </group>
+      <group ref={bowGroup} name="sky-rainbow" visible={false} scale={[1, 0.55, 1]}>
+        {bow.map((m, i) => (
+          <primitive key={i} object={m} />
+        ))}
+      </group>
+      <mesh ref={shooting} name="sky-shooting-star" visible={false}>
+        <boxGeometry args={[radius * 0.12, 0.08, 0.08]} />
+        <meshBasicMaterial color="#fff8e1" transparent opacity={0} depthWrite={false} fog={false} blending={T.AdditiveBlending} />
+      </mesh>
       <group ref={birds} name="sky-birds" visible={showBirds}>
         {Array.from({ length: 6 }, (_, i) => (
           <group key={i}>
