@@ -339,6 +339,28 @@ export function createCreature(id: string, shimmer = false) {
     wings.push(w);
     return w;
   };
+  // Sea creatures get ribbed pectoral fins: the wing membrane, small and
+  // drooping, with fine rays instead of bones.
+  const fin = (side: number, size = 1) => {
+    const w = new T.Group();
+    w.position.set(side * 0.34, 0.82, 0.18);
+    rig.add(w);
+    const span = 0.62 * size,
+      euler = new T.Euler(-Math.PI / 2, side * -0.35, side * -0.25, "ZYX"),
+      place = new T.Matrix4().makeRotationFromEuler(euler).multiply(new T.Matrix4().makeScale(span, span, 1)),
+      to3 = ([x, y]: [number, number]) => new T.Vector3(x * side, y, 0.02).applyMatrix4(place),
+      ray = tint(accent, dark, 0.25);
+    part(w, side > 0 ? "membraneR" : "membraneL", tint(accent, light, 0.3), [0, 0, 0], [span, span, 1]).rotation.copy(euler);
+    for (const tip of [WING_WRIST, ...WING_TIPS]) {
+      const a = to3([0, 0]),
+        b = to3(tip),
+        d = b.clone().sub(a),
+        e = new T.Euler().setFromQuaternion(new T.Quaternion().setFromUnitVectors(new T.Vector3(0, 1, 0), d.clone().normalize()));
+      part(w, "capsule", ray, a.add(b).multiplyScalar(0.5).toArray(), [0.014, d.length() / 2, 0.014], [e.x, e.y, e.z]);
+    }
+    wings.push(w);
+    return w;
+  };
   const horn = (x: number, y: number, z: number, sz = 0.4, color = cream) =>
     part(rig, "cone", color, [x, y, z], [0.09, sz, 0.1], [0.2, 0, -x * 0.7], s.tier === "S");
   if (four) {
@@ -496,7 +518,18 @@ export function createCreature(id: string, shimmer = false) {
     body([0, 0.82, 0.12], [0.34 * bx, 0.3, 0.62 * bz], cream);
     headY = 0.99;
     headZ = 0.61;
-    if (s.id !== "bloomanta" && s.id !== "cairnfin") { wing(-1, 1.15, accent); wing(1, 1.15, accent); }
+    if (s.id !== "bloomanta" && s.id !== "cairnfin") { fin(-1, 1.15); fin(1, 1.15); }
+    if (!/jellyfish|cuttlefish/.test(s.appearance)) {
+      // A forked tail fin that sways, and a dorsal fin along the back.
+      const tailFin = new T.Group();
+      tailFin.position.set(0, 0.9, -0.78 * bz);
+      rig.add(tailFin);
+      part(tailFin, "orb", c, [0, 0, -0.08], [0.14, 0.16, 0.18]);
+      for (const up of [-1, 1])
+        part(tailFin, "orb", accent, [0, up * 0.17, -0.3], [0.035, 0.27, 0.15], [up * 0.75, 0, 0]);
+      tails.push(tailFin);
+      part(rig, "orb", accent, [0, 0.9 + 0.4 * by, -0.15 * bz], [0.03, 0.2, 0.3], [-0.35, 0, 0]);
+    }
     if (/jellyfish|cuttlefish/.test(s.appearance)) {
       body([0, 1.05, 0], [0.66, 0.42, 0.65]);
       for (let i = 0; i < 6; i++) {
