@@ -1,4 +1,6 @@
 import type { TownReward } from "./town";
+import type { Point } from "./haven";
+import { buildGrid, findPath } from "./pathfind";
 
 // Walk-in interiors for Havenreach's visitor-book homes. Cloudwatch Lodge is
 // not listed: its door already opens the Wayfarer Lodge common room.
@@ -135,4 +137,16 @@ export function homeWalkable(x: number, z: number) {
       (f) => Math.abs(x - f.x) < f.w / 2 + 0.35 && Math.abs(z - f.z) < f.d / 2 + 0.35,
     )
   );
+}
+/** The resident's stroll around the rug and table, collision-checked like the keeper's. */
+export function homeResidentRoute(): Point[] {
+  const grid = buildGrid(homeWalkable, 6),
+    stops: Point[] = [[2.4, 1.9], [-1.6, 1.9], [-2.2, -0.4], [2.3, -0.8], [2.4, 1.9]],
+    route: Point[] = [stops[0]];
+  for (let i = 1; i < stops.length; i++) {
+    const leg = findPath(grid, route.at(-1)!, stops[i], homeWalkable);
+    if (!leg) return [stops[0]];
+    route.push(...leg);
+  }
+  return route;
 }

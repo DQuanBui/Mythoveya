@@ -10,6 +10,7 @@ import {
   HOME_SPAWN,
   HOME_STATIONS,
   homeWalkable,
+  homeResidentRoute,
   type HomeInterior,
 } from "../../../packages/shared/homes";
 import { Explorer, type WalkArea } from "./Scene";
@@ -22,6 +23,7 @@ import { Kit, SHAPES } from "./village-kit";
 import { HouseVisit } from "./HavenHouses";
 import type { ExplorationInput } from "./world-guide";
 import { audio, settings } from "./audio";
+import { residentPose } from "../../../packages/shared/lodge-life";
 import "./lodges.css";
 
 const shade = (c: string, t: number, to = "#000000") => new T.Color(c).lerp(new T.Color(to), t).getStyle();
@@ -125,7 +127,10 @@ function buildHome(h: HomeInterior, seed: number) {
     g.box("#e9ffd8", [fx, 2.2, fz + 0.1], [1.8, 0.06, 0.1]);
     k.add(SHAPES.CYL, "#4f86a8", [fx + 1.4, 0.18, fz + 0.5], [0.16, 0.36, 0.16]);
   } else if (h.feature === "pantry") {
-    k.box(shade(h.floor, 0.3), [fx, 1.2, fz], [2.3, 2.4, 0.8]);
+    // An open dresser: back, sides and top, so the jars on its shelves show.
+    k.box(shade(h.floor, 0.3), [fx, 1.2, fz - 0.35], [2.3, 2.4, 0.1]);
+    for (const x of [-1.15, 1.15]) k.box(shade(h.floor, 0.35), [fx + x, 1.2, fz], [0.08, 2.4, 0.8]);
+    k.box(shade(h.floor, 0.35), [fx, 2.42, fz], [2.4, 0.08, 0.85]);
     const jars = ["#c8473f", "#e48b3a", "#7d3f6e", "#e2c14e", "#9a4040"];
     for (let s = 0; s < 3; s++) {
       k.box(shade(h.floor, 0.1), [fx, 0.45 + s * 0.7, fz + 0.15], [2.1, 0.05, 0.6]);
@@ -148,8 +153,26 @@ function buildHome(h: HomeInterior, seed: number) {
   return { body: k.build(), glow: g.build() };
 }
 
-function Home({ id, blocked, interact }: { id: string; blocked: boolean; interact: (id: string) => void }) {
-  const h = HOME_INTERIORS[id];
+// One shared route; residents pause at each corner (see residentPose).
+const residentRoute = homeResidentRoute();
+const giftPaper = new T.MeshStandardMaterial({ color: "#c4473c", roughness: 0.6 }),
+  giftRibbon = new T.MeshStandardMaterial({ color: "#f2d27a", roughness: 0.3, metalness: 0.4 }),
+  frameGold = new T.MeshStandardMaterial({ color: "#c9a25a", roughness: 0.35, metalness: 0.5 });
+function Home({
+  id,
+  blocked,
+  interact,
+  signed,
+  given,
+}: {
+  id: string;
+  blocked: boolean;
+  interact: (id: string) => void;
+  signed: boolean;
+  given: boolean;
+}) {
+  const h = HOME_INTERIORS[id],
+    walked = useRef(0);
   const geo = useMemo(() => buildHome(h, id.length), [id]);
   useEffect(() => () => {
     geo.body.dispose();
@@ -168,9 +191,14 @@ function Home({ id, blocked, interact }: { id: string; blocked: boolean; interac
     m.scale.multiplyScalar(0.75);
     return m;
   }, [id]);
-  useFrame(({ clock }) => {
+  useFrame(({ clock }, dt) => {
     animateAvatar(host, clock.elapsedTime, false, false, settings.reduced);
-    animateCreature(resident, clock.elapsedTime, "idle", 0, settings.reduced);
+    if (!blocked && !settings.reduced) walked.current += Math.min(dt, 0.05);
+    const pose = residentPose(residentRoute, walked.current);
+    resident.position.x = pose.x;
+    resident.position.z = pose.z;
+    resident.rotation.y = pose.yaw;
+    animateCreature(resident, clock.elapsedTime, pose.walking && !settings.reduced ? "walk" : "idle", 0, settings.reduced);
   });
   return (
     <group name={`home-${id}`}>
@@ -178,6 +206,43 @@ function Home({ id, blocked, interact }: { id: string; blocked: boolean; interac
       <mesh geometry={geo.glow} material={glowMaterial} />
       <primitive object={host} />
       <primitive object={resident} />
+      {/* Today's gift waits, wrapped, in the signature corner until it is taken. */}
+      {!given && (
+        <group name="home-gift-parcel" position={[-1.75, 0.12, -2.55]} rotation={[0, 0.4, 0]}>
+          <mesh material={giftPaper} castShadow>
+            <boxGeometry args={[0.32, 0.24, 0.32]} />
+          </mesh>
+          <mesh material={giftRibbon}>
+            <boxGeometry args={[0.34, 0.26, 0.06]} />
+          </mesh>
+          <mesh material={giftRibbon}>
+            <boxGeometry args={[0.06, 0.26, 0.34]} />
+          </mesh>
+          <mesh material={giftRibbon} position={[0, 0.16, 0]} rotation={[0, 0, Math.PI / 4]}>
+            <torusGeometry args={[0.06, 0.02, 6, 12]} />
+          </mesh>
+        </group>
+      )}
+      {/* Once the visitor book is signed, the host frames your stamp by the lectern. */}
+      {signed && (
+        <group name="home-framed-stamp" position={[2.75, 2.05, -3.9]}>
+          <mesh material={frameGold}>
+            <boxGeometry args={[0.62, 0.62, 0.05]} />
+          </mesh>
+          <mesh position={[0, 0, 0.03]}>
+            <boxGeometry args={[0.5, 0.5, 0.02]} />
+            <meshStandardMaterial color="#f6ecd2" />
+          </mesh>
+          <mesh position={[0, 0, 0.045]}>
+            <circleGeometry args={[0.16, 24]} />
+            <meshStandardMaterial color={h.accent} />
+          </mesh>
+          <mesh position={[0, 0, 0.05]}>
+            <ringGeometry args={[0.17, 0.2, 24]} />
+            <meshStandardMaterial color={h.rug} />
+          </mesh>
+        </group>
+      )}
       {HOME_STATIONS.map((s) => (
         <WorldInteraction
           key={s.id}
@@ -274,7 +339,7 @@ export function HomeScene({
             <pointLight position={[-2.9, 1.6, -2.4]} color="#ffb969" intensity={10} distance={8} />
             <pointLight position={[1, 2.2, -3]} color="#ffe6b0" intensity={5} distance={6} />
             <ModelLighting intensity={0.3} />
-            <Home id={id} blocked={!!panel} interact={interact} />
+            <Home id={id} blocked={!!panel} interact={interact} signed={!!profile.town?.stamps?.includes(id)} given={!!given} />
             <Explorer
               {...{ profile, walker, input, area }}
               spawn={HOME_SPAWN}

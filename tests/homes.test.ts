@@ -6,7 +6,7 @@ import { HAVEN_HOUSES } from "../packages/shared/haven";
 import { LODGES } from "../packages/shared/lodges";
 import { NPCS } from "../packages/shared/town";
 import { byId } from "../packages/shared/content";
-import { HOME_INTERIORS, HOME_SPAWN, HOME_STATIONS, homeWalkable } from "../packages/shared/homes";
+import { HOME_INTERIORS, HOME_SPAWN, HOME_STATIONS, homeWalkable, homeResidentRoute } from "../packages/shared/homes";
 import { buildGrid, findPath } from "../packages/shared/pathfind";
 
 process.env.DB_PATH = join(mkdtempSync(join(tmpdir(), "mythoveya-homes-")), "save.sqlite");
@@ -31,6 +31,8 @@ describe("visitor-book home interiors", () => {
   it("lets the keeper walk from the door to every station", () => {
     const grid = buildGrid(homeWalkable, 6);
     expect(homeWalkable(...HOME_SPAWN)).toBe(true);
+    expect(homeResidentRoute().length).toBeGreaterThan(4);
+    for (const p of homeResidentRoute()) expect(homeWalkable(...p), String(p)).toBe(true);
     for (const s of HOME_STATIONS) {
       expect(homeWalkable(...s.point), s.id).toBe(true);
       expect(findPath(grid, HOME_SPAWN, s.point, homeWalkable), s.id).toBeTruthy();

@@ -17,6 +17,8 @@ Inside, walk around with WASD, the arrow keys, by clicking the floor, or with th
 - **Visitor book:** sign it, exactly as on the porch.
 - **Step outside:** return to the porch.
 
+The room responds to your progress: a wrapped gift waits in the signature corner until you take today's gift. Once you've signed the visitor book, the host frames your stamp on the back wall. The resident creature strolls around the rug and table, pausing at each corner (it stays still with Reduced Motion).
+
 Implementation notes:
 - Content, furniture footprints, stations and walkability are in `packages/shared/homes.ts`.
 - The gift mutation is `town-gift` in `apps/server/town-game.ts`. It stores `town.gifts` (optional, per UTC day).
