@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as T from "three";
-import { groundHeight } from "../../../packages/shared/haven";
+import { groundHeight, HAVEN_HOUSES } from "../../../packages/shared/haven";
+import { worldFocus } from "./village-materials";
 import type { Season } from "../../../packages/shared/seasons";
 import { WorldInteraction } from "./WorldInteraction";
 import { settings } from "./audio";
@@ -131,6 +132,64 @@ function Lantern({
   );
 }
 
+/** Autumn leaves (or snowflakes) drifting down around the keeper. */
+function SeasonAir({ prop }: { prop: Season["prop"] }) {
+  const count = settings.quality === "Low" ? 50 : settings.quality === "High" ? 160 : 100;
+  const air = useMemo(() => {
+    const leaf = prop === "gourd",
+      m = new T.InstancedMesh(
+        leaf ? new T.PlaneGeometry(0.16, 0.11) : new T.CircleGeometry(0.045, 6),
+        new T.MeshBasicMaterial({ side: T.DoubleSide, transparent: true, opacity: 0.9, depthWrite: false }),
+        count,
+      ),
+      palette = leaf ? ["#d9752f", "#c4452f", "#e8b440", "#a8582c"] : ["#ffffff", "#eaf6ff"],
+      seeds = Array.from({ length: count }, (_, i) => [Math.random() * 30 - 15, Math.random() * 14, Math.random() * 30 - 15, Math.random() * 6.28, i % palette.length]);
+    seeds.forEach((s, i) => m.setColorAt(i, new T.Color(palette[s[4]])));
+    m.frustumCulled = false;
+    m.name = leaf ? "season-leaves" : "season-snow";
+    return { m, seeds, leaf };
+  }, [prop, count]);
+  useEffect(() => () => {
+    air.m.geometry.dispose();
+    (air.m.material as T.Material).dispose();
+  }, [air]);
+  const o = useMemo(() => new T.Object3D(), []);
+  useFrame(({ clock }) => {
+    air.m.visible = !settings.reduced;
+    if (settings.reduced) return;
+    const t = clock.elapsedTime;
+    air.seeds.forEach(([sx, sy, sz, ph], i) => {
+      // Each one falls through a 14 m column above the keeper, swaying as it goes.
+      const fall = air.leaf ? 0.9 : 0.6,
+        y = 14 - ((t * fall + sy) % 14);
+      o.position.set(
+        worldFocus.x + sx + Math.sin(t * 0.8 + ph) * 0.8,
+        worldFocus.y + y,
+        worldFocus.z + sz + Math.cos(t * 0.6 + ph) * 0.6,
+      );
+      o.rotation.set(t * 1.3 + ph, t * 0.9 + ph, Math.sin(t * 2 + ph) * 0.8);
+      o.updateMatrix();
+      air.m.setMatrixAt(i, o.matrix);
+    });
+    air.m.instanceMatrix.needsUpdate = true;
+  });
+  return <primitive object={air.m} />;
+}
+/** Small festival decorations: a pair of gourds or star lanterns at each home's steps. */
+function PorchDecor({ prop }: { prop: Season["prop"] }) {
+  return (
+    <group name="season-porches">
+      {HAVEN_HOUSES.flatMap((h) =>
+        [-1, 1].map((side) => (
+          <group key={h.id + side} position={[h.point[0] + side * 0.55, groundHeight(h.point[0], h.point[1] + 2.4) + 0.2, h.point[1] + 2.4]} scale={prop === "gourd" ? 0.55 : 0.4}>
+            {prop === "gourd" ? <Gourd /> : <Star />}
+          </group>
+        )),
+      )}
+    </group>
+  );
+}
+
 /** The current festival's hidden lanterns around Havenreach. */
 export function SeasonalLanterns({
   season,
@@ -145,6 +204,8 @@ export function SeasonalLanterns({
 }) {
   return (
     <group name={`season-${season.id}`}>
+      <SeasonAir prop={season.prop} />
+      <PorchDecor prop={season.prop} />
       {season.spots.map((s) => (
         <Lantern key={s.id} {...s} prop={season.prop} name={season.name} found={found.includes(s.id)} disabled={disabled} onInteract={onInteract} />
       ))}
