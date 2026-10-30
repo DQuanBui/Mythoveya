@@ -39,6 +39,7 @@ import { HavenTreasure } from "./HavenTreasure";
 import { SeasonalLanterns } from "./SeasonalLanterns";
 import { photo } from "./PhotoMode";
 import { HitBurst } from "./HitBurst";
+import { Hearts } from "./Hearts";
 import { activeSeason } from "../../../packages/shared/seasons";
 import { Riftgate } from "./Riftgate";
 import { ModelLighting } from "./ModelLighting";
@@ -1072,6 +1073,7 @@ export function Explorer({
     <>
       <primitive object={avatar} />
       <primitive object={companion} />
+      <Hearts active={pet} target={companion} />
       <group ref={marker} visible={false} name="walk-marker">
         <mesh rotation={[-Math.PI / 2, 0, 0]} material={markerMaterial}>
           <ringGeometry args={[0.32, 0.42, 32]} />
