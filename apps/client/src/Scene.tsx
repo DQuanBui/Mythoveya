@@ -38,6 +38,7 @@ import { WeatherEffects } from "./Weather";
 import { HavenTreasure } from "./HavenTreasure";
 import { SeasonalLanterns } from "./SeasonalLanterns";
 import { photo } from "./PhotoMode";
+import { HitBurst } from "./HitBurst";
 import { activeSeason } from "../../../packages/shared/seasons";
 import { Riftgate } from "./Riftgate";
 import { ModelLighting } from "./ModelLighting";
@@ -1820,6 +1821,15 @@ export function BattleScene({
               phase={elapsed}
               scale={0.92}
             />
+            {active && event && !preview && outcome > 0 && event.actor !== u.id && (
+              <HitBurst
+                key={event.at}
+                at={event.at}
+                duration={event.duration}
+                element={byId[battle.units.find((x) => x.id === event.actor)?.species || u.species].element}
+                height={0.8 * byId[u.species].size}
+              />
+            )}
             <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.035, 0]} scale={battle.queue[0] === u.id ? 1.15 : 1}>
               <ringGeometry args={[0.65, battle.queue[0] === u.id ? 0.8 : 0.72, 32]} />
               <meshBasicMaterial
