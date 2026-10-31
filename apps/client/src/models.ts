@@ -94,6 +94,13 @@ function glassMaterial(color: string) {
   }
   return glassy.get(color)!;
 }
+// A faint additive glow around spirits.
+const ghosts = new Map<string, T.MeshStandardMaterial>();
+function ghostMaterial(color: string) {
+  if (!ghosts.has(color))
+    ghosts.set(color, new T.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.6, transparent: true, opacity: 0.16, depthWrite: false, blending: T.AdditiveBlending }));
+  return ghosts.get(color)!;
+}
 // Merged static parts share one vertex-colored skin material per surface:
 // soft fur and cloth, polished scales, wet amphibian skin, glossy chitin or
 // matte stone.
@@ -608,6 +615,24 @@ export function createCreature(id: string, shimmer = false) {
       part(rig, "cone", dark, [side * 0.4, 1.5, 0], [0.2, 0.65, 0.18], [0, 0, -side * 0.5]);
     for (let i = 0; i < 3; i++)
       body([Math.sin(i * 2) * 0.5, 0.5, Math.cos(i * 2) * 0.3], [0.12, 0.2, 0.13], i % 2 ? accent : light);
+    // A wispy tail that curls up behind, a faint glowing halo around the
+    // body, and three motes drifting with it.
+    const wisp = new T.Group();
+    wisp.position.set(0, 0.62, -0.28);
+    rig.add(wisp);
+    for (let k = 0; k < 5; k++)
+      part(wisp, "orb", tint(c, light, k / 5), [0, -0.05 + k * k * 0.03, -k * 0.16], [0.24 - k * 0.04, 0.2 - k * 0.032, 0.22 - k * 0.03]);
+    tails.push(wisp);
+    const halo = part(rig, "orb", light, [0, 1, 0], [0.66 * bx, 0.74 * by, 0.56]);
+    halo.material = ghostMaterial(light);
+    halo.userData.merge = false;
+    halo.castShadow = false;
+    const motes = new T.Group();
+    motes.position.set(0, 1.05, 0);
+    rig.add(motes);
+    for (let i = 0; i < 3; i++)
+      part(motes, "orb", i % 2 ? accent : light, [Math.cos(i * 2.1) * 0.7, (i - 1) * 0.2, Math.sin(i * 2.1) * 0.6], [0.045, 0.045, 0.045], undefined, true);
+    tails.push(motes);
   }
   if (s.id === "inkwisp") { headY=1.26; headZ=.4; }
   if (s.family === "golem") {
