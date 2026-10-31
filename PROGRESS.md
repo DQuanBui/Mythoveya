@@ -1,11 +1,29 @@
 # Mythoveya handoff
 
-Updated October 30, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`, pushed to `origin/main` (https://github.com/DQuanBui/Mythoveya). This handoff covers two rounds: October 29 (from `4619fdc`) and October 30 (from `b0d6c3d`). Earlier handoffs (October 28 online-build session, October 22 Wayfarer Lodges) are archived in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md). Preserve ignored `data/mythoveya.sqlite`. `CLAUDE.md` is the quick project map for new sessions.
+Updated October 31, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`, pushed to `origin/main` (https://github.com/DQuanBui/Mythoveya). This handoff covers three rounds: October 29 (from `4619fdc`), October 30 (from `b0d6c3d`) and October 31 (from `3497bb3`). Earlier handoffs (October 28 online-build session, October 22 Wayfarer Lodges) are archived in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md). Preserve ignored `data/mythoveya.sqlite`. `CLAUDE.md` is the quick project map for new sessions.
 
 ## Play
 
 - **Online (single-player):** https://dquanbui.github.io/Mythoveya/. `.github/workflows/pages.yml` publishes it on every push to `main` (Pages source: GitHub Actions). Check a deployment with `node scripts/smoke-pages.mjs https://dquanbui.github.io/Mythoveya/`.
 - **Local (full game, including the human arena):** `npm install`, then run `Play Mythoveya.cmd` or `npm run dev` and open http://127.0.0.1:5173/. For the compiled build, run `npm run build && npm start` and open http://127.0.0.1:2567/.
+
+## Implemented October 31
+
+- **Creatures:**
+  - clear, veined, iridescent insect wings (`glassMaterial`);
+  - golem stone slabs and chest runes, plus moss on grove golems;
+  - tortoise scutes and a rim on shells (`hex` geometry);
+  - spirit glow, wisp tail and motes (`ghostMaterial`);
+  - amphibian webbed feet and throat pouch.
+- **Emotes:**
+  - Keys 1-4 or the ☺ menu: wave, cheer, dance, sit.
+  - The emote lives in `keeperEmote`/`playEmote` (`village-materials.ts`); `animateAvatar` takes an `emote` argument.
+  - The companion plays along.
+- **Weather:** lightning flashes and thunder in full rain (`Weather.tsx`, `audio.thunder`).
+- **Footprints** in snow and sand (`Footprints.tsx`, ring buffer).
+- **Lantern sense:** a HUD chip within 14 m or 6 m of an unfound festival lantern. It uses `aria-live`, not `role="status"`. The toast must stay the page's only status, because tests rely on it.
+- **Performance:** PhotoMode, MilestonesPanel and SeasonalLanterns are lazy chunks; photo state lives in `photo.ts`. Entry 431 → 424 kB. In `Scene.tsx`, any `lazy()` call must come after all imports: in dev, Vite turns the React import into a plain variable.
+- **Tests:** `tests/keeper-fx.test.ts`; `keeper-life.spec` also covers emotes and the Keeper Record.
 
 ## Implemented October 30
 
@@ -64,7 +82,14 @@ Updated October 30, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch
 
 ## Verified (October 29)
 
-October 30 (final `HEAD`):
+October 31 (final `HEAD`):
+- typecheck and content audit pass;
+- 42 test files, **185 passed**;
+- both builds pass, entry 424 kB (146 kB gzipped);
+- Playwright, first full run: 27 of 33 passed. Five failures came from the new lantern chip taking `role="status"`. The sixth, `haven.spec` "mouse picking", couldn't find the 3D scene's internal store.
+- After the fix, the five affected files (8 scenarios) all passed, including the "mouse picking" scenario, so all 33 have passing evidence.
+
+October 30:
 - typecheck and content audit pass;
 - **41 test files, 182 passed** (new: `milestones.test.ts`);
 - both builds pass with no warning, entry 426 kB (146 kB gzipped);
