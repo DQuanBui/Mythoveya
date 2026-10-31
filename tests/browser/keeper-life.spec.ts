@@ -40,6 +40,17 @@ test("photo mode, the seasonal festival and stepping inside a home", async ({ pa
   await expect(page.locator(".keeper-badge")).toContainText("Cosy Keeper");
   await expect(page.locator(".modal")).toHaveCount(0);
 
+  // Emotes from the menu, and the Keeper Record behind the badge title.
+  await page.getByRole("button", { name: "Emotes" }).click();
+  await page.getByRole("menuitem", { name: /Cheer/ }).click();
+  await page.keyboard.press("Digit4");
+  // The guide's team of six already earns the first title.
+  await page.locator(".keeper-badge").getByRole("button", { name: "★ Bondmaker" }).click();
+  await expect(page.getByText(/KEEPER RECORD · 1 OF 13 TITLES/)).toBeVisible();
+  await expect(page.getByRole("progressbar")).toHaveCount(13);
+  await page.keyboard.press("Escape");
+  await expect(page.locator(".modal")).toHaveCount(0);
+
   const season = activeSeason();
   if (season) {
     await page.getByRole("button", { name: "Events and missions" }).click();

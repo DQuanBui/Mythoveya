@@ -15,6 +15,8 @@ export function leavePrint(x: number, y: number, z: number, yaw: number, t: numb
   prints.push({ x: x + Math.cos(yaw) * 0.09 * side, y, z: z - Math.sin(yaw) * 0.09 * side, yaw, t, snow });
   if (prints.length > MAX) prints.shift();
 }
+/** The prints currently remembered (oldest first). */
+export const recentPrints = (): readonly Print[] => prints;
 
 export function Footprints() {
   const marks = useMemo(() => {
