@@ -40,6 +40,7 @@ import { SeasonalLanterns } from "./SeasonalLanterns";
 import { photo } from "./PhotoMode";
 import { HitBurst } from "./HitBurst";
 import { Hearts } from "./Hearts";
+import { Footprints, leavePrint } from "./Footprints";
 import { activeSeason } from "../../../packages/shared/seasons";
 import { Riftgate } from "./Riftgate";
 import { ModelLighting } from "./ModelLighting";
@@ -989,7 +990,9 @@ export function Explorer({
       avatar.rotation.y = Math.atan2(v.x, v.z);
       worldHeading.yaw = avatar.rotation.y;
       if (clock.elapsedTime - foot.current > (sprinting ? 0.27 : 0.32)) {
-        audio.cue(area?.step || stepSound(profile.region, nx, nz, ny));
+        const step = area?.step || stepSound(profile.region, nx, nz, ny);
+        audio.cue(step);
+        if (step === "snowStep" || step === "sandStep") leavePrint(nx, ny, nz, avatar.rotation.y, clock.elapsedTime, step === "snowStep");
         foot.current = clock.elapsedTime;
       }
     }
@@ -1078,6 +1081,7 @@ export function Explorer({
       <primitive object={avatar} />
       <primitive object={companion} />
       <Hearts active={pet} target={companion} />
+      <Footprints />
       <group ref={marker} visible={false} name="walk-marker">
         <mesh rotation={[-Math.PI / 2, 0, 0]} material={markerMaterial}>
           <ringGeometry args={[0.32, 0.42, 32]} />
