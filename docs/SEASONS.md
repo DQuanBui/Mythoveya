@@ -9,6 +9,7 @@ For a few weeks each year, glowing lanterns are hidden around Havenreach. Walk u
 
 - **Events → festival tab** (shown first while a festival runs) lists a clue for every lantern and ticks off the ones you have found.
 - Progress belongs to that year's run (`lantern-night-2026`, and so on). Next year the lanterns return and can be found again. Completed runs stay listed under "Festivals completed".
+- **Lantern sense:** within 14 m of a lantern you haven't found, a chip under the place name says "A lantern glows nearby". Within 6 m it glows and says "Lantern very close!".
 - Found lanterns keep glowing softly in the world but can't be collected again.
 
 Implementation notes:

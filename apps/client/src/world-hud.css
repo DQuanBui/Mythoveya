@@ -761,3 +761,26 @@
     display: none;
   }
 }
+
+/* Lantern sense during seasonal festivals */
+.lantern-sense {
+  border-color: rgba(255, 178, 74, 0.6) !important;
+  color: #ffd9a0;
+}
+.lantern-sense.hot {
+  background: rgba(224, 120, 46, 0.35) !important;
+  animation: lantern-pulse 1.2s ease-in-out infinite;
+}
+@keyframes lantern-pulse {
+  50% {
+    box-shadow: 0 0 12px rgba(255, 178, 74, 0.8);
+  }
+}
+[data-reduced="true"] .lantern-sense.hot {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lantern-sense.hot {
+    animation: none;
+  }
+}

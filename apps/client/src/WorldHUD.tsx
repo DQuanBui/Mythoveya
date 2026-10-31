@@ -1,5 +1,6 @@
 import { rescueCount } from "../../../packages/shared/rescue";
 import { keeperTitle } from "../../../packages/shared/milestones";
+import { activeSeason } from "../../../packages/shared/seasons";
 import { MEADOW_EXTENT, MEADOW_PATHS, MEADOW_POND } from "../../../packages/shared/meadow";
 import { HOLLOW_EXTENT, HOLLOW_PATHS, HOLLOW_LAKE } from "../../../packages/shared/hollow";
 import { CANYON_EXTENT, CANYON_PATHS, CANYON_SPRINGS } from "../../../packages/shared/canyon";
@@ -108,6 +109,13 @@ export function WorldHUD({
   const weather = currentWeather(profile.region);
   const [currency, setCurrency] = useState("");
   const [emotes, setEmotes] = useState(false);
+  // During a festival, sense how close the nearest unfound lantern is.
+  const festival = !home && !fair && profile.region === "haven" ? activeSeason() : null,
+    found = festival && profile.seasons?.key === festival.key ? profile.seasons.found : [],
+    lanternDistance = festival
+      ? Math.min(...festival.season.spots.filter((s) => !found.includes(s.id)).map((s) => Math.hypot(s.point[0] - position[0], s.point[1] - position[1])))
+      : Infinity,
+    sense = lanternDistance < 14 ? { hot: lanternDistance < 6, icon: festival!.season.prop === "gourd" ? "🎃" : "❄" } : null;
   // A remembered per-browser preference: show only the objective and distance.
   const [compact, setCompact] = useState(() => {
     try {
@@ -181,6 +189,11 @@ export function WorldHUD({
               ? "Snow"
               : WEATHER_INFO[weather].name}
           </em>
+          {sense && (
+            <em className={`time-chip lantern-sense ${sense.hot ? "hot" : ""}`} role="status" title="An unfound festival lantern is close by">
+              <span aria-hidden="true">{sense.icon}</span> {sense.hot ? "Lantern very close!" : "A lantern glows nearby"}
+            </em>
+          )}
         </div>
         <div className="currencies" ref={wallet}>
           {(["diamonds", "gold"] as const).map((key) => (
