@@ -49,6 +49,7 @@ const geometry = {
   // Half a ring, for smiles and eyelid lines.
   arc: new T.TorusGeometry(1, 0.16, 6, 16, Math.PI),
   band: new T.CylinderGeometry(1, 1, 1, fine ? 20 : 14),
+  hex: new T.CylinderGeometry(1, 1, 1, 6),
   capsule: fine ? new T.CapsuleGeometry(0.5, 1, 4, 12) : new T.CapsuleGeometry(0.5, 1, 3, 9),
   // A dragon's wing membrane (span along +x, chord along +y), mirrored for the left.
   membraneR: membrane(1),
@@ -515,6 +516,24 @@ export function createCreature(id: string, shimmer = false) {
     headY = 0.65;
     headZ = 0.74;
     for (const x of [-0.55, 0.55]) for (const z of [-0.4, 0.4]) limb(x, z, 0.32);
+    // Tortoise scutes: a centre plate and a tilted ring of six, each a pale
+    // plate on a darker border, and a rim around the shell's edge.
+    if (s.id !== "kilnback") {
+      const plate = (x: number, z: number, tilt: [number, number], r: number) => {
+          // Sit on the dome ellipsoid (radii 0.7bx, 0.55by, 0.75bz).
+          const y = 0.73 + 0.55 * by * Math.sqrt(Math.max(0, 1 - (x / (0.7 * bx)) ** 2 - (z / (0.75 * bz)) ** 2)) - 0.015;
+          part(rig, "hex", dark, [x, y, z - 0.1], [r * 1.12, 0.05, r * 1.12], [tilt[0], 0.26, tilt[1]]);
+          part(rig, "hex", tint(light, c, 0.4), [x, y + 0.025, z - 0.1], [r, 0.05, r], [tilt[0], 0.26, tilt[1]]);
+        };
+      plate(0, 0, [0, 0], 0.17 * bx);
+      for (let i = 0; i < 6; i++) {
+        const a = (i / 6) * Math.PI * 2 + 0.26,
+          x = Math.sin(a) * 0.3 * bx,
+          z = Math.cos(a) * 0.32 * bz;
+        plate(x, z, [Math.cos(a) * 0.5, -Math.sin(a) * 0.5], 0.13 * bx);
+      }
+      part(rig, "ring", accent, [0, 0.5, -0.1], [0.7 * bx, 0.75 * bz, 2.6], [Math.PI / 2, 0, 0]);
+    }
   }
   if (s.family === "amphibian") {
     body([0, 0.62, -0.1], [0.61 * bx, 0.36 * by, 0.65 * bz]);
