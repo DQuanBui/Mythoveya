@@ -606,6 +606,23 @@ export function createCreature(id: string, shimmer = false) {
       limb(side * 0.36, 0, 0.45);
     }
     part(rig, "orb", accent, [0, 1.2, 0.43], [0.24, 0.32, 0.06], undefined, true);
+    // Rough stone slabs over the shoulders and back, glowing rune lines
+    // across the chest, and moss and sprouts on a grove golem's back.
+    const slab = tint(c, dark, 0.25),
+      grove = /moss|garden|grove/.test(s.appearance);
+    for (const side of [-1, 1])
+      for (let k = 0; k < 3; k++)
+        part(rig, "box", k % 2 ? slab : c, [side * (0.87 + (k - 1) * 0.14), 1.72 + k * 0.07, -0.05 + (k - 1) * 0.13], [0.3 - k * 0.04, 0.12, 0.3 - k * 0.04], [0.3 * k - 0.2, side * 0.4, side * (0.25 + k * 0.1)]);
+    for (let k = 0; k < 4; k++)
+      part(rig, "box", k % 2 ? slab : c, [(k - 1.5) * 0.28, 1.35 + (k % 2) * 0.12, -0.47], [0.26, 0.24, 0.12], [-0.3, (k - 1.5) * 0.3, (k % 2 ? -1 : 1) * 0.2]);
+    for (const [x, y, r] of [[-0.22, 1.42, 0.5], [0.24, 1.38, -0.6], [0, 0.92, 0], [-0.3, 1.05, -0.9], [0.3, 1.0, 0.9]])
+      part(rig, "capsule", accent, [x, y, 0.42], [0.025, 0.11, 0.02], [0.2, 0, r], true);
+    if (grove)
+      for (let k = 0; k < 7; k++) {
+        const a = k * 2.3;
+        part(rig, "orb", k % 2 ? "#6f9e5c" : "#88b86a", [Math.sin(a) * 0.4, 1.74 + (k % 3) * 0.04, -0.25 + Math.cos(a) * 0.15], [0.2, 0.09, 0.18]);
+        if (k % 2) part(rig, "cone", "#a9d58e", [Math.sin(a) * 0.4, 1.92, -0.2 + Math.cos(a) * 0.2], [0.05, 0.2, 0.05]);
+      }
   }
   if (s.id === "solmole") headY -= .1;
   // Head, ears, muzzle and a face with its own eyes.
