@@ -36,8 +36,6 @@ import { SkyferryDock } from "./Skyferry";
 import { BattleArena } from "./BattleArena";
 import { WeatherEffects } from "./Weather";
 import { HavenTreasure } from "./HavenTreasure";
-// Festival lanterns load only while a festival runs.
-const SeasonalLanterns = lazy(() => import("./SeasonalLanterns").then((m) => ({ default: m.SeasonalLanterns })));
 import { photo } from "./photo";
 import { HitBurst } from "./HitBurst";
 import { Hearts } from "./Hearts";
@@ -101,6 +99,8 @@ import {
   type Objective,
 } from "./world-guide";
 import type { MutableRefObject } from "react";
+// Festival lanterns load only while a festival runs.
+const SeasonalLanterns = lazy(() => import("./SeasonalLanterns").then((m) => ({ default: m.SeasonalLanterns })));
 function RenderStats() {
   const label = useRef<HTMLSpanElement>(null);
   const elapsed = useRef(0),
