@@ -84,6 +84,15 @@ function material(color: string, glow = false, gloss = false) {
     );
   return materials.get(key)!;
 }
+// Insect wings: see-through, double-sided, with an iridescent sheen on Medium/High.
+const glassy = new Map<string, T.MeshStandardMaterial>();
+function glassMaterial(color: string) {
+  if (!glassy.has(color)) {
+    const base = { color, transparent: true, opacity: 0.42, side: T.DoubleSide, depthWrite: false, roughness: 0.15 };
+    glassy.set(color, fine ? new T.MeshPhysicalMaterial({ ...base, clearcoat: 1, iridescence: 1, iridescenceIOR: 1.35 }) : new T.MeshStandardMaterial(base));
+  }
+  return glassy.get(color)!;
+}
 // Merged static parts share one vertex-colored skin material per surface:
 // soft fur and cloth, polished scales, wet amphibian skin, glossy chitin or
 // matte stone.
@@ -361,6 +370,31 @@ export function createCreature(id: string, shimmer = false) {
     wings.push(w);
     return w;
   };
+  // Insects get a clear forewing and hindwing on each side, with dark veins.
+  const insectWing = (side: number, size = 1) => {
+    const w = new T.Group();
+    w.position.set(side * 0.22, 0.92, -0.02);
+    rig.add(w);
+    const vein = tint(dark, accent, 0.2);
+    for (const [k, len, wide, back, yaw] of [
+      [0, 0.5, 0.16, 0, 0.35],
+      [1, 0.38, 0.14, -0.2, 0.75],
+    ]) {
+      const a = side * yaw,
+        dir = new T.Vector3(side * Math.cos(yaw), 0.04, -Math.sin(yaw)),
+        cx = dir.x * len * size,
+        cz = back + dir.z * len * size;
+      const pane = part(w, "orb", tint(accent, "#ffffff", 0.45), [cx, 0.02 - k * 0.03, cz], [len * size, 0.012, wide * size], [0, a, side * 0.12]);
+      pane.material = glassMaterial(tint(accent, "#ffffff", 0.45));
+      pane.userData.merge = false;
+      pane.castShadow = false;
+      // A spar along the leading edge and two veins fanning across the pane.
+      for (const [off, spread] of [[0, 0], [0.5, 0.25], [-0.5, -0.2]])
+        part(w, "capsule", vein, [cx + Math.sin(a) * off * wide * size * 0.6, 0.03 - k * 0.03, cz + Math.cos(a) * off * wide * size * 0.6], [0.012, len * size * (off ? 0.8 : 1), 0.012], [0, a + spread * side, Math.PI / 2]);
+    }
+    wings.push(w);
+    return w;
+  };
   const horn = (x: number, y: number, z: number, sz = 0.4, color = cream) =>
     part(rig, "cone", color, [x, y, z], [0.09, sz, 0.1], [0.2, 0, -x * 0.7], s.tier === "S");
   if (four) {
@@ -466,8 +500,8 @@ export function createCreature(id: string, shimmer = false) {
     if (s.id === "lanternmoth" || s.id === "velvetmoth") {
       // Broad luna wings are added by the authored anatomy below.
     } else if (/moth|mantis|winged|wing/i.test(s.appearance)) {
-      wing(-1, 1.3, accent);
-      wing(1, 1.3, accent);
+      insectWing(-1, 1.3);
+      insectWing(1, 1.3);
     } else
       for (const side of [-1, 1]) body([side * 0.2, 0.86, -0.15], [0.23, 0.12, 0.45], dna.marking === "spots" ? accent : dark);
     if(s.id!=="mossloom" && s.id!=="velvetmoth"){horn(-0.2, 1.3, 0.6, 0.5);horn(0.2, 1.3, 0.6, 0.5);}
