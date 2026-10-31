@@ -554,6 +554,13 @@ export function createCreature(id: string, shimmer = false) {
     }
     if (dna.marking !== "none")
       for (let i = 0; i < 4; i++) body([(i - 1.5) * 0.2, 0.92, -0.2 - (i % 2) * 0.15], [0.08, 0.04, 0.08], accent);
+    // Broad webbed hind feet with round toe pads, and a soft throat pouch.
+    for (const side of [-1, 1]) {
+      part(rig, "orb", mid, [side * 0.66, 0.05, -0.18], [0.17, 0.025, 0.15], [0, side * 0.5, 0]);
+      for (let k = -1; k <= 1; k++)
+        part(rig, "orb", cream, [side * 0.66 + Math.sin(side * 0.5 + k * 0.5) * 0.17, 0.06, -0.18 + Math.cos(side * 0.5 + k * 0.5) * 0.15], [0.04, 0.035, 0.04]);
+    }
+    part(rig, "orb", tint(cream, blush, 0.25), [0, 0.62, 0.66], [0.2, 0.12, 0.12]);
   }
   if (s.family === "serpent") {
     // The body thickens from a fine tail tip toward the head, with pale belly
