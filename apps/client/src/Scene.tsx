@@ -47,7 +47,7 @@ import { HavenTownsfolk } from "./HavenTownsfolk";
 import { HavenShops } from "./HavenShops";
 import { DayNight, SkyLife } from "./Atmosphere";
 import { WalkContext, type Walker } from "./hover";
-import { worldFocus, worldHeading } from "./village-materials";
+import { worldFocus, worldHeading, keeperEmote, EMOTES, playEmote } from "./village-materials";
 import { buildGrid, findPath, type WalkGrid } from "../../../packages/shared/pathfind";
 import { useMemo, useRef, useEffect, useState, useCallback } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
@@ -845,6 +845,8 @@ export function Explorer({
         return;
       keys.current.add(e.code);
       if (e.code === "KeyR" && !blocked) recenter();
+      const emote = !blocked && /^Digit[1-4]$/.test(e.code) ? EMOTES[Number(e.code.slice(5)) - 1] : null;
+      if (emote) playEmote(emote.id);
     };
     const up = (e: KeyboardEvent) => keys.current.delete(e.code);
     const blur = () => keys.current.clear();
@@ -1006,7 +1008,9 @@ export function Explorer({
     avatar.position.x = player.current.x;
     avatar.position.z = player.current.z;
     avatar.userData.groundY = player.current.y;
-    animateAvatar(avatar, clock.elapsedTime, moving, pet, settings.reduced);
+    // Moving or an expired timer ends an emote.
+    if (moving || Date.now() > keeperEmote.until) keeperEmote.name = "";
+    animateAvatar(avatar, clock.elapsedTime, moving, pet, settings.reduced, keeperEmote.name);
     const delta = player.current.clone().sub(follow.current);
     const following = delta.length() > 1.6;
     if (following) {
@@ -1029,11 +1033,11 @@ export function Explorer({
       player.current.z - follow.current.z,
     );
     // Left waiting long enough, the companion curls up for a nap.
-    rest.current = following || moving || pet ? 0 : rest.current + dt;
+    rest.current = following || moving || pet || keeperEmote.name ? 0 : rest.current + dt;
     animateCreature(
       companion,
       clock.elapsedTime,
-      pet ? "victory" : following ? "walk" : rest.current > 14 ? "sleep" : "idle",
+      pet ? "victory" : following ? "walk" : keeperEmote.name === "cheer" || keeperEmote.name === "dance" ? "play" : rest.current > 14 ? "sleep" : "idle",
       0,
       settings.reduced,
     );

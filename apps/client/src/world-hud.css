@@ -732,3 +732,32 @@
   font-variant-numeric: tabular-nums;
   opacity: 0.8;
 }
+
+/* Emote menu, opened from the companion strip */
+.emote-menu {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 8px);
+  display: flex;
+  gap: 4px;
+  padding: 6px;
+  border-radius: 12px;
+  background: rgba(16, 28, 31, 0.92);
+  border: 1px solid rgba(233, 206, 148, 0.35);
+}
+.companion-strip .emote-menu button {
+  width: auto;
+  height: auto;
+  white-space: nowrap;
+  padding: 6px 10px;
+  font-size: 0.85rem;
+}
+.emote-menu kbd {
+  opacity: 0.6;
+  font-size: 0.7rem;
+}
+@media (max-width: 600px) {
+  .emote-menu kbd {
+    display: none;
+  }
+}

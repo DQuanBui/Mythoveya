@@ -5,7 +5,7 @@ import { HOLLOW_EXTENT, HOLLOW_PATHS, HOLLOW_LAKE } from "../../../packages/shar
 import { CANYON_EXTENT, CANYON_PATHS, CANYON_SPRINGS } from "../../../packages/shared/canyon";
 import { WILDWOOD_LAKE } from "../../../packages/shared/wildwood";
 import { useEffect, useRef, useState, type MutableRefObject } from "react";
-import { worldHeading } from "./village-materials";
+import { worldHeading, EMOTES, playEmote } from "./village-materials";
 import { byId, REGIONS } from "../../../packages/shared/content";
 import type { Profile } from "../../../packages/shared/types";
 import { getInteractables } from "./Scene";
@@ -107,6 +107,7 @@ export function WorldHUD({
   const time = timeLabel(islandHour());
   const weather = currentWeather(profile.region);
   const [currency, setCurrency] = useState("");
+  const [emotes, setEmotes] = useState(false);
   // A remembered per-browser preference: show only the objective and distance.
   const [compact, setCompact] = useState(() => {
     try {
@@ -489,6 +490,24 @@ export function WorldHUD({
               </button>
             );
           })}
+          <button
+            className="pet-button"
+            aria-expanded={emotes}
+            aria-label="Emotes"
+            title="Emotes (keys 1-4)"
+            onClick={() => setEmotes(!emotes)}
+          >
+            ☺
+          </button>
+          {emotes && (
+            <div className="emote-menu" role="menu" aria-label="Emotes">
+              {EMOTES.map((e, i) => (
+                <button key={e.id} role="menuitem" onClick={() => playEmote(e.id)}>
+                  <span aria-hidden="true">{e.icon}</span> {e.label} <kbd>{i + 1}</kbd>
+                </button>
+              ))}
+            </div>
+          )}
           <button
             className="pet-button"
             onClick={greet}

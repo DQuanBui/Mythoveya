@@ -21,3 +21,16 @@ export function setNightGlow(glow: number) {
 export const worldFocus = new T.Vector3(0, 0, 5);
 // The keeper's facing (avatar yaw), shown by the minimap arrow.
 export const worldHeading = { yaw: Math.PI };
+// The keeper's current emote (keys 1-4 or the HUD), until `until` (ms) or until they move.
+export const keeperEmote: { name: "" | "wave" | "cheer" | "dance" | "sit"; until: number } = { name: "", until: 0 };
+export const EMOTES = [
+  { id: "wave", label: "Wave", icon: "👋", ms: 2500 },
+  { id: "cheer", label: "Cheer", icon: "🙌", ms: 3000 },
+  { id: "dance", label: "Dance", icon: "💃", ms: Infinity },
+  { id: "sit", label: "Sit", icon: "🪑", ms: Infinity },
+] as const;
+export function playEmote(id: (typeof EMOTES)[number]["id"]) {
+  const e = EMOTES.find((x) => x.id === id)!;
+  keeperEmote.name = keeperEmote.name === id && e.ms === Infinity ? "" : id;
+  keeperEmote.until = Date.now() + e.ms;
+}

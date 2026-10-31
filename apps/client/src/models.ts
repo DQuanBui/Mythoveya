@@ -1328,21 +1328,36 @@ function hair(head: T.Group, index: number, color: string) {
   // A glossy highlight band across the crown.
   part(head, "arc", tint(color, "#ffffff", 0.28), [0, 0.11, 0.035], [0.17, 0.13, 0.17], [-1.05, 0, 0], false, true);
 }
+export type Emote = "" | "wave" | "cheer" | "dance" | "sit";
 export function animateAvatar(
   g: T.Group,
   t: number,
   walk = false,
   gesture = false,
   reduced = false,
+  emote: Emote = "",
 ) {
+  const e = walk ? "" : gesture ? "wave" : emote,
+    calm = reduced ? 0.3 : 1;
   g.userData.limbs.forEach((l: T.Group, i: number) => {
+    const arm = i % 2 === 1,
+      side = i < 2 ? -1 : 1;
     l.rotation.x = walk
       ? Math.sin(t * 8 + Math.floor(i / 2) * Math.PI + (i % 2 ? Math.PI : 0)) * 0.55
-      : i % 2
+      : arm
         ? Math.sin(t * 1.5 + g.userData.index) * 0.035
         : 0;
-    if (gesture && i === 1) l.rotation.z = -1.8 + Math.sin(t * 5) * 0.15;
-    else l.rotation.z = 0;
+    l.rotation.z = 0;
+    if (e === "wave" && i === 1) l.rotation.z = -1.8 + Math.sin(t * 5) * 0.15 * calm;
+    // Both arms high, waving a little.
+    if (e === "cheer" && arm) l.rotation.z = side * (2.5 + Math.sin(t * 9 + i) * 0.2 * calm);
+    // Arms swing up and down in turn while the legs step to the beat.
+    if (e === "dance") {
+      if (arm) l.rotation.z = side * (1.1 + Math.sin(t * 6 + (side > 0 ? Math.PI : 0)) * 0.7 * calm);
+      else l.rotation.x = Math.max(0, Math.sin(t * 6 + (side > 0 ? Math.PI : 0))) * -0.5 * calm;
+    }
+    // Legs straight out in front, hands resting on the knees.
+    if (e === "sit") l.rotation.x = arm ? -0.55 : -Math.PI / 2;
   });
   // A quick blink every few seconds, offset per keeper.
   const blink = (t + g.userData.index * 0.83) % 3.9;
@@ -1352,12 +1367,19 @@ export function animateAvatar(
   const head = g.userData.head as T.Group | undefined;
   if (head) {
     head.rotation.y = walk || reduced ? 0 : Math.sin(t * 0.7 + g.userData.index) * 0.18;
-    head.rotation.x = walk ? 0.05 : Math.sin(t * 0.9 + g.userData.index) * 0.04;
+    head.rotation.x = walk ? 0.05 : e === "cheer" ? -0.25 : Math.sin(t * 0.9 + g.userData.index) * 0.04;
+    head.rotation.z = e === "dance" ? Math.sin(t * 3) * 0.15 * calm : 0;
   }
   // The walking bob rides on top of whatever ground the keeper stands on.
   g.position.y =
     (g.userData.groundY || 0) +
     (walk
       ? Math.abs(Math.sin(t * 8)) * 0.035
-      : Math.sin(t * 2) * 0.008 * (reduced ? 0.2 : 1));
+      : e === "cheer"
+        ? Math.abs(Math.sin(t * 6)) * 0.14 * calm
+        : e === "dance"
+          ? Math.abs(Math.sin(t * 6)) * 0.06 * calm
+          : e === "sit"
+            ? -0.58
+            : Math.sin(t * 2) * 0.008 * (reduced ? 0.2 : 1));
 }
