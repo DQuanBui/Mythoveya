@@ -190,7 +190,7 @@ export function WorldHUD({
               : WEATHER_INFO[weather].name}
           </em>
           {sense && (
-            <em className={`time-chip lantern-sense ${sense.hot ? "hot" : ""}`} role="status" title="An unfound festival lantern is close by">
+            <em className={`time-chip lantern-sense ${sense.hot ? "hot" : ""}`} aria-live="polite" title="An unfound festival lantern is close by">
               <span aria-hidden="true">{sense.icon}</span> {sense.hot ? "Lantern very close!" : "A lantern glows nearby"}
             </em>
           )}
