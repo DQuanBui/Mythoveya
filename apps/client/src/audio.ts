@@ -367,6 +367,13 @@ class AudioEngine {
       else this.wildlife();
     }
   }
+  /** A distant thunderclap that rolls away. */
+  thunder() {
+    if (!this.ctx) return;
+    this.noise(0.35, 0.16, "ambience", 900);
+    this.noise(2.8, 0.14, "ambience", 150);
+    this.tone(70, 38, 2.2, "sine", 0.05, "ambience");
+  }
   /** Indoors: the crackle and pop of a fire, with a low settle now and then. */
   hearth() {
     const pops = 1 + Math.floor(Math.random() * 3);

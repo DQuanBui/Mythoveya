@@ -1,8 +1,8 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as T from "three";
 import { regionWeather, weatherAt, type Weather } from "../../../packages/shared/weather";
-import { settings } from "./audio";
+import { audio, settings } from "./audio";
 import { worldFocus } from "./village-materials";
 
 /** Smoothly blended weather amounts shared by lighting, effects and audio. */
@@ -81,6 +81,27 @@ export function WeatherEffects({ region }: { region: string }) {
     [rain, splashes, mist],
   );
   const o = useMemo(() => new T.Object3D(), []);
+  // Thunderstorms: in full rain, lightning lights the scene now and then and
+  // thunder rolls in a moment later. Reduced Motion keeps the thunder only.
+  const flash = useRef<T.AmbientLight>(null),
+    bolt = useRef({ next: 8 + Math.random() * 10, at: -10 });
+  useFrame(({ clock }) => {
+    const t = clock.elapsedTime,
+      b = bolt.current,
+      storm = !snow && weatherFx.rain > 0.75;
+    if (storm && t > b.next) {
+      b.at = t;
+      b.next = t + 14 + Math.random() * 22;
+      setTimeout(() => audio.thunder(), 500 + Math.random() * 1500);
+    }
+    if (!storm) b.next = Math.max(b.next, t + 6);
+    if (flash.current) {
+      const since = t - b.at;
+      // Two quick pulses, the second a little brighter, gone in a quarter second.
+      flash.current.intensity =
+        settings.reduced || since > 0.26 ? 0 : since < 0.07 ? 1.6 : since < 0.12 ? 0.2 : 2.4 * (1 - (since - 0.12) / 0.14);
+    }
+  });
   useFrame(({ clock, camera }, delta) => {
     // Blend on real elapsed time so slow frames don't stall the transition.
     const dt = Math.min(delta, 1);
@@ -166,6 +187,7 @@ export function WeatherEffects({ region }: { region: string }) {
       <primitive object={rain.flakes} />
       <primitive object={splashes} />
       <primitive object={mist} />
+      <ambientLight ref={flash} color="#dfe9ff" intensity={0} />
     </>
   );
 }
