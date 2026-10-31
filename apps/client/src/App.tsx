@@ -33,8 +33,7 @@ import type { FestivalTab } from "./FestivalPanel";
 import { FESTIVAL_RADIUS } from "../../../packages/shared/festival";
 import { SKYFERRY, HAVEN_HOUSES, houseDoor } from "../../../packages/shared/haven";
 import { HOME_INTERIORS } from "../../../packages/shared/homes";
-import { PhotoMode, photoCss, type PhotoFilter } from "./PhotoMode";
-import { MilestonesPanel } from "./MilestonesPanel";
+import { photoCss, type PhotoFilter } from "./photo";
 import {
   catalogEntry,
   defaultHome,
@@ -88,6 +87,8 @@ const Arena = lazy(() => import("./Arena").then((m) => ({ default: m.Arena })));
 const BattleUI = lazy(() => import("./Arena").then((m) => ({ default: m.BattleUI })));
 // Islands and minigames are loaded only when the keeper travels there.
 const LodgeScene = lazy(() => import("./LodgeScene").then(m=>({default:m.LodgeScene})));
+const PhotoMode = lazy(() => import("./PhotoMode").then((m) => ({ default: m.PhotoMode })));
+const MilestonesPanel = lazy(() => import("./MilestonesPanel").then((m) => ({ default: m.MilestonesPanel })));
 const HomeScene = lazy(() => import("./HomeScene").then((m) => ({ default: m.HomeScene })));
 const IslandScene = lazy(() => import("./HomeIsland").then((m) => ({ default: m.IslandScene })));
 const HomePanel = lazy(() => import("./HomePanel").then((m) => ({ default: m.HomePanel })));
@@ -718,18 +719,20 @@ export default function App() {
             )}
           </div>
           {photoMode && (
-            <PhotoMode
-              filter={photoFilter}
-              setFilter={setPhotoFilter}
-              caption={`${profile.name} · ${profile.island === "festival" ? "Lanternfair Isle" : profile.island === "home" ? "Hearthfall Isle" : (REGIONS.find((r) => r.id === profile.region)?.name || "Havenreach")} · Mythoveya`}
-              close={() => setPhotoMode(false)}
-              // A pose holds the keeper's wave and the companion's cheer a little longer.
-              pose={() => {
-                setPet(true);
-                audio.cue("pet");
-                setTimeout(() => setPet(false), 3200);
-              }}
-            />
+            <Suspense fallback={null}>
+              <PhotoMode
+                filter={photoFilter}
+                setFilter={setPhotoFilter}
+                caption={`${profile.name} · ${profile.island === "festival" ? "Lanternfair Isle" : profile.island === "home" ? "Hearthfall Isle" : (REGIONS.find((r) => r.id === profile.region)?.name || "Havenreach")} · Mythoveya`}
+                close={() => setPhotoMode(false)}
+                // A pose holds the keeper's wave and the companion's cheer a little longer.
+                pose={() => {
+                  setPet(true);
+                  audio.cue("pet");
+                  setTimeout(() => setPet(false), 3200);
+                }}
+              />
+            </Suspense>
           )}
           {!photoMode && <WorldHUD
             profile={profile}

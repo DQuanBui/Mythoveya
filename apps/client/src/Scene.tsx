@@ -36,8 +36,9 @@ import { SkyferryDock } from "./Skyferry";
 import { BattleArena } from "./BattleArena";
 import { WeatherEffects } from "./Weather";
 import { HavenTreasure } from "./HavenTreasure";
-import { SeasonalLanterns } from "./SeasonalLanterns";
-import { photo } from "./PhotoMode";
+// Festival lanterns load only while a festival runs.
+const SeasonalLanterns = lazy(() => import("./SeasonalLanterns").then((m) => ({ default: m.SeasonalLanterns })));
+import { photo } from "./photo";
 import { HitBurst } from "./HitBurst";
 import { Hearts } from "./Hearts";
 import { Footprints, leavePrint } from "./Footprints";
@@ -50,7 +51,7 @@ import { DayNight, SkyLife } from "./Atmosphere";
 import { WalkContext, type Walker } from "./hover";
 import { worldFocus, worldHeading, keeperEmote, EMOTES, playEmote } from "./village-materials";
 import { buildGrid, findPath, type WalkGrid } from "../../../packages/shared/pathfind";
-import { useMemo, useRef, useEffect, useState, useCallback } from "react";
+import { lazy, Suspense, useMemo, useRef, useEffect, useState, useCallback } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Stars } from "@react-three/drei";
 import * as T from "three";
@@ -1259,12 +1260,14 @@ export function WorldScene({
         />
       )}
       {profile.region === "haven" && season && (
-        <SeasonalLanterns
-          season={season.season}
-          found={profile.seasons?.key === season.key ? profile.seasons.found : []}
-          disabled={blocked}
-          onInteract={onInteract}
-        />
+        <Suspense fallback={null}>
+          <SeasonalLanterns
+            season={season.season}
+            found={profile.seasons?.key === season.key ? profile.seasons.found : []}
+            disabled={blocked}
+            onInteract={onInteract}
+          />
+        </Suspense>
       )}
       {profile.region === "haven" && (
         <HavenWildlife onInteract={onInteract} disabled={blocked} />
