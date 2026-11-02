@@ -1335,7 +1335,13 @@ export function animateCreature(
     rig.scale.setScalar(1 - 0.2 * e);
     eyes?.forEach((eye: T.Group) => (eye.scale.y = 0.07));
   }
-  if (state === "entrance") rig.scale.setScalar(0.7 + Math.min(phase, 1) * 0.3);
+  if (state === "entrance") {
+    // Drop in from above, squash on landing, then spring back to full size.
+    const p = Math.min(1, Math.max(0, phase)),
+      land = p > 0.7 ? Math.sin(((p - 0.7) / 0.3) * Math.PI) * 0.14 * motion : 0;
+    rig.position.y += (1 - p) * (1 - p) * 1.6 * motion;
+    rig.scale.set(1 + land * 0.6, (0.7 + p * 0.3) * (1 - land), 1 + land * 0.6);
+  }
   if (state === "victory") rig.position.y += Math.abs(Math.sin(time * 4)) * 0.18 * motion;
   if (state === "guard") rig.scale.y = 0.85;
   if (state === "stunned") rig.rotation.z = Math.sin(time * 3) * 0.12;

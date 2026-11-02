@@ -15,11 +15,12 @@ November 2 round (from `9d221ef`). Done this round, newest last:
 - Frosty breath in Moonfrost: `Puffs.tsx` (32-puff ring buffer, camera-facing soft dots, `emitPuff`) draws little clouds from the keeper and companion every 1.1-1.8 s outdoors; hidden under Reduced Motion.
 - Sprint kicks: each sprinting footstep on stone, paths or sand throws a tan dust puff behind the keeper, and in snow a white powder puff (`dust`/`snow` kinds in `puff-buffer.ts`, which the breath fix split out of `Puffs.tsx` so Node tests can import it).
 - Water glints on the islands: the home island's placeable pond (9) and the Lanternfair pond (18); `WaterGlints` takes a `max` count, a third of it on Low.
+- Battle opening: each creature drops onto its ring in turn (by side, column and row, ~1.3 s total) with a landing squash; `entrance` in `animateCreature` now drops from above.
 
 Next 3 tasks:
-1. Battle start: creatures arrive with a staggered entrance.
-2. Full verification: vitest, both builds, smokes, Playwright, docs.
-3. Listening and physical-device pass.
+1. Full verification: vitest, both builds, smokes, Playwright, docs.
+2. Listening and physical-device pass of the new effects.
+3. Optional keeper hair dye in the wardrobe (needs an optional Profile field and a mutation).
 
 ## Play
 

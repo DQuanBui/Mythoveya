@@ -76,6 +76,15 @@ describe("creature looks", () => {
   });
 });
 
+it("drops an arriving creature in from above and lands it at full size", () => {
+  const model = createCreature("emberfox");
+  animateCreature(model, 0, "entrance", 0.05);
+  expect(model.userData.rig.position.y).toBeGreaterThan(1);
+  animateCreature(model, 0, "entrance", 1);
+  expect(model.userData.rig.position.y).toBeLessThan(0.05);
+  expect(model.userData.rig.scale.y).toBeCloseTo(1);
+});
+
 it("puffs Z's only while a creature sleeps", () => {
   const model = createCreature("mossprig");
   animateCreature(model, 2, "sleep");

@@ -1815,6 +1815,8 @@ export function BattleScene({
   side?: number;
 }) {
   const [, tick] = useState(0);
+  // When a battle opens, each side's creatures drop onto their rings in turn.
+  const opened = useMemo(() => Date.now(), [sourceBattle.id]);
   const phase = useRef(0);
   useEffect(() => {
     phase.current = 0;
@@ -1897,8 +1899,11 @@ export function BattleScene({
           active && elapsed < 0.45
             ? Math.max(0, Math.min(u.maxHp, u.hp + outcome))
             : u.hp;
+        const arrive = (Date.now() - opened - (u.side * 3 + (u.slot % 3)) * 110 - Math.floor(u.slot / 3) * 60) / 650;
         const state: Motion =
-          shownHp === 0
+          !preview && !active && arrive < 1 && shownHp > 0
+            ? "entrance"
+            : shownHp === 0
             ? "defeat"
             : active && event?.actor === u.id
               ? event.action.endsWith("-2")
@@ -1921,7 +1926,7 @@ export function BattleScene({
               rotation={u.side === 0 ? Math.PI : 0}
               state={state}
               // Creatures knocked out earlier stay down through later turns.
-              phase={state === "defeat" && !event?.amounts.some((a) => a.id === u.id) ? 2 : elapsed}
+              phase={state === "entrance" ? Math.max(0.001, arrive) : state === "defeat" && !event?.amounts.some((a) => a.id === u.id) ? 2 : elapsed}
               scale={0.92}
             />
             {active && event && !preview && outcome > 0 && event.actor !== u.id && (
