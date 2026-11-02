@@ -16,11 +16,12 @@ Done so far, newest last:
 - Keeper idle habits (`animateAvatar`), every ~9 s while standing: Kael hands on hips, Mira shades her eyes and scans, Rowan stretches, Sora bounces, Dax folds both arms, Nyra ponders, Elian sways, Vesper taps a foot. Village hosts and townsfolk reuse these models, so they show the same personalities. Off under Reduced Motion and during emotes.
 - Habitat wildlife (`HabitatResident`, used in every region) stops to watch a keeper within 5 m and hops about within 2.4 m; turns are smoothed. Wandering now steers toward its path point at a capped speed, which fixes a jump when a creature resumed after each pause.
 - Water glints (`WaterGlints.tsx`): instanced sun flecks wink across Willowmere pond and Reedwater Lake, warm by day and a few faint silver ones at night. Hidden under Reduced Motion; 14 on Low, 44 otherwise.
+- Fix: rain splashes sat at a fixed height and vanished under hills and mountains. `WeatherEffects` now takes the region's `ground` and caches each splash's height per drop.
 
 Next 3 tasks:
-1. Twinkling stars and a warmer dawn and dusk sky.
-2. Rain splashes on the ground around the keeper.
-3. Tests for the new model features (circlet, slit pupils, gaits, glass wings).
+1. Victory celebration when a battle is won (winners cheer, confetti).
+2. Tests for the new model features (circlet, slit pupils, gaits, glass wings).
+3. A shimmer reveal burst when a shimmering companion is recruited.
 
 ## Play
 

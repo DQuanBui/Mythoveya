@@ -26,7 +26,7 @@ function softDot() {
   return t;
 }
 
-export function WeatherEffects({ region }: { region: string }) {
+export function WeatherEffects({ region, ground }: { region: string; ground?: (x: number, z: number) => number }) {
   const snow = region === "hollow";
   const drops = settings.quality === "Low" ? 500 : settings.quality === "High" ? 1800 : 1100;
   const rain = useMemo(() => {
@@ -59,6 +59,8 @@ export function WeatherEffects({ region }: { region: string }) {
     m.name = "weather-splashes";
     return m;
   }, []);
+  // Each splash's ground height, looked up once per drop rather than every frame.
+  const splashY = useMemo(() => ({ cycle: new Float64Array(48).fill(-1), y: new Float32Array(48) }), []);
   const mist = useMemo(() => {
     const m = new T.InstancedMesh(
       new T.PlaneGeometry(1, 1),
@@ -153,9 +155,17 @@ export function WeatherEffects({ region }: { region: string }) {
     if (splashes.visible) {
       for (let i = 0; i < splashes.count; i++) {
         const p = (time * 1.6 + i * 0.37) % 1,
-          a = i * 2.39996 + Math.floor(time * 1.6 + i * 0.37) * 1.7,
-          d = 1.5 + ((i * 7.3) % 9);
-        o.position.set(fx.x + Math.cos(a) * d, 0.04, fx.z + Math.sin(a) * d);
+          cycle = Math.floor(time * 1.6 + i * 0.37),
+          a = i * 2.39996 + cycle * 1.7,
+          d = 1.5 + ((i * 7.3) % 9),
+          x = fx.x + Math.cos(a) * d,
+          z = fx.z + Math.sin(a) * d;
+        // Splashes land on the terrain, so they show on hills and slopes too.
+        if (splashY.cycle[i] !== cycle) {
+          splashY.cycle[i] = cycle;
+          splashY.y[i] = ground ? ground(x, z) : 0;
+        }
+        o.position.set(x, splashY.y[i] + 0.04, z);
         o.rotation.set(0, 0, 0);
         o.scale.setScalar(0.4 + p * 2.2);
         o.updateMatrix();

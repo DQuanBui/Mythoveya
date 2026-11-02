@@ -354,7 +354,7 @@ function Environment({
         <>
           <DayNight sky={sky} fog={r.color} haven={region === "haven"} />
           <SkyLife radius={expanded ? 54 : canyon || snow || meadow ? 62 : 26} birds={!expanded} />
-          <WeatherEffects region={region} />
+          <WeatherEffects region={region} ground={groundFor(region)} />
         </>
       )}
       {expanded ? (
