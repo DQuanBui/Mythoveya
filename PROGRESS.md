@@ -14,10 +14,11 @@ Done so far, newest last:
 - Support feedback (`SupportGlow` in `HitBurst.tsx`): healed allies get a green ground ring, spiralling motes and floating plus signs; shielded allies get a popping lattice bubble.
 - Skill effects travel element paths (`skill-path.ts`, tested in `tests/skill-path.test.ts`): flame and stone lob, tide waves, storm zigzags, grove corkscrews, shadow dips and weaves, frost and light fly straight. A seven-dot trail follows on Medium/High. Reduced Motion flies straight.
 - Keeper idle habits (`animateAvatar`), every ~9 s while standing: Kael hands on hips, Mira shades her eyes and scans, Rowan stretches, Sora bounces, Dax folds both arms, Nyra ponders, Elian sways, Vesper taps a foot. Village hosts and townsfolk reuse these models, so they show the same personalities. Off under Reduced Motion and during emotes.
+- Habitat wildlife (`HabitatResident`, used in every region) stops to watch a keeper within 5 m and hops about within 2.4 m; turns are smoothed. Wandering now steers toward its path point at a capped speed, which fixes a jump when a creature resumed after each pause.
 
 Next 3 tasks:
-1. Livelier wild creatures (notice the keeper, nap at night).
-2. Sparkling sun glints on Havenreach water.
+1. Sparkling sun glints on Havenreach water.
+2. Twinkling stars and a warmer dawn and dusk sky.
 3. Rain splashes on the ground around the keeper.
 
 ## Play

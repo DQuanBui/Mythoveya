@@ -10,6 +10,7 @@ import {
 import { createCreature, animateCreature } from "./models";
 import { audio, settings } from "./audio";
 import { daylight, islandHour } from "./daytime";
+import { worldFocus } from "./village-materials";
 import { byId } from "../../../packages/shared/content";
 
 export function HabitatResident({
@@ -47,25 +48,38 @@ export function HabitatResident({
       (settings.quality === "Low" ? 26 : settings.quality === "High" ? 43 : 36);
     if (!model.visible) return;
     time.current += Math.min(dt, 0.05);
-    // Wildlife settles down to sleep after dark.
+    // Wildlife settles down to sleep after dark. Awake, it stops to watch a
+    // keeper who comes close, and hops about when they are right beside it.
     const t = time.current,
       asleep = daylight(islandHour()).glow > 0.6,
-      walking = !settings.reduced && !asleep && t % 12 < 7;
+      kx = worldFocus.x - model.position.x,
+      kz = worldFocus.z - model.position.z,
+      near = Math.hypot(kx, kz),
+      curious = !asleep && near < 5,
+      walking = !settings.reduced && !asleep && !curious && t % 12 < 7;
+    let face = model.rotation.y;
     if (walking) {
       const x = site.point[0] + Math.sin(t * 0.23) * site.radius,
         z = site.point[1] + Math.cos(t * 0.17) * site.radius;
-      if (site.water || allowed(x, z)) {
-        const dx = x - model.position.x,
-          dz = z - model.position.z;
-        if (Math.hypot(dx, dz) > 0.001) model.rotation.y = Math.atan2(dx, dz);
-        model.position.x = x;
-        model.position.z = z;
+      // Steer toward the wander point, so a pause never ends in a jump.
+      const dx = x - model.position.x,
+        dz = z - model.position.z,
+        gap = Math.hypot(dx, dz),
+        step = Math.min(1, (1.6 * Math.min(dt, 0.05)) / Math.max(gap, 1e-6)),
+        nx = model.position.x + dx * step,
+        nz = model.position.z + dz * step;
+      if (gap > 0.001 && (site.water || allowed(nx, nz))) {
+        face = Math.atan2(dx, dz);
+        model.position.x = nx;
+        model.position.z = nz;
       }
-    }
+    } else if (curious) face = Math.atan2(kx, kz);
+    const turn = Math.atan2(Math.sin(face - model.rotation.y), Math.cos(face - model.rotation.y));
+    model.rotation.y += turn * Math.min(1, Math.min(dt, 0.05) * 6);
     model.position.y = site.water
       ? 0.08
       : ground(model.position.x, model.position.z);
-    animateCreature(model, t, walking ? "walk" : asleep && !site.water ? "sleep" : "idle", 0, settings.reduced);
+    animateCreature(model, t, walking ? "walk" : asleep && !site.water ? "sleep" : curious && near < 2.4 && !settings.reduced ? "play" : "idle", 0, settings.reduced);
     if (!asleep && t - lastVoice.current > 24 + index && distance < 14) {
       audio.voice(
         site.species,
