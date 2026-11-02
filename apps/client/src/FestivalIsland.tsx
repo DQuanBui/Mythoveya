@@ -29,6 +29,7 @@ import { Avatar, Creature, Explorer, type WalkArea } from "./Scene";
 import { SkyferryDock } from "./Skyferry";
 import { audio, settings } from "./audio";
 import type { ExplorationInput } from "./world-guide";
+import { WaterGlints } from "./WaterGlints";
 
 const STRIPES = ["#d9674f", "#f3e3b5", "#5fa7bb", "#f2c75e", "#9bc27a", "#b49be0"];
 type Built = { solid: T.BufferGeometry; glow: T.BufferGeometry };
@@ -173,6 +174,7 @@ function FairGround() {
         <circleGeometry args={[1, 40]} />
         <meshStandardMaterial color="#6fb0bf" roughness={0.3} />
       </mesh>
+      <WaterGlints x={FESTIVAL_POND.x} z={FESTIVAL_POND.z} rx={FESTIVAL_POND.rx} rz={FESTIVAL_POND.rz} y={0.045} max={18} />
       <mesh name="festival-structures" geometry={built.solid} material={villageMaterial} castShadow receiveShadow />
       <mesh geometry={built.glow} material={lampGlow} />
     </group>

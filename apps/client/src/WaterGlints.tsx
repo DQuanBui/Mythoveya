@@ -12,8 +12,9 @@ const hash = (n: number) => {
 /** Sun glints that wink on and off across a water ellipse: bright and warm
  * by day, a few faint silver ones at night. Each glint reappears somewhere
  * new after it fades. */
-export function WaterGlints({ x, z, rx, rz, y = 0.05 }: { x: number; z: number; rx: number; rz: number; y?: number }) {
-  const count = settings.quality === "Low" ? 14 : 44;
+export function WaterGlints({ x, z, rx, rz, y = 0.05, max = 44 }: { x: number; z: number; rx: number; rz: number; y?: number; max?: number }) {
+  // Small ponds get fewer glints; Low quality about a third.
+  const count = settings.quality === "Low" ? Math.max(3, Math.round(max / 3)) : max;
   const mesh = useMemo(() => {
     const star = mergeGeometries([new T.PlaneGeometry(0.7, 0.05), new T.PlaneGeometry(0.04, 0.16), new T.PlaneGeometry(0.16, 0.1)])!.rotateX(-Math.PI / 2);
     const m = new T.InstancedMesh(

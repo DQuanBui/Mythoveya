@@ -35,6 +35,7 @@ import { animateCreature, createCreature } from "./models";
 import { audio, settings } from "./audio";
 import { daylight, islandHour } from "./daytime";
 import type { ExplorationInput } from "./world-guide";
+import { WaterGlints } from "./WaterGlints";
 
 export type Placing = { kind: string; uid?: string; rot: number };
 const UP = new T.Vector3(0, 1, 0);
@@ -413,6 +414,7 @@ function Placed({ item }: { item: HomeItem }) {
     <group name={`home-item-${item.uid}`} position={[item.x, 0, item.z]} rotation={[0, (-item.rot * Math.PI) / 2, 0]}>
       <mesh geometry={built.solid} material={villageMaterial} castShadow receiveShadow />
       <mesh geometry={built.glow} material={lampGlow} />
+      {item.kind === "pond" && <WaterGlints x={0} z={0} rx={1.55} rz={1.05} y={0.085} max={9} />}
     </group>
   );
 }

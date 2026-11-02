@@ -14,11 +14,12 @@ November 2 round (from `9d221ef`). Done this round, newest last:
 - Keeper lantern after dark: a small lantern hangs plumb from the right hand outdoors once night glow passes 0.45 (`nightState` in `village-materials.ts`), and `DayNight keeperLight` adds one warm point light that follows the keeper, mounted with the other night lights.
 - Frosty breath in Moonfrost: `Puffs.tsx` (32-puff ring buffer, camera-facing soft dots, `emitPuff`) draws little clouds from the keeper and companion every 1.1-1.8 s outdoors; hidden under Reduced Motion.
 - Sprint kicks: each sprinting footstep on stone, paths or sand throws a tan dust puff behind the keeper, and in snow a white powder puff (`dust`/`snow` kinds in `puff-buffer.ts`, which the breath fix split out of `Puffs.tsx` so Node tests can import it).
+- Water glints on the islands: the home island's placeable pond (9) and the Lanternfair pond (18); `WaterGlints` takes a `max` count, a third of it on Low.
 
 Next 3 tasks:
-1. Water glints on the home island pond.
-2. Battle start: creatures arrive with a staggered entrance.
-3. Full verification: vitest, both builds, smokes, Playwright, docs.
+1. Battle start: creatures arrive with a staggered entrance.
+2. Full verification: vitest, both builds, smokes, Playwright, docs.
+3. Listening and physical-device pass.
 
 ## Play
 
