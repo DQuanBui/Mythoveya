@@ -3,6 +3,7 @@ import * as T from "three";
 import { HavenNature } from "./HavenNature";
 import { HavenWater } from "./HavenWater";
 import { HavenLandmarks } from "./HavenLandmarks";
+import { IslandFringe } from "./IslandFringe";
 import {
   HAVEN_PATHS,
   HAVEN_PLACES,
@@ -156,6 +157,7 @@ export function HavenTerrain() {
       <mesh geometry={cliff}>
         <meshStandardMaterial vertexColors flatShading />
       </mesh>
+      <IslandFringe />
       <TrailSurface points={strips} />
       {HAVEN_PLACES.filter(
         (p) => !["village", "driftshore", "summit", "windrest", "fieldstation"].includes(p.id),
