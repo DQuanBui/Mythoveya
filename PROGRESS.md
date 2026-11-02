@@ -12,11 +12,12 @@ November 2 round (from `9d221ef`). Done this round, newest last:
 - Support links (`SupportLink` in `HitBurst.tsx`): a glowing arc grows from the caster to each healed (green) or shielded (blue) ally, with a mote racing along it.
 - Island fringe in every region: `IslandFringe` takes `edge`, `height` and a `look`; `RaisedTerrain` adds 100 pieces per region (roots and vines in Whisperleaf, icicles and snow-capped islets in Moonfrost, basalt drips and ember-lit islets in Emberglass).
 - Keeper lantern after dark: a small lantern hangs plumb from the right hand outdoors once night glow passes 0.45 (`nightState` in `village-materials.ts`), and `DayNight keeperLight` adds one warm point light that follows the keeper, mounted with the other night lights.
+- Frosty breath in Moonfrost: `Puffs.tsx` (32-puff ring buffer, camera-facing soft dots, `emitPuff`) draws little clouds from the keeper and companion every 1.1-1.8 s outdoors; hidden under Reduced Motion.
 
 Next 3 tasks:
-1. Frosty breath puffs in Moonfrost.
-2. Dust puffs when sprinting.
-3. Water glints on the home and festival islands.
+1. Dust puffs when sprinting on grass and dirt.
+2. Water glints on the home and festival islands.
+3. Battle start: creatures arrive with a staggered entrance.
 
 ## Play
 

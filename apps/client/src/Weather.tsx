@@ -12,7 +12,7 @@ export function currentWeather(region: string, now = Date.now()): Weather {
   if (import.meta.env.DEV && pinned) return pinned;
   return regionWeather(weatherAt(now).weather, region);
 }
-function softDot() {
+export function softDot() {
   const canvas = document.createElement("canvas");
   canvas.width = canvas.height = 64;
   const g = canvas.getContext("2d")!,

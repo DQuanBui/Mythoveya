@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { EMOTES, keeperEmote, playEmote } from "../apps/client/src/village-materials";
 import { leavePrint, recentPrints } from "../apps/client/src/Footprints";
 import { PHOTO_FILTERS, photoCss } from "../apps/client/src/photo";
+import { emitPuff, recentPuffs } from "../apps/client/src/Puffs";
 
 describe("keeper emotes, footprints and photo filters", () => {
   it("plays timed emotes once and toggles lasting ones off on a second press", () => {
@@ -30,5 +31,13 @@ describe("keeper emotes, footprints and photo filters", () => {
   it("maps every photo filter to a CSS filter", () => {
     expect(photoCss("natural")).toBe("none");
     for (const f of PHOTO_FILTERS) expect(photoCss(f.id)).toMatch(/none|\w+\(/);
+  });
+
+  it("keeps only the most recent 32 puffs, oldest first", () => {
+    for (let i = 0; i < 40; i++) emitPuff(i, 1.5, 0, 0, 1, i, "breath");
+    const puffs = recentPuffs();
+    expect(puffs).toHaveLength(32);
+    expect(puffs[0].x).toBe(8);
+    expect(puffs.at(-1)).toMatchObject({ x: 39, kind: "breath" });
   });
 });

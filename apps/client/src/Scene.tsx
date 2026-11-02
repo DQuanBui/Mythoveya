@@ -41,6 +41,7 @@ import { Confetti, HitBurst, SupportGlow, SupportLink } from "./HitBurst";
 import { skillPath } from "./skill-path";
 import { Hearts } from "./Hearts";
 import { Footprints, leavePrint } from "./Footprints";
+import { Puffs, emitPuff } from "./Puffs";
 import { activeSeason } from "../../../packages/shared/seasons";
 import { Riftgate } from "./Riftgate";
 import { ModelLighting } from "./ModelLighting";
@@ -787,6 +788,7 @@ export function Explorer({
   const near = useRef("");
   const last = useRef(0);
   const foot = useRef(0);
+  const breath = useRef(0);
   const follow = useRef(new T.Vector3(spawn[0] - 1, 0, spawn[1] + 1.5)),
     rest = useRef(0);
   const route = useRef<Route | null>(null),
@@ -1047,6 +1049,17 @@ export function Explorer({
     // Moving or an expired timer ends an emote.
     if (moving || Date.now() > keeperEmote.until) keeperEmote.name = "";
     animateAvatar(avatar, clock.elapsedTime, moving, pet, settings.reduced, keeperEmote.name);
+    // In Moonfrost's cold, keeper and companion breathe little clouds.
+    if (profile.region === "hollow" && !area && clock.elapsedTime - breath.current > (moving ? 1.1 : 1.8)) {
+      breath.current = clock.elapsedTime;
+      const fx = Math.sin(avatar.rotation.y),
+        fz = Math.cos(avatar.rotation.y),
+        [hy, hz] = companion.userData.headAt,
+        size = companion.scale.x,
+        cy = companion.rotation.y;
+      emitPuff(player.current.x + fx * 0.22, player.current.y + 1.5, player.current.z + fz * 0.22, fx, fz, clock.elapsedTime, "breath");
+      emitPuff(follow.current.x + Math.sin(cy) * (hz + 0.35) * size, follow.current.y + hy * size, follow.current.z + Math.cos(cy) * (hz + 0.35) * size, Math.sin(cy), Math.cos(cy), clock.elapsedTime + 0.5, "breath");
+    }
     // The lantern hangs plumb whatever the arm is doing, with a little sway.
     lantern.visible = !area && nightState.glow > 0.45 && !keeperEmote.name;
     if (lantern.visible) {
@@ -1123,6 +1136,7 @@ export function Explorer({
       <primitive object={companion} />
       <Hearts active={pet} target={companion} />
       <Footprints />
+      <Puffs />
       <group ref={marker} visible={false} name="walk-marker">
         <mesh rotation={[-Math.PI / 2, 0, 0]} material={markerMaterial}>
           <ringGeometry args={[0.32, 0.42, 32]} />
