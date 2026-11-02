@@ -7,11 +7,12 @@ Updated October 31, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch
 Done so far, newest last:
 - Shimmering variants: iridescent skin (Medium/High) and three twinkling four-point stars (`spike` geometry, `skinFor(surface, shimmer)`).
 - See-through Lanternmoth (veined ivory) and Frostmoth (frosted, rime-edged) wings via `glassPane`; Velvetmoth stays velvet.
+- Dragons and serpents: gold-flecked irises with vertical slit pupils (`reptile` in `createCreature`).
 
 Next 3 tasks:
-1. Slit-pupil eyes for dragons and serpents.
-2. Glowing bond sigil and pulsing crest gem on evolved forms.
-3. Per-family walking gaits (slither, hop, waddle, drift).
+1. Glowing bond sigil and pulsing crest gem on evolved forms.
+2. Per-family walking gaits (slither, hop, waddle, drift).
+3. Family-specific attack, cast and hit reactions.
 
 ## Play
 

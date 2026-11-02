@@ -270,7 +270,8 @@ export function createCreature(id: string, shimmer = false) {
     wings: T.Group[] = [],
     tails: T.Group[] = [],
     eyes: T.Group[] = [];
-  const four = ["quadruped", "fox", "antler", "dragon"].includes(s.family),
+  const reptile = s.family === "dragon" || s.family === "serpent",
+    four = ["quadruped", "fox", "antler", "dragon"].includes(s.family),
     pawed = four || s.family === "amphibian",
     // Soft-coated species get cheek and chest tufts; scaled or stony ones do not.
     furry = ["quadruped", "fox", "antler"].includes(s.family) &&
@@ -783,10 +784,12 @@ export function createCreature(id: string, shimmer = false) {
     const look = new T.Group(); eye.add(look); eye.userData.look = look;
     part(eye, "smooth", "#fffaf0", [ex, ey, ez], [0.1 * es, 0.115 * es, 0.07], tilt, false, true);
     // A dark rim around a brighter, lit-from-below iris gives the eye depth.
-    part(look, "smooth", tint(dna.iris, "#0d1418", 0.55), [ex, ey - 0.005, ez + 0.04], [0.07 * es, 0.085 * es, 0.035], tilt, false, true);
-    part(look, "smooth", dna.iris, [ex, ey - 0.005, ez + 0.045], [0.06 * es, 0.075 * es, 0.035], tilt, dna.glowEyes, true);
-    part(look, "smooth", tint(dna.iris, "#ffffff", 0.45), [ex, ey - 0.035 * es, ez + 0.058], [0.04 * es, 0.03 * es, 0.025], tilt, dna.glowEyes, true);
-    part(look, "smooth", "#0d1418", [ex, ey - 0.005, ez + 0.068], [0.034 * es, 0.046 * es, 0.02], tilt, false, true);
+    // Dragons and serpents have gold-flecked irises and slit pupils.
+    const iris = reptile ? tint(dna.iris, "#f2c14e", 0.35) : dna.iris;
+    part(look, "smooth", tint(iris, "#0d1418", 0.55), [ex, ey - 0.005, ez + 0.04], [0.07 * es, 0.085 * es, 0.035], tilt, false, true);
+    part(look, "smooth", iris, [ex, ey - 0.005, ez + 0.045], [0.06 * es, 0.075 * es, 0.035], tilt, dna.glowEyes, true);
+    part(look, "smooth", tint(iris, reptile ? "#ffe9a8" : "#ffffff", 0.45), [ex, ey - 0.035 * es, ez + 0.058], [0.04 * es, 0.03 * es, 0.025], tilt, dna.glowEyes, true);
+    part(look, "smooth", "#0d1418", [ex, ey - 0.005, ez + 0.068], reptile ? [0.013 * es, 0.062 * es, 0.02] : [0.034 * es, 0.046 * es, 0.02], tilt, false, true);
     part(look, "smooth", "#ffffff", [ex - side * 0.02, ey + 0.035 * es, ez + 0.084], [0.018 * es, 0.02 * es, 0.01], undefined, true);
     part(look, "smooth", "#ffffff", [ex + side * 0.022, ey - 0.03 * es, ez + 0.08], [0.008 * es, 0.009 * es, 0.006], undefined, true);
     // A soft upper lid, a shade deeper than the coat.
