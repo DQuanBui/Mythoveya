@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { activeSeason } from "../../packages/shared/seasons";
+import { keeperTitle, milestoneProgress } from "../../packages/shared/milestones";
 import { clickWorld, walkRoute } from "./world-helpers";
 
 test("photo mode, the seasonal festival and stepping inside a home", async ({ page }) => {
@@ -8,7 +9,7 @@ test("photo mode, the seasonal festival and stepping inside a home", async ({ pa
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("/");
-  await page.evaluate(async () => {
+  const profile = await page.evaluate(async () => {
     const post = (data: unknown, path: string, token = "") =>
       fetch("/api/" + path, {
         method: "POST",
@@ -17,9 +18,14 @@ test("photo mode, the seasonal festival and stepping inside a home", async ({ pa
       }).then((r) => r.json());
     const g = await post({ name: "Cosy Keeper", avatar: 1 }, "guest");
     localStorage.setItem("mythoveya-session", g.token);
+    let last: any;
     for (const data of [{ kind: "starter", species: "emberfox" }, { kind: "guide" }])
-      await post({ ...data, requestId: crypto.randomUUID() }, "mutate", g.token);
+      last = await post({ ...data, requestId: crypto.randomUUID() }, "mutate", g.token);
+    return last.profile;
   });
+  // The guide's team can roll a shimmering companion (1 in 50 each), which
+  // earns Starcatcher on top of Bondmaker; expect whatever this save earned.
+  const earned = milestoneProgress(profile).filter((m) => m.done).length;
   await page.reload();
   await page.getByRole("button", { name: "Continue your journey" }).click();
   await expect(page.locator(".keeper-badge")).toContainText("Cosy Keeper");
@@ -45,8 +51,9 @@ test("photo mode, the seasonal festival and stepping inside a home", async ({ pa
   await page.getByRole("menuitem", { name: /Cheer/ }).click();
   await page.keyboard.press("Digit4");
   // The guide's team of six already earns the first title.
-  await page.locator(".keeper-badge").getByRole("button", { name: "★ Bondmaker" }).click();
-  await expect(page.getByText(/KEEPER RECORD · 1 OF 13 TITLES/)).toBeVisible();
+  expect(earned).toBeGreaterThanOrEqual(1);
+  await page.locator(".keeper-badge").getByRole("button", { name: `★ ${keeperTitle(profile)}` }).click();
+  await expect(page.getByText(`KEEPER RECORD · ${earned} OF 13 TITLES`)).toBeVisible();
   await expect(page.getByRole("progressbar")).toHaveCount(13);
   await page.keyboard.press("Escape");
   await expect(page.locator(".modal")).toHaveCount(0);
