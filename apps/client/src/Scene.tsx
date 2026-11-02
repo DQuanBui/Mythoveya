@@ -1038,11 +1038,13 @@ export function Explorer({
       player.current.z - follow.current.z,
     );
     // Left waiting long enough, the companion curls up for a nap.
-    rest.current = following || moving || pet || keeperEmote.name ? 0 : rest.current + dt;
+    rest.current = following || moving || pet || (keeperEmote.name && keeperEmote.name !== "sit") ? 0 : rest.current + dt;
     animateCreature(
       companion,
       clock.elapsedTime,
-      pet ? "victory" : following ? "walk" : keeperEmote.name === "cheer" || keeperEmote.name === "dance" ? "play" : rest.current > 14 ? "sleep" : "idle",
+      // The companion joins in: it hops at a wave, plays along with a cheer or
+      // dance, and settles down low when the keeper sits (later dozing off).
+      pet || keeperEmote.name === "wave" ? "victory" : following ? "walk" : keeperEmote.name === "cheer" || keeperEmote.name === "dance" ? "play" : keeperEmote.name === "sit" && rest.current < 14 ? "guard" : rest.current > 14 ? "sleep" : "idle",
       0,
       settings.reduced,
     );
