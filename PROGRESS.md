@@ -9,11 +9,12 @@ Done so far, newest last:
 - See-through Lanternmoth (veined ivory) and Frostmoth (frosted, rime-edged) wings via `glassPane`; Velvetmoth stays velvet.
 - Dragons and serpents: gold-flecked irises with vertical slit pupils (`reptile` in `createCreature`).
 - Evolved forms: a floating, turning bond circlet (`halo` geometry) above a breathing crest gem (`userData.crest`).
+- Walking gaits per family: diagonal trot with footfall bob (four-legged), lumbering golems, hopping birds, buzzing insects, drifting spirits, and a head-to-tail slither wave through serpent segments (`userData.slither`).
 
 Next 3 tasks:
-1. Per-family walking gaits (slither, hop, waddle, drift).
-2. Family-specific attack, cast and hit reactions.
-3. Heal and shield feedback on supported allies in battle.
+1. Family-specific attack, cast and hit reactions.
+2. Heal and shield feedback on supported allies in battle.
+3. Element-shaped skill projectile paths with a trail.
 
 ## Play
 

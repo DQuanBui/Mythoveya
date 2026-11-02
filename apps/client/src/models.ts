@@ -588,6 +588,7 @@ export function createCreature(id: string, shimmer = false) {
       part(p, "orb", cream, [0, -r * 0.45, 0.01], [r * 0.82, r * 0.55, 0.12 + r * 0.4]);
       if (i % 2) part(p, "cone", accent, [0, r * 0.9, 0], [0.04, 0.09 + r * 0.25, 0.08], [-0.3, 0, 0]);
       if (i === 0) part(p, "cone", c, [0, 0, -0.2], [0.08, 0.3, 0.08], [-Math.PI / 2, 0, 0]);
+      p.userData.slither = { x: p.position.x, k: i };
       tails.push(p);
     }
     headY = 1.16;
@@ -1216,15 +1217,23 @@ export function animateCreature(
     1,
   );
   if (state === "idle") rig.rotation.y = Math.sin(time * 0.6 + index) * 0.06 * motion;
+  // Gaits: four-legged creatures trot on diagonal pairs, golems lumber,
+  // birds and insects keep their feet together and let their wings work.
+  const walking = state === "walk",
+    four = limbs.length >= 4 && ["quadruped", "fox", "antler", "dragon"].includes(family),
+    stride = family === "golem" ? 5 : family === "fox" ? 9 : 8;
   limbs.forEach((l: T.Group, i: number) => {
-    l.rotation.x =
-      state === "walk"
-        ? Math.sin(time * 8 + (i % 2) * Math.PI) * 0.5
-        : Math.sin(time * speed + i) * 0.035;
+    const pair = four ? ((i >> 1) + i) % 2 : i % 2;
+    l.rotation.x = walking
+      ? family === "bird" || family === "insect"
+        ? Math.sin(time * stride * 1.4) * 0.18
+        : Math.sin(time * stride + pair * Math.PI) * (family === "golem" ? 0.35 : 0.5)
+      : Math.sin(time * speed + i) * 0.035;
   });
+  const flap = walking ? (family === "insect" ? 24 : 8) : 3;
   wings.forEach((w: T.Group, i: number) => {
     w.rotation.z =
-      Math.sin(time * (state === "walk" ? 8 : 3)) * ((i % 2) * 2 - 1) * 0.27 * motion;
+      Math.sin(time * flap) * ((i % 2) * 2 - 1) * (walking && family === "insect" ? 0.16 : 0.27) * motion;
   });
   // Now and then an idle creature does something of its own: a play-bow
   // stretch, a happy wiggle with a quick tail wag, or a little hop and flap.
@@ -1247,10 +1256,37 @@ export function animateCreature(
       wings.forEach((w: T.Group, i: number) => (w.rotation.z = Math.sin(time * 16) * ((i % 2) * 2 - 1) * 0.5 * quirk));
     }
   }
-  if (state === "walk") {
+  // Serpents slither: a wave runs from head to tail while walking.
+  tails.forEach((t: T.Group) => {
+    const sl = t.userData.slither;
+    if (sl) t.position.x = sl.x + (walking ? Math.sin(time * 7 - sl.k * 0.85) * 0.12 * motion : 0);
+  });
+  if (walking) {
     if (family === "amphibian") rig.position.y += Math.abs(Math.sin(time * 5)) * .16 * motion;
     if (family === "shell") rig.rotation.z = Math.sin(time * 5) * .07 * motion;
-    if (family === "aquatic") rig.rotation.y = Math.sin(time * 3) * .18 * motion;
+    if (family === "aquatic") {
+      rig.rotation.y = Math.sin(time * 3) * .18 * motion;
+      rig.rotation.x = Math.sin(time * 6) * .05 * motion;
+    }
+    // A bob on every footfall and a slight nod with it.
+    if (four) {
+      rig.position.y += Math.abs(Math.sin(time * stride)) * (family === "fox" ? 0.06 : 0.04) * motion;
+      rig.rotation.x = Math.sin(time * stride * 2) * 0.025 * motion;
+    }
+    if (family === "golem") {
+      rig.rotation.z = Math.sin(time * stride) * 0.07 * motion;
+      rig.position.y += Math.abs(Math.sin(time * stride)) * 0.05 * motion;
+    }
+    if (family === "bird") {
+      rig.position.y += Math.abs(Math.sin(time * 11)) * 0.09 * motion;
+      rig.rotation.x = 0.12 * motion;
+    }
+    if (family === "insect") rig.position.y += 0.08 * motion + Math.sin(time * 17) * 0.015 * motion;
+    if (family === "spirit") {
+      rig.rotation.x = 0.16 * motion;
+      rig.position.y += Math.sin(time * 2.2) * 0.06 * motion;
+    }
+    if (family === "serpent") rig.rotation.y = Math.sin(time * 3.5) * 0.08 * motion;
   }
   if (["attack", "cast", "ultimate"].includes(state)) {
     const p = Math.sin(Math.min(1, phase) * Math.PI);
