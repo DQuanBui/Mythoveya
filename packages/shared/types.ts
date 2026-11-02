@@ -105,6 +105,8 @@ export type Profile = {
   festival?: import("./festival").FestivalState;
   /** Seasonal lantern hunts (optional, created on first find). */
   seasons?: import("./seasons").SeasonState;
+  /** Optional hair dye id from `HAIR_DYES` (looks.ts); absent means natural. */
+  hair?: string;
 };
 export type Status = {
   kind: string;

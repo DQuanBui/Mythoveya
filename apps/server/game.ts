@@ -30,6 +30,7 @@ import { atomic, getProfile, matchRecorded, recordMatch, save } from "./store";
 import { ensureTown, utcDay, utcWeek } from "../../packages/shared/town";
 import { townMutation } from "./town-game";
 import { seasonMutation } from "./season-game";
+import { lookMutation } from "./look-game";
 import { resourcesForRegion } from "../../packages/shared/haven";
 import { track } from "../../packages/shared/events";
 import { eventMutation } from "./events-game";
@@ -130,6 +131,7 @@ export function mutate(p: Profile, kind: string, v: any, now = Date.now()) {
   if (kind.startsWith("can-")) return canyonMutation(p, kind, v, random);
   if (kind.startsWith("exp-")) return expeditionMutation(p, kind, v, now, random);
   if (kind.startsWith("season-")) return seasonMutation(p, kind, v, now);
+  if (kind.startsWith("look-")) return lookMutation(p, kind, v);
   if (kind.startsWith("town-"))
     return townMutation(p, kind, v, Date.now(), random);
   if (ADVENTURE_KINDS.includes(kind)) {
