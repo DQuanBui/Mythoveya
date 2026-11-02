@@ -3,6 +3,7 @@ import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { AVATARS, byId } from "../../../packages/shared/content";
 import { dnaOf } from "./creature-dna";
+import { glyphSprite } from "./glyphs";
 
 // Low graphics quality keeps the lighter geometry and plain materials.
 // (Read directly: this module also runs in Node tests, without audio.ts.)
@@ -1338,6 +1339,28 @@ export function animateCreature(
   if (state === "victory") rig.position.y += Math.abs(Math.sin(time * 4)) * 0.18 * motion;
   if (state === "guard") rig.scale.y = 0.85;
   if (state === "stunned") rig.rotation.z = Math.sin(time * 3) * 0.12;
+  // Sleepers puff a slow trail of Z's that rise, drift and fade.
+  if (state === "sleep") {
+    if (!g.userData.zzz) {
+      const zzz = new T.Group(),
+        [hy, hz] = g.userData.headAt;
+      zzz.name = "sleep-zzz";
+      zzz.position.set(0.18, hy + 0.3, hz - 0.05);
+      for (let k = 0; k < 3; k++) {
+        const z = glyphSprite("Z", "#eef6ff", 0.22);
+        if (z) zzz.add(z);
+      }
+      g.add(zzz);
+      g.userData.zzz = zzz;
+    }
+    g.userData.zzz.visible = true;
+    g.userData.zzz.children.forEach((z: T.Sprite, k: number) => {
+      const f = reduced ? 0.25 + k * 0.3 : (time * 0.35 + k / 3) % 1;
+      z.position.set(f * 0.35 + Math.sin(f * 6 + k) * 0.05, f * 0.75, 0);
+      z.scale.setScalar(0.12 + f * 0.16);
+      z.material.opacity = reduced ? 0.8 : Math.sin(f * Math.PI);
+    });
+  } else if (g.userData.zzz) g.userData.zzz.visible = false;
   if (state === "sleep") {
     // Curled low with slow, deep breaths and a tucked, still tail.
     rig.position.y = (floating ? 0.05 : -0.05) + Math.sin(time * 1.2) * 0.02 * motion;

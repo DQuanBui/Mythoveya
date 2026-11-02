@@ -76,6 +76,14 @@ describe("creature looks", () => {
   });
 });
 
+it("puffs Z's only while a creature sleeps", () => {
+  const model = createCreature("mossprig");
+  animateCreature(model, 2, "sleep");
+  expect(model.getObjectByName("sleep-zzz")?.visible).toBe(true);
+  animateCreature(model, 3, "idle");
+  expect(model.getObjectByName("sleep-zzz")?.visible).toBe(false);
+});
+
 describe("keeper habits", () => {
   it("falls into a personal habit while idle, but not while walking or under Reduced Motion", () => {
     const dax = createAvatar(4),

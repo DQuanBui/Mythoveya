@@ -7,11 +7,12 @@ Updated November 1, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch
 November 2 round (from `9d221ef`). Done this round, newest last:
 - Fix: evolving a shimmering companion now reveals the evolved form with its shimmer (`CompanionGrowth` passes `o.shimmer` to `RecruitmentStage`).
 - Test: `keeper-life.spec` derives the expected badge title and record count from the save the guide created, so a shimmering guide companion (Starcatcher) no longer fails it.
+- Sleeping Z's (`glyphs.ts` sprite helper; `sleep-zzz` group added lazily by `animateCreature`) over napping companions, sleeping wildlife and any other sleeper; static under Reduced Motion.
 
 Next 3 tasks:
-1. Sleeping Z's over napping companions and wildlife.
-2. Curiosity bubbles when wildlife notices the keeper.
-3. A glowing support link from caster to healed or shielded allies.
+1. Curiosity bubbles when wildlife notices the keeper.
+2. A glowing support link from caster to healed or shielded allies.
+3. Island fringe for Meadow, Canyon and Hollow.
 
 ## Play
 
