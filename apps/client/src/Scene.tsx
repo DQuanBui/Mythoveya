@@ -38,6 +38,7 @@ import { WeatherEffects } from "./Weather";
 import { HavenTreasure } from "./HavenTreasure";
 import { photo } from "./photo";
 import { HitBurst, SupportGlow } from "./HitBurst";
+import { skillPath } from "./skill-path";
 import { Hearts } from "./Hearts";
 import { Footprints, leavePrint } from "./Footprints";
 import { activeSeason } from "../../../packages/shared/seasons";
@@ -1621,12 +1622,16 @@ function BattleCamera({
   });
   return null;
 }
+const TRAIL = 7;
 function SkillEffect({ battle, phase }: { battle: Battle; phase?: number }) {
-  const ref = useRef<T.Group>(null);
+  const ref = useRef<T.Group>(null),
+    trail = useRef<T.InstancedMesh>(null),
+    dot = useMemo(() => new T.Object3D(), []);
   useFrame(() => {
     if (!ref.current || !battle.event) return;
     const p = phase ?? (Date.now() - battle.event.at) / battle.event.duration;
     ref.current.visible = p >= 0 && p < 1;
+    if (trail.current) trail.current.visible = ref.current.visible && p < 0.55 && settings.quality !== "Low";
     if (p >= 1) return;
     const actor = battle.units.find((u) => u.id === battle.event!.actor)!,
       target = battle.units.find((u) => u.id === battle.event!.target)!;
@@ -1636,7 +1641,19 @@ function SkillEffect({ battle, phase }: { battle: Battle; phase?: number }) {
       to = new T.Vector3(...unitPosition(target.side, target.slot)).add(
         new T.Vector3(0, 0.6, 0),
       );
-    ref.current.position.copy(from.lerp(to, Math.min(1, p * 2)));
+    const element = byId[actor.species].element,
+      k = Math.min(1, p * 2);
+    // Each element travels its own path, leaving a fading trail behind it.
+    skillPath(settings.reduced ? "" : element, from, to, k, ref.current.position);
+    if (trail.current?.visible) {
+      for (let i = 0; i < TRAIL; i++) {
+        skillPath(settings.reduced ? "" : element, from, to, Math.max(0, k - (i + 1) * 0.035), dot.position);
+        dot.scale.setScalar((1 - i / TRAIL) * Math.min(1, k * 6));
+        dot.updateMatrix();
+        trail.current.setMatrixAt(i, dot.matrix);
+      }
+      trail.current.instanceMatrix.needsUpdate = true;
+    }
     ref.current.rotation.y = settings.reduced ? 0 : p * 5;
     const scale = p < 0.5 ? 0.25 + p : 1 + Math.sin((p - 0.5) * Math.PI) * 1.5;
     ref.current.scale.setScalar(settings.reduced ? 0.8 : scale);
@@ -1650,6 +1667,11 @@ function SkillEffect({ battle, phase }: { battle: Battle; phase?: number }) {
     ult = e.action.endsWith("-2"),
     v = s.index % 10;
   return (
+    <>
+    <instancedMesh ref={trail} args={[undefined, undefined, TRAIL]} frustumCulled={false} visible={false}>
+      <sphereGeometry args={[0.13, 8, 6]} />
+      <meshBasicMaterial color={s.color} transparent opacity={0.45} depthWrite={false} blending={T.AdditiveBlending} />
+    </instancedMesh>
     <group ref={ref} name="skill-effect">
       {!e.action.endsWith("-0") && <WildwoodEffect id={s.id} />}
       {ult && s.tier === "S" && (
@@ -1711,6 +1733,7 @@ function SkillEffect({ battle, phase }: { battle: Battle; phase?: number }) {
           </mesh>
         ))}
     </group>
+    </>
   );
 }
 export function BattleScene({

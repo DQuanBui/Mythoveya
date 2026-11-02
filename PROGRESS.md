@@ -12,11 +12,12 @@ Done so far, newest last:
 - Walking gaits per family: diagonal trot with footfall bob (four-legged), lumbering golems, hopping birds, buzzing insects, drifting spirits, and a head-to-tail slither wave through serpent segments (`userData.slither`).
 - Battle motions: attacks wind up before the lunge (pounce, wing buffet, serpent strike, tail swipe, golem slam); casts rear up with wings spread; hits knock back with a squash and shut eyes; defeat topples over with closed eyes. Scene passes a settled phase to creatures knocked out in earlier turns.
 - Support feedback (`SupportGlow` in `HitBurst.tsx`): healed allies get a green ground ring, spiralling motes and floating plus signs; shielded allies get a popping lattice bubble.
+- Skill effects travel element paths (`skill-path.ts`, tested in `tests/skill-path.test.ts`): flame and stone lob, tide waves, storm zigzags, grove corkscrews, shadow dips and weaves, frost and light fly straight. A seven-dot trail follows on Medium/High. Reduced Motion flies straight.
 
 Next 3 tasks:
-1. Element-shaped skill projectile paths with a trail.
-2. Per-keeper idle habits and personalities.
-3. Livelier wild creatures (notice the keeper, nap at night).
+1. Per-keeper idle habits and personalities.
+2. Livelier wild creatures (notice the keeper, nap at night).
+3. Village friends with personal idle gestures.
 
 ## Play
 
