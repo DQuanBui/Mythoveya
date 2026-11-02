@@ -1,10 +1,23 @@
 # Mythoveya handoff
 
-Updated November 1, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`, pushed to `origin/main` (https://github.com/DQuanBui/Mythoveya). This handoff covers four rounds: October 29 (from `4619fdc`), October 30 (from `b0d6c3d`), October 31 (from `3497bb3`) and November 1 (from `3d8496d`). Earlier handoffs (October 28 online-build session, October 22 Wayfarer Lodges) are archived in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md). Preserve ignored `data/mythoveya.sqlite`. `CLAUDE.md` is the quick project map for new sessions.
+Updated November 2, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`, pushed to `origin/main` (https://github.com/DQuanBui/Mythoveya). This handoff covers five rounds: October 29 (from `4619fdc`), October 30 (from `b0d6c3d`), October 31 (from `3497bb3`), November 1 (from `3d8496d`) and November 2 (from `9d221ef`). Earlier handoffs (October 28 online-build session, October 22 Wayfarer Lodges) are archived in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md). Preserve ignored `data/mythoveya.sqlite`. `CLAUDE.md` is the quick project map for new sessions.
 
 ## Next up
 
-November 2 round (from `9d221ef`). Done this round, newest last:
+November 2 round is complete: 15 commits from `9d221ef` (creatures, characters, world, battle, hair dyes), all pushed, with the verification record below.
+
+Next 3 tasks:
+1. Make the browser helpers that read React Three Fiber's internal store (`playerPoint` in `lodges.spec.ts`, the `haven.spec` mouse-picking scenario) wait until the canvas's root is registered; both flaked once and passed on rerun.
+2. Listening pass and a physical phone/tablet check of the effects added in the last two rounds (frame rate with glints, fringe, puffs, links and lantern light).
+3. Show the hair dye in other keeper views (photo mode, rankings and festival ghosts), and offer the wardrobe outside Lanternfair.
+
+## Play
+
+- **Online (single-player):** https://dquanbui.github.io/Mythoveya/. `.github/workflows/pages.yml` publishes it on every push to `main` (Pages source: GitHub Actions). Check a deployment with `node scripts/smoke-pages.mjs https://dquanbui.github.io/Mythoveya/`.
+- **Local (full game, including the human arena):** `npm install`, then run `Play Mythoveya.cmd` or `npm run dev` and open http://127.0.0.1:5173/. For the compiled build, run `npm run build && npm start` and open http://127.0.0.1:2567/.
+
+## Implemented November 2
+
 - Fix: evolving a shimmering companion now reveals the evolved form with its shimmer (`CompanionGrowth` passes `o.shimmer` to `RecruitmentStage`).
 - Test: `keeper-life.spec` derives the expected badge title and record count from the save the guide created, so a shimmering guide companion (Starcatcher) no longer fails it.
 - Sleeping Z's (`glyphs.ts` sprite helper; `sleep-zzz` group added lazily by `animateCreature`) over napping companions, sleeping wildlife and any other sleeper; static under Reduced Motion.
@@ -18,16 +31,6 @@ November 2 round (from `9d221ef`). Done this round, newest last:
 - Battle opening: each creature drops onto its ring in turn (by side, column and row, ~1.3 s total) with a landing squash; `entrance` in `animateCreature` now drops from above.
 - Hair dyes, server side: eight dyes in `packages/shared/looks.ts` (`HAIR_DYES`, `hairColor`), optional `Profile.hair`, new free mutation kind `look-hair` (`apps/server/look-game.ts`; `natural` clears the field), tested in `tests/looks.test.ts`.
 - Hair dyes, client side: `createAvatar(index, hairColor)` (own geometry cache key), the explorer keeper and wardrobe mannequin wear the dye, the Lanternfair wardrobe has a radio row of eight swatches (`.hair-dyes`), `look-` results toast. `islands.spec` now also dyes and reloads.
-
-Next 3 tasks:
-1. Full verification: vitest, both builds, smokes, Playwright, docs.
-2. Listening and physical-device pass of the new effects.
-3. Show the hair dye in other keeper views (photo mode poses, rankings portraits).
-
-## Play
-
-- **Online (single-player):** https://dquanbui.github.io/Mythoveya/. `.github/workflows/pages.yml` publishes it on every push to `main` (Pages source: GitHub Actions). Check a deployment with `node scripts/smoke-pages.mjs https://dquanbui.github.io/Mythoveya/`.
-- **Local (full game, including the human arena):** `npm install`, then run `Play Mythoveya.cmd` or `npm run dev` and open http://127.0.0.1:5173/. For the compiled build, run `npm run build && npm start` and open http://127.0.0.1:2567/.
 
 ## Implemented November 1
 
@@ -123,6 +126,13 @@ Next 3 tasks:
   - Indoor music reuses an existing theme, because `tests/signatures.test.ts` pins ten music themes.
 
 ## Verified
+
+November 2 (final code commit `307b579`):
+- typecheck and content audit pass (92 species, 276 actions, 92 passives, 12 families);
+- **45 test files, 203 passed** (new: `looks.test.ts`; new cases in `creature-look.test.ts` and `keeper-fx.test.ts`);
+- both builds pass, entry 442 kB (152 kB gzipped); `smoke-production` and local `smoke-pages` pass;
+- Playwright full run (33.8 min): 32 of 33 passed. `lodges.spec` failed once reading React Three Fiber's internal store right after "Return outdoors" (the helper raced the canvas mounting); it passed on a targeted rerun (3.7 min), so all 33 have passing evidence. `keeper-life.spec` no longer depends on the shimmer roll, and `islands.spec` now also picks a hair dye and checks it after a reload.
+- Note: `945b3ca` (frosty breath) was pushed with `keeper-fx.test.ts` failing in Node because the scratch check script hid the vitest exit code; `1b51abd` fixed the test import and the script now stops on test failures.
 
 November 1 (final code commit `44b0cbc`):
 - typecheck and content audit pass (92 species, 276 actions, 92 passives, 12 families);
