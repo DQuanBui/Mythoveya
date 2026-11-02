@@ -50,7 +50,7 @@ export function CompanionGrowth({
     <div className="growth">
       {evolved && (
         <div className="evolution-reveal" role="status">
-          <RecruitmentStage id={evolved} />
+          <RecruitmentStage id={evolved} shimmer={!!o.shimmer} />
           <p className="eyebrow">A BOND GROWS DEEPER</p>
           <h3>{byId[evolved].name}</h3>
           <p className="muted">{byId[evolved].lore}</p>

@@ -4,12 +4,13 @@ Updated November 1, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch
 
 ## Next up
 
-November 1 round (creatures, characters, visuals) is complete: 17 feature/fix/test commits from `3d8496d`, all pushed, with the verification record below.
+November 2 round (from `9d221ef`). Done this round, newest last:
+- Fix: evolving a shimmering companion now reveals the evolved form with its shimmer (`CompanionGrowth` passes `o.shimmer` to `RecruitmentStage`).
 
 Next 3 tasks:
-1. Listening pass and a physical phone/tablet check of the new effects (water glints, confetti, skill trails, island fringe) for feel and frame rate.
-2. Island fringe and water glints for the other regions and the home/festival islands.
-3. Make `keeper-life.spec` independent of the random shimmer roll (owner decision: accept either title, or seed the guide team), then caster-to-ally links for support skills.
+1. Make `keeper-life.spec` robust to the random shimmer roll of the guide team.
+2. Sleeping Z's over napping companions and wildlife.
+3. Curiosity bubbles when wildlife notices the keeper.
 
 ## Play
 
