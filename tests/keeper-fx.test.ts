@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { EMOTES, keeperEmote, playEmote } from "../apps/client/src/village-materials";
 import { leavePrint, recentPrints } from "../apps/client/src/Footprints";
 import { PHOTO_FILTERS, photoCss } from "../apps/client/src/photo";
-import { emitPuff, recentPuffs } from "../apps/client/src/Puffs";
+import { emitPuff, recentPuffs } from "../apps/client/src/puff-buffer";
 
 describe("keeper emotes, footprints and photo filters", () => {
   it("plays timed emotes once and toggles lasting ones off on a second press", () => {

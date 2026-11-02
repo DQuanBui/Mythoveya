@@ -4,6 +4,7 @@ import * as T from "three";
 import { regionWeather, weatherAt, type Weather } from "../../../packages/shared/weather";
 import { audio, settings } from "./audio";
 import { worldFocus } from "./village-materials";
+import { softDot } from "./glyphs";
 
 /** Smoothly blended weather amounts shared by lighting, effects and audio. */
 export const weatherFx = { rain: 0, mist: 0, snow: false };
@@ -11,19 +12,6 @@ export function currentWeather(region: string, now = Date.now()): Weather {
   const pinned = (globalThis as { __weather?: Weather }).__weather;
   if (import.meta.env.DEV && pinned) return pinned;
   return regionWeather(weatherAt(now).weather, region);
-}
-export function softDot() {
-  const canvas = document.createElement("canvas");
-  canvas.width = canvas.height = 64;
-  const g = canvas.getContext("2d")!,
-    gradient = g.createRadialGradient(32, 32, 0, 32, 32, 32);
-  gradient.addColorStop(0, "rgba(255,255,255,0.9)");
-  gradient.addColorStop(1, "rgba(255,255,255,0)");
-  g.fillStyle = gradient;
-  g.fillRect(0, 0, 64, 64);
-  const t = new T.CanvasTexture(canvas);
-  t.colorSpace = T.SRGBColorSpace;
-  return t;
 }
 
 export function WeatherEffects({ region, ground }: { region: string; ground?: (x: number, z: number) => number }) {

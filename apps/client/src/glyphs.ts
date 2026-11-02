@@ -30,3 +30,18 @@ export function glyphSprite(glyph: string, color = "#ffffff", size = 0.3) {
   s.renderOrder = 5;
   return s;
 }
+
+/** A soft round glow texture for mist, puffs and other billboards. */
+export function softDot() {
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = 64;
+  const g = canvas.getContext("2d")!,
+    gradient = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+  gradient.addColorStop(0, "rgba(255,255,255,0.9)");
+  gradient.addColorStop(1, "rgba(255,255,255,0)");
+  g.fillStyle = gradient;
+  g.fillRect(0, 0, 64, 64);
+  const t = new T.CanvasTexture(canvas);
+  t.colorSpace = T.SRGBColorSpace;
+  return t;
+}
