@@ -8,11 +8,12 @@ Done so far, newest last:
 - Shimmering variants: iridescent skin (Medium/High) and three twinkling four-point stars (`spike` geometry, `skinFor(surface, shimmer)`).
 - See-through Lanternmoth (veined ivory) and Frostmoth (frosted, rime-edged) wings via `glassPane`; Velvetmoth stays velvet.
 - Dragons and serpents: gold-flecked irises with vertical slit pupils (`reptile` in `createCreature`).
+- Evolved forms: a floating, turning bond circlet (`halo` geometry) above a breathing crest gem (`userData.crest`).
 
 Next 3 tasks:
-1. Glowing bond sigil and pulsing crest gem on evolved forms.
-2. Per-family walking gaits (slither, hop, waddle, drift).
-3. Family-specific attack, cast and hit reactions.
+1. Per-family walking gaits (slither, hop, waddle, drift).
+2. Family-specific attack, cast and hit reactions.
+3. Heal and shield feedback on supported allies in battle.
 
 ## Play
 

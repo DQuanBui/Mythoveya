@@ -46,6 +46,7 @@ const geometry = {
   cone: new T.ConeGeometry(1, 1, fine ? 12 : 9),
   box: new RoundedBoxGeometry(1, 1, 1, fine ? 2 : 1, 0.18),
   ring: new T.TorusGeometry(1, 0.055, 6, 32),
+  halo: new T.TorusGeometry(1, 0.13, 8, 28),
   // Half a ring, for smiles and eyelid lines.
   arc: new T.TorusGeometry(1, 0.16, 6, 16, Math.PI),
   band: new T.CylinderGeometry(1, 1, 1, fine ? 20 : 14),
@@ -266,7 +267,8 @@ export function createCreature(id: string, shimmer = false) {
   const evolved = !!s.evolvedFrom,
     rank = ["E", "D", "C", "B", "A", "S"].indexOf(s.tier),
     rare = rank >= 4;
-  const limbs: T.Group[] = [],
+  const crest: { gem?: T.Mesh; circlet?: T.Group } = {},
+    limbs: T.Group[] = [],
     wings: T.Group[] = [],
     tails: T.Group[] = [],
     eyes: T.Group[] = [];
@@ -891,7 +893,19 @@ export function createCreature(id: string, shimmer = false) {
       const a = (i / 6 - 0.5) * 2.4;
       part(rig, "cone", i % 2 ? light : c, [Math.sin(a) * 0.3, headY - 0.05 + Math.cos(a) * 0.12, headZ - 0.22], [0.11, 0.42, 0.11], [-1.1, 0, -a * 0.8]);
     }
-    part(rig, "orb", tint(c, "#ffffff", 0.35), [0, headY + 0.3, headZ + 0.16], [0.075, 0.1, 0.06], undefined, true);
+    crest.gem = part(rig, "orb", tint(c, "#ffffff", 0.35), [0, headY + 0.3, headZ + 0.16], [0.075, 0.1, 0.06], undefined, true);
+    // A floating bond circlet with four points of light marks the evolution.
+    const circlet = new T.Group();
+    circlet.name = "bond-circlet";
+    circlet.position.set(0, headY + 0.62, headZ - 0.08);
+    circlet.rotation.x = -0.28;
+    rig.add(circlet);
+    part(circlet, "halo", tint(accent, "#ffe7a0", 0.3), [0, 0, 0], [0.24, 0.24, 0.24], [Math.PI / 2, 0, 0], true);
+    for (let i = 0; i < 4; i++) {
+      const a = (i / 4) * Math.PI * 2;
+      part(circlet, "spike", i % 2 ? light : "#fff6d8", [Math.cos(a) * 0.24, 0.02, Math.sin(a) * 0.24], [0.05, 0.11, 0.05], undefined, true);
+    }
+    crest.circlet = circlet;
   }
   if (s.id === "ignivara")
     for (const side of [-1, 1]) {
@@ -1138,7 +1152,7 @@ export function createCreature(id: string, shimmer = false) {
     rig.add(glints);
   }
   g.scale.setScalar(s.size);
-  g.userData = { shimmer, glints, rig, limbs, wings, tails, eyes, family: s.family, index: s.index, headAt: [headY, headZ] };
+  g.userData = { shimmer, glints, crest, rig, limbs, wings, tails, eyes, family: s.family, index: s.index, headAt: [headY, headZ] };
   return g;
 }
 export type Motion =
@@ -1162,7 +1176,13 @@ export function animateCreature(
   phase = 0,
   reduced = false,
 ) {
-  const { rig, limbs, wings, tails, family, index, glints, eyes } = g.userData;
+  const { rig, limbs, wings, tails, family, index, glints, eyes, crest } = g.userData;
+  // Evolved forms: the circlet turns and bobs while the crest gem breathes.
+  if (crest?.circlet) {
+    crest.circlet.rotation.y = reduced ? 0 : time * 0.8;
+    crest.circlet.position.y = crest.gem.position.y + 0.32 + (reduced ? 0 : Math.sin(time * 1.6 + index) * 0.03);
+    crest.gem.scale.set(0.075, 0.1, 0.06).multiplyScalar(reduced ? 1 : 1 + Math.sin(time * 2.4) * 0.12);
+  }
   if (glints && g.userData.shimmer) {
     glints.rotation.y = reduced ? 0 : time * 0.45;
     glints.children.forEach((star: T.Object3D, i: number) => {
