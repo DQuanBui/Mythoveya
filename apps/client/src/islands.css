@@ -452,6 +452,27 @@
   background: radial-gradient(circle at 50% 35%, #e8d39c33, #0f2a3155);
   border: 1px solid #b8c8aa30;
 }
+.hair-dyes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+.hair-dyes button {
+  width: 30px;
+  height: 30px;
+  min-height: 0;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  box-shadow: inset 0 -4px 6px rgba(0, 0, 0, 0.18);
+}
+.hair-dyes button.on {
+  border-color: #f5d38a;
+  outline: 2px solid #f5d38a;
+  outline-offset: 2px;
+}
 .wardrobe .market-stock {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }

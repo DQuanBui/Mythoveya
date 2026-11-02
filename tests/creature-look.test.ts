@@ -93,6 +93,14 @@ it("puffs Z's only while a creature sleeps", () => {
   expect(model.getObjectByName("sleep-zzz")?.visible).toBe(false);
 });
 
+it("dyes a keeper's hair without touching the cached natural look", () => {
+  const colors = (m: Object3D) => meshes(m).flatMap((x) => Array.from((x.geometry.attributes.color?.array || []) as ArrayLike<number>));
+  const natural = colors(createAvatar(1)),
+    dyed = colors(createAvatar(1, "#3f6f9a"));
+  expect(dyed).not.toEqual(natural);
+  expect(colors(createAvatar(1))).toEqual(natural);
+});
+
 describe("keeper habits", () => {
   it("falls into a personal habit while idle, but not while walking or under Reduced Motion", () => {
     const dax = createAvatar(4),

@@ -17,11 +17,12 @@ November 2 round (from `9d221ef`). Done this round, newest last:
 - Water glints on the islands: the home island's placeable pond (9) and the Lanternfair pond (18); `WaterGlints` takes a `max` count, a third of it on Low.
 - Battle opening: each creature drops onto its ring in turn (by side, column and row, ~1.3 s total) with a landing squash; `entrance` in `animateCreature` now drops from above.
 - Hair dyes, server side: eight dyes in `packages/shared/looks.ts` (`HAIR_DYES`, `hairColor`), optional `Profile.hair`, new free mutation kind `look-hair` (`apps/server/look-game.ts`; `natural` clears the field), tested in `tests/looks.test.ts`.
+- Hair dyes, client side: `createAvatar(index, hairColor)` (own geometry cache key), the explorer keeper and wardrobe mannequin wear the dye, the Lanternfair wardrobe has a radio row of eight swatches (`.hair-dyes`), `look-` results toast. `islands.spec` now also dyes and reloads.
 
 Next 3 tasks:
-1. Hair dye UI in the wardrobe, applied to the explorer keeper, the wardrobe preview and the toast list.
-2. Full verification: vitest, both builds, smokes, Playwright, docs.
-3. Listening and physical-device pass of the new effects.
+1. Full verification: vitest, both builds, smokes, Playwright, docs.
+2. Listening and physical-device pass of the new effects.
+3. Show the hair dye in other keeper views (photo mode poses, rankings portraits).
 
 ## Play
 

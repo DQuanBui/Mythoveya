@@ -6,6 +6,8 @@ import { dressKeeper } from "./TownScenery";
 import { ModelLighting } from "./ModelLighting";
 import { settings } from "./audio";
 import type { Profile } from "../../../packages/shared/types";
+import { HAIR_DYES, hairColor } from "../../../packages/shared/looks";
+import { AVATARS } from "../../../packages/shared/content";
 import {
   FESTIVAL_SHOP,
   GREETING_TICKETS,
@@ -33,8 +35,8 @@ const SECTIONS: [ShopEntry["kind"], string][] = [
   ["supply", "Weekly supplies"],
 ];
 
-function Mannequin({ avatar, outfit }: { avatar: number; outfit?: string }) {
-  const model = useMemo(() => dressKeeper(createAvatar(avatar), outfit), [avatar, outfit]);
+function Mannequin({ avatar, outfit, hair }: { avatar: number; outfit?: string; hair?: string }) {
+  const model = useMemo(() => dressKeeper(createAvatar(avatar, hair), outfit), [avatar, outfit, hair]);
   const turn = useRef(0);
   useFrame(({ clock }, dt) => {
     if (!settings.reduced) turn.current += dt * 0.6;
@@ -45,14 +47,14 @@ function Mannequin({ avatar, outfit }: { avatar: number; outfit?: string }) {
   return <primitive object={model} />;
 }
 /** A turning preview of your keeper in an outfit. */
-function OutfitPreview({ avatar, outfit }: { avatar: number; outfit?: string }) {
+function OutfitPreview({ avatar, outfit, hair }: { avatar: number; outfit?: string; hair?: string }) {
   return (
     <div className="outfit-preview" aria-label="Outfit preview">
       <Canvas camera={{ position: [0, 1.25, 3.9], fov: 34 }} dpr={[1, 1.5]} onCreated={({ camera }) => camera.lookAt(new T.Vector3(0, 0.98, 0))}>
         <ModelLighting intensity={0.8} />
         <ambientLight intensity={1.3} />
         <directionalLight position={[2, 3, 3]} intensity={2.2} />
-        <Mannequin avatar={avatar} outfit={outfit} />
+        <Mannequin avatar={avatar} outfit={outfit} hair={hair} />
       </Canvas>
     </div>
   );
@@ -194,8 +196,26 @@ export function FestivalPanel({
       {tab === "wardrobe" && (
         <div className="wardrobe">
         <div>
-          <OutfitPreview avatar={profile.avatar} outfit={trying ?? f.outfit} />
+          <OutfitPreview avatar={profile.avatar} outfit={trying ?? f.outfit} hair={hairColor(profile)} />
           <small className="muted">{trying ? "Previewing" : f.outfit ? "Wearing" : "No outfit"}</small>
+          {/* Hair dyes are free and can be changed at any time. */}
+          <div className="hair-dyes" role="radiogroup" aria-label="Hair dye">
+            {HAIR_DYES.map((d) => {
+              const on = (profile.hair || "natural") === d.id;
+              return (
+                <button
+                  key={d.id}
+                  role="radio"
+                  aria-checked={on}
+                  title={d.name}
+                  aria-label={d.name}
+                  className={on ? "on" : ""}
+                  style={{ background: d.color || AVATARS[profile.avatar].hair }}
+                  onClick={() => !on && run("look-hair", { item: d.id })}
+                />
+              );
+            })}
+          </div>
         </div>
         <div className="market-stock">
           {FESTIVAL_SHOP.filter((s) => s.kind === "outfit").map((s) => {

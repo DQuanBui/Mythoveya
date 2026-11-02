@@ -85,6 +85,7 @@ import {
   slideStep,
   type Point,
 } from "../../../packages/shared/haven";
+import { hairColor } from "../../../packages/shared/looks";
 import type { Battle, Profile } from "../../../packages/shared/types";
 import {
   animateAvatar,
@@ -727,9 +728,10 @@ export function Explorer({
   walker: MutableRefObject<Walker>;
 }) {
   const outfit = profile.festival?.outfit;
+  const hair = hairColor(profile);
   const avatar = useMemo(
-    () => dressKeeper(createAvatar(profile.avatar), outfit),
-    [profile.avatar, outfit],
+    () => dressKeeper(createAvatar(profile.avatar, hair), outfit),
+    [profile.avatar, outfit, hair],
   );
   // After dark the keeper carries a small lantern in the right hand.
   const lantern = useMemo(() => {

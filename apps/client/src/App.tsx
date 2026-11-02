@@ -252,7 +252,7 @@ export default function App() {
       audio.cue("confirm");
       if (kind === "resource") notify("Gathered +1 Sunseed · +25 Gold");
       if (
-        (kind.startsWith("lodge-") || kind.startsWith("rescue-") || kind.startsWith("atlas-") || kind.startsWith("cons-") || kind.startsWith("rally-") || kind.startsWith("mea-") || kind.startsWith("hol-") || kind.startsWith("can-") || kind.startsWith("exp-") || kind.startsWith("town-") || kind.startsWith("home-") || kind.startsWith("island-") || kind.startsWith("season-")) &&
+        (kind.startsWith("lodge-") || kind.startsWith("rescue-") || kind.startsWith("atlas-") || kind.startsWith("cons-") || kind.startsWith("rally-") || kind.startsWith("mea-") || kind.startsWith("hol-") || kind.startsWith("can-") || kind.startsWith("exp-") || kind.startsWith("town-") || kind.startsWith("home-") || kind.startsWith("island-") || kind.startsWith("season-") || kind.startsWith("look-")) &&
         result.value?.message &&
         kind !== "town-talk" &&
         kind !== "town-fish"

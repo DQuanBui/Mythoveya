@@ -1388,7 +1388,8 @@ export function animateCreature(
 // Keepers: rounded proportions, faces with brows and smiles, and per-character hair.
 const PANTS = ["#3b4f57", "#33454d", "#4d5a3f", "#3e566b", "#4a4f52", "#3d3446", "#6b6455", "#2f3a46"];
 const IRIS = ["#4a3020", "#2c5f63", "#5a7a3a", "#3f6f9a", "#3a2a20", "#6a4a80", "#7a5a2a", "#2a3a4a"];
-export function createAvatar(index: number) {
+/** A keeper model; `hairColor` overrides their natural hair (a dye). */
+export function createAvatar(index: number, hairColor?: string) {
   const a = AVATARS[index],
     g = new T.Group(),
     limbs: T.Group[] = [],
@@ -1460,12 +1461,12 @@ export function createAvatar(index: number) {
     // Lashes along the upper lid, flicked out at the corner.
     part(eye, "arc", "#24170f", [0, 0.002, 0.184], [0.042, 0.04, 0.03], [-0.25, 0, 0]);
     part(eye, "capsule", "#24170f", [side * 0.043, 0.012, 0.176], [0.006, 0.014, 0.006], [0, 0, -side * 1]);
-    part(head, "box", a.hair, [side * 0.075, 0.072, 0.17], [0.07, 0.016, 0.02], [0, 0, side * -0.12]);
+    part(head, "box", hairColor || a.hair, [side * 0.075, 0.072, 0.17], [0.07, 0.016, 0.02], [0, 0, side * -0.12]);
     part(head, "orb", tint(a.skin, "#ff8f80", 0.35), [side * 0.11, -0.05, 0.15], [0.035, 0.022, 0.012]);
   }
   part(head, "orb", skinShade, [0, -0.025, 0.2], [0.025, 0.03, 0.025]);
   part(head, "ring", "#7a3f35", [0, -0.075, 0.178], [0.035, 0.022, 0.03], [0, 0, Math.PI]);
-  hair(head, index, a.hair);
+  hair(head, index, hairColor || a.hair);
   // Character accents.
   if (index === 2 || index === 5) part(g, "cone", a.coat, [0, 1.08, -0.06], [0.34, 0.62, 0.24]);
   if (index === 3) part(g, "ring", "#71c3e6", [0, 1.42, 0], [0.13, 0.13, 0.5], [Math.PI / 2, 0, 0]);
@@ -1476,7 +1477,7 @@ export function createAvatar(index: number) {
   if (index === 7)
     for (const side of [-1, 1])
       part(head, "ring", "#d6b775", [side * 0.075, 0.16, 0.13], [0.055, 0.055, 0.05], [0.3, 0, 0], false, true);
-  consolidate(g, `avatar:${index}`);
+  consolidate(g, `avatar:${index}${hairColor ? `:${hairColor}` : ""}`);
   g.userData = { limbs, index, head, eyes };
   return g;
 }

@@ -183,6 +183,11 @@ test("Lanternfair opens after a win: welcome tickets, an outfit and a reload", a
   await page.getByRole("tab", { name: "♔ Wardrobe" }).click();
   await page.locator('[data-outfit="wreath"] button', { hasText: "Wear" }).click();
   await expect(page.locator('[data-outfit="wreath"]')).toContainText("Wearing now");
+  // Hair dyes are free and apply at once.
+  await page.getByRole("radio", { name: "Tide blue" }).click();
+  await expect(page.getByRole("status")).toContainText("Tide blue hair suits you!");
+  await expect(page.getByRole("radio", { name: "Tide blue" })).toHaveAttribute("aria-checked", "true");
+  await page.locator(".wardrobe").screenshot({ path: "artifacts/wardrobe-hair.png" });
   await page.reload();
   await page.getByRole("button", { name: "Continue your journey" }).click();
   await expect(page.locator(".location")).toContainText("Lanternfair Isle");
@@ -193,6 +198,10 @@ test("Lanternfair opens after a win: welcome tickets, an outfit and a reload", a
     return (await r.json()).festival;
   });
   expect(festival.outfit).toBe("wreath");
+  expect(await page.evaluate(async () => {
+    const r = await fetch("/api/profile", { headers: { Authorization: "Bearer " + localStorage.getItem("mythoveya-session") } });
+    return (await r.json()).hair;
+  })).toBe("tide");
   expect(festival.tickets).toBe(17);
   expect(errors).toEqual([]);
 });
