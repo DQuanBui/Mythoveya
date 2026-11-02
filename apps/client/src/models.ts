@@ -1288,17 +1288,51 @@ export function animateCreature(
     }
     if (family === "serpent") rig.rotation.y = Math.sin(time * 3.5) * 0.08 * motion;
   }
-  if (["attack", "cast", "ultimate"].includes(state)) {
-    const p = Math.sin(Math.min(1, phase) * Math.PI);
-    rig.position.z = p * (state === "attack" ? 0.4 : 0.15) * motion;
-    rig.rotation.x = -p * 0.25 * motion;
-    rig.position.y += p * 0.2 * motion;
+  if (state === "attack") {
+    // A short wind-up, then the lunge, flavoured by family: four-legged
+    // creatures pounce with their forepaws up, birds buffet with their wings,
+    // serpents rear and strike, swimmers swipe, golems slam down.
+    const a = Math.min(1, phase),
+      wind = a < 0.25 ? Math.sin((a / 0.25) * Math.PI) : 0,
+      p = a < 0.25 ? 0 : Math.sin(((a - 0.25) / 0.75) * Math.PI);
+    rig.position.z = (p * (family === "insect" ? 0.55 : 0.4) - wind * 0.12) * motion;
+    rig.position.y += (p * 0.2 - wind * 0.04) * motion;
+    rig.rotation.x = (-p * 0.25 + wind * 0.12) * motion;
+    if (four) limbs.forEach((l: T.Group, i: number) => i % 2 && (l.rotation.x = -p * 0.9 * motion));
+    if (family === "bird") wings.forEach((w: T.Group, i: number) => (w.rotation.z = ((i % 2) * 2 - 1) * (wind * 0.7 - p * 0.5) * motion));
+    if (family === "serpent") rig.rotation.x = (wind * 0.3 - p * 0.45) * motion;
+    if (family === "aquatic") rig.rotation.y = Math.sin(a * Math.PI * 2) * 0.45 * motion;
+    if (family === "golem") rig.rotation.x = (p * 0.3 - wind * 0.2) * motion;
   }
-  if (state === "hit") rig.rotation.z = Math.sin(phase * 20) * 0.1 * motion;
+  if (state === "cast" || state === "ultimate") {
+    // Rear up with wings spread wide to call the skill; ultimates rise higher.
+    const p = Math.sin(Math.min(1, phase) * Math.PI),
+      big = state === "ultimate" ? 1.6 : 1;
+    rig.position.z = p * 0.15 * motion;
+    rig.rotation.x = -p * 0.3 * big * motion;
+    rig.position.y += p * 0.2 * big * motion;
+    wings.forEach((w: T.Group, i: number) => (w.rotation.z = ((i % 2) * 2 - 1) * -p * 0.6 * motion));
+    if (four) limbs.forEach((l: T.Group, i: number) => i % 2 && (l.rotation.x = -p * 0.5 * motion));
+    if (state === "ultimate" && (family === "spirit" || family === "bird")) rig.rotation.y = p * Math.PI * 2 * motion;
+  }
+  if (state === "hit") {
+    // Knocked back with a squash, eyes squeezed shut, then a recovering wobble.
+    const h = Math.min(1, Math.max(0, (phase - 0.45) / 0.55)),
+      k = Math.sin(h * Math.PI) * (1 - h * 0.5);
+    rig.position.z = -k * 0.3 * motion;
+    rig.rotation.x = k * 0.18 * motion;
+    rig.rotation.z = Math.sin(phase * 20) * 0.1 * motion;
+    rig.scale.set(1 + k * 0.1 * motion, 1 - k * 0.14 * motion, 1 + k * 0.1 * motion);
+    if (h < 0.45) eyes?.forEach((eye: T.Group) => (eye.scale.y = 0.12));
+  }
   if (state === "defeat") {
-    rig.rotation.z = 1.15;
-    rig.position.y = -0.16;
-    rig.scale.setScalar(0.8);
+    // Topple over the moment the last point of health goes, eyes closed.
+    const d = Math.min(1, Math.max(0, (phase - 0.45) / 0.35)),
+      e = reduced ? 1 : 1 - (1 - d) * (1 - d);
+    rig.rotation.z = 1.15 * e;
+    rig.position.y = -0.16 * e + Math.sin(d * Math.PI) * 0.12;
+    rig.scale.setScalar(1 - 0.2 * e);
+    eyes?.forEach((eye: T.Group) => (eye.scale.y = 0.07));
   }
   if (state === "entrance") rig.scale.setScalar(0.7 + Math.min(phase, 1) * 0.3);
   if (state === "victory") rig.position.y += Math.abs(Math.sin(time * 4)) * 0.18 * motion;

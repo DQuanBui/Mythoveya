@@ -10,11 +10,12 @@ Done so far, newest last:
 - Dragons and serpents: gold-flecked irises with vertical slit pupils (`reptile` in `createCreature`).
 - Evolved forms: a floating, turning bond circlet (`halo` geometry) above a breathing crest gem (`userData.crest`).
 - Walking gaits per family: diagonal trot with footfall bob (four-legged), lumbering golems, hopping birds, buzzing insects, drifting spirits, and a head-to-tail slither wave through serpent segments (`userData.slither`).
+- Battle motions: attacks wind up before the lunge (pounce, wing buffet, serpent strike, tail swipe, golem slam); casts rear up with wings spread; hits knock back with a squash and shut eyes; defeat topples over with closed eyes. Scene passes a settled phase to creatures knocked out in earlier turns.
 
 Next 3 tasks:
-1. Family-specific attack, cast and hit reactions.
-2. Heal and shield feedback on supported allies in battle.
-3. Element-shaped skill projectile paths with a trail.
+1. Heal and shield feedback on supported allies in battle.
+2. Element-shaped skill projectile paths with a trail.
+3. Per-keeper idle habits and personalities.
 
 ## Play
 

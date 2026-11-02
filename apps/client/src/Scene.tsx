@@ -1831,7 +1831,8 @@ export function BattleScene({
               shimmer={u.shimmer}
               rotation={u.side === 0 ? Math.PI : 0}
               state={state}
-              phase={elapsed}
+              // Creatures knocked out earlier stay down through later turns.
+              phase={state === "defeat" && !event?.amounts.some((a) => a.id === u.id) ? 2 : elapsed}
               scale={0.92}
             />
             {active && event && !preview && outcome > 0 && event.actor !== u.id && (
