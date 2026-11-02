@@ -10,9 +10,10 @@ function Entrance({ id, shimmer = false }: { id: string; shimmer?: boolean }) {
   const creature = useRef<T.Group>(null);
   const halo = useRef<T.Group>(null);
   const started = useRef<number | null>(null);
+  const burst = useRef<T.Group>(null);
   const species = byId[id];
   const rare = species.tier === "S" || species.tier === "A";
-  useFrame(({ clock }) => {
+  useFrame(({ clock, camera }) => {
     started.current ??= clock.elapsedTime;
     const t = Math.min(1, (clock.elapsedTime - started.current) / 1.8);
     const ease = 1 - (1 - t) ** 3;
@@ -25,6 +26,28 @@ function Entrance({ id, shimmer = false }: { id: string; shimmer?: boolean }) {
         ? 0.35
         : 0.35 + (1 - ease) * Math.PI * 2;
     }
+    // A shimmer's arrival ends in a prismatic starburst, and the shrine's
+    // halo keeps cycling through the rainbow while it stands there.
+    const since = clock.elapsedTime - started.current;
+    if (burst.current) {
+      const b = (since - 1.5) / 0.9;
+      burst.current.visible = shimmer && !settings.reduced && b > 0 && b < 1;
+      if (burst.current.visible) {
+        const fade = 1 - b;
+        burst.current.quaternion.copy(camera.quaternion);
+        burst.current.children.forEach((m, i) => {
+          const mat = (m as T.Mesh).material as T.MeshBasicMaterial;
+          mat.opacity = fade;
+          mat.color.setHSL((i / 9 + since * 0.4) % 1, 0.95, 0.62);
+          if (i === 0) m.scale.setScalar(0.3 + b * 2.4);
+          else m.scale.set(1, 0.2 + Math.sin(b * Math.PI) * 1.2, 1);
+        });
+      }
+    }
+    if (shimmer && halo.current)
+      halo.current.children.forEach((m, i) =>
+        ((m as T.Mesh).material as T.MeshBasicMaterial).color.setHSL((i * 0.07 + (settings.reduced ? 0 : clock.elapsedTime * 0.15)) % 1, 0.7, 0.72),
+      );
     if (halo.current) {
       halo.current.rotation.y = settings.reduced ? 0 : clock.elapsedTime * 0.3;
       halo.current.scale.setScalar(
@@ -48,6 +71,23 @@ function Entrance({ id, shimmer = false }: { id: string; shimmer?: boolean }) {
       <group ref={creature}>
         <Creature id={id} shimmer={shimmer} state="victory" scale={0.9} />
       </group>
+      {shimmer && (
+        <group ref={burst} name="shimmer-burst" position={[0, 0.7, 0]} visible={false}>
+          <mesh>
+            <torusGeometry args={[0.6, 0.05, 6, 48]} />
+            <meshBasicMaterial transparent depthWrite={false} blending={T.AdditiveBlending} />
+          </mesh>
+          {Array.from({ length: 8 }, (_, i) => {
+            const a = (i / 8) * Math.PI * 2;
+            return (
+              <mesh key={i} position={[-Math.sin(a) * 1.1, Math.cos(a) * 1.1, 0]} rotation={[0, 0, a]}>
+                <boxGeometry args={[0.08, 1.2, 0.02]} />
+                <meshBasicMaterial transparent depthWrite={false} blending={T.AdditiveBlending} />
+              </mesh>
+            );
+          })}
+        </group>
+      )}
       <group ref={halo}>
         {[0, 1].map((i) => (
           <mesh
