@@ -12,6 +12,7 @@ const spec = {
   low: "#bc8b6c",
   high: "#987b79",
   side: "#735c5a",
+  fringe: "ember" as const,
   trail: "#e0b991",
 };
 export function CanyonTerrain() {

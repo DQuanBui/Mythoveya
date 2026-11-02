@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import * as T from "three";
 import type { Point } from "../../../packages/shared/haven";
+import { IslandFringe, type FringeLook } from "./IslandFringe";
 type TerrainSpec = {
   name: string;
   paths: Point[][];
@@ -10,6 +11,7 @@ type TerrainSpec = {
   high: string;
   side: string;
   trail: string;
+  fringe?: FringeLook;
 };
 
 function terrain(spec: TerrainSpec) {
@@ -117,6 +119,7 @@ export function RaisedTerrain({ spec }: { spec: TerrainSpec }) {
         <coneGeometry args={[45, 10, 16]} />
         <meshStandardMaterial color={spec.side} flatShading />
       </mesh>
+      <IslandFringe edge={spec.edge} height={spec.height} look={spec.fringe} count={100} />
     </group>
   );
 }

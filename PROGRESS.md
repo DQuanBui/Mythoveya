@@ -10,11 +10,12 @@ November 2 round (from `9d221ef`). Done this round, newest last:
 - Sleeping Z's (`glyphs.ts` sprite helper; `sleep-zzz` group added lazily by `animateCreature`) over napping companions, sleeping wildlife and any other sleeper; static under Reduced Motion.
 - Wildlife thought bubbles (`HabitatResident`): a "!" or "?" pops up when a creature first notices the keeper (reset once the keeper is 7 m away), and a heart every few seconds while it plays beside them.
 - Support links (`SupportLink` in `HitBurst.tsx`): a glowing arc grows from the caster to each healed (green) or shielded (blue) ally, with a mote racing along it.
+- Island fringe in every region: `IslandFringe` takes `edge`, `height` and a `look`; `RaisedTerrain` adds 100 pieces per region (roots and vines in Whisperleaf, icicles and snow-capped islets in Moonfrost, basalt drips and ember-lit islets in Emberglass).
 
 Next 3 tasks:
-1. Island fringe for Meadow, Canyon and Hollow.
-2. Keeper carries a glowing lantern after dark.
-3. Frosty breath puffs in Moonfrost.
+1. Keeper carries a glowing lantern after dark.
+2. Frosty breath puffs in Moonfrost.
+3. Dust puffs when sprinting.
 
 ## Play
 
