@@ -3,6 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import * as T from "three";
 import { settings } from "./audio";
 import { HAVEN_POND, edgeRadius } from "../../../packages/shared/haven";
+import { WaterGlints } from "./WaterGlints";
 
 export function HavenWater() {
   const ripples = useRef<T.Group>(null),
@@ -74,6 +75,7 @@ export function HavenWater() {
           metalness={0.18}
         />
       </mesh>
+      <WaterGlints x={p.x} z={p.z} rx={p.rx} rz={p.rz} />
       <group ref={ripples}>
         {[
           [18, -8],

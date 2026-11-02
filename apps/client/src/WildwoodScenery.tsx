@@ -12,6 +12,7 @@ import { Kit, SHAPES } from "./village-kit";
 import { ChimneySmoke, villageMaterial } from "./HavenVillage";
 import { lampGlow } from "./village-materials";
 import { settings } from "./audio";
+import { WaterGlints } from "./WaterGlints";
 
 function buildDistrict(repaired: string[], restored: boolean) {
   const k = new Kit(),
@@ -251,6 +252,7 @@ export function WildwoodScenery({
           metalness={0.12}
         />
       </mesh>
+      <WaterGlints x={WILDWOOD_LAKE.x} z={WILDWOOD_LAKE.z} rx={WILDWOOD_LAKE.rx} rz={WILDWOOD_LAKE.rz} y={0.055} />
       <group
         ref={ripples}
         position={[-49, 0.045, 12]}
