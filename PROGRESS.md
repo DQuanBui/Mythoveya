@@ -13,11 +13,12 @@ November 2 round (from `9d221ef`). Done this round, newest last:
 - Island fringe in every region: `IslandFringe` takes `edge`, `height` and a `look`; `RaisedTerrain` adds 100 pieces per region (roots and vines in Whisperleaf, icicles and snow-capped islets in Moonfrost, basalt drips and ember-lit islets in Emberglass).
 - Keeper lantern after dark: a small lantern hangs plumb from the right hand outdoors once night glow passes 0.45 (`nightState` in `village-materials.ts`), and `DayNight keeperLight` adds one warm point light that follows the keeper, mounted with the other night lights.
 - Frosty breath in Moonfrost: `Puffs.tsx` (32-puff ring buffer, camera-facing soft dots, `emitPuff`) draws little clouds from the keeper and companion every 1.1-1.8 s outdoors; hidden under Reduced Motion.
+- Sprint kicks: each sprinting footstep on stone, paths or sand throws a tan dust puff behind the keeper, and in snow a white powder puff (`dust`/`snow` kinds in `puff-buffer.ts`, which the breath fix split out of `Puffs.tsx` so Node tests can import it).
 
 Next 3 tasks:
-1. Dust puffs when sprinting on grass and dirt.
-2. Water glints on the home and festival islands.
-3. Battle start: creatures arrive with a staggered entrance.
+1. Water glints on the home island pond.
+2. Battle start: creatures arrive with a staggered entrance.
+3. Full verification: vitest, both builds, smokes, Playwright, docs.
 
 ## Play
 

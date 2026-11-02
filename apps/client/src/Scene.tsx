@@ -1029,6 +1029,12 @@ export function Explorer({
         const step = area?.step || stepSound(profile.region, nx, nz, ny);
         audio.cue(step);
         if (step === "snowStep" || step === "sandStep") leavePrint(nx, ny, nz, avatar.rotation.y, clock.elapsedTime, step === "snowStep");
+        // A sprint kicks up dust on paths, stone and sand, and powder in snow.
+        if (sprinting && (step === "stoneStep" || step === "sandStep" || step === "snowStep")) {
+          const bx = -Math.sin(avatar.rotation.y),
+            bz = -Math.cos(avatar.rotation.y);
+          emitPuff(nx + bx * 0.25, ny + 0.08, nz + bz * 0.25, bx, bz, clock.elapsedTime, step === "snowStep" ? "snow" : "dust");
+        }
         foot.current = clock.elapsedTime;
       }
     }

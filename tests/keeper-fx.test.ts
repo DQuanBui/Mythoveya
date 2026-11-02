@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { EMOTES, keeperEmote, playEmote } from "../apps/client/src/village-materials";
 import { leavePrint, recentPrints } from "../apps/client/src/Footprints";
 import { PHOTO_FILTERS, photoCss } from "../apps/client/src/photo";
-import { emitPuff, recentPuffs } from "../apps/client/src/puff-buffer";
+import { PUFF_LOOK, emitPuff, recentPuffs } from "../apps/client/src/puff-buffer";
 
 describe("keeper emotes, footprints and photo filters", () => {
   it("plays timed emotes once and toggles lasting ones off on a second press", () => {
@@ -39,5 +39,12 @@ describe("keeper emotes, footprints and photo filters", () => {
     expect(puffs).toHaveLength(32);
     expect(puffs[0].x).toBe(8);
     expect(puffs.at(-1)).toMatchObject({ x: 39, kind: "breath" });
+  });
+
+  it("styles dust and snow kicks shorter-lived and lower than breath", () => {
+    for (const kind of ["dust", "snow"] as const) {
+      expect(PUFF_LOOK[kind].life).toBeLessThan(PUFF_LOOK.breath.life);
+      expect(PUFF_LOOK[kind].rise).toBeLessThan(PUFF_LOOK.breath.rise);
+    }
   });
 });
