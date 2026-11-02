@@ -37,7 +37,7 @@ import { BattleArena } from "./BattleArena";
 import { WeatherEffects } from "./Weather";
 import { HavenTreasure } from "./HavenTreasure";
 import { photo } from "./photo";
-import { Confetti, HitBurst, SupportGlow } from "./HitBurst";
+import { Confetti, HitBurst, SupportGlow, SupportLink } from "./HitBurst";
 import { skillPath } from "./skill-path";
 import { Hearts } from "./Hearts";
 import { Footprints, leavePrint } from "./Footprints";
@@ -1956,6 +1956,26 @@ export function BattleScene({
         battle={battle}
         phase={preview && paused ? previewPhase : undefined}
       />
+      {/* Links from a supporting caster to each ally it heals or shields. */}
+      {!preview && battle.event && Date.now() - battle.event.at < battle.event.duration && (() => {
+        const e = battle.event!,
+          actor = battle.units.find((u) => u.id === e.actor);
+        if (!actor) return null;
+        return e.amounts
+          .filter((a) => a.id !== actor.id && (a.amount < 0 || a.shield > 0))
+          .map((a) => battle.units.find((u) => u.id === a.id))
+          .filter((u) => u && u.side === actor.side)
+          .map((u) => (
+            <SupportLink
+              key={`${e.at}:${u!.id}`}
+              from={unitPosition(actor.side, actor.slot)}
+              to={unitPosition(u!.side, u!.slot)}
+              at={e.at}
+              duration={e.duration}
+              color={e.amounts.some((x) => x.id === u!.id && x.amount < 0) ? "#7dffa0" : "#9fdcff"}
+            />
+          ));
+      })()}
       {/* Once the winning blow has landed, confetti rains on the viewer's team. */}
       {!preview && battle.winner === side && (!battle.event || Date.now() - battle.event.at > battle.event.duration) && (
         <Confetti key={battle.id} center={unitPosition(side, 1).map((v, i) => (i === 1 ? 1.4 : v)) as [number, number, number]} />

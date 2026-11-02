@@ -9,11 +9,12 @@ November 2 round (from `9d221ef`). Done this round, newest last:
 - Test: `keeper-life.spec` derives the expected badge title and record count from the save the guide created, so a shimmering guide companion (Starcatcher) no longer fails it.
 - Sleeping Z's (`glyphs.ts` sprite helper; `sleep-zzz` group added lazily by `animateCreature`) over napping companions, sleeping wildlife and any other sleeper; static under Reduced Motion.
 - Wildlife thought bubbles (`HabitatResident`): a "!" or "?" pops up when a creature first notices the keeper (reset once the keeper is 7 m away), and a heart every few seconds while it plays beside them.
+- Support links (`SupportLink` in `HitBurst.tsx`): a glowing arc grows from the caster to each healed (green) or shielded (blue) ally, with a mote racing along it.
 
 Next 3 tasks:
-1. A glowing support link from caster to healed or shielded allies.
-2. Island fringe for Meadow, Canyon and Hollow.
-3. Keeper carries a glowing lantern after dark.
+1. Island fringe for Meadow, Canyon and Hollow.
+2. Keeper carries a glowing lantern after dark.
+3. Frosty breath puffs in Moonfrost.
 
 ## Play
 

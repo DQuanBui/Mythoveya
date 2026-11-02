@@ -208,3 +208,51 @@ export function Confetti({ center, count = 70 }: { center: [number, number, numb
   });
   return <primitive object={parts.m} />;
 }
+
+/** A glowing arc that grows from a supporting caster to the ally it heals or
+ * shields, with a bright mote racing along it. Timed from the battle event. */
+export function SupportLink({ from, to, at, duration, color }: { from: [number, number, number]; to: [number, number, number]; at: number; duration: number; color: string }) {
+  const parts = useMemo(() => {
+    const a = new T.Vector3(...from).setY(0.9),
+      b = new T.Vector3(...to).setY(0.9),
+      mid = a.clone().lerp(b, 0.5).setY(0.9 + 0.35 * a.distanceTo(b));
+    const curve = new T.QuadraticBezierCurve3(a, mid, b),
+      mat = (o: number) => new T.MeshBasicMaterial({ color, transparent: true, opacity: o, depthWrite: false, blending: T.AdditiveBlending });
+    return {
+      curve,
+      tube: new T.Mesh(new T.TubeGeometry(curve, 40, 0.045, 6), mat(0.8)),
+      mote: new T.Mesh(new T.SphereGeometry(0.12, 10, 8), mat(1)),
+    };
+    // Positions arrive as fresh arrays on every battle tick; key on their values.
+  }, [from.join(), to.join(), color]);
+  useEffect(
+    () => () => {
+      for (const m of [parts.tube, parts.mote]) {
+        m.geometry.dispose();
+        (m.material as T.Material).dispose();
+      }
+    },
+    [parts],
+  );
+  const group = useRef<T.Group>(null);
+  useFrame(() => {
+    const g = group.current;
+    if (!g) return;
+    const t = ((Date.now() - at) / duration - 0.12) / 0.55;
+    g.visible = t >= 0 && t <= 1;
+    if (!g.visible) return;
+    const grow = settings.reduced ? 1 : Math.min(1, t / 0.55),
+      fade = t < 0.7 ? 1 : (1 - t) / 0.3,
+      index = parts.tube.geometry.index!;
+    parts.tube.geometry.setDrawRange(0, Math.floor((index.count / 6) * grow) * 6);
+    (parts.tube.material as T.MeshBasicMaterial).opacity = 0.7 * fade;
+    parts.mote.visible = !settings.reduced && grow < 1;
+    parts.curve.getPoint(grow, parts.mote.position);
+  });
+  return (
+    <group ref={group} visible={false} renderOrder={9}>
+      <primitive object={parts.tube} />
+      <primitive object={parts.mote} />
+    </group>
+  );
+}
