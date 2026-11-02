@@ -13,11 +13,12 @@ Done so far, newest last:
 - Battle motions: attacks wind up before the lunge (pounce, wing buffet, serpent strike, tail swipe, golem slam); casts rear up with wings spread; hits knock back with a squash and shut eyes; defeat topples over with closed eyes. Scene passes a settled phase to creatures knocked out in earlier turns.
 - Support feedback (`SupportGlow` in `HitBurst.tsx`): healed allies get a green ground ring, spiralling motes and floating plus signs; shielded allies get a popping lattice bubble.
 - Skill effects travel element paths (`skill-path.ts`, tested in `tests/skill-path.test.ts`): flame and stone lob, tide waves, storm zigzags, grove corkscrews, shadow dips and weaves, frost and light fly straight. A seven-dot trail follows on Medium/High. Reduced Motion flies straight.
+- Keeper idle habits (`animateAvatar`), every ~9 s while standing: Kael hands on hips, Mira shades her eyes and scans, Rowan stretches, Sora bounces, Dax folds both arms, Nyra ponders, Elian sways, Vesper taps a foot. Village hosts and townsfolk reuse these models, so they show the same personalities. Off under Reduced Motion and during emotes.
 
 Next 3 tasks:
-1. Per-keeper idle habits and personalities.
-2. Livelier wild creatures (notice the keeper, nap at night).
-3. Village friends with personal idle gestures.
+1. Livelier wild creatures (notice the keeper, nap at night).
+2. Sparkling sun glints on Havenreach water.
+3. Rain splashes on the ground around the keeper.
 
 ## Play
 

@@ -1522,8 +1522,57 @@ export function animateAvatar(
     head.rotation.x = walk ? 0.05 : e === "cheer" ? -0.25 : Math.sin(t * 0.9 + g.userData.index) * 0.04;
     head.rotation.z = e === "dance" ? Math.sin(t * 3) * 0.15 * calm : 0;
   }
+  // Standing idle, each keeper falls into a habit of their own every so often.
+  const cyc = (t + g.userData.index * 2.3) % 9,
+    h = walk || e || reduced || cyc > 2.6 ? 0 : Math.sin((cyc / 2.6) * Math.PI);
+  let lift = 0;
+  if (h) {
+    const [, leftArm, rightLeg, rightArm] = g.userData.limbs as T.Group[],
+      arms = [leftArm, rightArm],
+      hd = head || new T.Object3D();
+    switch (g.userData.index % 8) {
+      case 0: // Kael: hands on hips, chin up.
+        arms.forEach((l, i) => ((l.rotation.z = (i ? 1 : -1) * 0.75 * h), (l.rotation.x = 0.3 * h)));
+        hd.rotation.x -= 0.12 * h;
+        break;
+      case 1: // Mira: shades her eyes and scans the horizon.
+        rightArm.rotation.x = -2.6 * h;
+        rightArm.rotation.z = -0.35 * h;
+        hd.rotation.y = Math.sin(t * 1.2) * 0.5 * h;
+        break;
+      case 2: // Rowan: a long, slow stretch.
+        arms.forEach((l, i) => (l.rotation.z = (i ? 1 : -1) * 2.7 * h));
+        hd.rotation.x = -0.2 * h;
+        lift = 0.02 * h;
+        break;
+      case 3: // Sora: bouncing on the toes, ready to run.
+        lift = Math.abs(Math.sin(t * 9)) * 0.05 * h;
+        arms.forEach((l, i) => (l.rotation.x = Math.sin(t * 9 + i * Math.PI) * 0.4 * h));
+        break;
+      case 4: // Dax: arms folded, a steady nod.
+        arms.forEach((l, i) => ((l.rotation.x = -1.1 * h), (l.rotation.z = (i ? -1 : 1) * 0.55 * h)));
+        hd.rotation.x = 0.08 * h;
+        break;
+      case 5: // Nyra: hand to chin, head tilted in thought.
+        rightArm.rotation.x = -2.1 * h;
+        rightArm.rotation.z = -0.45 * h;
+        hd.rotation.z = 0.18 * h;
+        break;
+      case 6: // Elian: humming and swaying.
+        hd.rotation.z = Math.sin(t * 2.4) * 0.15 * h;
+        arms.forEach((l, i) => (l.rotation.z = (i ? 1 : -1) * (0.25 + Math.sin(t * 2.4) * 0.15) * h));
+        lift = Math.abs(Math.sin(t * 2.4)) * 0.015 * h;
+        break;
+      case 7: // Vesper: one hand on a hip, tapping a foot.
+        rightLeg.rotation.x = -Math.max(0, Math.sin(t * 10)) * 0.25 * h;
+        leftArm.rotation.z = -0.7 * h;
+        hd.rotation.x = Math.sin(t * 10) * 0.03 * h;
+        break;
+    }
+  }
   // The walking bob rides on top of whatever ground the keeper stands on.
   g.position.y =
+    lift +
     (g.userData.groundY || 0) +
     (walk
       ? Math.abs(Math.sin(t * 8)) * 0.035
