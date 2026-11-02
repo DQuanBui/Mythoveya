@@ -2,6 +2,16 @@
 
 Updated October 31, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`, pushed to `origin/main` (https://github.com/DQuanBui/Mythoveya). This handoff covers three rounds: October 29 (from `4619fdc`), October 30 (from `b0d6c3d`) and October 31 (from `3497bb3`). Earlier handoffs (October 28 online-build session, October 22 Wayfarer Lodges) are archived in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md). Preserve ignored `data/mythoveya.sqlite`. `CLAUDE.md` is the quick project map for new sessions.
 
+## Next up (November 1 round: creatures, characters, visuals)
+
+Done so far, newest last:
+- Shimmering variants: iridescent skin (Medium/High) and three twinkling four-point stars (`spike` geometry, `skinFor(surface, shimmer)`).
+
+Next 3 tasks:
+1. See-through moth wings (lanternmoth, velvetmoth, frostmoth) with `glassMaterial`.
+2. Slit-pupil eyes for dragons and serpents.
+3. Glowing bond sigil and pulsing crest gem on evolved forms.
+
 ## Play
 
 - **Online (single-player):** https://dquanbui.github.io/Mythoveya/. `.github/workflows/pages.yml` publishes it on every push to `main` (Pages source: GitHub Actions). Check a deployment with `node scripts/smoke-pages.mjs https://dquanbui.github.io/Mythoveya/`.

@@ -50,6 +50,8 @@ const geometry = {
   arc: new T.TorusGeometry(1, 0.16, 6, 16, Math.PI),
   band: new T.CylinderGeometry(1, 1, 1, fine ? 20 : 14),
   hex: new T.CylinderGeometry(1, 1, 1, 6),
+  // Sharp points for sparkle stars and slit pupils.
+  spike: new T.OctahedronGeometry(1, 0),
   capsule: fine ? new T.CapsuleGeometry(0.5, 1, 4, 12) : new T.CapsuleGeometry(0.5, 1, 3, 9),
   // A dragon's wing membrane (span along +x, chord along +y), mirrored for the left.
   membraneR: membrane(1),
@@ -112,13 +114,16 @@ const SURFACE: Record<Surface, { rim: number; params: T.MeshPhysicalMaterialPara
   chitin: { rim: 0.35, params: { roughness: 0.38, clearcoat: 0.75, clearcoatRoughness: 0.18, sheen: 0 } },
   stone: { rim: 0.15, params: { roughness: 0.95, sheen: 0.2, sheenRoughness: 0.9 } },
 };
-const skins = new Map<Surface, T.MeshStandardMaterial>();
-function skinFor(surface: Surface) {
-  if (!skins.has(surface)) {
+const skins = new Map<string, T.MeshStandardMaterial>();
+// Shimmering variants add an oil-slick iridescence that shifts as they turn.
+function skinFor(surface: Surface, shimmer = false) {
+  const key = surface + (shimmer ? ":shimmer" : "");
+  if (!skins.has(key)) {
     const m = finish({ vertexColors: true, roughness: 0.6, envMapIntensity: 0.8 }, false),
       { rim, params } = SURFACE[surface];
     if (fine) {
       m.setValues(params);
+      if (shimmer) (m as T.MeshPhysicalMaterial).setValues({ iridescence: 0.9, iridescenceIOR: 1.7, iridescenceThicknessRange: [180, 620], envMapIntensity: 1.2 });
       // Light caught at the silhouette brightens it, in proportion to the
       // light already falling there (so nothing glows at night).
       m.onBeforeCompile = (shader) => {
@@ -128,11 +133,11 @@ function skinFor(surface: Surface) {
           #include <opaque_fragment>`,
         );
       };
-      m.customProgramCacheKey = () => `skin-${surface}`;
+      m.customProgramCacheKey = () => `skin-${key}`;
     }
-    skins.set(surface, m);
+    skins.set(key, m);
   }
-  return skins.get(surface)!;
+  return skins.get(key)!;
 }
 const surfaceOf = (family: string): Surface =>
   family === "dragon" || family === "serpent" || family === "shell"
@@ -187,7 +192,7 @@ export function part(
 }
 const merged = new Map<string, T.BufferGeometry>();
 /** Bakes each group's plain parts into one cached mesh; glowing and glossy parts stay separate. */
-function consolidate(root: T.Object3D, key: string, surface: Surface = "fur") {
+function consolidate(root: T.Object3D, key: string, surface: Surface = "fur", shimmer = false) {
   let n = 0;
   const visit = (group: T.Object3D) => {
     const parts = group.children.filter(
@@ -215,7 +220,7 @@ function consolidate(root: T.Object3D, key: string, surface: Surface = "fur") {
       merged.set(id, geo);
     }
     for (const m of parts) group.remove(m);
-    const mesh = new T.Mesh(geo, skinFor(surface));
+    const mesh = new T.Mesh(geo, skinFor(surface, shimmer));
     mesh.castShadow = mesh.receiveShadow = true;
     group.add(mesh);
   };
@@ -1099,14 +1104,20 @@ export function createCreature(id: string, shimmer = false) {
     }
   }
   tails.forEach((t) => { t.userData.restRotation = t.rotation.clone(); });
-  consolidate(rig, `creature:${id}:${shimmer ? "shimmer" : "normal"}`, surfaceOf(s.family));
+  consolidate(rig, `creature:${id}:${shimmer ? "shimmer" : "normal"}`, surfaceOf(s.family), shimmer);
   const glints = new T.Group();
   if (shimmer) {
+    // Four-point sparkle stars circle the body and twinkle in turn.
     glints.name = "shimmer-glints";
     glints.position.y = headY * 0.65;
-    for (let i = 0; i < 3; i++) {
-      const a = (i / 3) * Math.PI * 2;
-      part(glints, "orb", "#fff1ba", [Math.cos(a) * 0.8, (i - 1) * 0.3, Math.sin(a) * 0.8], [0.035, 0.075, 0.035], undefined, true);
+    const n = 3;
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * Math.PI * 2,
+        star = new T.Group();
+      star.position.set(Math.cos(a) * 0.8, Math.sin(i * 2.4) * 0.35, Math.sin(a) * 0.8);
+      part(star, "spike", i % 2 ? "#fff1ba" : "#d9f7ff", [0, 0, 0], [0.034, 0.2, 0.034], undefined, true);
+      part(star, "spike", i % 2 ? "#fff1ba" : "#d9f7ff", [0, 0, 0], [0.15, 0.03, 0.03], undefined, true);
+      glints.add(star);
     }
     rig.add(glints);
   }
@@ -1138,7 +1149,10 @@ export function animateCreature(
   const { rig, limbs, wings, tails, family, index, glints, eyes } = g.userData;
   if (glints && g.userData.shimmer) {
     glints.rotation.y = reduced ? 0 : time * 0.45;
-    glints.scale.setScalar(reduced ? 1 : 0.92 + Math.sin(time * 2) * 0.08);
+    glints.children.forEach((star: T.Object3D, i: number) => {
+      star.scale.setScalar(reduced ? 1 : 0.35 + Math.max(0, Math.sin(time * 2.6 + i * 2.2)) * 0.9);
+      star.rotation.z = reduced ? 0 : time * 1.3 + i;
+    });
   }
   const floating = ["bird", "aquatic", "spirit"].includes(family),
     speed = 2 + (index % 4) * 0.3;
