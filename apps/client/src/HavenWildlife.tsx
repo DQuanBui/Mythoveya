@@ -11,6 +11,7 @@ import { createCreature, animateCreature } from "./models";
 import { audio, settings } from "./audio";
 import { daylight, islandHour } from "./daytime";
 import { worldFocus } from "./village-materials";
+import { glyphSprite } from "./glyphs";
 import { byId } from "../../../packages/shared/content";
 
 export function HabitatResident({
@@ -32,7 +33,18 @@ export function HabitatResident({
 }) {
   const model = useMemo(() => createCreature(site.species), [site.species]),
     lastVoice = useRef(0),
-    time = useRef(index * 3.7);
+    time = useRef(index * 3.7),
+    // A thought bubble: "!" or "?" on noticing the keeper, a heart at play.
+    bubble = useRef({ since: -9, glyph: "" }),
+    sprites = useMemo(() => {
+      const group = new T.Group(),
+        list = (["!", "?", "♥"] as const).map((g) => glyphSprite(g, g === "♥" ? "#ff8fa8" : "#fff6d8", 0.42));
+      group.name = "wildlife-bubble";
+      group.position.y = model.userData.headAt[0] + 0.55;
+      for (const s of list) if (s) ((s.visible = false), group.add(s));
+      model.add(group);
+      return list;
+    }, [model]);
   const anchor = useMemo(
     () => new T.Vector3(site.point[0], 0, site.point[1]),
     [site],
@@ -79,7 +91,23 @@ export function HabitatResident({
     model.position.y = site.water
       ? 0.08
       : ground(model.position.x, model.position.z);
-    animateCreature(model, t, walking ? "walk" : asleep && !site.water ? "sleep" : curious && near < 2.4 && !settings.reduced ? "play" : "idle", 0, settings.reduced);
+    const playing = curious && near < 2.4 && !settings.reduced,
+      b = bubble.current;
+    if (curious && !b.glyph) ((b.glyph = index % 3 === 1 ? "?" : "!"), (b.since = t));
+    else if (!curious && (asleep || near > 7)) b.glyph = "";
+    else if (playing && t - b.since > 4) ((b.glyph = "♥"), (b.since = t));
+    // Pop in past full size, settle, then fade after about a second and a half.
+    const age = t - b.since,
+      shown = b.glyph && age < 1.8 ? b.glyph : "";
+    sprites.forEach((s, i) => {
+      if (!s) return;
+      s.visible = shown === ["!", "?", "♥"][i];
+      if (!s.visible) return;
+      s.scale.setScalar(0.42 * (settings.reduced ? 1 : Math.min(1.15, age * 6) - Math.max(0, age - 0.2) * 0.1));
+      s.position.y = settings.reduced ? 0 : Math.min(age, 0.3) * 0.4;
+      s.material.opacity = Math.min(1, (1.8 - age) / 0.4);
+    });
+    animateCreature(model, t, walking ? "walk" : asleep && !site.water ? "sleep" : playing ? "play" : "idle", 0, settings.reduced);
     if (!asleep && t - lastVoice.current > 24 + index && distance < 14) {
       audio.voice(
         site.species,
