@@ -89,12 +89,20 @@ function material(color: string, glow = false, gloss = false) {
 }
 // Insect wings: see-through, double-sided, with an iridescent sheen on Medium/High.
 const glassy = new Map<string, T.MeshStandardMaterial>();
-function glassMaterial(color: string) {
-  if (!glassy.has(color)) {
-    const base = { color, transparent: true, opacity: 0.42, side: T.DoubleSide, depthWrite: false, roughness: 0.15 };
-    glassy.set(color, fine ? new T.MeshPhysicalMaterial({ ...base, clearcoat: 1, iridescence: 1, iridescenceIOR: 1.35 }) : new T.MeshStandardMaterial(base));
+function glassMaterial(color: string, opacity = 0.42) {
+  const key = color + opacity;
+  if (!glassy.has(key)) {
+    const base = { color, transparent: true, opacity, side: T.DoubleSide, depthWrite: false, roughness: 0.15 };
+    glassy.set(key, fine ? new T.MeshPhysicalMaterial({ ...base, clearcoat: 1, iridescence: 1, iridescenceIOR: 1.35 }) : new T.MeshStandardMaterial(base));
   }
-  return glassy.get(color)!;
+  return glassy.get(key)!;
+}
+/** Turns a part into a see-through wing pane that light passes through. */
+function glassPane(m: T.Mesh, color: string, opacity?: number) {
+  m.material = glassMaterial(color, opacity);
+  m.userData.merge = false;
+  m.castShadow = false;
+  return m;
 }
 // A faint additive glow around spirits.
 const ghosts = new Map<string, T.MeshStandardMaterial>();
@@ -397,10 +405,8 @@ export function createCreature(id: string, shimmer = false) {
         dir = new T.Vector3(side * Math.cos(yaw), 0.04, -Math.sin(yaw)),
         cx = dir.x * len * size,
         cz = back + dir.z * len * size;
-      const pane = part(w, "orb", tint(accent, "#ffffff", 0.45), [cx, 0.02 - k * 0.03, cz], [len * size, 0.012, wide * size], [0, a, side * 0.12]);
-      pane.material = glassMaterial(tint(accent, "#ffffff", 0.45));
-      pane.userData.merge = false;
-      pane.castShadow = false;
+      const pane = tint(accent, "#ffffff", 0.45);
+      glassPane(part(w, "orb", pane, [cx, 0.02 - k * 0.03, cz], [len * size, 0.012, wide * size], [0, a, side * 0.12]), pane);
       // A spar along the leading edge and two veins fanning across the pane.
       for (const [off, spread] of [[0, 0], [0.5, 0.25], [-0.5, -0.2]])
         part(w, "capsule", vein, [cx + Math.sin(a) * off * wide * size * 0.6, 0.03 - k * 0.03, cz + Math.cos(a) * off * wide * size * 0.6], [0.012, len * size * (off ? 0.8 : 1), 0.012], [0, a + spread * side, Math.PI / 2]);
@@ -918,7 +924,12 @@ export function createCreature(id: string, shimmer = false) {
     const moth = s.id === "lanternmoth";
     for (const side of [-1, 1]) {
       const fin = new T.Group(); fin.name = moth ? "luna-wing" : "petal-fin"; fin.position.set(side * .24, moth ? .9 : 1, 0); rig.add(fin); wings.push(fin);
-      part(fin, "orb", moth ? cream : accent, [side * .58, 0, -.03], [.8, .06, moth ? .62 : .85], [0, side * -.3, side * .12]);
+      const sail = part(fin, "orb", moth ? cream : accent, [side * .58, 0, -.03], [.8, moth ? .03 : .06, moth ? .62 : .85], [0, side * -.3, side * .12]);
+      // Lanternmoth's ivory wings are thin enough for light to glow through.
+      if (moth) {
+        glassPane(sail, tint(cream, "#fff4cf", 0.4), 0.62);
+        for (const k of [-0.5, 0, 0.5]) part(fin, "capsule", tint(cream, dark, 0.35), [side * .55, .02, -.03 + k * .32], [.014, .7, .014], [0, side * -.3 + k * .35, Math.PI / 2]);
+      }
       part(fin, "orb", moth ? accent : light, [side * .6, .065, .05], [.22, .015, .23]);
       part(fin, "orb", moth ? dark : cream, [side * .6, .082, .05], [.095, .015, .11]);
       if (moth) part(fin, "orb", light, [side * .78, 0, -.8], [.09, .035, .58], [0, side * .2, 0]);
@@ -1097,7 +1108,9 @@ export function createCreature(id: string, shimmer = false) {
     for(const side of [-1,1]){
       const wing=new T.Group();wing.name="frostmoth-icewing";wing.position.set(side*.2,.95,-.1);rig.add(wing);wings.push(wing);
       for(let j=0;j<2;j++){
-        part(wing,"orb",j?accent:light,[side*(.55+j*.15),.08-j*.2,.22-j*.6],[.66,.055,.48],[0,side*(.4-j*.8),side*.1]);
+        // Frosted, see-through ice panes with a rime edge.
+        glassPane(part(wing,"orb",j?accent:light,[side*(.55+j*.15),.08-j*.2,.22-j*.6],[.66,.03,.48],[0,side*(.4-j*.8),side*.1]),tint(j?accent:light,"#ffffff",.5),.5);
+        part(wing,"ring",tint(light,"#ffffff",.6),[side*(.55+j*.15),.08-j*.2,.22-j*.6],[.66,.48,.4],[Math.PI/2,0,-side*(.4-j*.8)]);
         part(wing,"orb",dark,[side*(.65+j*.15),.14-j*.2,.22-j*.6],[.16,.03,.16]);
         part(wing,"orb",cream,[side*(.65+j*.15),.17-j*.2,.22-j*.6],[.07,.02,.07],undefined,true);
       }
