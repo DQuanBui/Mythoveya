@@ -20,11 +20,12 @@ Done so far, newest last:
 - Victory: once the final blow lands, the winning side plays `victory`, and confetti (`Confetti` in `HitBurst.tsx`) bursts over the viewer's team if it won. `BattleScene` takes an optional `side` (Arena passes the human side). Reduced Motion skips the confetti.
 - Shimmer reveal (`RecruitmentStage.tsx`): a shimmering arrival ends in a prismatic starburst (eight rays and a ring), and the shrine's halo and crystals cycle through the rainbow. Reduced Motion skips the burst and holds the colours.
 - Companion joins emotes: a hop at a wave, play during cheer and dance, and settling low beside a sitting keeper before dozing off after ~14 s.
+- Tests: `tests/creature-look.test.ts` (slit vs round pupils for every species, circlets only on evolved forms, glass moth wings, twinkling stars, serpent slither, hit and defeat, keeper habits).
 
 Next 3 tasks:
-1. Tests for the new model features (circlet, slit pupils, gaits, glass wings).
-2. Full verification: vitest, both builds, smoke tests, docs.
-3. Floating-island underside detail (hanging roots, drifting rocks).
+1. Full verification: vitest, both builds, smoke tests, docs.
+2. Floating-island underside detail (hanging roots, drifting rocks).
+3. Listening pass and physical-device check of the new effects.
 
 ## Play
 
