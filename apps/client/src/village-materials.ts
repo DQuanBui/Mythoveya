@@ -13,7 +13,10 @@ export const villageGlow = new T.MeshStandardMaterial({
   emissiveIntensity: 0.3,
   flatShading: true,
 });
+// How dark it is (0 day .. 1 night), for things like the keeper's lantern.
+export const nightState = { glow: 0 };
 export function setNightGlow(glow: number) {
+  nightState.glow = glow;
   villageGlow.emissiveIntensity = 0.3 + glow * 1.5;
   lampGlow.emissiveIntensity = 0.25 + glow * 2.4;
 }

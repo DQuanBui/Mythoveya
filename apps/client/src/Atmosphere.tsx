@@ -35,16 +35,20 @@ export function DayNight({
   sky,
   fog,
   haven,
+  keeperLight = false,
 }: {
   sky: string;
   fog: string;
   haven: boolean;
+  /** A warm light from the keeper's lantern follows them after dark. */
+  keeperLight?: boolean;
 }) {
   const { scene } = useThree();
   const sun = useRef<T.DirectionalLight>(null),
     ambient = useRef<T.AmbientLight>(null),
     hemi = useRef<T.HemisphereLight>(null),
     lights = useRef<T.Group>(null),
+    carry = useRef<T.PointLight>(null),
     last = useRef(-1),
     named = useRef<{ stars?: T.Object3D; orb?: T.Mesh } | null>(null),
     fogBase = useRef<{ near: number; far: number } | null>(null);
@@ -74,6 +78,7 @@ export function DayNight({
     light.position.set(fx + dir.x * 30, dir.y * 30, fz + dir.z * 30);
     light.target.position.set(fx, 0, fz);
     light.target.updateMatrixWorld();
+    carry.current?.position.set(worldFocus.x + 0.35, worldFocus.y + 1.1, worldFocus.z);
     // Colors only need a refresh a few times per second.
     if (Math.abs(clock.elapsedTime - last.current) < 0.25) return;
     last.current = clock.elapsedTime;
@@ -118,6 +123,7 @@ export function DayNight({
     if (stars) stars.visible = glow > 0.3 && cover < 0.3;
     if (orb) (orb.material as T.MeshBasicMaterial).color.set(glow > 0.6 ? "#e4ebf6" : "#f6e6bb");
     if (glow > 0.35 !== night) setNight(glow > 0.35);
+    if (carry.current) carry.current.intensity = Math.max(0, glow - 0.45) * 12;
     lights.current?.children.forEach((l, i) => {
       (l as T.PointLight).intensity = glow * (i === 2 ? (haven ? 14 : 0) : 9);
     });
@@ -147,6 +153,7 @@ export function DayNight({
           <pointLight position={[3.5, 1.3, 29.5]} color="#ff9f4a" distance={12} decay={1.5} intensity={0} />
         </group>
       )}
+      {night && keeperLight && <pointLight ref={carry} color="#ffc777" distance={8} decay={1.6} intensity={0} />}
       <Fireflies haven={haven} />
     </>
   );

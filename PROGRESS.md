@@ -11,11 +11,12 @@ November 2 round (from `9d221ef`). Done this round, newest last:
 - Wildlife thought bubbles (`HabitatResident`): a "!" or "?" pops up when a creature first notices the keeper (reset once the keeper is 7 m away), and a heart every few seconds while it plays beside them.
 - Support links (`SupportLink` in `HitBurst.tsx`): a glowing arc grows from the caster to each healed (green) or shielded (blue) ally, with a mote racing along it.
 - Island fringe in every region: `IslandFringe` takes `edge`, `height` and a `look`; `RaisedTerrain` adds 100 pieces per region (roots and vines in Whisperleaf, icicles and snow-capped islets in Moonfrost, basalt drips and ember-lit islets in Emberglass).
+- Keeper lantern after dark: a small lantern hangs plumb from the right hand outdoors once night glow passes 0.45 (`nightState` in `village-materials.ts`), and `DayNight keeperLight` adds one warm point light that follows the keeper, mounted with the other night lights.
 
 Next 3 tasks:
-1. Keeper carries a glowing lantern after dark.
-2. Frosty breath puffs in Moonfrost.
-3. Dust puffs when sprinting.
+1. Frosty breath puffs in Moonfrost.
+2. Dust puffs when sprinting.
+3. Water glints on the home and festival islands.
 
 ## Play
 
