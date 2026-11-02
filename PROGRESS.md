@@ -1,10 +1,23 @@
 # Mythoveya handoff
 
-Updated October 31, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`, pushed to `origin/main` (https://github.com/DQuanBui/Mythoveya). This handoff covers three rounds: October 29 (from `4619fdc`), October 30 (from `b0d6c3d`) and October 31 (from `3497bb3`). Earlier handoffs (October 28 online-build session, October 22 Wayfarer Lodges) are archived in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md). Preserve ignored `data/mythoveya.sqlite`. `CLAUDE.md` is the quick project map for new sessions.
+Updated November 1, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`, pushed to `origin/main` (https://github.com/DQuanBui/Mythoveya). This handoff covers four rounds: October 29 (from `4619fdc`), October 30 (from `b0d6c3d`), October 31 (from `3497bb3`) and November 1 (from `3d8496d`). Earlier handoffs (October 28 online-build session, October 22 Wayfarer Lodges) are archived in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md). Preserve ignored `data/mythoveya.sqlite`. `CLAUDE.md` is the quick project map for new sessions.
 
-## Next up (November 1 round: creatures, characters, visuals)
+## Next up
 
-Done so far, newest last:
+November 1 round (creatures, characters, visuals) is complete: 17 feature/fix/test commits from `3d8496d`, all pushed, with the verification record below.
+
+Next 3 tasks:
+1. Listening pass and a physical phone/tablet check of the new effects (water glints, confetti, skill trails, island fringe) for feel and frame rate.
+2. Island fringe and water glints for the other regions and the home/festival islands.
+3. Make `keeper-life.spec` independent of the random shimmer roll (owner decision: accept either title, or seed the guide team), then caster-to-ally links for support skills.
+
+## Play
+
+- **Online (single-player):** https://dquanbui.github.io/Mythoveya/. `.github/workflows/pages.yml` publishes it on every push to `main` (Pages source: GitHub Actions). Check a deployment with `node scripts/smoke-pages.mjs https://dquanbui.github.io/Mythoveya/`.
+- **Local (full game, including the human arena):** `npm install`, then run `Play Mythoveya.cmd` or `npm run dev` and open http://127.0.0.1:5173/. For the compiled build, run `npm run build && npm start` and open http://127.0.0.1:2567/.
+
+## Implemented November 1
+
 - Shimmering variants: iridescent skin (Medium/High) and three twinkling four-point stars (`spike` geometry, `skinFor(surface, shimmer)`).
 - See-through Lanternmoth (veined ivory) and Frostmoth (frosted, rime-edged) wings via `glassPane`; Velvetmoth stays velvet.
 - Dragons and serpents: gold-flecked irises with vertical slit pupils (`reptile` in `createCreature`).
@@ -22,16 +35,6 @@ Done so far, newest last:
 - Companion joins emotes: a hop at a wave, play during cheer and dance, and settling low beside a sitting keeper before dozing off after ~14 s.
 - Island fringe (`IslandFringe.tsx`, in `HavenTerrain`): 140 roots and vines hang over Havenreach's rim as one merged mesh, and nine mossy islets bob around the island (two instanced meshes; still under Reduced Motion).
 - Tests: `tests/creature-look.test.ts` (slit vs round pupils for every species, circlets only on evolved forms, glass moth wings, twinkling stars, serpent slither, hit and defeat, keeper habits).
-
-Next 3 tasks:
-1. Full verification: vitest, both builds, smoke tests, docs.
-2. Listening pass and physical-device check of the new effects.
-3. Island fringe for the other regions and home islands.
-
-## Play
-
-- **Online (single-player):** https://dquanbui.github.io/Mythoveya/. `.github/workflows/pages.yml` publishes it on every push to `main` (Pages source: GitHub Actions). Check a deployment with `node scripts/smoke-pages.mjs https://dquanbui.github.io/Mythoveya/`.
-- **Local (full game, including the human arena):** `npm install`, then run `Play Mythoveya.cmd` or `npm run dev` and open http://127.0.0.1:5173/. For the compiled build, run `npm run build && npm start` and open http://127.0.0.1:2567/.
 
 ## Implemented October 31
 
@@ -106,7 +109,14 @@ Next 3 tasks:
   - Seasonal finds now show their toast. `run()` in `App.tsx` only toasts listed kind prefixes; this is now noted in CLAUDE.md.
   - Indoor music reuses an existing theme, because `tests/signatures.test.ts` pins ten music themes.
 
-## Verified (October 29)
+## Verified
+
+November 1 (final code commit `44b0cbc`):
+- typecheck and content audit pass (92 species, 276 actions, 92 passives, 12 families);
+- **44 test files, 196 passed** (new: `skill-path.test.ts` 4, `creature-look.test.ts` 7);
+- both builds pass with no warning, entry 434 kB (149 kB gzipped); `smoke-production` and `smoke-pages` (local and the deployed site) pass; GitHub Tests and Pages workflows green;
+- Playwright full run (42.4 min): 32 of 33 passed. `keeper-life.spec` failed because the guide's random team included a shimmering companion, so the badge read "★ Starcatcher" instead of "★ Bondmaker" (1/50 per companion, roughly a 10% chance). It passed on a targeted rerun (43 s), so all 33 have passing evidence. The test itself was not changed.
+- Visual checks used the git-excluded gallery (`gallery.tsx` with `shimmer`, `*` ids, `habits`, `water` and `island` modes; `gallery-hit.tsx` with `support` and `confetti`; new `gallery-shrine.html`), one screenshot per change in ignored `artifacts/`.
 
 October 31 (final `HEAD`):
 - typecheck and content audit pass;
