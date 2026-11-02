@@ -158,3 +158,53 @@ export function SupportGlow({ at, duration, heal, shield, height }: { at: number
     </group>
   );
 }
+
+const CONFETTI = ["#ffd166", "#ef7b6e", "#7fd6c2", "#9fb7ff", "#f7a8d8", "#b6e388"];
+/** A burst of paper confetti that flutters down over the winning team. */
+export function Confetti({ center, count = 70 }: { center: [number, number, number]; count?: number }) {
+  const parts = useMemo(() => {
+    const m = new T.InstancedMesh(
+      new T.PlaneGeometry(0.09, 0.14),
+      new T.MeshBasicMaterial({ side: T.DoubleSide, transparent: true, depthWrite: false }),
+      count,
+    );
+    m.frustumCulled = false;
+    const color = new T.Color();
+    const seeds = Array.from({ length: count }, (_, i) => {
+      m.setColorAt(i, color.set(CONFETTI[i % CONFETTI.length]));
+      const a = Math.random() * Math.PI * 2,
+        speed = 1.2 + Math.random() * 2.2;
+      return { vx: Math.cos(a) * speed, vz: Math.sin(a) * speed * 0.6, vy: 4 + Math.random() * 3, spin: 3 + Math.random() * 6, phase: Math.random() * 6 };
+    });
+    return { m, seeds, born: performance.now() };
+  }, [count]);
+  useEffect(
+    () => () => {
+      parts.m.geometry.dispose();
+      (parts.m.material as T.Material).dispose();
+    },
+    [parts],
+  );
+  const o = useMemo(() => new T.Object3D(), []);
+  useFrame(() => {
+    const t = (performance.now() - parts.born) / 1000;
+    parts.m.visible = !settings.reduced && t < 4.5;
+    if (!parts.m.visible) return;
+    (parts.m.material as T.MeshBasicMaterial).opacity = Math.min(1, (4.5 - t) / 0.8);
+    parts.seeds.forEach((s, i) => {
+      // A quick upward pop, then a slow, swaying fall once air drag takes over.
+      const up = Math.min(t, 0.6),
+        fall = Math.max(0, t - 0.6);
+      o.position.set(
+        center[0] + s.vx * up + Math.sin(t * 3 + s.phase) * 0.25 * Math.min(1, fall),
+        center[1] + s.vy * up - 4.9 * up * up - fall * 0.9,
+        center[2] + s.vz * up,
+      );
+      o.rotation.set(t * s.spin, t * s.spin * 0.6, s.phase);
+      o.updateMatrix();
+      parts.m.setMatrixAt(i, o.matrix);
+    });
+    parts.m.instanceMatrix.needsUpdate = true;
+  });
+  return <primitive object={parts.m} />;
+}

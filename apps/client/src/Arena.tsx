@@ -124,7 +124,7 @@ export function BattleUI({
   const chosen = ts.some((t) => t.id === target) ? target : ts[0]?.id || "";
   return (
     <div className="battle-screen">
-      <BattleScene battle={battle} target={chosen} onTarget={setTarget} />
+      <BattleScene battle={battle} target={chosen} onTarget={setTarget} side={side} />
       <UltimateMoment battle={battle} now={now} />
       {guardianIntent(battle) && battle.winner === null && <aside className="guardian-intent" role="status"><strong>{guardianIntent(battle)!.title}</strong><span>{guardianIntent(battle)!.text}</span></aside>}
       <header className="battle-top">

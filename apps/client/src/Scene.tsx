@@ -37,7 +37,7 @@ import { BattleArena } from "./BattleArena";
 import { WeatherEffects } from "./Weather";
 import { HavenTreasure } from "./HavenTreasure";
 import { photo } from "./photo";
-import { HitBurst, SupportGlow } from "./HitBurst";
+import { Confetti, HitBurst, SupportGlow } from "./HitBurst";
 import { skillPath } from "./skill-path";
 import { Hearts } from "./Hearts";
 import { Footprints, leavePrint } from "./Footprints";
@@ -1743,6 +1743,7 @@ export function BattleScene({
   preview = false,
   paused = false,
   previewPhase = 0.55,
+  side = 0,
 }: {
   battle: Battle;
   target: string;
@@ -1750,6 +1751,8 @@ export function BattleScene({
   preview?: boolean;
   paused?: boolean;
   previewPhase?: number;
+  /** The viewer's team, which gets confetti when it wins. */
+  side?: number;
 }) {
   const [, tick] = useState(0);
   const phase = useRef(0);
@@ -1847,7 +1850,9 @@ export function BattleScene({
                   elapsed >= 0.45 &&
                   event?.amounts.some((a) => a.id === u.id && a.amount > 0)
                 ? "hit"
-                : "idle";
+                : battle.winner === u.side && !active
+                  ? "victory"
+                  : "idle";
         return (
           <group key={u.id} position={p} onClick={() => onTarget(u.id)}>
             <Creature
@@ -1949,6 +1954,10 @@ export function BattleScene({
         battle={battle}
         phase={preview && paused ? previewPhase : undefined}
       />
+      {/* Once the winning blow has landed, confetti rains on the viewer's team. */}
+      {!preview && battle.winner === side && (!battle.event || Date.now() - battle.event.at > battle.event.duration) && (
+        <Confetti key={battle.id} center={unitPosition(side, 1).map((v, i) => (i === 1 ? 1.4 : v)) as [number, number, number]} />
+      )}
       <OrbitControls
         target={[0, 0, preview ? 0 : 1.2]}
         enablePan={false}
