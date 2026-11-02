@@ -37,7 +37,7 @@ import { BattleArena } from "./BattleArena";
 import { WeatherEffects } from "./Weather";
 import { HavenTreasure } from "./HavenTreasure";
 import { photo } from "./photo";
-import { HitBurst } from "./HitBurst";
+import { HitBurst, SupportGlow } from "./HitBurst";
 import { Hearts } from "./Hearts";
 import { Footprints, leavePrint } from "./Footprints";
 import { activeSeason } from "../../../packages/shared/seasons";
@@ -1806,6 +1806,7 @@ export function BattleScene({
           event?.amounts
             .filter((a) => a.id === u.id)
             .reduce((sum, a) => sum + a.amount, 0) || 0;
+        const shielded = !!event?.amounts.some((a) => a.id === u.id && a.shield > 0);
         const shownHp =
           active && elapsed < 0.45
             ? Math.max(0, Math.min(u.maxHp, u.hp + outcome))
@@ -1841,6 +1842,16 @@ export function BattleScene({
                 at={event.at}
                 duration={event.duration}
                 element={byId[battle.units.find((x) => x.id === event.actor)?.species || u.species].element}
+                height={0.8 * byId[u.species].size}
+              />
+            )}
+            {active && event && !preview && (outcome < 0 || shielded) && (
+              <SupportGlow
+                key={`s${event.at}`}
+                at={event.at}
+                duration={event.duration}
+                heal={outcome < 0}
+                shield={shielded}
                 height={0.8 * byId[u.species].size}
               />
             )}
