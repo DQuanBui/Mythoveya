@@ -664,6 +664,19 @@
   .photo-bar kbd {
     display: none;
   }
+  /* Span the screen, so the filters wrap in rows instead of a tall column. */
+  .photo-bar {
+    left: 16px;
+    right: 16px;
+    transform: none;
+    padding: 8px 10px;
+  }
+  .photo-filters {
+    justify-content: center;
+  }
+  .photo-bar > button {
+    flex: 1 1 auto;
+  }
 }
 /* Name tags and markers (drei Html, siblings of the canvas) step aside for photos. */
 .scene.photo-shot canvas ~ div {

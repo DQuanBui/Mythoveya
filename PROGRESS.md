@@ -17,9 +17,10 @@ November 5 round (from `1e622b9`). Done this round, newest last:
 - Facing the target: during its action a battle creature turns toward the unit it targets (eased in and out over the event, the short way round), so diagonal strikes and lunges head for their target. `turnToward` in `Scene.tsx`.
 - Winners face the camera: once the last event ends, the winning team's standing creatures turn round over ~0.6 of an event to celebrate toward the camera.
 - Photo mode gains a seventh filter, Moonlit (cool, desaturated blue); README updated.
+- Photo toolbar on phones: under 600 px it spans the screen (16 px gutters), so the seven filters wrap in two rows and Pose, Take photo and Done share a row, instead of a thin column covering half the view (checked at 390x844).
 
 Next 3 tasks:
-1. Lay the photo toolbar out across narrow screens (at 390 px it is a thin column covering half the view).
+1. Make the Moonlit filter actually blue (hue-rotate turned greens yellow).
 2. Full verification, Playwright and docs.
 3. Listening and physical-device pass.
 
