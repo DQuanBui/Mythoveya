@@ -9,11 +9,12 @@ November 5 round (from `1e622b9`). Done this round, newest last:
 - Leaf umbrella: `createUmbrella` (models.ts) is a broad leaf on a stem held upright in the left hand; the keeper raises it outdoors when rain passes 0.35 (not in snow, not during emotes).
 - Townsfolk umbrellas: strolling islanders hold up the same leaf umbrella in rain, lowering it while they wave with that hand.
 - Shake dry: a new `shake` motion (fast, fading roll with squeezed eyes); when the companion stops after following the keeper in rain it shakes for 0.9 s and flings eight droplets (`drop` puff kind). Listed in the asset gallery; tested.
+- Puddles (`Puddles.tsx`, spots from `puddle-spots.ts`): up to 40 glossy puddles (16 on Low) on level Havenreach trail ground fill over ~20 s of rain and dry over about a minute. Placement tested in `tests/puddles.test.ts`; seen in a dev screenshot with rain pinned.
 
 Next 3 tasks:
-1. Puddles on flat ground in rain.
-2. Raindrop ripples on ponds and lakes.
-3. Villagers wave back when the keeper waves.
+1. Raindrop ripples on ponds and lakes.
+2. Villagers wave back when the keeper waves.
+3. A sniff-the-ground idle quirk for creatures.
 
 ## Play
 
