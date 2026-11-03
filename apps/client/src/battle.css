@@ -83,6 +83,16 @@
 .unit-bar.side-1 .hp i {
   background: linear-gradient(90deg, #e0705d, #f2a582);
 }
+/* Under a quarter of health the bar pulses red. */
+.unit-bar.low .hp i {
+  background: linear-gradient(90deg, #e24d3f, #ff8f6e);
+  animation: low-hp 0.9s ease-in-out infinite alternate;
+}
+@keyframes low-hp {
+  to {
+    filter: brightness(1.5);
+  }
+}
 .unit-bar .hp b {
   position: absolute;
   inset: 0 0 0 auto;
@@ -210,6 +220,9 @@
   .ult-banner,
   .ult-flash {
     animation-duration: 0.01s;
+  }
+  .unit-bar.low .hp i {
+    animation: none;
   }
 }
 

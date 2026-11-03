@@ -2061,7 +2061,7 @@ export function BattleScene({
               >
                 {/* A slim health bar; the name shows for the acting or targeted unit and on hover. */}
                 <button
-                  className={`unit-bar side-${u.side} ${target === u.id ? "selected" : ""} ${battle.queue[0] === u.id ? "acting" : ""} ${shownHp === 0 ? "down" : ""}`}
+                  className={`unit-bar side-${u.side} ${target === u.id ? "selected" : ""} ${battle.queue[0] === u.id ? "acting" : ""} ${shownHp === 0 ? "down" : shownHp < u.maxHp * 0.25 ? "low" : ""}`}
                   onClick={() => onTarget(u.id)}
                   aria-label={`${byId[u.species].name} ${shownHp} of ${u.maxHp}`}
                 >
