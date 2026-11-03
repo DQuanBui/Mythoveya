@@ -9,11 +9,12 @@ November 3 round (from `933a869`). Done this round, newest last:
 - Status effects in 3D (`StatusAura.tsx`, shared geometry and materials): stars circle stunned creatures (which also sway in the `stunned` motion), embers rise from burns, a frost ring with ice shards marks slows, green motes rise during regeneration and a red marker hovers over marked targets.
 - Weary creatures: a new `weary` motion (heavy panting, droop, heavy-lidded eyes) plays for battle creatures under 25% health until the battle ends; listed in the dev asset gallery's motion picker.
 - Region ambience (`RegionMotes.tsx`): flickering embers rise around the keeper in Emberglass and pollen drifts through Whisperleaf (48 motes, 16 on Low, in a 16 m box that follows the keeper; hidden under Reduced Motion).
+- Companion paw prints: `leavePaw` in `Footprints.tsx` adds small round prints (same 48-print buffer, own left/right alternation) every 0.17-0.22 s while the companion follows over snow or sand.
 
 Next 3 tasks:
-1. Companion paw prints in snow and sand.
-2. Fireflies drawn to the keeper's lantern at night.
-3. Fish leap in Reedwater Lake.
+1. Fireflies drawn to the keeper's lantern at night.
+2. Fish leap in Reedwater Lake.
+3. Hair dye in festival ghosts and a dye picker outside Lanternfair.
 
 ## Play
 

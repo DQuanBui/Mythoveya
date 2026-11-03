@@ -42,7 +42,7 @@ import { skillPath } from "./skill-path";
 import { StatusAura } from "./StatusAura";
 import { RegionMotes } from "./RegionMotes";
 import { Hearts } from "./Hearts";
-import { Footprints, leavePrint } from "./Footprints";
+import { Footprints, leavePrint, leavePaw } from "./Footprints";
 import { Puffs } from "./Puffs";
 import { emitPuff } from "./puff-buffer";
 import { activeSeason } from "../../../packages/shared/seasons";
@@ -795,6 +795,7 @@ export function Explorer({
   const last = useRef(0);
   const foot = useRef(0);
   const breath = useRef(0);
+  const paw = useRef(0);
   const follow = useRef(new T.Vector3(spawn[0] - 1, 0, spawn[1] + 1.5)),
     rest = useRef(0);
   const route = useRef<Route | null>(null),
@@ -1092,6 +1093,12 @@ export function Explorer({
           allowed,
         );
         follow.current.set(fx, ground(fx, fz), fz);
+        // The companion leaves paw prints where the keeper leaves footprints.
+        if (clock.elapsedTime - paw.current > (sprinting ? 0.17 : 0.22)) {
+          paw.current = clock.elapsedTime;
+          const step = area ? "" : stepSound(profile.region, fx, fz, follow.current.y);
+          if (step === "snowStep" || step === "sandStep") leavePaw(fx, follow.current.y, fz, Math.atan2(delta.x, delta.z), clock.elapsedTime, step === "snowStep");
+        }
       }
     }
     companion.position.copy(follow.current);

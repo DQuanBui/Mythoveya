@@ -6,9 +6,16 @@ import * as T from "three";
 // on each footstep and this component draws, each print slowly filling in.
 const MAX = 48,
   LIFE = 9;
-type Print = { x: number; y: number; z: number; yaw: number; t: number; snow: boolean };
+type Print = { x: number; y: number; z: number; yaw: number; t: number; snow: boolean; paw?: boolean };
 const prints: Print[] = [];
-let side = 1;
+let side = 1,
+  pawSide = 1;
+/** A companion's small round paw print, alternating either side of its path. */
+export function leavePaw(x: number, y: number, z: number, yaw: number, t: number, snow: boolean) {
+  pawSide = -pawSide;
+  prints.push({ x: x + Math.cos(yaw) * 0.07 * pawSide, y, z: z - Math.sin(yaw) * 0.07 * pawSide, yaw, t, snow, paw: true });
+  if (prints.length > MAX) prints.shift();
+}
 export function leavePrint(x: number, y: number, z: number, yaw: number, t: number, snow: boolean) {
   side = -side;
   // Alternate left and right of the walking line.
@@ -46,7 +53,8 @@ export function Footprints() {
       const fill = 1 - age / LIFE;
       o.position.set(p.x, p.y + 0.025, p.z);
       o.rotation.set(0, p.yaw, 0);
-      o.scale.set(0.13 * fill, 1, 0.22 * fill);
+      if (p.paw) o.scale.set(0.09 * fill, 1, 0.1 * fill);
+      else o.scale.set(0.13 * fill, 1, 0.22 * fill);
       o.updateMatrix();
       if (p.snow) marks.snow.setMatrixAt(s++, o.matrix);
       else marks.sand.setMatrixAt(d++, o.matrix);

@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { EMOTES, keeperEmote, playEmote } from "../apps/client/src/village-materials";
-import { leavePrint, recentPrints } from "../apps/client/src/Footprints";
+import { leavePaw, leavePrint, recentPrints } from "../apps/client/src/Footprints";
 import { PHOTO_FILTERS, photoCss } from "../apps/client/src/photo";
 import { PUFF_LOOK, emitPuff, recentPuffs } from "../apps/client/src/puff-buffer";
 
@@ -26,6 +26,15 @@ describe("keeper emotes, footprints and photo filters", () => {
     expect(prints.at(-1)!.z).toBe(59);
     expect(Math.sign(prints.at(-1)!.x)).toBe(-Math.sign(prints.at(-2)!.x));
     expect(Math.abs(prints.at(-1)!.x)).toBeCloseTo(0.09);
+  });
+
+  it("marks a companion's paw prints and keeps them in the same 48-print buffer", () => {
+    for (let i = 0; i < 4; i++) leavePaw(0, 0, i, 0, i, false);
+    const prints = recentPrints();
+    expect(prints).toHaveLength(48);
+    expect(prints.at(-1)).toMatchObject({ paw: true, z: 3, snow: false });
+    expect(Math.abs(prints.at(-1)!.x)).toBeCloseTo(0.07);
+    expect(Math.sign(prints.at(-1)!.x)).toBe(-Math.sign(prints.at(-2)!.x));
   });
 
   it("maps every photo filter to a CSS filter", () => {
