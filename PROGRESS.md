@@ -6,11 +6,12 @@ Updated November 3, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch
 
 November 4 round (from `d37297c`). Done this round, newest last:
 - Refactor: the hair dye swatch row is one `HairDyePicker` component used by the Lanternfair wardrobe and the keeper appearance panel.
+- Accessibility: the hair dye radiogroup uses roving focus (only the chosen swatch is in the tab order; arrows, Home and End move focus; Enter or Space picks, since each pick may save). `islands.spec` checks it.
 
 Next 3 tasks:
-1. Arrow-key navigation in the hair dye radiogroup.
-2. Village hosts turn their heads toward a nearby keeper.
-3. Companion looks up at the keeper when it waits beside them.
+1. Village hosts turn their heads toward a nearby keeper.
+2. Companion looks up at the keeper when it waits beside them.
+3. Grass and tree crowns sway in the wind.
 
 ## Play
 

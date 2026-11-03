@@ -187,6 +187,13 @@ test("Lanternfair opens after a win: welcome tickets, an outfit and a reload", a
   await page.getByRole("radio", { name: "Tide blue" }).click();
   await expect(page.getByRole("status")).toContainText("Tide blue hair suits you!");
   await expect(page.getByRole("radio", { name: "Tide blue" })).toHaveAttribute("aria-checked", "true");
+  // Arrow keys move between swatches without picking; only the chosen one is in the tab order.
+  await expect(page.getByRole("radio", { name: "Tide blue" })).toHaveAttribute("tabindex", "0");
+  await page.getByRole("radio", { name: "Tide blue" }).press("ArrowRight");
+  await expect(page.getByRole("radio", { name: "Dusk violet" })).toBeFocused();
+  await expect(page.getByRole("radio", { name: "Dusk violet" })).toHaveAttribute("aria-checked", "false");
+  await page.keyboard.press("ArrowLeft");
+  await expect(page.getByRole("radio", { name: "Tide blue" })).toBeFocused();
   await page.locator(".wardrobe").screenshot({ path: "artifacts/wardrobe-hair.png" });
   await page.reload();
   await page.getByRole("button", { name: "Continue your journey" }).click();
