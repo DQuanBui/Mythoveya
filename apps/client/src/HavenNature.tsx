@@ -10,7 +10,46 @@ import {
 } from "../../../packages/shared/haven";
 import { audio, settings } from "./audio";
 import { worldFocus } from "./village-materials";
+import { weatherFx } from "./Weather";
 
+// Wind: grass tips and tree tops sway on one shared clock, a little harder in rain.
+export const wind = { time: { value: 0 }, strength: { value: 1 } };
+// Local height of each swaying shape (bottom to top) and how far its top moves.
+const SWAY: Partial<Record<string, [number, number, number]>> = {
+  grass: [-0.5, 0.5, 0.3],
+  crown: [-1.7, 1.7, 0.07],
+  pine: [-2.15, 2.15, 0.12],
+};
+function swaying(material: T.MeshStandardMaterial, part: string) {
+  const sway = SWAY[part];
+  if (!sway) return;
+  const [low, high, reach] = sway;
+  material.onBeforeCompile = (shader) => {
+    shader.uniforms.uWindTime = wind.time;
+    shader.uniforms.uWindStrength = wind.strength;
+    shader.vertexShader = shader.vertexShader
+      .replace(
+        "#include <common>",
+        `#include <common>
+        uniform float uWindTime;
+        uniform float uWindStrength;`,
+      )
+      .replace(
+        "#include <begin_vertex>",
+        `#include <begin_vertex>
+        #ifdef USE_INSTANCING
+          vec2 windAt = vec2(instanceMatrix[3][0], instanceMatrix[3][2]);
+        #else
+          vec2 windAt = vec2(0.0);
+        #endif
+        float windTip = clamp((position.y - (${low.toFixed(2)})) / ${(high - low).toFixed(2)}, 0.0, 1.0);
+        windTip *= windTip * uWindStrength * ${reach.toFixed(2)};
+        transformed.x += sin(uWindTime * 1.7 + windAt.x * 0.35 + windAt.y * 0.21) * windTip;
+        transformed.z += cos(uWindTime * 1.3 + windAt.x * 0.21 - windAt.y * 0.3) * windTip * 0.6;`,
+      );
+  };
+  material.customProgramCacheKey = () => `wind-${part}`;
+}
 function makeInstances(
   geometry: T.BufferGeometry,
   sites: TreeSite[],
@@ -20,6 +59,7 @@ function makeInstances(
     flatShading: true,
     roughness: 1,
   });
+  swaying(material, part);
   const mesh = new T.InstancedMesh(geometry, material, sites.length),
     o = new T.Object3D(),
     c = new T.Color();
@@ -110,6 +150,8 @@ export function HavenNature() {
   );
   // Shared foliage geometry keeps hundreds of plants in a handful of draw calls.
   useFrame(({ clock }, dt) => {
+    wind.time.value = clock.elapsedTime;
+    wind.strength.value = settings.reduced ? 0 : 1 + weatherFx.rain * 0.8;
     const mesh = extras[0],
       { bushes, shake, o, last } = rustle;
     const moved = last.distanceToSquared(worldFocus) > 1e-4;

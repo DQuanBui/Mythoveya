@@ -9,11 +9,12 @@ November 4 round (from `d37297c`). Done this round, newest last:
 - Accessibility: the hair dye radiogroup uses roving focus (only the chosen swatch is in the tab order; arrows, Home and End move focus; Enter or Space picks, since each pick may save). `islands.spec` checks it.
 - Villagers watch the keeper: `watchKeeper(model)` marks an NPC whose head eases toward the keeper within 4.5 m (and back afterwards). Used for the village friends, strolling townsfolk, home and lodge hosts, and the Atlas, Conservancy, Rally, Rescue and region rangers. Tested in `creature-look.test.ts`.
 - Companion gaze: `animateCreature` honours an optional `userData.gaze` while a creature is free to glance; the companion waiting within 2.4 m of the keeper looks up at them instead of darting its eyes about.
+- Wind: Havenreach's instanced grass, tree crowns and pines sway in the vertex shader (`swaying` in `HavenNature.tsx`, shared `wind` uniforms), a little harder in rain; still under Reduced Motion. Checked for shader errors on the Pages build.
 
 Next 3 tasks:
-1. Grass and tree crowns sway in the wind.
-2. Drifting cloud shadows over Havenreach.
-3. Element-shaped impact sparks in battle.
+1. Drifting cloud shadows over Havenreach.
+2. Element-shaped impact sparks in battle.
+3. A pulse on the acting creature's ring.
 
 ## Play
 
