@@ -8,8 +8,6 @@ import { WaterGlints } from "./WaterGlints";
 export function HavenWater() {
   const ripples = useRef<T.Group>(null),
     falls = useRef<T.Group>(null),
-    fish = useRef<T.Group>(null),
-    splash = useRef<T.Mesh<T.RingGeometry, T.MeshBasicMaterial>>(null),
     p = HAVEN_POND;
   const pads = useMemo(
     () =>
@@ -30,26 +28,6 @@ export function HavenWater() {
     falls.current?.children.forEach((r, i) => {
       r.position.y = -((clock.elapsedTime * 2 + i * 0.6) % 7);
     });
-    // Every few seconds a fish leaps somewhere new and leaves a ring.
-    const cycle = clock.elapsedTime / 4.5,
-      n = Math.floor(cycle),
-      t = cycle - n,
-      a = n * 2.4,
-      x = p.x + Math.cos(a) * 4.2,
-      z = p.z + Math.sin(a) * 3 + (Math.abs(Math.sin(a) * 3) < 1.6 ? 2.4 : 0);
-    if (fish.current) {
-      fish.current.visible = t < 0.22;
-      const u = t / 0.22;
-      fish.current.position.set(x + (u - 0.5) * 1.1, 0.05 + Math.sin(u * Math.PI) * 0.75, z);
-      fish.current.rotation.z = (0.5 - u) * 2.2;
-    }
-    if (splash.current) {
-      const s = t < 0.22 ? 0 : (t - 0.22) / 0.5;
-      splash.current.visible = s > 0 && s < 1;
-      splash.current.position.set(x + 0.55, 0.045, z);
-      splash.current.scale.setScalar(0.3 + s * 1.6);
-      splash.current.material.opacity = (1 - s) * 0.55;
-    }
   });
   return (
     <group name="willowmere-water">
@@ -112,20 +90,8 @@ export function HavenWater() {
           )}
         </group>
       ))}
-      <group ref={fish} name="leaping-fish" visible={false}>
-        <mesh scale={[0.32, 0.12, 0.09]}>
-          <sphereGeometry args={[1, 8, 6]} />
-          <meshStandardMaterial color="#e3a35c" metalness={0.3} roughness={0.4} />
-        </mesh>
-        <mesh position={[-0.34, 0, 0]} rotation={[0, 0, Math.PI / 2]} scale={[0.12, 0.1, 0.02]}>
-          <coneGeometry args={[1, 1, 3]} />
-          <meshStandardMaterial color="#d48a4c" />
-        </mesh>
-      </group>
-      <mesh ref={splash} rotation={[-Math.PI / 2, 0, 0]} visible={false}>
-        <ringGeometry args={[0.5, 0.6, 28]} />
-        <meshBasicMaterial color="#e6f6ef" transparent opacity={0.5} depthWrite={false} />
-      </mesh>
+      {/* Keep the leaps clear of the bridge across the middle. */}
+      <LeapingFish x={p.x} z={p.z} rx={4.2} rz={3} nudge={(a) => (Math.abs(Math.sin(a) * 3) < 1.6 ? 2.4 : 0)} />
       <group name="willowmere-bridge" position={[21, 0, -5]}>
         {Array.from({ length: 30 }, (_, i) => (
           <mesh key={i} position={[-8.7 + i * 0.6, 0.065, 0]} receiveShadow>
@@ -173,5 +139,70 @@ export function HavenWater() {
         </group>
       </group>
     </group>
+  );
+}
+
+/** Every few seconds a fish leaps from somewhere new on an ellipse of water
+ * and leaves a spreading ring. `nudge` shifts a spot along z (e.g. off a bridge). */
+export function LeapingFish({
+  x: cx,
+  z: cz,
+  rx,
+  rz,
+  y = 0.045,
+  period = 4.5,
+  color = "#e3a35c",
+  nudge,
+}: {
+  x: number;
+  z: number;
+  rx: number;
+  rz: number;
+  y?: number;
+  period?: number;
+  color?: string;
+  nudge?: (angle: number) => number;
+}) {
+  const fish = useRef<T.Group>(null),
+    splash = useRef<T.Mesh<T.RingGeometry, T.MeshBasicMaterial>>(null);
+  useFrame(({ clock }) => {
+    if (settings.reduced) return;
+    const cycle = clock.elapsedTime / period,
+      n = Math.floor(cycle),
+      t = cycle - n,
+      a = n * 2.4,
+      x = cx + Math.cos(a) * rx,
+      z = cz + Math.sin(a) * rz + (nudge?.(a) || 0);
+    if (fish.current) {
+      fish.current.visible = t < 0.22;
+      const u = t / 0.22;
+      fish.current.position.set(x + (u - 0.5) * 1.1, y + 0.005 + Math.sin(u * Math.PI) * 0.75, z);
+      fish.current.rotation.z = (0.5 - u) * 2.2;
+    }
+    if (splash.current) {
+      const s = t < 0.22 ? 0 : (t - 0.22) / 0.5;
+      splash.current.visible = s > 0 && s < 1;
+      splash.current.position.set(x + 0.55, y, z);
+      splash.current.scale.setScalar(0.3 + s * 1.6);
+      splash.current.material.opacity = (1 - s) * 0.55;
+    }
+  });
+  return (
+    <>
+      <group ref={fish} name="leaping-fish" visible={false}>
+        <mesh scale={[0.32, 0.12, 0.09]}>
+          <sphereGeometry args={[1, 8, 6]} />
+          <meshStandardMaterial color={color} metalness={0.3} roughness={0.4} />
+        </mesh>
+        <mesh position={[-0.34, 0, 0]} rotation={[0, 0, Math.PI / 2]} scale={[0.12, 0.1, 0.02]}>
+          <coneGeometry args={[1, 1, 3]} />
+          <meshStandardMaterial color={new T.Color(color).multiplyScalar(0.9).getStyle()} />
+        </mesh>
+      </group>
+      <mesh ref={splash} rotation={[-Math.PI / 2, 0, 0]} visible={false}>
+        <ringGeometry args={[0.5, 0.6, 28]} />
+        <meshBasicMaterial color="#e6f6ef" transparent opacity={0.5} depthWrite={false} />
+      </mesh>
+    </>
   );
 }
