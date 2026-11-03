@@ -5,7 +5,7 @@ Updated November 5, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch
 ## Next up
 
 November 6 round (from `040b6f1`). Done this round, newest last:
-- Test environment: Playwright keeps video only for failing journeys (`retain-on-failure`) instead of recording all 33, to lighten long runs; traces and failure screenshots are unchanged.
+- Test environment: Playwright no longer records video (first tried `retain-on-failure`, which still encodes every journey); failure traces with step snapshots and failure screenshots remain.
 
 Next 3 tasks:
 1. Adaptive effects: drop decorative effects when the frame rate stays low.
