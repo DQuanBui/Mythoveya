@@ -10,11 +10,12 @@ November 3 round (from `933a869`). Done this round, newest last:
 - Weary creatures: a new `weary` motion (heavy panting, droop, heavy-lidded eyes) plays for battle creatures under 25% health until the battle ends; listed in the dev asset gallery's motion picker.
 - Region ambience (`RegionMotes.tsx`): flickering embers rise around the keeper in Emberglass and pollen drifts through Whisperleaf (48 motes, 16 on Low, in a 16 m box that follows the keeper; hidden under Reduced Motion).
 - Companion paw prints: `leavePaw` in `Footprints.tsx` adds small round prints (same 48-print buffer, own left/right alternation) every 0.17-0.22 s while the companion follows over snow or sand.
+- Fireflies and the lantern: every tenth firefly gradually drifts over to circle the keeper's lantern at night (`Fireflies lantern`, blended over a few seconds) and wanders back by day.
 
 Next 3 tasks:
-1. Fireflies drawn to the keeper's lantern at night.
-2. Fish leap in Reedwater Lake.
-3. Hair dye in festival ghosts and a dye picker outside Lanternfair.
+1. Fish leap in Reedwater Lake.
+2. Hair dye in festival ghosts and a dye picker outside Lanternfair.
+3. Night-time in-game check of lantern, fireflies and glints.
 
 ## Play
 

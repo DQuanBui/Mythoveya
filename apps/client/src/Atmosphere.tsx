@@ -3,7 +3,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import * as T from "three";
 import { settings } from "./audio";
 import { daylight, islandHour } from "./daytime";
-import { setNightGlow, worldFocus } from "./village-materials";
+import { nightState, setNightGlow, worldFocus } from "./village-materials";
 import { seeded } from "../../../packages/shared/haven";
 import { weatherFx } from "./Weather";
 import { weatherAt, WEATHER_SPELL_MS } from "../../../packages/shared/weather";
@@ -154,7 +154,7 @@ export function DayNight({
         </group>
       )}
       {night && keeperLight && <pointLight ref={carry} color="#ffc777" distance={8} decay={1.6} intensity={0} />}
-      <Fireflies haven={haven} />
+      <Fireflies haven={haven} lantern={keeperLight} />
     </>
   );
 }
@@ -174,8 +174,10 @@ function glowDot() {
   texture.colorSpace = T.SRGBColorSpace;
   return texture;
 }
-function Fireflies({ haven }: { haven: boolean }) {
-  const count = settings.quality === "Low" ? 50 : 120;
+function Fireflies({ haven, lantern = false }: { haven: boolean; lantern?: boolean }) {
+  const count = settings.quality === "Low" ? 50 : 120,
+    // How far each tenth firefly has drifted toward the keeper's lantern.
+    drawn = useMemo(() => new Float32Array(Math.ceil(count / 10)), [count]);
   const { points, base } = useMemo(() => {
     const random = seeded(77),
       centers = haven
@@ -221,9 +223,10 @@ function Fireflies({ haven }: { haven: boolean }) {
     },
     [points],
   );
-  useFrame(({ clock }) => {
+  useFrame(({ clock }, dt) => {
     const glow = daylight(islandHour()).glow,
-      material = points.material as T.PointsMaterial;
+      material = points.material as T.PointsMaterial,
+      lit = lantern && nightState.glow > 0.45;
     points.visible = glow > 0.05;
     if (!points.visible) return;
     material.opacity = glow * (0.65 + Math.sin(clock.elapsedTime * 3) * 0.2);
@@ -231,12 +234,22 @@ function Fireflies({ haven }: { haven: boolean }) {
     const attr = points.geometry.attributes.position as T.BufferAttribute;
     for (let i = 0; i < count; i++) {
       const t = clock.elapsedTime * 0.5 + i * 1.7;
-      attr.setXYZ(
-        i,
-        base[i * 3] + Math.sin(t) * 0.6,
-        base[i * 3 + 1] + Math.sin(t * 1.3) * 0.25,
-        base[i * 3 + 2] + Math.cos(t * 0.8) * 0.6,
-      );
+      let x = base[i * 3] + Math.sin(t) * 0.6,
+        y = base[i * 3 + 1] + Math.sin(t * 1.3) * 0.25,
+        z = base[i * 3 + 2] + Math.cos(t * 0.8) * 0.6;
+      // A few drift over to circle the lantern, and wander home by day.
+      if (i % 10 === 0) {
+        const k = i / 10,
+          w = (drawn[k] += ((lit ? 1 : 0) - drawn[k]) * Math.min(1, Math.min(dt, 0.1) * 0.35)),
+          a = clock.elapsedTime * (0.7 + (k % 3) * 0.2) + k * 2.1,
+          r = 0.55 + (k % 4) * 0.15;
+        if (w > 0.001) {
+          x += (worldFocus.x + 0.35 + Math.cos(a) * r - x) * w;
+          y += (worldFocus.y + 1.2 + Math.sin(a * 1.7) * 0.35 - y) * w;
+          z += (worldFocus.z + Math.sin(a) * r - z) * w;
+        }
+      }
+      attr.setXYZ(i, x, y, z);
     }
     attr.needsUpdate = true;
   });
