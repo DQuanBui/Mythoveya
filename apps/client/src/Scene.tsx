@@ -115,7 +115,7 @@ import { frameMonitor } from "./adaptive";
 import { inPuddle } from "./puddle-spots";
 import { unitLabel } from "./battle-labels";
 import { useCarried } from "./carried";
-import { elementMultiplier } from "../../../packages/shared/combat";
+import { elementMultiplier } from "../../../packages/shared/elements";
 // Festival lanterns load only while a festival runs.
 const SeasonalLanterns = lazy(() => import("./SeasonalLanterns").then((m) => ({ default: m.SeasonalLanterns })));
 function RenderStats() {

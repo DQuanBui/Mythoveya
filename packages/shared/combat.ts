@@ -2,6 +2,8 @@ import { guardianDamage, guardianPower } from "./guardian";
 import { byId, signatureId, TIERS } from "./content";
 import { skillPower } from "./adventure";
 import type { Battle, Owned, Unit, Status } from "./types";
+import { elementMultiplier } from "./elements";
+export { elementMultiplier };
 export function rng(b: { seed: number }) {
   b.seed = (Math.imul(b.seed, 1664525) + 1013904223) >>> 0;
   return b.seed / 4294967296;
@@ -29,15 +31,6 @@ export const power = (o: Owned) => {
   const s = stats(o);
   return Math.round(s.hp + s.attack * 3 + s.defense * 2 + s.speed);
 };
-export function elementMultiplier(a: string, b: string) {
-  if ((a === "Light" && b === "Shadow") || (a === "Shadow" && b === "Light"))
-    return 1.2;
-  const cycle = ["Flame", "Grove", "Stone", "Storm", "Tide"];
-  const x = cycle.indexOf(a),
-    y = cycle.indexOf(b);
-  if (x < 0 || y < 0) return 1;
-  return (x + 1) % 5 === y ? 1.2 : (y + 1) % 5 === x ? 0.85 : 1;
-}
 const has = (u: Unit, k: string) => u.statuses.find((s) => s.kind === k);
 function status(u: Unit, kind: string, turns = 2, value = 0.2) {
   const old = has(u, kind);
