@@ -9,11 +9,12 @@ November 6 round (from `040b6f1`). Done this round, newest last:
 - Adaptive effects (`adaptive.ts`): a frame-time monitor in the world scene sets `perf.lite` after 6 s below ~30 fps (and clears it after 20 s above ~50 fps); region motes, water glints and ripples, puddles, puffs and islet drift pause meanwhile. Gameplay feedback is untouched and no toast is shown. Tested in `tests/adaptive.test.ts`.
 - Health trail: battle health bars keep a pale trail where health was lost, which drains away 0.45 s later (a CSS width transition; instant under Reduced Motion).
 - Low health: battle health bars under a quarter turn red and pulse (`.unit-bar.low`), still under either reduced-motion setting.
+- Puddle splashes: `puddles` / `inPuddle` in `puddle-spots.ts` share the live puddles; a keeper footstep inside a puddle that holds water throws up three small splashes (`splash` puff kind). Tested.
 
 Next 3 tasks:
-1. Puddle splashes underfoot.
-2. Companion stretches before a nap.
-3. Fireflies hide in the rain.
+1. Companion stretches before a nap.
+2. Fireflies hide in the rain.
+3. Full verification, Playwright and docs.
 
 ## Play
 

@@ -15,3 +15,12 @@ export function puddleSpots(count = 40) {
   }
   return spots;
 }
+
+/** Live puddles: how full they are (0 dry .. 1 full) and where, for footsteps. */
+export const puddles = { wet: 0, spots: [] as ReturnType<typeof puddleSpots> };
+/** Whether a point is inside a puddle that holds water right now. */
+export function inPuddle(x: number, z: number) {
+  if (puddles.wet < 0.3) return false;
+  const k = Math.sqrt(puddles.wet);
+  return puddles.spots.some((s) => Math.hypot((x - s.x) / 1.3, z - s.z) < s.size * k);
+}

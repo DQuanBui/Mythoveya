@@ -113,6 +113,7 @@ import {
 import type { MutableRefObject } from "react";
 import { useContextRecovery } from "./context-recovery";
 import { frameMonitor } from "./adaptive";
+import { inPuddle } from "./puddle-spots";
 // Festival lanterns load only while a festival runs.
 const SeasonalLanterns = lazy(() => import("./SeasonalLanterns").then((m) => ({ default: m.SeasonalLanterns })));
 function RenderStats() {
@@ -1047,6 +1048,12 @@ export function Explorer({
         const step = area?.step || stepSound(profile.region, nx, nz, ny);
         audio.cue(step);
         if (step === "snowStep" || step === "sandStep") leavePrint(nx, ny, nz, avatar.rotation.y, clock.elapsedTime, step === "snowStep");
+        // Stepping in a full puddle throws up a little splash.
+        if (profile.region === "haven" && !area && inPuddle(nx, nz))
+          for (let k = 0; k < 3; k++) {
+            const a = avatar.rotation.y + (k - 1) * 1.3;
+            emitPuff(nx, ny + 0.06, nz, Math.sin(a), Math.cos(a), clock.elapsedTime, "splash");
+          }
         // A sprint kicks up dust on paths, stone and sand, and powder in snow.
         if (sprinting && (step === "stoneStep" || step === "sandStep" || step === "snowStep")) {
           const bx = -Math.sin(avatar.rotation.y),

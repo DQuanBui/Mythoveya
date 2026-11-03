@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { groundHeight, inPond, pathDistance, slopeAt } from "../packages/shared/haven";
-import { puddleSpots } from "../apps/client/src/puddle-spots";
+import { inPuddle, puddleSpots, puddles } from "../apps/client/src/puddle-spots";
 
 describe("rain puddles", () => {
   it("collect only on level trail ground, clear of the pond and of each other", () => {
@@ -13,5 +13,15 @@ describe("rain puddles", () => {
       expect(inPond(s.x, s.z, 1.5)).toBe(false);
     }
     for (const a of spots) for (const b of spots) if (a !== b) expect(Math.hypot(a.x - b.x, a.z - b.z)).toBeGreaterThanOrEqual(3);
+  });
+
+  it("splash only where a puddle holds water", () => {
+    puddles.spots = puddleSpots(40);
+    const s = puddles.spots[0];
+    puddles.wet = 0;
+    expect(inPuddle(s.x, s.z)).toBe(false);
+    puddles.wet = 1;
+    expect(inPuddle(s.x, s.z)).toBe(true);
+    expect(inPuddle(s.x + 5, s.z + 5)).toBe(puddles.spots.some((p) => Math.hypot((s.x + 5 - p.x) / 1.3, s.z + 5 - p.z) < p.size));
   });
 });
