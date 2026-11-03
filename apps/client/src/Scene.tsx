@@ -39,6 +39,7 @@ import { HavenTreasure } from "./HavenTreasure";
 import { photo } from "./photo";
 import { Confetti, HitBurst, SupportGlow, SupportLink } from "./HitBurst";
 import { skillPath } from "./skill-path";
+import { StatusAura } from "./StatusAura";
 import { Hearts } from "./Hearts";
 import { Footprints, leavePrint } from "./Footprints";
 import { Puffs } from "./Puffs";
@@ -1919,7 +1920,9 @@ export function BattleScene({
                 ? "hit"
                 : battle.winner === u.side && !active
                   ? "victory"
-                  : "idle";
+                  : u.statuses.some((s) => s.kind === "stun")
+                    ? "stunned"
+                    : "idle";
         return (
           <group key={u.id} position={p} onClick={() => onTarget(u.id)}>
             <Creature
@@ -1940,6 +1943,7 @@ export function BattleScene({
                 height={0.8 * byId[u.species].size}
               />
             )}
+            {!preview && shownHp > 0 && <StatusAura kinds={u.statuses.map((x) => x.kind)} height={0.8 * byId[u.species].size} />}
             {active && event && !preview && (outcome < 0 || shielded) && (
               <SupportGlow
                 key={`s${event.at}`}

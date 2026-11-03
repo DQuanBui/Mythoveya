@@ -6,11 +6,12 @@ Updated November 2, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch
 
 November 3 round (from `933a869`). Done this round, newest last:
 - Test: `waitForScene` in `tests/browser/world-helpers.ts` polls until the canvas's React Three Fiber root holds the keeper; `walkRoute`, `clickWorld`, `haven.spec`'s walker and `lodges.spec`'s `playerPoint` wait on it (lodges, haven and keeper-life pass).
+- Status effects in 3D (`StatusAura.tsx`, shared geometry and materials): stars circle stunned creatures (which also sway in the `stunned` motion), embers rise from burns, a frost ring with ice shards marks slows, green motes rise during regeneration and a red marker hovers over marked targets.
 
 Next 3 tasks:
-1. Status effects in 3D: stars circle stunned creatures, burning ones smoulder, slowed ones frost over.
-2. Weakened creatures (under 25% HP) pant and droop in battle.
-3. Region ambience: drifting embers in Emberglass, pollen in Whisperleaf.
+1. Weakened creatures (under 25% HP) pant and droop in battle.
+2. Region ambience: drifting embers in Emberglass, pollen in Whisperleaf.
+3. Companion paw prints in snow and sand.
 
 ## Play
 
