@@ -13,11 +13,12 @@ November 5 round (from `1e622b9`). Done this round, newest last:
 - Raindrop ripples: every water body with glints (Havenreach pond and lake, Whisperleaf pond, Moonfrost lake, island ponds) also spawns expanding raindrop rings while it rains (a third of its glint count), and its sun glints dim under the overcast.
 - Wave back: villagers, hosts and rangers marked with `watchKeeper` wave back while the keeper's wave emote plays within 8 m. Tested.
 - Sniffing: a fourth idle quirk where a creature lowers its nose, sniffs along the ground with a little bob and looks down (the quirk cycle is now four kinds). Tested.
+- Snow sparkle: `WaterGlints` takes a `color` and a `follow` ground function; in Moonfrost, 36 white-blue sparkles wink on the snow within 9 m of the keeper, sitting on the slopes (fewer and silver at night).
 
 Next 3 tasks:
-1. Snow sparkles around the keeper in Moonfrost.
-2. Battle: attackers turn toward their target.
-3. Battle: winners turn to face the camera.
+1. Battle: attackers turn toward their target.
+2. Battle: winners turn to face the camera.
+3. A golden-hour photo filter.
 
 ## Play
 

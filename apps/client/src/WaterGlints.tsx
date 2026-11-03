@@ -5,6 +5,7 @@ import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js
 import { settings } from "./audio";
 import { daylight, islandHour } from "./daytime";
 import { weatherFx } from "./Weather";
+import { worldFocus } from "./village-materials";
 
 const FAR = 60;
 const hash = (n: number) => {
@@ -14,7 +15,26 @@ const hash = (n: number) => {
 /** Sun glints that wink on and off across a water ellipse: bright and warm
  * by day, a few faint silver ones at night, and raindrop rings in the rain. Each glint reappears somewhere
  * new after it fades. */
-export function WaterGlints({ x, z, rx, rz, y = 0.05, max = 44 }: { x: number; z: number; rx: number; rz: number; y?: number; max?: number }) {
+export function WaterGlints({
+  x: cx,
+  z: cz,
+  rx,
+  rz,
+  y = 0.05,
+  max = 44,
+  color = "#fff4d2",
+  follow,
+}: {
+  x: number;
+  z: number;
+  rx: number;
+  rz: number;
+  y?: number;
+  max?: number;
+  color?: string;
+  /** Sparkle on the ground around the keeper instead (e.g. snow), at this height. */
+  follow?: (x: number, z: number) => number;
+}) {
   // Small ponds get fewer glints; Low quality about a third.
   const count = settings.quality === "Low" ? Math.max(3, Math.round(max / 3)) : max;
   const mesh = useMemo(() => {
@@ -50,9 +70,11 @@ export function WaterGlints({ x, z, rx, rz, y = 0.05, max = 44 }: { x: number; z
     [mesh, rings],
   );
   const o = useMemo(() => new T.Object3D(), []),
-    warm = useMemo(() => new T.Color("#fff4d2"), []),
+    warm = useMemo(() => new T.Color(color), [color]),
     cool = useMemo(() => new T.Color("#c9dcff"), []);
   useFrame(({ clock, camera }) => {
+    const x = follow ? worldFocus.x : cx,
+      z = follow ? worldFocus.z : cz;
     // Out of sight across the island, the water needs no glints.
     mesh.visible = !settings.reduced && Math.hypot(camera.position.x - x, camera.position.z - z) < FAR + Math.max(rx, rz);
     const rain = weatherFx.snow ? 0 : weatherFx.rain;
@@ -88,7 +110,9 @@ export function WaterGlints({ x, z, rx, rz, y = 0.05, max = 44 }: { x: number; z
         on = day > 0.3 || i % 4 === 0 ? Math.pow(Math.max(0, Math.sin(k * Math.PI)), 3) : 0,
         a = hash(i * 13 + n) * Math.PI * 2,
         r = Math.sqrt(hash(i * 29 + n * 3)) * 0.88;
-      o.position.set(x + Math.cos(a) * rx * r, y, z + Math.sin(a) * rz * r);
+      const gx = x + Math.cos(a) * rx * r,
+        gz = z + Math.sin(a) * rz * r;
+      o.position.set(gx, follow ? follow(gx, gz) + y : y, gz);
       o.rotation.set(0, hash(i + n) * 0.6 - 0.3, 0);
       o.scale.setScalar(on * (0.6 + hash(i * 3) * 0.7));
       o.updateMatrix();

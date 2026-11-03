@@ -41,6 +41,7 @@ import { ChargeAura, Confetti, HitBurst, LandingDust, SupportGlow, SupportLink }
 import { skillPath } from "./skill-path";
 import { StatusAura } from "./StatusAura";
 import { RegionMotes } from "./RegionMotes";
+import { WaterGlints } from "./WaterGlints";
 import { Hearts } from "./Hearts";
 import { Footprints, leavePrint, leavePaw } from "./Footprints";
 import { Puffs } from "./Puffs";
@@ -377,6 +378,8 @@ function Environment({
           <SkyLife radius={expanded ? 54 : canyon || snow || meadow ? 62 : 26} birds={!expanded} />
           <WeatherEffects region={region} ground={groundFor(region)} />
           <RegionMotes region={region} />
+          {/* Fresh snow sparkles in the sun around the keeper. */}
+          {region === "hollow" && <WaterGlints x={0} z={0} rx={9} rz={9} y={0.04} max={36} color="#f4fbff" follow={hollowHeight} />}
         </>
       )}
       {expanded ? (
