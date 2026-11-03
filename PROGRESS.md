@@ -1,10 +1,23 @@
 # Mythoveya handoff
 
-Updated November 4, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`, pushed to `origin/main` (https://github.com/DQuanBui/Mythoveya). This handoff covers seven rounds: October 29 (from `4619fdc`), October 30 (from `b0d6c3d`), October 31 (from `3497bb3`), November 1 (from `3d8496d`) November 2 (from `9d221ef`), November 3 (from `933a869`) and November 4 (from `d37297c`). Earlier handoffs (October 28 online-build session, October 22 Wayfarer Lodges) are archived in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md). Preserve ignored `data/mythoveya.sqlite`. `CLAUDE.md` is the quick project map for new sessions.
+Updated November 5, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`, pushed to `origin/main` (https://github.com/DQuanBui/Mythoveya). This handoff covers eight rounds: October 29 (from `4619fdc`), October 30 (from `b0d6c3d`), October 31 (from `3497bb3`), November 1 (from `3d8496d`) November 2 (from `9d221ef`), November 3 (from `933a869`), November 4 (from `d37297c`) and November 5 (from `1e622b9`). Earlier handoffs (October 28 online-build session, October 22 Wayfarer Lodges) are archived in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md). Preserve ignored `data/mythoveya.sqlite`. `CLAUDE.md` is the quick project map for new sessions.
 
 ## Next up
 
-November 5 round (from `1e622b9`). Done this round, newest last:
+November 5 round is complete: 15 commits from `1e622b9` plus this record, all pushed.
+
+Next 3 tasks:
+1. Full Playwright runs keep losing one to three journeys that pass on their own (lodges, keeper-life, atlas, canyon, variants in different runs), and run time grew from 28 to 51 minutes. Frame rate is fine in every hour and weather (about 52 fps in the dev build at 1440x900), so look at the run environment: disable video for passing tests, try a fresh browser per file, and watch for the new graphics-context warning in traces.
+2. Adaptive quality: drop decorative effects automatically when the frame rate stays low on a weak device.
+3. Listening pass and a physical phone/tablet check.
+
+## Play
+
+- **Online (single-player):** https://dquanbui.github.io/Mythoveya/. `.github/workflows/pages.yml` publishes it on every push to `main` (Pages source: GitHub Actions). Check a deployment with `node scripts/smoke-pages.mjs https://dquanbui.github.io/Mythoveya/`.
+- **Local (full game, including the human arena):** `npm install`, then run `Play Mythoveya.cmd` or `npm run dev` and open http://127.0.0.1:5173/. For the compiled build, run `npm run build && npm start` and open http://127.0.0.1:2567/.
+
+## Implemented November 5
+
 - Graphics context recovery (`context-recovery.ts`): the world, battle, lodge, home, home island and festival canvases mark a lost WebGL context as recoverable, log a warning, and rebuild the Canvas when the browser restores it. Verified by forcing a loss and restore with `WEBGL_lose_context` on the Pages build (the world came back). This may be what blanked the lodge room in full Playwright runs; the warning will show in future traces.
 - Leaf umbrella: `createUmbrella` (models.ts) is a broad leaf on a stem held upright in the left hand; the keeper raises it outdoors when rain passes 0.35 (not in snow, not during emotes).
 - Townsfolk umbrellas: strolling islanders hold up the same leaf umbrella in rain, lowering it while they wave with that hand.
@@ -19,16 +32,6 @@ November 5 round (from `1e622b9`). Done this round, newest last:
 - Photo mode gains a seventh filter, Moonlit (cool, desaturated blue); README updated.
 - Photo toolbar on phones: under 600 px it spans the screen (16 px gutters), so the seven filters wrap in two rows and Pose, Take photo and Done share a row, instead of a thin column covering half the view (checked at 390x844).
 - Fix: the Moonlit filter now uses sepia then a 175° hue turn, giving a true cool blue (plain hue-rotate had turned the greens yellow); checked on the Pages build at 390x844.
-
-Next 3 tasks:
-1. Full verification, Playwright and docs.
-2. Listening and physical-device pass.
-3. Cloud shadows across all ground surfaces.
-
-## Play
-
-- **Online (single-player):** https://dquanbui.github.io/Mythoveya/. `.github/workflows/pages.yml` publishes it on every push to `main` (Pages source: GitHub Actions). Check a deployment with `node scripts/smoke-pages.mjs https://dquanbui.github.io/Mythoveya/`.
-- **Local (full game, including the human arena):** `npm install`, then run `Play Mythoveya.cmd` or `npm run dev` and open http://127.0.0.1:5173/. For the compiled build, run `npm run build && npm start` and open http://127.0.0.1:2567/.
 
 ## Implemented November 4
 
@@ -174,6 +177,14 @@ Next 3 tasks:
   - Indoor music reuses an existing theme, because `tests/signatures.test.ts` pins ten music themes.
 
 ## Verified
+
+November 5 (final code commit `9ad83a0`):
+- typecheck and content audit pass;
+- **46 test files, 215 passed** (new: `puddles.test.ts`; new cases for shake, sniffing and waving back);
+- both builds pass, entry 458 kB (157 kB gzipped); `smoke-production` and local `smoke-pages` pass;
+- graphics context recovery checked by forcing a WebGL context loss and restore on the Pages build (the world came back);
+- Playwright full run (50.9 min): 30 of 33 passed. `atlas.spec` and `canyon.spec` timed out clicking a visible Travel map button and `variants.spec` waited 13 minutes for its shimmer count; all three (four scenarios) passed together on a targeted rerun (4.9 min, variants in 9.4 s). A frame-rate probe on the dev build found about 52 fps whether day, night, clear or rain, so the extra effects are not the cause.
+- Visual checks: gallery shots (umbrellas, ripples), dev-server shots with pinned hour and weather (puddles and umbrellas in rain), and the photo toolbar plus Moonlit filter at 390x844.
 
 November 4 (final code commit `04fa944`):
 - typecheck and content audit pass;
