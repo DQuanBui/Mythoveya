@@ -70,6 +70,13 @@
   border-radius: 3px;
   transition: width 0.35s ease-out;
 }
+.unit-bar .hp .trail {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 3px;
+  background: #fff3d6c0;
+  transition: width 0.6s ease-in 0.45s;
+}
 .unit-bar.side-0 .hp i {
   background: linear-gradient(90deg, #5fc79b, #a5e7b8);
 }

@@ -2067,6 +2067,8 @@ export function BattleScene({
                 >
                   <strong>{byId[u.species].name}</strong>
                   <span className="hp">
+                    {/* A pale trail lingers where health was lost, then drains away. */}
+                    <em className="trail" style={{ width: `${(shownHp / u.maxHp) * 100}%` }} />
                     <i style={{ width: `${(shownHp / u.maxHp) * 100}%` }} />
                     {u.shield > 0 && (
                       <b style={{ width: `${Math.min(100, (u.shield / u.maxHp) * 100)}%` }} />
