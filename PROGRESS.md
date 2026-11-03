@@ -16,11 +16,12 @@ November 3 round (from `933a869`). Done this round, newest last:
 - Hair dyes outside Lanternfair: the pause menu's Change keeper appearance panel has the same eight swatches; the preview shows the dye on the chosen keeper and Save appearance also saves a changed dye. `Avatar` and `Preview` take an optional `hair` colour.
 - Companion joy: a successful gather, Skyglass cache, festival lantern, home gift or catch sets `companionJoy` (`village-materials.ts`) for 2.2 s, and the waiting companion hops in its victory motion (waking it from a nap).
 - Performance: water glints hide and skip their per-frame update when the camera is over 60 m (plus the water's radius) away, leaping fish skip distant lakes, Low quality hangs half the rim fringe, and islets stop updating under Reduced Motion. FPS check (Pages build, Havenreach, 1280x800): Low, Medium and High all at the 60 fps cap.
+- Ultimate charge-up (`ChargeAura` in `HitBurst.tsx`): for the first 40% of every ultimate, an element-coloured ring and turning hex rune open under the caster, a column of light rises and sparks stream up; static under Reduced Motion.
 
 Next 3 tasks:
-1. Night-time in-game check of lantern, fireflies and glints.
-2. Full verification and docs.
-3. Playwright full run.
+1. A dust ring where a defeated creature topples.
+2. Night-time in-game check of lantern, fireflies and glints.
+3. Full verification, Playwright and docs.
 
 ## Play
 

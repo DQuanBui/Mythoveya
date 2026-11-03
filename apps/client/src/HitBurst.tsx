@@ -256,3 +256,69 @@ export function SupportLink({ from, to, at, duration, color }: { from: [number, 
     </group>
   );
 }
+
+/** The moment before an ultimate: a ring of light opens under the caster,
+ * a column rises through it and sparks stream upward, in its element colour. */
+export function ChargeAura({ at, duration, element, height }: { at: number; duration: number; element: string; height: number }) {
+  const parts = useMemo(() => {
+    const color = new T.Color(TINT[element] || "#ffffff"),
+      mat = (o: number, side: T.Side = T.FrontSide) =>
+        new T.MeshBasicMaterial({ color, transparent: true, opacity: o, depthWrite: false, blending: T.AdditiveBlending, side });
+    return {
+      ring: new T.Mesh(new T.RingGeometry(0.7, 0.85, 40).rotateX(-Math.PI / 2), mat(0.9)),
+      rune: new T.Mesh(new T.RingGeometry(0.45, 0.5, 6).rotateX(-Math.PI / 2), mat(0.7)),
+      column: new T.Mesh(new T.CylinderGeometry(0.55, 0.7, 1, 24, 1, true), mat(0.25, T.DoubleSide)),
+      sparks: new T.InstancedMesh(new T.OctahedronGeometry(0.06, 0), mat(1), 12),
+    };
+  }, [element]);
+  useEffect(
+    () => () => {
+      for (const m of Object.values(parts)) {
+        m.geometry.dispose();
+        (m.material as T.Material).dispose();
+      }
+    },
+    [parts],
+  );
+  const group = useRef<T.Group>(null),
+    o = useMemo(() => new T.Object3D(), []);
+  useFrame(() => {
+    const g = group.current;
+    if (!g) return;
+    // The first 40% of the ultimate, before the effect flies.
+    const t = (Date.now() - at) / duration / 0.4;
+    g.visible = t >= 0 && t <= 1;
+    if (!g.visible) return;
+    const calm = settings.reduced,
+      open = Math.min(1, t * 3),
+      fade = t < 0.75 ? 1 : (1 - t) / 0.25;
+    parts.ring.scale.setScalar(calm ? 1 : open);
+    parts.ring.position.y = 0.06;
+    (parts.ring.material as T.MeshBasicMaterial).opacity = 0.9 * fade;
+    parts.rune.rotation.y = calm ? 0 : t * 4;
+    parts.rune.position.y = 0.07;
+    (parts.rune.material as T.MeshBasicMaterial).opacity = 0.7 * fade;
+    const tall = height * 2.6 * (calm ? 1 : open);
+    parts.column.scale.set(1, tall, 1);
+    parts.column.position.y = tall / 2;
+    (parts.column.material as T.MeshBasicMaterial).opacity = 0.22 * fade;
+    parts.sparks.visible = !calm;
+    for (let i = 0; i < 12; i++) {
+      const k = (t * 2.2 + i / 12) % 1,
+        a = i * 2.4 + t * 6;
+      o.position.set(Math.cos(a) * 0.6 * (1 - k * 0.5), k * height * 2.4, Math.sin(a) * 0.6 * (1 - k * 0.5));
+      o.scale.setScalar(Math.sin(k * Math.PI) * fade);
+      o.updateMatrix();
+      parts.sparks.setMatrixAt(i, o.matrix);
+    }
+    parts.sparks.instanceMatrix.needsUpdate = true;
+  });
+  return (
+    <group ref={group} visible={false}>
+      <primitive object={parts.ring} />
+      <primitive object={parts.rune} />
+      <primitive object={parts.column} />
+      <primitive object={parts.sparks} />
+    </group>
+  );
+}

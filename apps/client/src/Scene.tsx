@@ -37,7 +37,7 @@ import { BattleArena } from "./BattleArena";
 import { WeatherEffects } from "./Weather";
 import { HavenTreasure } from "./HavenTreasure";
 import { photo } from "./photo";
-import { Confetti, HitBurst, SupportGlow, SupportLink } from "./HitBurst";
+import { ChargeAura, Confetti, HitBurst, SupportGlow, SupportLink } from "./HitBurst";
 import { skillPath } from "./skill-path";
 import { StatusAura } from "./StatusAura";
 import { RegionMotes } from "./RegionMotes";
@@ -1958,6 +1958,9 @@ export function BattleScene({
                 element={byId[battle.units.find((x) => x.id === event.actor)?.species || u.species].element}
                 height={0.8 * byId[u.species].size}
               />
+            )}
+            {active && event && !preview && event.actor === u.id && event.action.endsWith("-2") && (
+              <ChargeAura key={`c${event.at}`} at={event.at} duration={event.duration} element={byId[u.species].element} height={0.8 * byId[u.species].size} />
             )}
             {!preview && shownHp > 0 && <StatusAura kinds={u.statuses.map((x) => x.kind)} height={0.8 * byId[u.species].size} />}
             {active && event && !preview && (outcome < 0 || shielded) && (
