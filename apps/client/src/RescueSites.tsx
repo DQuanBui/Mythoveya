@@ -17,7 +17,7 @@ import { atlasBlocked } from "../../../packages/shared/atlas";
 import { conservancyBlocked } from "../../../packages/shared/conservancy";
 import { rallyBlocked } from "../../../packages/shared/rally";
 import { Kit, SHAPES } from "./village-kit";
-import { createAvatar, animateAvatar, part } from "./models";
+import { createAvatar, watchKeeper, animateAvatar, part } from "./models";
 import { WorldInteraction } from "./WorldInteraction";
 import { HabitatResident } from "./HavenWildlife";
 import { settings } from "./audio";
@@ -139,7 +139,7 @@ function Site({ profile, onInteract, disabled }: Props) {
   }, [s, index, count, record.outcome, height, x, z]);
   useEffect(() => () => geometry.dispose(), [geometry]);
   const host = useMemo(() => {
-    const m = createAvatar(s.avatar);
+    const m = watchKeeper(createAvatar(s.avatar));
     m.position.set(
       s.point[0] + 0.7,
       height(s.point[0] + 0.7, s.point[1]),

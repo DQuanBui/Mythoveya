@@ -9,7 +9,7 @@ import { groundHeight, havenWalkable } from "../../../packages/shared/haven";
 import { meadowHeight, meadowWalkable } from "../../../packages/shared/meadow";
 import { canyonHeight, canyonWalkable } from "../../../packages/shared/canyon";
 import { hollowHeight, hollowWalkable } from "../../../packages/shared/hollow";
-import { createAvatar, animateAvatar, part } from "./models";
+import { createAvatar, watchKeeper, animateAvatar, part } from "./models";
 import { Kit, SHAPES } from "./village-kit";
 import { WorldInteraction } from "./WorldInteraction";
 import { HabitatResident } from "./HavenWildlife";
@@ -34,7 +34,7 @@ function Camp({
 }) {
   const [ground, walk] = rules[h.region];
   const host = useMemo(() => {
-    const m = createAvatar(h.avatar);
+    const m = watchKeeper(createAvatar(h.avatar));
     m.position.set(
       h.point[0] + 1.3,
       ground(h.point[0] + 1.3, h.point[1]),

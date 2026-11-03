@@ -4,6 +4,7 @@ import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeom
 import { AVATARS, byId } from "../../../packages/shared/content";
 import { dnaOf } from "./creature-dna";
 import { glyphSprite } from "./glyphs";
+import { worldFocus } from "./village-materials";
 
 // Low graphics quality keeps the lighter geometry and plain materials.
 // (Read directly: this module also runs in Node tests, without audio.ts.)
@@ -1522,6 +1523,12 @@ function hair(head: T.Group, index: number, color: string) {
   part(head, "arc", tint(color, "#ffffff", 0.28), [0, 0.11, 0.035], [0.17, 0.13, 0.17], [-1.05, 0, 0], false, true);
 }
 export type Emote = "" | "wave" | "cheer" | "dance" | "sit";
+const seen = { at: new T.Vector3(), turn: new T.Quaternion(), yaw: new T.Euler() };
+/** Marks a villager or host whose head follows a keeper who comes near. */
+export function watchKeeper<M extends T.Object3D>(model: M) {
+  model.userData.watch = true;
+  return model;
+}
 export function animateAvatar(
   g: T.Group,
   t: number,
@@ -1562,6 +1569,19 @@ export function animateAvatar(
     head.rotation.y = walk || reduced ? 0 : Math.sin(t * 0.7 + g.userData.index) * 0.18;
     head.rotation.x = walk ? 0.05 : e === "cheer" ? -0.25 : Math.sin(t * 0.9 + g.userData.index) * 0.04;
     head.rotation.z = e === "dance" ? Math.sin(t * 3) * 0.15 * calm : 0;
+    // Villagers and hosts who watch the keeper turn their heads to follow them.
+    if (g.userData.watch && !walk && !reduced) {
+      g.getWorldPosition(seen.at);
+      g.getWorldQuaternion(seen.turn);
+      seen.yaw.setFromQuaternion(seen.turn, "YXZ");
+      const dx = worldFocus.x - seen.at.x,
+        dz = worldFocus.z - seen.at.z,
+        off = Math.atan2(Math.sin(Math.atan2(dx, dz) - seen.yaw.y), Math.cos(Math.atan2(dx, dz) - seen.yaw.y)),
+        near = Math.hypot(dx, dz) < 4.5 && Math.abs(off) < 2.2,
+        look = (g.userData.look ??= 0) + ((near ? Math.max(-1, Math.min(1, off)) : 0) - g.userData.look) * 0.08;
+      g.userData.look = look;
+      head.rotation.y = near || Math.abs(look) > 0.02 ? look : head.rotation.y;
+    }
   }
   // Standing idle, each keeper falls into a habit of their own every so often.
   const cyc = (t + g.userData.index * 2.3) % 9,

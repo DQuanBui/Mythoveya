@@ -7,11 +7,12 @@ Updated November 3, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch
 November 4 round (from `d37297c`). Done this round, newest last:
 - Refactor: the hair dye swatch row is one `HairDyePicker` component used by the Lanternfair wardrobe and the keeper appearance panel.
 - Accessibility: the hair dye radiogroup uses roving focus (only the chosen swatch is in the tab order; arrows, Home and End move focus; Enter or Space picks, since each pick may save). `islands.spec` checks it.
+- Villagers watch the keeper: `watchKeeper(model)` marks an NPC whose head eases toward the keeper within 4.5 m (and back afterwards). Used for the village friends, strolling townsfolk, home and lodge hosts, and the Atlas, Conservancy, Rally, Rescue and region rangers. Tested in `creature-look.test.ts`.
 
 Next 3 tasks:
-1. Village hosts turn their heads toward a nearby keeper.
-2. Companion looks up at the keeper when it waits beside them.
-3. Grass and tree crowns sway in the wind.
+1. Companion looks up at the keeper when it waits beside them.
+2. Grass and tree crowns sway in the wind.
+3. Drifting cloud shadows over Havenreach.
 
 ## Play
 

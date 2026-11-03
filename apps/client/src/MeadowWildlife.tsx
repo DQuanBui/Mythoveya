@@ -7,7 +7,7 @@ import {
   meadowWalkable,
 } from "../../../packages/shared/meadow";
 import { HabitatResident } from "./HavenWildlife";
-import { animateAvatar, createAvatar } from "./models";
+import { animateAvatar, createAvatar, watchKeeper } from "./models";
 import { WorldInteraction } from "./WorldInteraction";
 import { settings } from "./audio";
 export function MeadowWildlife({
@@ -18,7 +18,7 @@ export function MeadowWildlife({
   disabled: boolean;
 }) {
   const rowan = useMemo(() => {
-    const m = createAvatar(3);
+    const m = watchKeeper(createAvatar(3));
     m.position.set(20.5, meadowHeight(20.5, 12), 12);
     m.userData.groundY = m.position.y;
     m.rotation.y = -Math.PI / 3;

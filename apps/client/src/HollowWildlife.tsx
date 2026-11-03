@@ -7,7 +7,7 @@ import {
   hollowWalkable,
 } from "../../../packages/shared/hollow";
 import { HabitatResident } from "./HavenWildlife";
-import { animateAvatar, createAvatar } from "./models";
+import { animateAvatar, createAvatar, watchKeeper } from "./models";
 import { WorldInteraction } from "./WorldInteraction";
 import { settings } from "./audio";
 export function HollowWildlife({
@@ -18,7 +18,7 @@ export function HollowWildlife({
   disabled: boolean;
 }) {
   const mira = useMemo(() => {
-    const m = createAvatar(4);
+    const m = watchKeeper(createAvatar(4));
     m.position.set(20.5, hollowHeight(20.5, 12), 12);
     m.userData.groundY = m.position.y;
     m.rotation.y = -Math.PI / 3;

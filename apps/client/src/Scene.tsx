@@ -92,6 +92,7 @@ import type { Battle, Profile } from "../../../packages/shared/types";
 import {
   animateAvatar,
   animateCreature,
+  watchKeeper,
   createAvatar,
   createCreature,
   type Motion,
@@ -169,6 +170,7 @@ export function Avatar({
   gesture = false,
   position = [0, 0, 0],
   hair,
+  watch = false,
 }: {
   index?: number;
   walk?: boolean;
@@ -176,8 +178,14 @@ export function Avatar({
   position?: [number, number, number];
   /** A dye colour for the keeper's hair. */
   hair?: string;
+  /** Turn the head toward a nearby keeper (villagers). */
+  watch?: boolean;
 }) {
-  const model = useMemo(() => createAvatar(index, hair), [index, hair]);
+  const model = useMemo(() => {
+    const m = createAvatar(index, hair);
+    if (watch) watchKeeper(m);
+    return m;
+  }, [index, hair, watch]);
   useFrame(({ clock }) =>
     animateAvatar(model, clock.elapsedTime, walk, gesture, settings.reduced),
   );
@@ -1364,7 +1372,7 @@ export function WorldScene({
           hint={`${n.role} · Click to talk`}
           activate={() => onInteract(n.location)}
         >
-          <Avatar index={n.avatar} position={n.position} />
+          <Avatar index={n.avatar} position={n.position} watch />
         </WorldInteraction>
       ))}
       <Roamer

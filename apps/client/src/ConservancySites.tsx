@@ -15,7 +15,7 @@ import { meadowHeight, meadowWalkable } from "../../../packages/shared/meadow";
 import { canyonHeight, canyonWalkable } from "../../../packages/shared/canyon";
 import { hollowHeight, hollowWalkable } from "../../../packages/shared/hollow";
 import { Kit, SHAPES } from "./village-kit";
-import { createAvatar, animateAvatar, part } from "./models";
+import { createAvatar, watchKeeper, animateAvatar, part } from "./models";
 import { WorldInteraction } from "./WorldInteraction";
 import { HabitatResident } from "./HavenWildlife";
 import { settings } from "./audio";
@@ -110,7 +110,7 @@ function Site({
   }, [h, installed, finished]);
   useEffect(() => () => geometry.dispose(), [geometry]);
   const host = useMemo(() => {
-    const m = createAvatar(h.avatar);
+    const m = watchKeeper(createAvatar(h.avatar));
     m.position.set(
       h.point[0] + 1.1,
       ground(h.point[0] + 1.1, h.point[1]),

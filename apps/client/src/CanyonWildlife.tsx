@@ -6,7 +6,7 @@ import {
   canyonWalkable,
 } from "../../../packages/shared/canyon";
 import { HabitatResident } from "./HavenWildlife";
-import { animateAvatar, createAvatar } from "./models";
+import { animateAvatar, createAvatar, watchKeeper } from "./models";
 import { WorldInteraction } from "./WorldInteraction";
 import { settings } from "./audio";
 const sentinel = {
@@ -22,7 +22,7 @@ export function CanyonWildlife({
   disabled: boolean;
 }) {
   const ranger = useMemo(() => {
-    const model = createAvatar(6);
+    const model = watchKeeper(createAvatar(6));
     model.position.set(-25.5, canyonHeight(-25.5, 25.5), 25.5);
     model.userData.groundY = model.position.y;
     model.rotation.y = Math.PI;

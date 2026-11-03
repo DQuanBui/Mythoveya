@@ -15,7 +15,7 @@ import {
 } from "../../../packages/shared/homes";
 import { Explorer, type WalkArea } from "./Scene";
 import { WalkContext, type Walker } from "./hover";
-import { createAvatar, animateAvatar, createCreature, animateCreature } from "./models";
+import { createAvatar, watchKeeper, animateAvatar, createCreature, animateCreature } from "./models";
 import { ModelLighting } from "./ModelLighting";
 import { WorldInteraction } from "./WorldInteraction";
 import { TouchPad } from "./WorldHUD";
@@ -179,7 +179,7 @@ function Home({
     geo.glow.dispose();
   }, [geo]);
   const host = useMemo(() => {
-    const m = createAvatar(h.avatar);
+    const m = watchKeeper(createAvatar(h.avatar));
     m.position.set(-1.1, 0, -3.15);
     m.userData.groundY = 0;
     return m;

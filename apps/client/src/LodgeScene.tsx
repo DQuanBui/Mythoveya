@@ -16,7 +16,7 @@ import { FIELD_ABILITIES, fieldAbility } from "../../../packages/shared/rescue";
 import { Explorer, type WalkArea } from "./Scene";
 import { WalkContext, type Walker } from "./hover";
 import {
-  createAvatar,
+  createAvatar, watchKeeper,
   animateAvatar,
   createCreature,
   animateCreature,
@@ -58,7 +58,7 @@ function Room({
   );
   useEffect(() => () => geometry.dispose(), [geometry]);
   const host = useMemo(() => {
-    const m = createAvatar(site.avatar);
+    const m = watchKeeper(createAvatar(site.avatar));
     m.position.set(layout.host[0], 0, layout.host[1]);
     m.userData.groundY = 0;
     part(m, "box", site.color, [0, 1.19, 0.2], [0.4, 0.14, 0.08]);

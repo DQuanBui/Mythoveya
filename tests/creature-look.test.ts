@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { Mesh, MeshBasicMaterial, MeshStandardMaterial, Object3D } from "three";
 import { ALL_SPECIES } from "../packages/shared/content";
-import { animateAvatar, animateCreature, createAvatar, createCreature } from "../apps/client/src/models";
+import { animateAvatar, animateCreature, createAvatar, createCreature, watchKeeper } from "../apps/client/src/models";
+import { worldFocus } from "../apps/client/src/village-materials";
 
 const meshes = (o: Object3D) => {
   const out: Mesh[] = [];
@@ -119,5 +120,23 @@ describe("keeper habits", () => {
     expect(leftArm.rotation.x).toBeGreaterThan(-0.1);
     animateAvatar(dax, at, true);
     expect(Math.abs(leftArm.rotation.z)).toBe(0);
+  });
+});
+
+describe("villagers who watch the keeper", () => {
+  it("turn their heads toward a keeper close by, and only when marked", () => {
+    worldFocus.set(3, 0, 0.2);
+    const host = watchKeeper(createAvatar(2)),
+      other = createAvatar(2);
+    for (let i = 0; i < 80; i++) {
+      animateAvatar(host, i / 30);
+      animateAvatar(other, i / 30);
+    }
+    expect(host.userData.head.rotation.y).toBeGreaterThan(0.9);
+    expect(Math.abs(other.userData.head.rotation.y)).toBeLessThan(0.2);
+    worldFocus.set(30, 0, 0);
+    for (let i = 0; i < 80; i++) animateAvatar(host, i / 30);
+    expect(Math.abs(host.userData.head.rotation.y)).toBeLessThan(0.2);
+    worldFocus.set(0, 0, 5);
   });
 });

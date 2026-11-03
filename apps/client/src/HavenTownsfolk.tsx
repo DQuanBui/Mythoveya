@@ -8,7 +8,7 @@ import {
   type Point,
 } from "../../../packages/shared/haven";
 import { buildGrid, findPath, type WalkGrid } from "../../../packages/shared/pathfind";
-import { animateAvatar, createAvatar } from "./models";
+import { animateAvatar, createAvatar, watchKeeper } from "./models";
 import { WorldInteraction } from "./WorldInteraction";
 import { daylight, islandHour } from "./daytime";
 import { settings } from "./audio";
@@ -102,7 +102,7 @@ function Villager({
   disabled: boolean;
 }) {
   const folk = TOWNSFOLK[index];
-  const model = useMemo(() => createAvatar(folk.avatar), [folk.avatar]);
+  const model = useMemo(() => watchKeeper(createAvatar(folk.avatar)), [folk.avatar]);
   const home = useMemo(() => door(folk.home), [folk.home]);
   const state = useRef({
     pos: new T.Vector3(),
