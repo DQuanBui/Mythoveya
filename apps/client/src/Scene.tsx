@@ -795,6 +795,8 @@ export function Explorer({
   const breath = useRef(0);
   const paw = useRef(0);
   const sparkle = useRef(0);
+  const shook = useRef(-9);
+  const wasFollowing = useRef(false);
   const follow = useRef(new T.Vector3(spawn[0] - 1, 0, spawn[1] + 1.5)),
     rest = useRef(0);
   const route = useRef<Route | null>(null),
@@ -1113,6 +1115,18 @@ export function Explorer({
       player.current.x - follow.current.x,
       player.current.z - follow.current.z,
     );
+    // Stopping after a walk in the rain, the companion shakes itself dry.
+    if (wasFollowing.current && !following && weatherFx.rain > 0.35 && !area) {
+      shook.current = clock.elapsedTime;
+      const [hy] = companion.userData.headAt,
+        size = companion.scale.x;
+      for (let i = 0; i < 8; i++) {
+        const a = (i / 8) * Math.PI * 2;
+        emitPuff(follow.current.x, follow.current.y + hy * size * 0.6, follow.current.z, Math.cos(a), Math.sin(a), clock.elapsedTime + 0.1 + i * 0.04, "drop");
+      }
+    }
+    wasFollowing.current = following;
+    const shaking = clock.elapsedTime - shook.current < 0.9;
     // Waiting at the keeper's side, the companion looks up at them.
     companion.userData.gaze = !following && !moving && delta.length() < 2.4 ? COMPANION_GAZE : null;
     // Left waiting long enough, the companion curls up for a nap.
@@ -1122,8 +1136,8 @@ export function Explorer({
       clock.elapsedTime,
       // The companion joins in: it hops at a wave, plays along with a cheer or
       // dance, and settles down low when the keeper sits (later dozing off).
-      pet || keeperEmote.name === "wave" || (!following && Date.now() < companionJoy.until) ? "victory" : following ? "walk" : keeperEmote.name === "cheer" || keeperEmote.name === "dance" ? "play" : keeperEmote.name === "sit" && rest.current < 14 ? "guard" : rest.current > 14 ? "sleep" : "idle",
-      0,
+      shaking && !following ? "shake" : pet || keeperEmote.name === "wave" || (!following && Date.now() < companionJoy.until) ? "victory" : following ? "walk" : keeperEmote.name === "cheer" || keeperEmote.name === "dance" ? "play" : keeperEmote.name === "sit" && rest.current < 14 ? "guard" : rest.current > 14 ? "sleep" : "idle",
+      shaking ? (clock.elapsedTime - shook.current) / 0.9 : 0,
       settings.reduced,
     );
     if (controls.current)

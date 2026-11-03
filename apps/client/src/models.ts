@@ -1172,7 +1172,8 @@ export type Motion =
   | "stunned"
   | "sleep"
   | "play"
-  | "weary";
+  | "weary"
+  | "shake";
 export function animateCreature(
   g: T.Group,
   time: number,
@@ -1381,6 +1382,15 @@ export function animateCreature(
     limbs.forEach((l: T.Group) => (l.rotation.x = 0));
     tails.forEach((t: T.Group) => (t.rotation.y = 0.5));
     wings.forEach((w: T.Group, i: number) => (w.rotation.z = ((i % 2) * 2 - 1) * -0.1));
+  }
+  if (state === "shake") {
+    // A fast, fading shake from head to tail, eyes squeezed shut.
+    const p = Math.min(1, Math.max(0, phase)),
+      fade = (1 - p) * motion;
+    rig.rotation.z = Math.sin(p * Math.PI * 12) * 0.3 * fade;
+    rig.rotation.y = Math.sin(p * Math.PI * 12 + 1.2) * 0.14 * fade;
+    rig.scale.x = 1 + Math.abs(Math.sin(p * Math.PI * 12)) * 0.06 * fade;
+    if (p < 0.8) eyes?.forEach((eye: T.Group) => (eye.scale.y = 0.15));
   }
   if (state === "weary") {
     // Badly hurt: heavy, quick breaths, a low droop and heavy-lidded eyes.

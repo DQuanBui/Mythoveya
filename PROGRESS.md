@@ -8,11 +8,12 @@ November 5 round (from `1e622b9`). Done this round, newest last:
 - Graphics context recovery (`context-recovery.ts`): the world, battle, lodge, home, home island and festival canvases mark a lost WebGL context as recoverable, log a warning, and rebuild the Canvas when the browser restores it. Verified by forcing a loss and restore with `WEBGL_lose_context` on the Pages build (the world came back). This may be what blanked the lodge room in full Playwright runs; the warning will show in future traces.
 - Leaf umbrella: `createUmbrella` (models.ts) is a broad leaf on a stem held upright in the left hand; the keeper raises it outdoors when rain passes 0.35 (not in snow, not during emotes).
 - Townsfolk umbrellas: strolling islanders hold up the same leaf umbrella in rain, lowering it while they wave with that hand.
+- Shake dry: a new `shake` motion (fast, fading roll with squeezed eyes); when the companion stops after following the keeper in rain it shakes for 0.9 s and flings eight droplets (`drop` puff kind). Listed in the asset gallery; tested.
 
 Next 3 tasks:
-1. Companion shakes off the rain when it stops.
-2. Puddles on flat ground in rain.
-3. Raindrop ripples on ponds and lakes.
+1. Puddles on flat ground in rain.
+2. Raindrop ripples on ponds and lakes.
+3. Villagers wave back when the keeper waves.
 
 ## Play
 

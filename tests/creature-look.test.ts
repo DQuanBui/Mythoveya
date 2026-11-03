@@ -113,6 +113,13 @@ it("wags a celebrating creature's tail hard, but not under Reduced Motion", () =
   expect(swing("victory", true)).toBeLessThan(0.2);
 });
 
+it("shakes a wet creature hard at first and settles by the end", () => {
+  const model = createCreature("emberfox"),
+    roll = (phase: number) => (animateCreature(model, 1, "shake", phase), Math.abs(model.userData.rig.rotation.z));
+  expect(Math.max(roll(0.04), roll(0.12))).toBeGreaterThan(0.15);
+  expect(roll(1)).toBeLessThan(0.01);
+});
+
 it("puffs Z's only while a creature sleeps", () => {
   const model = createCreature("mossprig");
   animateCreature(model, 2, "sleep");
