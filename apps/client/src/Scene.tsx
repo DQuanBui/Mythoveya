@@ -1696,12 +1696,16 @@ function BattleCamera({
           ? Math.min(78, (2 * Math.atan(Math.tan((base * Math.PI) / 360) * 0.62 / aspect) * 180) / Math.PI)
           : base;
     cam.fov = Math.max(base, fit) - amount;
+    // A knock-out lands with a short jolt as the creature topples.
+    const knockout = !preview && !!e && p > 0.78 && p < 0.9 && e.amounts.some((a) => a.amount > 0 && battle.units.find((u) => u.id === a.id)?.hp === 0);
     cam.setViewOffset(
       size.width,
       size.height,
       settings.shake && !settings.reduced && p > 0.43 && p < 0.57
         ? Math.sin(p * 100) * 2
-        : 0,
+        : settings.shake && !settings.reduced && knockout
+          ? Math.sin(p * 160) * 3 * (0.9 - p) * 8
+          : 0,
       0,
       size.width,
       size.height,

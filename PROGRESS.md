@@ -12,11 +12,12 @@ November 4 round (from `d37297c`). Done this round, newest last:
 - Wind: Havenreach's instanced grass, tree crowns and pines sway in the vertex shader (`swaying` in `HavenNature.tsx`, shared `wind` uniforms), a little harder in rain; still under Reduced Motion. Checked for shader errors on the Pages build.
 - Element debris on impact (`DEBRIS` in `HitBurst.tsx`): flame tongues rise, tide droplets fall, grove leaves flutter, stone chips drop hard, frost shards, storm bolts and light needles point along their flight, shadow wisps drift up. (Tried cloud shadows painted in the ground shader; reverted because the plaza, trails and place discs are separate meshes and would show seams.)
 - Turn ring: the next creature to act has its ring gently pulse (with the battle's 50 ms refresh); still under Reduced Motion and once the battle is won.
+- Knock-out jolt: when an event knocks a creature out, the battle camera gives a short, decaying ~3 px jolt as it topples (only with the camera shake setting on and Reduced Motion off).
 
 Next 3 tasks:
-1. A camera jolt when a blow knocks a creature out.
-2. Shimmering companions trail sparkles while walking.
-3. Villagers carry lanterns at night.
+1. Shimmering companions trail sparkles while walking.
+2. Villagers carry lanterns at night.
+3. Full verification, Playwright and docs.
 
 ## Play
 
