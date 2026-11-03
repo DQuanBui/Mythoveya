@@ -14,10 +14,11 @@ November 6 round (from `040b6f1`). Done this round, newest last:
 - Fireflies shelter from rain: their glow fades out as rain builds (gone at about 70% rain) and returns when it clears.
 - Perf: puddle spots store their ground height once, so filling puddles no longer looks up 40 terrain heights every frame.
 - Cheer along: villagers, hosts and rangers within 8 m now cheer (both arms up, little hops) while the keeper's cheer emote plays, as well as waving back. Tested.
+- Accessibility: each battle creature's button label now reads its shield and lasting statuses in plain words, e.g. "Mossprig 20 of 61, shield 12, stunned for 1 round" (`battle-labels.ts`, tested).
 
 Next 3 tasks:
 1. Villagers stop to chat in pairs.
-2. Health bar labels name lasting statuses for screen readers.
+2. Companion splashes through puddles.
 3. Full verification, Playwright and docs.
 
 ## Play

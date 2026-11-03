@@ -114,6 +114,7 @@ import type { MutableRefObject } from "react";
 import { useContextRecovery } from "./context-recovery";
 import { frameMonitor } from "./adaptive";
 import { inPuddle } from "./puddle-spots";
+import { unitLabel } from "./battle-labels";
 // Festival lanterns load only while a festival runs.
 const SeasonalLanterns = lazy(() => import("./SeasonalLanterns").then((m) => ({ default: m.SeasonalLanterns })));
 function RenderStats() {
@@ -2070,7 +2071,7 @@ export function BattleScene({
                 <button
                   className={`unit-bar side-${u.side} ${target === u.id ? "selected" : ""} ${battle.queue[0] === u.id ? "acting" : ""} ${shownHp === 0 ? "down" : shownHp < u.maxHp * 0.25 ? "low" : ""}`}
                   onClick={() => onTarget(u.id)}
-                  aria-label={`${byId[u.species].name} ${shownHp} of ${u.maxHp}`}
+                  aria-label={unitLabel(byId[u.species].name, shownHp, u.maxHp, u.shield, u.statuses)}
                 >
                   <strong>{byId[u.species].name}</strong>
                   <span className="hp">
