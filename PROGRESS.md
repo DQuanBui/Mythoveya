@@ -14,11 +14,12 @@ November 3 round (from `933a869`). Done this round, newest last:
 - Fish leap in Reedwater Lake: the pond's leaping fish is now a reusable `LeapingFish` (exported from `HavenWater.tsx`, with an optional `nudge` that keeps the pond's leaps off the bridge); a silver-blue fish leaps in the lake every ~6 s.
 - Festival ghosts wear hair dyes: `fest-run` stores an optional `hair` in the run data beside avatar and outfit (absent when natural, so older runs render as before); the race, course and fishing keepers use `hairColor`. Tested in `festival-games.test.ts`.
 - Hair dyes outside Lanternfair: the pause menu's Change keeper appearance panel has the same eight swatches; the preview shows the dye on the chosen keeper and Save appearance also saves a changed dye. `Avatar` and `Preview` take an optional `hair` colour.
+- Companion joy: a successful gather, Skyglass cache, festival lantern, home gift or catch sets `companionJoy` (`village-materials.ts`) for 2.2 s, and the waiting companion hops in its victory motion (waking it from a nap).
 
 Next 3 tasks:
 1. Night-time in-game check of lantern, fireflies and glints.
-2. Companion reacts when the keeper fishes or opens a cache.
-3. Performance pass on Low quality (fringe islets, motes, status auras).
+2. Performance pass on Low quality (fringe islets, motes, status auras).
+3. Full verification and docs.
 
 ## Play
 

@@ -52,7 +52,7 @@ import { HavenTownsfolk } from "./HavenTownsfolk";
 import { HavenShops } from "./HavenShops";
 import { DayNight, SkyLife } from "./Atmosphere";
 import { WalkContext, type Walker } from "./hover";
-import { worldFocus, worldHeading, keeperEmote, EMOTES, playEmote, nightState } from "./village-materials";
+import { worldFocus, worldHeading, keeperEmote, EMOTES, playEmote, nightState, companionJoy } from "./village-materials";
 import { buildGrid, findPath, type WalkGrid } from "../../../packages/shared/pathfind";
 import { lazy, Suspense, useMemo, useRef, useEffect, useState, useCallback } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
@@ -1110,13 +1110,13 @@ export function Explorer({
       player.current.z - follow.current.z,
     );
     // Left waiting long enough, the companion curls up for a nap.
-    rest.current = following || moving || pet || (keeperEmote.name && keeperEmote.name !== "sit") ? 0 : rest.current + dt;
+    rest.current = following || moving || pet || Date.now() < companionJoy.until || (keeperEmote.name && keeperEmote.name !== "sit") ? 0 : rest.current + dt;
     animateCreature(
       companion,
       clock.elapsedTime,
       // The companion joins in: it hops at a wave, plays along with a cheer or
       // dance, and settles down low when the keeper sits (later dozing off).
-      pet || keeperEmote.name === "wave" ? "victory" : following ? "walk" : keeperEmote.name === "cheer" || keeperEmote.name === "dance" ? "play" : keeperEmote.name === "sit" && rest.current < 14 ? "guard" : rest.current > 14 ? "sleep" : "idle",
+      pet || keeperEmote.name === "wave" || (!following && Date.now() < companionJoy.until) ? "victory" : following ? "walk" : keeperEmote.name === "cheer" || keeperEmote.name === "dance" ? "play" : keeperEmote.name === "sit" && rest.current < 14 ? "guard" : rest.current > 14 ? "sleep" : "idle",
       0,
       settings.reduced,
     );

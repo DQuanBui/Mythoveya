@@ -40,6 +40,7 @@ import {
   homeRadius,
   islandArrival,
 } from "../../../packages/shared/islands";
+import { companionJoy } from "./village-materials";
 // Panels and region maps load when first opened.
 const LodgePanel = lazy(() => import("./LodgePanel").then((m) => ({ default: m.LodgePanel })));
 const RescuePanel = lazy(() => import("./RescuePanel").then((m) => ({ default: m.RescuePanel })));
@@ -250,6 +251,8 @@ export default function App() {
         );
       }
       audio.cue("confirm");
+      // Finds and gifts make the following companion hop with joy.
+      if (["resource", "town-cache", "season-find", "town-gift", "town-fish"].includes(kind)) companionJoy.until = Date.now() + 2200;
       if (kind === "resource") notify("Gathered +1 Sunseed · +25 Gold");
       if (
         (kind.startsWith("lodge-") || kind.startsWith("rescue-") || kind.startsWith("atlas-") || kind.startsWith("cons-") || kind.startsWith("rally-") || kind.startsWith("mea-") || kind.startsWith("hol-") || kind.startsWith("can-") || kind.startsWith("exp-") || kind.startsWith("town-") || kind.startsWith("home-") || kind.startsWith("island-") || kind.startsWith("season-") || kind.startsWith("look-")) &&
