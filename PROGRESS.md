@@ -1,10 +1,23 @@
 # Mythoveya handoff
 
-Updated November 5, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`, pushed to `origin/main` (https://github.com/DQuanBui/Mythoveya). This handoff covers eight rounds: October 29 (from `4619fdc`), October 30 (from `b0d6c3d`), October 31 (from `3497bb3`), November 1 (from `3d8496d`) November 2 (from `9d221ef`), November 3 (from `933a869`), November 4 (from `d37297c`) and November 5 (from `1e622b9`). Earlier handoffs (October 28 online-build session, October 22 Wayfarer Lodges) are archived in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md). Preserve ignored `data/mythoveya.sqlite`. `CLAUDE.md` is the quick project map for new sessions.
+Updated November 6, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`, pushed to `origin/main` (https://github.com/DQuanBui/Mythoveya). This handoff covers nine rounds: October 29 (from `4619fdc`), October 30 (from `b0d6c3d`), October 31 (from `3497bb3`), November 1 (from `3d8496d`) November 2 (from `9d221ef`), November 3 (from `933a869`), November 4 (from `d37297c`), November 5 (from `1e622b9`) and November 6 (from `040b6f1`). Earlier handoffs (October 28 online-build session, October 22 Wayfarer Lodges) are archived in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md). Preserve ignored `data/mythoveya.sqlite`. `CLAUDE.md` is the quick project map for new sessions.
 
 ## Next up
 
-November 6 round (from `040b6f1`). Done this round, newest last:
+November 6 round is complete: 16 commits from `040b6f1` plus this record, all pushed. The full Playwright run passed all 33 journeys in one go (29.2 min) for the first time in five rounds, after video recording was turned off.
+
+Next 3 tasks:
+1. Listening pass and a physical phone/tablet check of the effects from the last six rounds, including whether adaptive effects ever switch on.
+2. Cloud shadows done properly: shade the ground, trails, plaza and place discs together.
+3. Keep an eye on full-suite stability over the next runs now that video is off; if journeys start dropping again, look for graphics-context warnings in the traces.
+
+## Play
+
+- **Online (single-player):** https://dquanbui.github.io/Mythoveya/. `.github/workflows/pages.yml` publishes it on every push to `main` (Pages source: GitHub Actions). Check a deployment with `node scripts/smoke-pages.mjs https://dquanbui.github.io/Mythoveya/`.
+- **Local (full game, including the human arena):** `npm install`, then run `Play Mythoveya.cmd` or `npm run dev` and open http://127.0.0.1:5173/. For the compiled build, run `npm run build && npm start` and open http://127.0.0.1:2567/.
+
+## Implemented November 6
+
 - Test environment: Playwright no longer records video (first tried `retain-on-failure`, which still encodes every journey); failure traces with step snapshots and failure screenshots remain.
 - Adaptive effects (`adaptive.ts`): a frame-time monitor in the world scene sets `perf.lite` after 6 s below ~30 fps (and clears it after 20 s above ~50 fps); region motes, water glints and ripples, puddles, puffs and islet drift pause meanwhile. Gameplay feedback is untouched and no toast is shown. Tested in `tests/adaptive.test.ts`.
 - Health trail: battle health bars keep a pale trail where health was lost, which drains away 0.45 s later (a CSS width transition; instant under Reduced Motion).
@@ -20,16 +33,6 @@ November 6 round (from `040b6f1`). Done this round, newest last:
 - Islander chats: strolling islanders who stop within 2.6 m of another standing islander turn to face them and talk with their hands, nodding along (`userData.chatting` in `animateAvatar`, which skips the idle habit meanwhile). Tested.
 - Super-effective hits: when the attacker's element beats the target's (`elementMultiplier` above 1), the impact flash, ring and debris burst about 45% bigger and wider.
 - Perf: `elementMultiplier` moved to `packages/shared/elements.ts` (still re-exported by `combat.ts`), so the battle scene's super-effective check no longer pulls the whole battle engine into the entry chunk (471 back to 461 kB).
-
-Next 3 tasks:
-1. Full verification, Playwright and docs.
-2. Listening and physical-device pass.
-3. Cloud shadows across all ground surfaces.
-
-## Play
-
-- **Online (single-player):** https://dquanbui.github.io/Mythoveya/. `.github/workflows/pages.yml` publishes it on every push to `main` (Pages source: GitHub Actions). Check a deployment with `node scripts/smoke-pages.mjs https://dquanbui.github.io/Mythoveya/`.
-- **Local (full game, including the human arena):** `npm install`, then run `Play Mythoveya.cmd` or `npm run dev` and open http://127.0.0.1:5173/. For the compiled build, run `npm run build && npm start` and open http://127.0.0.1:2567/.
 
 ## Implemented November 5
 
@@ -192,6 +195,13 @@ Next 3 tasks:
   - Indoor music reuses an existing theme, because `tests/signatures.test.ts` pins ten music themes.
 
 ## Verified
+
+November 6 (final code commit `6b0aaf7`):
+- typecheck and content audit pass;
+- **48 test files, 223 passed** (new: `adaptive.test.ts`, `battle-labels.test.ts`; new cases for puddle splashes, stretching, cheering along and chatting);
+- both builds pass, entry 461 kB (159 kB gzipped; a stray import briefly made it 471 kB and was fixed); `smoke-production` and local `smoke-pages` pass;
+- **Playwright: all 33 journeys passed in one full run (29.2 min)**, down from 50.9 min with three failures in the previous round. The only test-environment change is that video recording is off.
+- Visual checks: Pages-build world loads with no console errors after the carried-items refactor and the islander chats; a mid-battle screenshot after the health trail.
 
 November 5 (final code commit `9ad83a0`):
 - typecheck and content audit pass;
