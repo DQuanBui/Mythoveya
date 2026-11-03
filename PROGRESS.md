@@ -14,11 +14,12 @@ November 5 round (from `1e622b9`). Done this round, newest last:
 - Wave back: villagers, hosts and rangers marked with `watchKeeper` wave back while the keeper's wave emote plays within 8 m. Tested.
 - Sniffing: a fourth idle quirk where a creature lowers its nose, sniffs along the ground with a little bob and looks down (the quirk cycle is now four kinds). Tested.
 - Snow sparkle: `WaterGlints` takes a `color` and a `follow` ground function; in Moonfrost, 36 white-blue sparkles wink on the snow within 9 m of the keeper, sitting on the slopes (fewer and silver at night).
+- Facing the target: during its action a battle creature turns toward the unit it targets (eased in and out over the event, the short way round), so diagonal strikes and lunges head for their target. `turnToward` in `Scene.tsx`.
 
 Next 3 tasks:
-1. Battle: attackers turn toward their target.
-2. Battle: winners turn to face the camera.
-3. A golden-hour photo filter.
+1. Battle: winners turn to face the camera.
+2. A golden-hour photo filter.
+3. Full verification, Playwright and docs.
 
 ## Play
 

@@ -1651,6 +1651,11 @@ export function Preview({
     </Canvas>
   );
 }
+/** A yaw `k` of the way from `base` toward facing `to` from `from`, turning the short way. */
+function turnToward(from: number[], to: number[], base: number, k: number) {
+  const yaw = Math.atan2(to[0] - from[0], to[2] - from[2]);
+  return base + Math.atan2(Math.sin(yaw - base), Math.cos(yaw - base)) * k;
+}
 export function unitPosition(
   side: number,
   slot: number,
@@ -1949,6 +1954,10 @@ export function BattleScene({
           active && elapsed < 0.45
             ? Math.max(0, Math.min(u.maxHp, u.hp + outcome))
             : u.hp;
+        // An attacker turns to face its target through the strike.
+        const base = u.side === 0 ? Math.PI : 0,
+          aim = !preview && active && event?.actor === u.id && event.target !== u.id ? battle.units.find((x) => x.id === event.target) : undefined,
+          facing = aim ? turnToward(p, unitPosition(aim.side, aim.slot), base, Math.sin(Math.min(1, elapsed) * Math.PI)) : base;
         const arrive = (Date.now() - opened - (u.side * 3 + (u.slot % 3)) * 110 - Math.floor(u.slot / 3) * 60) / 650;
         const state: Motion =
           !preview && !active && arrive < 1 && shownHp > 0
@@ -1977,7 +1986,7 @@ export function BattleScene({
             <Creature
               id={u.species}
               shimmer={u.shimmer}
-              rotation={u.side === 0 ? Math.PI : 0}
+              rotation={facing}
               state={state}
               // Creatures knocked out earlier stay down through later turns.
               phase={state === "entrance" ? Math.max(0.001, arrive) : state === "defeat" && !event?.amounts.some((a) => a.id === u.id) ? 2 : elapsed}
