@@ -1604,18 +1604,24 @@ export function animateAvatar(
     head.rotation.y = walk || reduced ? 0 : Math.sin(t * 0.7 + g.userData.index) * 0.18;
     head.rotation.x = walk ? 0.05 : e === "cheer" ? -0.25 : Math.sin(t * 0.9 + g.userData.index) * 0.04;
     head.rotation.z = e === "dance" ? Math.sin(t * 3) * 0.15 * calm : 0;
-    // Villagers and hosts who watch the keeper turn their heads to follow them.
+    // Villagers and hosts who watch the keeper turn their heads to follow
+    // them; the keeper can watch a point too (the companion), with pauses.
     if (g.userData.watch && !walk && !reduced) {
+      const target: T.Vector3 = g.userData.watch === true ? worldFocus : g.userData.watch;
       g.getWorldPosition(seen.at);
       g.getWorldQuaternion(seen.turn);
       seen.yaw.setFromQuaternion(seen.turn, "YXZ");
-      const dx = worldFocus.x - seen.at.x,
-        dz = worldFocus.z - seen.at.z,
+      const dx = target.x - seen.at.x,
+        dz = target.z - seen.at.z,
         off = Math.atan2(Math.sin(Math.atan2(dx, dz) - seen.yaw.y), Math.cos(Math.atan2(dx, dz) - seen.yaw.y)),
-        near = Math.hypot(dx, dz) < 4.5 && Math.abs(off) < 2.2,
+        near = !g.userData.watchPaused && Math.hypot(dx, dz) < 4.5 && Math.abs(off) < 2.2,
         look = (g.userData.look ??= 0) + ((near ? Math.max(-1, Math.min(1, off)) : 0) - g.userData.look) * 0.08;
       g.userData.look = look;
-      head.rotation.y = near || Math.abs(look) > 0.02 ? look : head.rotation.y;
+      if (near || Math.abs(look) > 0.02) {
+        head.rotation.y = look;
+        // Something low, like a companion, gets a glance down as well.
+        if (target !== worldFocus) head.rotation.x += Math.min(1, Math.abs(look) * 3) * 0.18;
+      }
     }
   }
   // Standing idle, each keeper falls into a habit of their own every so often.

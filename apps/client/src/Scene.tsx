@@ -1052,6 +1052,9 @@ export function Explorer({
     avatar.userData.groundY = player.current.y;
     // Moving or an expired timer ends an emote.
     if (moving || Date.now() > keeperEmote.until) keeperEmote.name = "";
+    // Standing about, the keeper glances at the companion every few seconds.
+    avatar.userData.watch = follow.current;
+    avatar.userData.watchPaused = moving || !!keeperEmote.name || clock.elapsedTime % 7 > 2.6;
     animateAvatar(avatar, clock.elapsedTime, moving, pet, settings.reduced, keeperEmote.name);
     // In Moonfrost's cold, keeper and companion breathe little clouds.
     if (profile.region === "hollow" && !area && clock.elapsedTime - breath.current > (moving ? 1.1 : 1.8)) {

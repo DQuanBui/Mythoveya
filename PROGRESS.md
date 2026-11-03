@@ -17,11 +17,12 @@ November 4 round (from `d37297c`). Done this round, newest last:
 - Refactor: the keeper's lantern is built, swung and disposed by `createLantern`, `swingLantern` and `disposeLantern` in `models.ts`, ready for other carriers.
 - Townsfolk lanterns: from dusk (night glow above 0.4) each strolling islander carries the same hand lantern as the keeper, swinging as they walk home.
 - Glints in every region: Whisperleaf's pond (26) and Moonfrost's lake (32) sparkle like the Havenreach waters, placed in world coordinates so distance culling works.
+- Keeper glances at the companion: `userData.watch` can be a point as well as the keeper (with `watchPaused` to look away smoothly); standing still, the keeper glances down at a companion beside them for ~2.6 s of every 7. Tested.
 
 Next 3 tasks:
-1. The keeper glances at the companion while standing idle.
-2. Happy tail wag when a companion celebrates.
-3. Full verification, Playwright and docs.
+1. Happy tail wag when a companion celebrates.
+2. Full verification, Playwright and docs.
+3. Listening and physical-device pass.
 
 ## Play
 

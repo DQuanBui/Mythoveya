@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Mesh, MeshBasicMaterial, MeshStandardMaterial, Object3D } from "three";
+import { Mesh, MeshBasicMaterial, MeshStandardMaterial, Object3D, Vector3 } from "three";
 import { ALL_SPECIES } from "../packages/shared/content";
 import { animateAvatar, animateCreature, createAvatar, createCreature, watchKeeper } from "../apps/client/src/models";
 import { worldFocus } from "../apps/client/src/village-materials";
@@ -147,5 +147,17 @@ describe("villagers who watch the keeper", () => {
     for (let i = 0; i < 80; i++) animateAvatar(host, i / 30);
     expect(Math.abs(host.userData.head.rotation.y)).toBeLessThan(0.2);
     worldFocus.set(0, 0, 5);
+  });
+
+  it("let the keeper glance at a point, and look away while paused", () => {
+    const keeper = createAvatar(0),
+      pet = new Vector3(-2, 0, 0.5);
+    keeper.userData.watch = pet;
+    for (let i = 0; i < 80; i++) animateAvatar(keeper, i / 30);
+    expect(keeper.userData.head.rotation.y).toBeLessThan(-0.9);
+    expect(keeper.userData.head.rotation.x).toBeGreaterThan(0.1);
+    keeper.userData.watchPaused = true;
+    for (let i = 0; i < 80; i++) animateAvatar(keeper, i / 30);
+    expect(Math.abs(keeper.userData.head.rotation.y)).toBeLessThan(0.2);
   });
 });
