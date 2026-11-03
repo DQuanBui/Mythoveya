@@ -36,6 +36,7 @@ import { audio, settings } from "./audio";
 import { daylight, islandHour } from "./daytime";
 import type { ExplorationInput } from "./world-guide";
 import { WaterGlints } from "./WaterGlints";
+import { useContextRecovery } from "./context-recovery";
 
 export type Placing = { kind: string; uid?: string; rot: number };
 const UP = new T.Vector3(0, 1, 0);
@@ -691,6 +692,7 @@ export function IslandScene({
   placing: Placing | null;
   onPlace: (x: number, z: number) => void;
 }) {
+  const recover = useContextRecovery("home island");
   const home = profile.home || defaultHome(),
     r = homeRadius(home),
     next = HOME_EXPANSIONS[home.expansion + 1]?.radius;
@@ -700,6 +702,8 @@ export function IslandScene({
   const shown = home.items.filter((i) => i.uid !== placing?.uid);
   return (
     <Canvas
+      key={recover.key}
+      onCreated={recover.onCreated}
       shadows
       camera={{ position: [spawn[0] + 10, 10, spawn[1] + 11], fov: 45 }}
       frameloop={blocked ? "demand" : "always"}

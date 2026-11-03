@@ -34,6 +34,7 @@ import {
   lodgeResidentRoute,
   residentPose,
 } from "../../../packages/shared/lodge-life";
+import { useContextRecovery } from "./context-recovery";
 function Room({
   site,
   profile,
@@ -201,6 +202,7 @@ export function LodgeScene({
   run: (kind: string, data?: Record<string, unknown>) => Promise<any>;
   exit: () => void;
 }) {
+  const recover = useContextRecovery("lodge");
   const layout = useMemo(() => roomLayout(site.region), [site.region]);
   const area = useMemo<WalkArea>(
     () => ({
@@ -263,6 +265,8 @@ export function LodgeScene({
     <div className="lodge-visit" aria-label={site.name}>
       <div className="scene full">
         <Canvas
+          key={recover.key}
+          onCreated={recover.onCreated}
           shadows
           camera={{ position: [10, 10, 16.5], fov: 45 }}
           frameloop={panel ? "demand" : "always"}

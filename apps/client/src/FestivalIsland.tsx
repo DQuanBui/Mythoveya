@@ -30,6 +30,7 @@ import { SkyferryDock } from "./Skyferry";
 import { audio, settings } from "./audio";
 import type { ExplorationInput } from "./world-guide";
 import { WaterGlints } from "./WaterGlints";
+import { useContextRecovery } from "./context-recovery";
 
 const STRIPES = ["#d9674f", "#f3e3b5", "#5fa7bb", "#f2c75e", "#9bc27a", "#b49be0"];
 type Built = { solid: T.BufferGeometry; glow: T.BufferGeometry };
@@ -512,6 +513,7 @@ export function FestivalScene({
   pet: boolean;
   input: MutableRefObject<ExplorationInput>;
 }) {
+  const recover = useContextRecovery("festival island");
   const area = useMemo(() => festivalArea(profile), [profile]);
   const spawn = useMemo(() => islandArrival("festival", R), []);
   const walker = useRef<Walker>({ go: (_t, _r, act) => act?.() });
@@ -519,6 +521,8 @@ export function FestivalScene({
   const points = Object.fromEntries(area.points.map((p) => [p.id, p.p]));
   return (
     <Canvas
+      key={recover.key}
+      onCreated={recover.onCreated}
       shadows
       camera={{ position: [spawn[0] + 10, 10, spawn[1] + 11], fov: 45 }}
       frameloop={blocked ? "demand" : "always"}

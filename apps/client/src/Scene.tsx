@@ -109,6 +109,7 @@ import {
   type Objective,
 } from "./world-guide";
 import type { MutableRefObject } from "react";
+import { useContextRecovery } from "./context-recovery";
 // Festival lanterns load only while a festival runs.
 const SeasonalLanterns = lazy(() => import("./SeasonalLanterns").then((m) => ({ default: m.SeasonalLanterns })));
 function RenderStats() {
@@ -1288,11 +1289,14 @@ export function WorldScene({
   objective: Objective;
   input: MutableRefObject<ExplorationInput>;
 }) {
+  const recover = useContextRecovery("world");
   const initialPosition = useMemo(() => position, [profile.region]);
   const walker = useRef<Walker>({ go: (_t, _r, act) => act?.() });
   const season = useMemo(() => activeSeason(), []);
   return (
     <Canvas
+      key={recover.key}
+      onCreated={recover.onCreated}
       shadows
       camera={{
         position: [initialPosition[0] + 10, 10, initialPosition[1] + 11],
@@ -1831,6 +1835,7 @@ export function BattleScene({
   /** The viewer's team, which gets confetti when it wins. */
   side?: number;
 }) {
+  const recover = useContextRecovery("battle");
   const [, tick] = useState(0);
   // When a battle opens, each side's creatures drop onto their rings in turn.
   const opened = useMemo(() => Date.now(), [sourceBattle.id]);
@@ -1869,6 +1874,8 @@ export function BattleScene({
       : sourceBattle;
   return (
     <Canvas
+      key={recover.key}
+      onCreated={recover.onCreated}
       shadows
       camera={{ position: preview ? [7, 6, 10] : [0, 13.5, 17.5], fov: 42 }}
       dpr={[1, 1.5]}

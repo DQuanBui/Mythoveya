@@ -4,12 +4,13 @@ Updated November 4, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch
 
 ## Next up
 
-November 4 round is complete: 15 commits from `d37297c` plus this record, all pushed.
+November 5 round (from `1e622b9`). Done this round, newest last:
+- Graphics context recovery (`context-recovery.ts`): the world, battle, lodge, home, home island and festival canvases mark a lost WebGL context as recoverable, log a warning, and rebuild the Canvas when the browser restores it. Verified by forcing a loss and restore with `WEBGL_lose_context` on the Pages build (the world came back). This may be what blanked the lodge room in full Playwright runs; the warning will show in future traces.
 
 Next 3 tasks:
-1. `lodges.spec` fails only inside full Playwright runs (as test 26, the lodge room renders blank and `lodge-furnishings-waiting` is missing) and passes every time on its own (seven standalone passes). Suspect resources accumulating over the long suite (WebGL contexts or GPU memory in the shared browser); try running it in a fresh browser or earlier in the order, and check for leaked canvases.
-2. Listening pass and a physical phone/tablet check of the effects from the last four rounds, with a frame-rate check on a weaker GPU (this machine caps at 60 fps on every preset).
-3. Cloud shadows done properly: shade the ground, trails, plaza and place discs together (a first attempt was reverted because those are separate meshes and would show seams).
+1. Leaf umbrella for the keeper in rain.
+2. Townsfolk umbrellas in rain.
+3. Companion shakes off the rain when it stops.
 
 ## Play
 

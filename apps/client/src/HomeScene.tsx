@@ -25,6 +25,7 @@ import type { ExplorationInput } from "./world-guide";
 import { audio, settings } from "./audio";
 import { residentPose } from "../../../packages/shared/lodge-life";
 import "./lodges.css";
+import { useContextRecovery } from "./context-recovery";
 
 const shade = (c: string, t: number, to = "#000000") => new T.Color(c).lerp(new T.Color(to), t).getStyle();
 const roomMaterial = new T.MeshStandardMaterial({ vertexColors: true, roughness: 0.85 }),
@@ -283,6 +284,7 @@ export function HomeScene({
   run: (kind: string, data?: Record<string, unknown>) => Promise<any>;
   exit: () => void;
 }) {
+  const recover = useContextRecovery("home");
   const h = HOME_INTERIORS[id],
     house = HAVEN_HOUSES.find((x) => x.id === id)!;
   const area = useMemo<WalkArea>(
@@ -327,6 +329,8 @@ export function HomeScene({
     <div className="lodge-visit home-visit" aria-label={house.name}>
       <div className="scene full">
         <Canvas
+          key={recover.key}
+          onCreated={recover.onCreated}
           shadows
           camera={{ position: [6, 8, 11], fov: 45 }}
           frameloop={panel ? "demand" : "always"}
