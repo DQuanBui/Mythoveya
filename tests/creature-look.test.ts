@@ -120,6 +120,16 @@ it("shakes a wet creature hard at first and settles by the end", () => {
   expect(roll(1)).toBeLessThan(0.01);
 });
 
+it("now and then puts its nose down to sniff while idle", () => {
+  const model = createCreature("emberfox"),
+    sniffs = [];
+  for (let s = 0; s < 400; s += 0.25) {
+    animateCreature(model, s, "idle");
+    if (model.userData.rig.rotation.x > 0.2 && model.userData.eyes[0].userData.look.position.y < 0) sniffs.push(s);
+  }
+  expect(sniffs.length).toBeGreaterThan(0);
+});
+
 it("puffs Z's only while a creature sleeps", () => {
   const model = createCreature("mossprig");
   animateCreature(model, 2, "sleep");

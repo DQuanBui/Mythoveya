@@ -12,11 +12,12 @@ November 5 round (from `1e622b9`). Done this round, newest last:
 - Puddles (`Puddles.tsx`, spots from `puddle-spots.ts`): up to 40 glossy puddles (16 on Low) on level Havenreach trail ground fill over ~20 s of rain and dry over about a minute. Placement tested in `tests/puddles.test.ts`; seen in a dev screenshot with rain pinned.
 - Raindrop ripples: every water body with glints (Havenreach pond and lake, Whisperleaf pond, Moonfrost lake, island ponds) also spawns expanding raindrop rings while it rains (a third of its glint count), and its sun glints dim under the overcast.
 - Wave back: villagers, hosts and rangers marked with `watchKeeper` wave back while the keeper's wave emote plays within 8 m. Tested.
+- Sniffing: a fourth idle quirk where a creature lowers its nose, sniffs along the ground with a little bob and looks down (the quirk cycle is now four kinds). Tested.
 
 Next 3 tasks:
-1. A sniff-the-ground idle quirk for creatures.
-2. Snow sparkles around the keeper in Moonfrost.
-3. Battle: attackers turn toward their target.
+1. Snow sparkles around the keeper in Moonfrost.
+2. Battle: attackers turn toward their target.
+3. Battle: winners turn to face the camera.
 
 ## Play
 
