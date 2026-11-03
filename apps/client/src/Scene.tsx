@@ -93,6 +93,9 @@ import {
   animateAvatar,
   animateCreature,
   watchKeeper,
+  createLantern,
+  disposeLantern,
+  swingLantern,
   createAvatar,
   createCreature,
   type Motion,
@@ -749,35 +752,10 @@ export function Explorer({
     [profile.avatar, outfit, hair],
   );
   // After dark the keeper carries a small lantern in the right hand.
-  const lantern = useMemo(() => {
-    const l = new T.Group(),
-      frame = new T.MeshStandardMaterial({ color: "#5a4636", roughness: 0.6, metalness: 0.3 }),
-      glass = new T.MeshStandardMaterial({ color: "#ffe2a0", emissive: "#ffb04a", emissiveIntensity: 1.6 });
-    l.name = "keeper-lantern";
-    l.visible = false;
-    const add = (geo: T.BufferGeometry, mat: T.Material, y: number) => {
-      const m = new T.Mesh(geo, mat);
-      m.position.y = y;
-      l.add(m);
-    };
-    add(new T.TorusGeometry(0.035, 0.008, 4, 10, Math.PI), frame, -0.02);
-    add(new T.CylinderGeometry(0.035, 0.055, 0.035, 6), frame, -0.07);
-    add(new T.CylinderGeometry(0.045, 0.045, 0.1, 6), glass, -0.14);
-    add(new T.CylinderGeometry(0.055, 0.04, 0.025, 6), frame, -0.2);
-    l.position.set(0.03, -0.47, 0.04);
-    return l;
-  }, []);
+  const lantern = useMemo(() => createLantern("keeper-lantern"), []);
   useEffect(() => {
     (avatar.userData.limbs as T.Group[])[3].add(lantern);
-    return () => {
-      lantern.removeFromParent();
-      lantern.traverse((m) => {
-        if (m instanceof T.Mesh) {
-          m.geometry.dispose();
-          (m.material as T.Material).dispose();
-        }
-      });
-    };
+    return () => disposeLantern(lantern);
   }, [avatar, lantern]);
   const leader = profile.owned.find((o) => o.id === profile.team[0]);
   const companion = useMemo(
@@ -1088,10 +1066,7 @@ export function Explorer({
     }
     // The lantern hangs plumb whatever the arm is doing, with a little sway.
     lantern.visible = !area && nightState.glow > 0.45 && !keeperEmote.name;
-    if (lantern.visible) {
-      const arm = lantern.parent;
-      if (arm) lantern.rotation.set(-arm.rotation.x + (settings.reduced ? 0 : Math.sin(clock.elapsedTime * 8) * (moving ? 0.25 : 0.04)), 0, -arm.rotation.z);
-    }
+    if (lantern.visible) swingLantern(lantern, clock.elapsedTime, moving, settings.reduced);
     const delta = player.current.clone().sub(follow.current);
     const following = delta.length() > 1.6;
     if (following) {

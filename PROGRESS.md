@@ -14,11 +14,12 @@ November 4 round (from `d37297c`). Done this round, newest last:
 - Turn ring: the next creature to act has its ring gently pulse (with the battle's 50 ms refresh); still under Reduced Motion and once the battle is won.
 - Knock-out jolt: when an event knocks a creature out, the battle camera gives a short, decaying ~3 px jolt as it topples (only with the camera shake setting on and Reduced Motion off).
 - Shimmer trail: a shimmering lead companion leaves small golden sparkles (`sparkle` puff kind) that rise and fade behind it while it follows the keeper.
+- Refactor: the keeper's lantern is built, swung and disposed by `createLantern`, `swingLantern` and `disposeLantern` in `models.ts`, ready for other carriers.
 
 Next 3 tasks:
 1. Villagers carry lanterns at night.
-2. Full verification, Playwright and docs.
-3. Listening and physical-device pass.
+2. Glints on Moonfrost's lake and Whisperleaf's pond.
+3. The keeper glances at the companion while standing idle.
 
 ## Play
 

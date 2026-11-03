@@ -1525,6 +1525,39 @@ function hair(head: T.Group, index: number, color: string) {
   part(head, "arc", tint(color, "#ffffff", 0.28), [0, 0.11, 0.035], [0.17, 0.13, 0.17], [-1.05, 0, 0], false, true);
 }
 export type Emote = "" | "wave" | "cheer" | "dance" | "sit";
+/** A small hand lantern for a keeper's right hand (limb 3); it owns its parts. */
+export function createLantern(name: string) {
+  const l = new T.Group(),
+    frame = new T.MeshStandardMaterial({ color: "#5a4636", roughness: 0.6, metalness: 0.3 }),
+    glass = new T.MeshStandardMaterial({ color: "#ffe2a0", emissive: "#ffb04a", emissiveIntensity: 1.6 });
+  l.name = name;
+  l.visible = false;
+  const add = (geo: T.BufferGeometry, mat: T.Material, y: number) => {
+    const m = new T.Mesh(geo, mat);
+    m.position.y = y;
+    l.add(m);
+  };
+  add(new T.TorusGeometry(0.035, 0.008, 4, 10, Math.PI), frame, -0.02);
+  add(new T.CylinderGeometry(0.035, 0.055, 0.035, 6), frame, -0.07);
+  add(new T.CylinderGeometry(0.045, 0.045, 0.1, 6), glass, -0.14);
+  add(new T.CylinderGeometry(0.055, 0.04, 0.025, 6), frame, -0.2);
+  l.position.set(0.03, -0.47, 0.04);
+  return l;
+}
+export function disposeLantern(l: T.Object3D) {
+  l.removeFromParent();
+  l.traverse((m) => {
+    if (m instanceof T.Mesh) {
+      m.geometry.dispose();
+      (m.material as T.Material).dispose();
+    }
+  });
+}
+/** Keeps a carried lantern hanging plumb whatever the arm does, with a little sway. */
+export function swingLantern(l: T.Object3D, t: number, moving: boolean, reduced: boolean) {
+  const arm = l.parent;
+  if (arm) l.rotation.set(-arm.rotation.x + (reduced ? 0 : Math.sin(t * 8) * (moving ? 0.25 : 0.04)), 0, -arm.rotation.z);
+}
 const seen = { at: new T.Vector3(), turn: new T.Quaternion(), yaw: new T.Euler() };
 /** Marks a villager or host whose head follows a keeper who comes near. */
 export function watchKeeper<M extends T.Object3D>(model: M) {
