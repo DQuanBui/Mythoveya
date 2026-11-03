@@ -8,11 +8,12 @@ import {
   type Point,
 } from "../../../packages/shared/haven";
 import { buildGrid, findPath, type WalkGrid } from "../../../packages/shared/pathfind";
-import { animateAvatar, createAvatar, watchKeeper, createLantern, disposeLantern, swingLantern } from "./models";
+import { animateAvatar, createAvatar, watchKeeper, createLantern, createUmbrella, disposeLantern, swingLantern } from "./models";
 import { WorldInteraction } from "./WorldInteraction";
 import { daylight, islandHour } from "./daytime";
 import { settings } from "./audio";
 import { worldFocus } from "./village-materials";
+import { weatherFx } from "./Weather";
 
 // Islanders who stroll between homes and landmarks, then head home at night.
 export const TOWNSFOLK = [
@@ -106,10 +107,17 @@ function Villager({
   const home = useMemo(() => door(folk.home), [folk.home]);
   // From dusk, islanders light their way home with a hand lantern.
   const lantern = useMemo(() => createLantern(`townsfolk-lantern-${index}`), [index]);
+  // ...and in the rain, a broad leaf held overhead.
+  const umbrella = useMemo(() => createUmbrella(`townsfolk-umbrella-${index}`), [index]);
   useEffect(() => {
-    (model.userData.limbs as T.Group[])[3].add(lantern);
-    return () => disposeLantern(lantern);
-  }, [model, lantern]);
+    const limbs = model.userData.limbs as T.Group[];
+    limbs[3].add(lantern);
+    limbs[1].add(umbrella);
+    return () => {
+      disposeLantern(lantern);
+      disposeLantern(umbrella);
+    };
+  }, [model, lantern, umbrella]);
   const state = useRef({
     pos: new T.Vector3(),
     path: [] as Point[],
@@ -175,6 +183,9 @@ function Villager({
       animateAvatar(model, clock.elapsedTime + index, walking, s.greet > 0.6, settings.reduced);
       lantern.visible = daylight(islandHour()).glow > 0.4;
       if (lantern.visible) swingLantern(lantern, clock.elapsedTime + index, walking, settings.reduced);
+      // Not while waving with that hand.
+      umbrella.visible = weatherFx.rain > 0.35 && s.greet <= 0.6;
+      if (umbrella.visible) swingLantern(umbrella, (clock.elapsedTime + index) * 0.5, walking, settings.reduced);
     }
   });
   return (
