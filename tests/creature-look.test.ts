@@ -130,6 +130,15 @@ it("now and then puts its nose down to sniff while idle", () => {
   expect(sniffs.length).toBeGreaterThan(0);
 });
 
+it("stretches long and low with eyes shut, and ends standing tall", () => {
+  const model = createCreature("emberfox");
+  animateCreature(model, 1, "stretch", 0.5);
+  expect(model.userData.rig.rotation.x).toBeGreaterThan(0.25);
+  expect(model.userData.eyes.every((e: Object3D) => e.scale.y < 0.2)).toBe(true);
+  animateCreature(model, 1, "stretch", 1);
+  expect(model.userData.rig.rotation.x).toBeLessThan(0.01);
+});
+
 it("puffs Z's only while a creature sleeps", () => {
   const model = createCreature("mossprig");
   animateCreature(model, 2, "sleep");

@@ -1154,8 +1154,8 @@ export function Explorer({
       clock.elapsedTime,
       // The companion joins in: it hops at a wave, plays along with a cheer or
       // dance, and settles down low when the keeper sits (later dozing off).
-      shaking && !following ? "shake" : pet || keeperEmote.name === "wave" || (!following && Date.now() < companionJoy.until) ? "victory" : following ? "walk" : keeperEmote.name === "cheer" || keeperEmote.name === "dance" ? "play" : keeperEmote.name === "sit" && rest.current < 14 ? "guard" : rest.current > 14 ? "sleep" : "idle",
-      shaking ? (clock.elapsedTime - shook.current) / 0.9 : 0,
+      shaking && !following ? "shake" : pet || keeperEmote.name === "wave" || (!following && Date.now() < companionJoy.until) ? "victory" : following ? "walk" : keeperEmote.name === "cheer" || keeperEmote.name === "dance" ? "play" : keeperEmote.name === "sit" && rest.current < 14 ? "guard" : rest.current > 14 ? "sleep" : rest.current > 12.6 ? "stretch" : "idle",
+      shaking ? (clock.elapsedTime - shook.current) / 0.9 : rest.current > 12.6 && rest.current <= 14 ? (rest.current - 12.6) / 1.4 : 0,
       settings.reduced,
     );
     if (controls.current)

@@ -1173,7 +1173,8 @@ export type Motion =
   | "sleep"
   | "play"
   | "weary"
-  | "shake";
+  | "shake"
+  | "stretch";
 export function animateCreature(
   g: T.Group,
   time: number,
@@ -1388,6 +1389,15 @@ export function animateCreature(
     limbs.forEach((l: T.Group) => (l.rotation.x = 0));
     tails.forEach((t: T.Group) => (t.rotation.y = 0.5));
     wings.forEach((w: T.Group, i: number) => (w.rotation.z = ((i % 2) * 2 - 1) * -0.1));
+  }
+  if (state === "stretch") {
+    // A long, slow play-bow stretch with eyes shut, as before a nap.
+    const p = Math.sin(Math.min(1, Math.max(0, phase)) * Math.PI) * motion;
+    rig.rotation.x = 0.3 * p;
+    rig.scale.set(1, 1 - 0.05 * p, 1 + 0.12 * p);
+    rig.position.y -= 0.04 * p;
+    limbs.forEach((l: T.Group, i: number) => (l.rotation.x = (i % 2 ? -0.6 : 0.25) * p));
+    if (p > 0.3) eyes?.forEach((eye: T.Group) => (eye.scale.y = 0.12));
   }
   if (state === "shake") {
     // A fast, fading shake from head to tail, eyes squeezed shut.

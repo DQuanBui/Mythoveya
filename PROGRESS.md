@@ -10,10 +10,11 @@ November 6 round (from `040b6f1`). Done this round, newest last:
 - Health trail: battle health bars keep a pale trail where health was lost, which drains away 0.45 s later (a CSS width transition; instant under Reduced Motion).
 - Low health: battle health bars under a quarter turn red and pulse (`.unit-bar.low`), still under either reduced-motion setting.
 - Puddle splashes: `puddles` / `inPuddle` in `puddle-spots.ts` share the live puddles; a keeper footstep inside a puddle that holds water throws up three small splashes (`splash` puff kind). Tested.
+- Stretch before a nap: a new `stretch` motion (slow play-bow, eyes shut) plays over the 1.4 s before a waiting companion curls up to sleep; listed in the asset gallery; tested.
 
 Next 3 tasks:
-1. Companion stretches before a nap.
-2. Fireflies hide in the rain.
+1. Fireflies hide in the rain.
+2. Villagers stop to chat in pairs.
 3. Full verification, Playwright and docs.
 
 ## Play
