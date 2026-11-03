@@ -4,12 +4,13 @@ Updated November 3, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch
 
 ## Next up
 
-November 3 round is complete: 14 commits from `933a869` plus this record, all pushed.
+November 4 round (from `d37297c`). Done this round, newest last:
+- Refactor: the hair dye swatch row is one `HairDyePicker` component used by the Lanternfair wardrobe and the keeper appearance panel.
 
 Next 3 tasks:
-1. Investigate the intermittent `lodges.spec` failure (blank lodge room, `lodge-furnishings-waiting` missing): it failed twice in a row after the full run, then passed five times, including at the same commit and during game night.
-2. Listening pass and a physical phone/tablet check of the new effects (status auras, motes, charge rings, dust).
-3. More characterful NPCs: hosts turning their heads to the keeper, and grass and trees swaying in the wind.
+1. Arrow-key navigation in the hair dye radiogroup.
+2. Village hosts turn their heads toward a nearby keeper.
+3. Companion looks up at the keeper when it waits beside them.
 
 ## Play
 

@@ -6,7 +6,8 @@ import { dressKeeper } from "./TownScenery";
 import { ModelLighting } from "./ModelLighting";
 import { settings } from "./audio";
 import type { Profile } from "../../../packages/shared/types";
-import { HAIR_DYES, hairColor } from "../../../packages/shared/looks";
+import { hairColor } from "../../../packages/shared/looks";
+import { HairDyePicker } from "./HairDyePicker";
 import { AVATARS } from "../../../packages/shared/content";
 import {
   FESTIVAL_SHOP,
@@ -199,23 +200,7 @@ export function FestivalPanel({
           <OutfitPreview avatar={profile.avatar} outfit={trying ?? f.outfit} hair={hairColor(profile)} />
           <small className="muted">{trying ? "Previewing" : f.outfit ? "Wearing" : "No outfit"}</small>
           {/* Hair dyes are free and can be changed at any time. */}
-          <div className="hair-dyes" role="radiogroup" aria-label="Hair dye">
-            {HAIR_DYES.map((d) => {
-              const on = (profile.hair || "natural") === d.id;
-              return (
-                <button
-                  key={d.id}
-                  role="radio"
-                  aria-checked={on}
-                  title={d.name}
-                  aria-label={d.name}
-                  className={on ? "on" : ""}
-                  style={{ background: d.color || AVATARS[profile.avatar].hair }}
-                  onClick={() => !on && run("look-hair", { item: d.id })}
-                />
-              );
-            })}
-          </div>
+          <HairDyePicker value={profile.hair || "natural"} natural={AVATARS[profile.avatar].hair} onPick={(item) => run("look-hair", { item })} />
         </div>
         <div className="market-stock">
           {FESTIVAL_SHOP.filter((s) => s.kind === "outfit").map((s) => {

@@ -9,7 +9,8 @@ import {
   ALL_SPECIES,
   TIERS,
 } from "../../../packages/shared/content";
-import { HAIR_DYES, hairColor } from "../../../packages/shared/looks";
+import { hairColor } from "../../../packages/shared/looks";
+import { HairDyePicker } from "./HairDyePicker";
 import {
   power,
   makeBattle,
@@ -660,20 +661,7 @@ export function Appearance({
             </button>
           ))}
           {/* Hair dyes are free; the natural swatch follows the chosen keeper. */}
-          <div className="hair-dyes" role="radiogroup" aria-label="Hair dye">
-            {HAIR_DYES.map((d) => (
-              <button
-                key={d.id}
-                role="radio"
-                aria-checked={dye === d.id}
-                title={d.name}
-                aria-label={d.name}
-                className={dye === d.id ? "on" : ""}
-                style={{ background: d.color || AVATARS[avatar].hair }}
-                onClick={() => setDye(d.id)}
-              />
-            ))}
-          </div>
+          <HairDyePicker value={dye} natural={AVATARS[avatar].hair} onPick={setDye} />
           <button
             className="primary"
             onClick={async () => {
