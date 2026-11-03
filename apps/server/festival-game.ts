@@ -116,7 +116,8 @@ export function festivalMutation(p: Profile, kind: string, v: any, now = Date.no
         minTime: number,
         detail: { time?: number; misses?: number; score?: number; caught?: string[] },
         data: Record<string, unknown>;
-      const keeper = { avatar: p.avatar, outfit: f.outfit };
+      // Ghosts wear the keeper's outfit and hair dye (both optional).
+      const keeper = { avatar: p.avatar, outfit: f.outfit, ...(p.hair ? { hair: p.hair } : {}) };
       if (activity === "race") {
         const o = p.owned.find((o) => o.id === v.id);
         if (!o) throw Error("Choose a companion to race.");

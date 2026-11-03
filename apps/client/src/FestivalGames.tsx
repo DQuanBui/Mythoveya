@@ -28,6 +28,7 @@ import { fishWeights, weatherAt } from "../../../packages/shared/weather";
 import { api } from "./api";
 import { animateAvatar, animateCreature, createAvatar, createCreature } from "./models";
 import { dressKeeper } from "./TownScenery";
+import { hairColor } from "../../../packages/shared/looks";
 import { ModelLighting } from "./ModelLighting";
 import { Kit, SHAPES } from "./village-kit";
 import { villageMaterial } from "./HavenVillage";
@@ -107,6 +108,7 @@ type Ghost = {
   shimmer?: boolean;
   avatar?: number;
   outfit?: string;
+  hair?: string;
 };
 type Board = { day: string; featured: Activity; today: BoardRow[]; allTime: BoardRow[]; ghosts: Ghost[] };
 type Racer = {
@@ -115,6 +117,7 @@ type Racer = {
   shimmer?: boolean;
   avatar?: number;
   outfit?: string;
+  hair?: string;
   mine?: boolean;
   sim: RaceSim | CourseSim | FishSim;
 };
@@ -122,7 +125,7 @@ const FISH_COLORS: Record<FishKind, string> = { minnow: "#c9d6dc", carp: "#e8b34
 
 /** The tournament jetty: your keeper, a float that dips on a bite, and fish that leap out. */
 function FishingWorld({ racer, clock }: { racer: Racer; clock: { current: number } }) {
-  const keeper = useMemo(() => dressKeeper(createAvatar(racer.avatar ?? 0), racer.outfit), [racer]);
+  const keeper = useMemo(() => dressKeeper(createAvatar(racer.avatar ?? 0, hairColor(racer)), racer.outfit), [racer]);
   const float = useRef<T.Group>(null),
     ring = useRef<T.Mesh>(null),
     fish = useRef<T.Group>(null),
@@ -323,7 +326,7 @@ function CourseWorld({ racers, obstacles, clock }: { racers: Racer[]; obstacles:
   const models = useMemo(
     () =>
       racers.map((r) => {
-        const m = dressKeeper(createAvatar(r.avatar ?? 0), r.outfit);
+        const m = dressKeeper(createAvatar(r.avatar ?? 0, hairColor(r)), r.outfit);
         if (!r.mine)
           m.traverse((c) => {
             if (c instanceof T.Mesh) {
@@ -506,13 +509,13 @@ export function FestivalGame({
       }
     } else if (activity === "fishing") {
       const bites = fishingBites(day, fishWeights(weatherAt(Date.now()).weather));
-      list.push({ name: "You", avatar: profile.avatar, outfit: f?.outfit, mine: true, sim: new FishSim(bites) });
+      list.push({ name: "You", avatar: profile.avatar, outfit: f?.outfit, hair: profile.hair, mine: true, sim: new FishSim(bites) });
     } else {
-      list.push({ name: "You", avatar: profile.avatar, outfit: f?.outfit, mine: true, sim: new CourseSim(obstacles) });
+      list.push({ name: "You", avatar: profile.avatar, outfit: f?.outfit, hair: profile.hair, mine: true, sim: new CourseSim(obstacles) });
       for (const g of ghosts) {
         const sim = new CourseSim(obstacles);
         g.inputs.forEach((t) => sim.press(t));
-        list.push({ name: g.profile === profile.id ? "Your best" : g.name, avatar: g.avatar, outfit: g.outfit, sim });
+        list.push({ name: g.profile === profile.id ? "Your best" : g.name, avatar: g.avatar, outfit: g.outfit, hair: g.hair, sim });
       }
     }
     inputs.current = [];

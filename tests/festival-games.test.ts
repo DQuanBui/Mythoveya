@@ -132,3 +132,18 @@ describe("server-scored festival runs", () => {
     expect(topRuns(day, "fishing", false)[0]).toMatchObject({ name: "Angler", score: run.score });
   });
 });
+
+describe("festival ghosts", () => {
+  it("record the keeper's hair dye with their outfit, and leave it out when natural", () => {
+    const dyed = fairgoer("Dyed"),
+      plain = fairgoer("Plain");
+    act(dyed, "look-hair", { item: "ember" }, now);
+    for (const [token, at] of [[dyed, now], [plain, now + 200000]] as const) {
+      act(token, "fest-start", { quest: "course" }, at);
+      act(token, "fest-run", { quest: "course", inputs: perfectCourse() }, at + 31000);
+    }
+    const runs = topRuns(day, "course", true);
+    expect(runs.find((r) => r.name === "Dyed")!.data.hair).toBe("ember");
+    expect("hair" in runs.find((r) => r.name === "Plain")!.data).toBe(false);
+  });
+});

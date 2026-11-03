@@ -12,9 +12,10 @@ November 3 round (from `933a869`). Done this round, newest last:
 - Companion paw prints: `leavePaw` in `Footprints.tsx` adds small round prints (same 48-print buffer, own left/right alternation) every 0.17-0.22 s while the companion follows over snow or sand.
 - Fireflies and the lantern: every tenth firefly gradually drifts over to circle the keeper's lantern at night (`Fireflies lantern`, blended over a few seconds) and wanders back by day.
 - Fish leap in Reedwater Lake: the pond's leaping fish is now a reusable `LeapingFish` (exported from `HavenWater.tsx`, with an optional `nudge` that keeps the pond's leaps off the bridge); a silver-blue fish leaps in the lake every ~6 s.
+- Festival ghosts wear hair dyes: `fest-run` stores an optional `hair` in the run data beside avatar and outfit (absent when natural, so older runs render as before); the race, course and fishing keepers use `hairColor`. Tested in `festival-games.test.ts`.
 
 Next 3 tasks:
-1. Hair dye in festival ghosts and a dye picker outside Lanternfair.
+1. A hair dye picker outside Lanternfair (Keeper Record).
 2. Night-time in-game check of lantern, fireflies and glints.
 3. Companion reacts when the keeper fishes or opens a cache.
 
