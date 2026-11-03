@@ -6,11 +6,12 @@ Updated November 5, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch
 
 November 6 round (from `040b6f1`). Done this round, newest last:
 - Test environment: Playwright no longer records video (first tried `retain-on-failure`, which still encodes every journey); failure traces with step snapshots and failure screenshots remain.
+- Adaptive effects (`adaptive.ts`): a frame-time monitor in the world scene sets `perf.lite` after 6 s below ~30 fps (and clears it after 20 s above ~50 fps); region motes, water glints and ripples, puddles, puffs and islet drift pause meanwhile. Gameplay feedback is untouched and no toast is shown. Tested in `tests/adaptive.test.ts`.
 
 Next 3 tasks:
-1. Adaptive effects: drop decorative effects when the frame rate stays low.
-2. Battle health bars show a draining trail after damage.
-3. Low-health bars pulse red.
+1. Battle health bars show a draining trail after damage.
+2. Low-health bars pulse red.
+3. Puddle splashes underfoot.
 
 ## Play
 

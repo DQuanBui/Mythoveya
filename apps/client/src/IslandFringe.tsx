@@ -4,6 +4,7 @@ import * as T from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { edgeRadius, groundHeight } from "../../../packages/shared/haven";
 import { settings } from "./audio";
+import { perf } from "./adaptive";
 
 const paint = (g: T.BufferGeometry, color: string) => {
   const c = new T.Color(color),
@@ -94,7 +95,7 @@ export function IslandFringe({
   const o = useMemo(() => new T.Object3D(), []);
   useFrame(({ clock }) => {
     // Islets hold still under Reduced Motion, so they need no updates after the first frame.
-    if (settings.reduced && islets.rock.userData.placed) return;
+    if ((settings.reduced || perf.lite) && islets.rock.userData.placed) return;
     islets.rock.userData.placed = true;
     const t = settings.reduced ? 0 : clock.elapsedTime;
     islets.seeds.forEach((s, i) => {

@@ -4,6 +4,7 @@ import * as T from "three";
 import { settings } from "./audio";
 import { softDot } from "./glyphs";
 import { MAX_PUFFS as MAX, PUFF_LOOK as LOOK, recentPuffs } from "./puff-buffer";
+import { perf } from "./adaptive";
 
 export function Puffs() {
   const mesh = useMemo(() => {
@@ -29,7 +30,7 @@ export function Puffs() {
     c = useMemo(() => new T.Color(), []);
   useFrame(({ clock, camera }) => {
     let n = 0;
-    if (!settings.reduced)
+    if (!settings.reduced && !perf.lite)
       for (const p of recentPuffs()) {
         const look = LOOK[p.kind],
           k = (clock.elapsedTime - p.t) / look.life;

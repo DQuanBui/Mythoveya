@@ -6,6 +6,7 @@ import { settings } from "./audio";
 import { daylight, islandHour } from "./daytime";
 import { weatherFx } from "./Weather";
 import { worldFocus } from "./village-materials";
+import { perf } from "./adaptive";
 
 const FAR = 60;
 const hash = (n: number) => {
@@ -76,7 +77,7 @@ export function WaterGlints({
     const x = follow ? worldFocus.x : cx,
       z = follow ? worldFocus.z : cz;
     // Out of sight across the island, the water needs no glints.
-    mesh.visible = !settings.reduced && Math.hypot(camera.position.x - x, camera.position.z - z) < FAR + Math.max(rx, rz);
+    mesh.visible = !settings.reduced && !perf.lite && Math.hypot(camera.position.x - x, camera.position.z - z) < FAR + Math.max(rx, rz);
     const rain = weatherFx.snow ? 0 : weatherFx.rain;
     rings.visible = mesh.visible && rain > 0.15;
     if (rings.visible) {

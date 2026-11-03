@@ -112,6 +112,7 @@ import {
 } from "./world-guide";
 import type { MutableRefObject } from "react";
 import { useContextRecovery } from "./context-recovery";
+import { frameMonitor } from "./adaptive";
 // Festival lanterns load only while a festival runs.
 const SeasonalLanterns = lazy(() => import("./SeasonalLanterns").then((m) => ({ default: m.SeasonalLanterns })));
 function RenderStats() {
@@ -378,6 +379,7 @@ function Environment({
           <SkyLife radius={expanded ? 54 : canyon || snow || meadow ? 62 : 26} birds={!expanded} />
           <WeatherEffects region={region} ground={groundFor(region)} />
           <RegionMotes region={region} />
+          <AdaptiveEffects />
           {/* Fresh snow sparkles in the sun around the keeper. */}
           {region === "hollow" && <WaterGlints x={0} z={0} rx={9} rz={9} y={0.04} max={36} color="#f4fbff" follow={hollowHeight} />}
         </>
@@ -679,6 +681,12 @@ function stepSound(region: string, x: number, z: number, y: number) {
   return "grass";
 }
 const COMPANION_GAZE = { x: 0, y: 0.5 };
+/** Feeds the frame time to the adaptive-effects monitor (see adaptive.ts). */
+function AdaptiveEffects() {
+  const monitor = useMemo(() => frameMonitor(), []);
+  useFrame((_, dt) => monitor.add(dt * 1000));
+  return null;
+}
 const groundFor = (region: string) =>
   region === "haven" ? groundHeight : region === "canyon" ? canyonHeight : region === "hollow" ? hollowHeight : region === "meadow" ? meadowHeight : () => 0;
 /** Where a click ray meets the terrain, found by marching then bisecting. */

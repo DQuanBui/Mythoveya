@@ -4,6 +4,7 @@ import * as T from "three";
 import { settings } from "./audio";
 import { softDot } from "./glyphs";
 import { worldFocus } from "./village-materials";
+import { perf } from "./adaptive";
 
 // Each region's air: embers rising off Emberglass's basalt, pollen drifting
 // through Whisperleaf. Motes live in a box around the keeper and wrap.
@@ -41,7 +42,7 @@ export function RegionMotes({ region }: { region: string }) {
   const o = useMemo(() => new T.Object3D(), []);
   useFrame(({ clock, camera }) => {
     if (!mesh || !air) return;
-    mesh.visible = !settings.reduced;
+    mesh.visible = !settings.reduced && !perf.lite;
     if (!mesh.visible) return;
     const t = clock.elapsedTime,
       wrap = (v: number, c: number) => c + ((((v - c + BOX / 2) % BOX) + BOX) % BOX) - BOX / 2;
