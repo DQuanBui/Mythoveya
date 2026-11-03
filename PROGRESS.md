@@ -6,11 +6,12 @@ Updated November 4, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch
 
 November 5 round (from `1e622b9`). Done this round, newest last:
 - Graphics context recovery (`context-recovery.ts`): the world, battle, lodge, home, home island and festival canvases mark a lost WebGL context as recoverable, log a warning, and rebuild the Canvas when the browser restores it. Verified by forcing a loss and restore with `WEBGL_lose_context` on the Pages build (the world came back). This may be what blanked the lodge room in full Playwright runs; the warning will show in future traces.
+- Leaf umbrella: `createUmbrella` (models.ts) is a broad leaf on a stem held upright in the left hand; the keeper raises it outdoors when rain passes 0.35 (not in snow, not during emotes).
 
 Next 3 tasks:
-1. Leaf umbrella for the keeper in rain.
-2. Townsfolk umbrellas in rain.
-3. Companion shakes off the rain when it stops.
+1. Townsfolk umbrellas in rain.
+2. Companion shakes off the rain when it stops.
+3. Puddles on flat ground in rain.
 
 ## Play
 

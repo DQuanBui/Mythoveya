@@ -1546,6 +1546,33 @@ export function createLantern(name: string) {
   l.position.set(0.03, -0.47, 0.04);
   return l;
 }
+/** A broad leaf held up on its stem as an umbrella, for a keeper's left hand
+ * (limb 1). Hang it with `swingLantern`; dispose it with `disposeLantern`. */
+export function createUmbrella(name: string) {
+  const u = new T.Group(),
+    leaf = new T.MeshStandardMaterial({ color: "#5e8f4c", roughness: 0.7, side: T.DoubleSide }),
+    vein = new T.MeshStandardMaterial({ color: "#a9c98a", roughness: 0.8 }),
+    stem = new T.MeshStandardMaterial({ color: "#5c7a43", roughness: 0.9 });
+  u.name = name;
+  u.visible = false;
+  const shaft = new T.Mesh(new T.CylinderGeometry(0.014, 0.018, 1.05, 5), stem);
+  shaft.position.y = 0.5;
+  u.add(shaft);
+  // A shallow dome that droops toward a pointed tip at the front.
+  const canopy = new T.Mesh(new T.SphereGeometry(0.5, 14, 6, 0, Math.PI * 2, 0, Math.PI * 0.32), leaf);
+  canopy.scale.set(1, 0.55, 1.25);
+  canopy.position.y = 0.88;
+  u.add(canopy);
+  for (const a of [0, Math.PI / 2]) {
+    const rib = new T.Mesh(new T.BoxGeometry(0.012, 0.012, 1.08), vein);
+    rib.position.y = 1.03;
+    rib.rotation.y = a;
+    rib.scale.z = a ? 0.85 : 1.1;
+    u.add(rib);
+  }
+  u.position.set(-0.02, -0.45, 0.04);
+  return u;
+}
 export function disposeLantern(l: T.Object3D) {
   l.removeFromParent();
   l.traverse((m) => {

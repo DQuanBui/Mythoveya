@@ -34,7 +34,7 @@ import { HavenBirds } from "./HavenBirds";
 import { HavenFrontier } from "./HavenFrontier";
 import { SkyferryDock } from "./Skyferry";
 import { BattleArena } from "./BattleArena";
-import { WeatherEffects } from "./Weather";
+import { WeatherEffects, weatherFx } from "./Weather";
 import { HavenTreasure } from "./HavenTreasure";
 import { photo } from "./photo";
 import { ChargeAura, Confetti, HitBurst, LandingDust, SupportGlow, SupportLink } from "./HitBurst";
@@ -94,6 +94,7 @@ import {
   animateCreature,
   watchKeeper,
   createLantern,
+  createUmbrella,
   disposeLantern,
   swingLantern,
   createAvatar,
@@ -754,6 +755,12 @@ export function Explorer({
   );
   // After dark the keeper carries a small lantern in the right hand.
   const lantern = useMemo(() => createLantern("keeper-lantern"), []);
+  // In the rain, a broad leaf held up in the other hand.
+  const umbrella = useMemo(() => createUmbrella("keeper-umbrella"), []);
+  useEffect(() => {
+    (avatar.userData.limbs as T.Group[])[1].add(umbrella);
+    return () => disposeLantern(umbrella);
+  }, [avatar, umbrella]);
   useEffect(() => {
     (avatar.userData.limbs as T.Group[])[3].add(lantern);
     return () => disposeLantern(lantern);
@@ -1071,6 +1078,8 @@ export function Explorer({
     // The lantern hangs plumb whatever the arm is doing, with a little sway.
     lantern.visible = !area && nightState.glow > 0.45 && !keeperEmote.name;
     if (lantern.visible) swingLantern(lantern, clock.elapsedTime, moving, settings.reduced);
+    umbrella.visible = !area && weatherFx.rain > 0.35 && !weatherFx.snow && !keeperEmote.name;
+    if (umbrella.visible) swingLantern(umbrella, clock.elapsedTime * 0.5, moving, settings.reduced);
     const delta = player.current.clone().sub(follow.current);
     const following = delta.length() > 1.6;
     if (following) {
