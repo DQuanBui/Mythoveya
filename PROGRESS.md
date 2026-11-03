@@ -1,10 +1,23 @@
 # Mythoveya handoff
 
-Updated November 2, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`, pushed to `origin/main` (https://github.com/DQuanBui/Mythoveya). This handoff covers five rounds: October 29 (from `4619fdc`), October 30 (from `b0d6c3d`), October 31 (from `3497bb3`), November 1 (from `3d8496d`) and November 2 (from `9d221ef`). Earlier handoffs (October 28 online-build session, October 22 Wayfarer Lodges) are archived in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md). Preserve ignored `data/mythoveya.sqlite`. `CLAUDE.md` is the quick project map for new sessions.
+Updated November 3, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`, pushed to `origin/main` (https://github.com/DQuanBui/Mythoveya). This handoff covers six rounds: October 29 (from `4619fdc`), October 30 (from `b0d6c3d`), October 31 (from `3497bb3`), November 1 (from `3d8496d`) November 2 (from `9d221ef`) and November 3 (from `933a869`). Earlier handoffs (October 28 online-build session, October 22 Wayfarer Lodges) are archived in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md). Preserve ignored `data/mythoveya.sqlite`. `CLAUDE.md` is the quick project map for new sessions.
 
 ## Next up
 
-November 3 round (from `933a869`). Done this round, newest last:
+November 3 round is complete: 14 commits from `933a869` plus this record, all pushed.
+
+Next 3 tasks:
+1. Investigate the intermittent `lodges.spec` failure (blank lodge room, `lodge-furnishings-waiting` missing): it failed twice in a row after the full run, then passed five times, including at the same commit and during game night.
+2. Listening pass and a physical phone/tablet check of the new effects (status auras, motes, charge rings, dust).
+3. More characterful NPCs: hosts turning their heads to the keeper, and grass and trees swaying in the wind.
+
+## Play
+
+- **Online (single-player):** https://dquanbui.github.io/Mythoveya/. `.github/workflows/pages.yml` publishes it on every push to `main` (Pages source: GitHub Actions). Check a deployment with `node scripts/smoke-pages.mjs https://dquanbui.github.io/Mythoveya/`.
+- **Local (full game, including the human arena):** `npm install`, then run `Play Mythoveya.cmd` or `npm run dev` and open http://127.0.0.1:5173/. For the compiled build, run `npm run build && npm start` and open http://127.0.0.1:2567/.
+
+## Implemented November 3
+
 - Test: `waitForScene` in `tests/browser/world-helpers.ts` polls until the canvas's React Three Fiber root holds the keeper; `walkRoute`, `clickWorld`, `haven.spec`'s walker and `lodges.spec`'s `playerPoint` wait on it (lodges, haven and keeper-life pass).
 - Status effects in 3D (`StatusAura.tsx`, shared geometry and materials): stars circle stunned creatures (which also sway in the `stunned` motion), embers rise from burns, a frost ring with ice shards marks slows, green motes rise during regeneration and a red marker hovers over marked targets.
 - Weary creatures: a new `weary` motion (heavy panting, droop, heavy-lidded eyes) plays for battle creatures under 25% health until the battle ends; listed in the dev asset gallery's motion picker.
@@ -18,16 +31,6 @@ November 3 round (from `933a869`). Done this round, newest last:
 - Performance: water glints hide and skip their per-frame update when the camera is over 60 m (plus the water's radius) away, leaping fish skip distant lakes, Low quality hangs half the rim fringe, and islets stop updating under Reduced Motion. FPS check (Pages build, Havenreach, 1280x800): Low, Medium and High all at the 60 fps cap.
 - Ultimate charge-up (`ChargeAura` in `HitBurst.tsx`): for the first 40% of every ultimate, an element-coloured ring and turning hex rune open under the caster, a column of light rises and sparks stream up; static under Reduced Motion.
 - Knock-out dust (`KnockoutDust` in `HitBurst.tsx`): a ring of soft dust puffs blooms where a creature topples when that event knocks it out (from 78% of the event for ~0.6 s; hidden under Reduced Motion).
-
-Next 3 tasks:
-1. Night-time in-game check of lantern, fireflies and glints.
-2. Full verification, Playwright and docs.
-3. Listening and physical-device pass.
-
-## Play
-
-- **Online (single-player):** https://dquanbui.github.io/Mythoveya/. `.github/workflows/pages.yml` publishes it on every push to `main` (Pages source: GitHub Actions). Check a deployment with `node scripts/smoke-pages.mjs https://dquanbui.github.io/Mythoveya/`.
-- **Local (full game, including the human arena):** `npm install`, then run `Play Mythoveya.cmd` or `npm run dev` and open http://127.0.0.1:5173/. For the compiled build, run `npm run build && npm start` and open http://127.0.0.1:2567/.
 
 ## Implemented November 2
 
@@ -139,6 +142,14 @@ Next 3 tasks:
   - Indoor music reuses an existing theme, because `tests/signatures.test.ts` pins ten music themes.
 
 ## Verified
+
+November 3 (final code commit `bc66a94`):
+- typecheck and content audit pass;
+- **45 test files, 206 passed**;
+- both builds pass, entry 449 kB (154 kB gzipped); `smoke-production` and local `smoke-pages` pass;
+- FPS check (Pages build, Havenreach, 1280x800, this machine's GPU): Low, Medium and High all at the 60 fps cap;
+- Playwright full run (28.4 min): 32 of 33 passed. `lodges.spec` failed in the full run and again on an immediate rerun: the lodge room rendered blank and the `lodge-furnishings-waiting` mesh was missing from its scene (no page errors in the trace). A bisect over this round's commits found every tested commit passing, and the spec then passed at the final commit and again during game night (five passes in a row), so the cause is still open.
+- Visual checks: gallery screenshots per change (status auras, weary pose, motes, charge ring, knock-out dust) and an in-game night screenshot showing the lantern light with fireflies circling the keeper.
 
 November 2 (final code commit `307b579`):
 - typecheck and content audit pass (92 species, 276 actions, 92 passives, 12 families);
