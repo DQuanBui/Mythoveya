@@ -40,6 +40,7 @@ import { photo } from "./photo";
 import { Confetti, HitBurst, SupportGlow, SupportLink } from "./HitBurst";
 import { skillPath } from "./skill-path";
 import { StatusAura } from "./StatusAura";
+import { RegionMotes } from "./RegionMotes";
 import { Hearts } from "./Hearts";
 import { Footprints, leavePrint } from "./Footprints";
 import { Puffs } from "./Puffs";
@@ -359,6 +360,7 @@ function Environment({
           <DayNight sky={sky} fog={r.color} haven={region === "haven"} keeperLight />
           <SkyLife radius={expanded ? 54 : canyon || snow || meadow ? 62 : 26} birds={!expanded} />
           <WeatherEffects region={region} ground={groundFor(region)} />
+          <RegionMotes region={region} />
         </>
       )}
       {expanded ? (

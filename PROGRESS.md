@@ -8,11 +8,12 @@ November 3 round (from `933a869`). Done this round, newest last:
 - Test: `waitForScene` in `tests/browser/world-helpers.ts` polls until the canvas's React Three Fiber root holds the keeper; `walkRoute`, `clickWorld`, `haven.spec`'s walker and `lodges.spec`'s `playerPoint` wait on it (lodges, haven and keeper-life pass).
 - Status effects in 3D (`StatusAura.tsx`, shared geometry and materials): stars circle stunned creatures (which also sway in the `stunned` motion), embers rise from burns, a frost ring with ice shards marks slows, green motes rise during regeneration and a red marker hovers over marked targets.
 - Weary creatures: a new `weary` motion (heavy panting, droop, heavy-lidded eyes) plays for battle creatures under 25% health until the battle ends; listed in the dev asset gallery's motion picker.
+- Region ambience (`RegionMotes.tsx`): flickering embers rise around the keeper in Emberglass and pollen drifts through Whisperleaf (48 motes, 16 on Low, in a 16 m box that follows the keeper; hidden under Reduced Motion).
 
 Next 3 tasks:
-1. Region ambience: drifting embers in Emberglass, pollen in Whisperleaf.
-2. Companion paw prints in snow and sand.
-3. Fireflies drawn to the keeper's lantern at night.
+1. Companion paw prints in snow and sand.
+2. Fireflies drawn to the keeper's lantern at night.
+3. Fish leap in Reedwater Lake.
 
 ## Play
 
