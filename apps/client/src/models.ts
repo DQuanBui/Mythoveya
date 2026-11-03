@@ -1246,8 +1246,10 @@ export function animateCreature(
     q = (beat % 1) * 9,
     quirk = state === "idle" && !reduced && q < 1.6 ? Math.sin((q / 1.6) * Math.PI) : 0,
     kind = (Math.floor(beat) + index) % 3;
+  // Celebrating creatures wag their tails hard (serpent bodies excepted).
+  const happy = (state === "victory" || state === "play") && !reduced;
   tails.forEach((t: T.Group, i: number) => {
-    const wag = quirk && kind === 1 ? Math.sin(time * 13 + i) * 0.45 * quirk : 0;
+    const wag = happy && !t.userData.slither ? Math.sin(time * 16 + i) * 0.5 : quirk && kind === 1 ? Math.sin(time * 13 + i) * 0.45 * quirk : 0;
     t.rotation.y = (t.userData.restRotation?.y || 0) + Math.sin(time * 2 + i * 0.7) * 0.22 * motion + wag;
     t.rotation.x = (t.userData.restRotation?.x || 0) + Math.sin(time * 2 + i) * 0.08 * motion;
   });

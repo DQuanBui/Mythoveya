@@ -102,6 +102,17 @@ it("lets the scene set a gaze, which only applies while the creature is free to 
   expect(model.userData.eyes[0].userData.look.position.y).toBe(0);
 });
 
+it("wags a celebrating creature's tail hard, but not under Reduced Motion", () => {
+  const model = createCreature("emberfox"),
+    tail = model.userData.tails[0],
+    swing = (state: "victory" | "idle", reduced = false) => {
+      const at = [0, 0.05, 0.1, 0.15].map((time) => (animateCreature(model, time + 1, state, 0, reduced), tail.rotation.y));
+      return Math.max(...at) - Math.min(...at);
+    };
+  expect(swing("victory")).toBeGreaterThan(swing("idle") + 0.2);
+  expect(swing("victory", true)).toBeLessThan(0.2);
+});
+
 it("puffs Z's only while a creature sleeps", () => {
   const model = createCreature("mossprig");
   animateCreature(model, 2, "sleep");

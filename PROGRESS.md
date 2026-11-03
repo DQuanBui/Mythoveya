@@ -18,10 +18,11 @@ November 4 round (from `d37297c`). Done this round, newest last:
 - Townsfolk lanterns: from dusk (night glow above 0.4) each strolling islander carries the same hand lantern as the keeper, swinging as they walk home.
 - Glints in every region: Whisperleaf's pond (26) and Moonfrost's lake (32) sparkle like the Havenreach waters, placed in world coordinates so distance culling works.
 - Keeper glances at the companion: `userData.watch` can be a point as well as the keeper (with `watchPaused` to look away smoothly); standing still, the keeper glances down at a companion beside them for ~2.6 s of every 7. Tested.
+- Happy tails: creatures in the `victory` or `play` motion (battle wins, greetings, joy hops, cheering along) wag their tails hard; serpent body segments excluded, off under Reduced Motion. Tested.
 
 Next 3 tasks:
-1. Happy tail wag when a companion celebrates.
-2. Full verification, Playwright and docs.
+1. Full verification, Playwright and docs.
+2. Investigate the intermittent lodges.spec blank room.
 3. Listening and physical-device pass.
 
 ## Play
