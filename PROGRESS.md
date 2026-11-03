@@ -8,11 +8,12 @@ November 4 round (from `d37297c`). Done this round, newest last:
 - Refactor: the hair dye swatch row is one `HairDyePicker` component used by the Lanternfair wardrobe and the keeper appearance panel.
 - Accessibility: the hair dye radiogroup uses roving focus (only the chosen swatch is in the tab order; arrows, Home and End move focus; Enter or Space picks, since each pick may save). `islands.spec` checks it.
 - Villagers watch the keeper: `watchKeeper(model)` marks an NPC whose head eases toward the keeper within 4.5 m (and back afterwards). Used for the village friends, strolling townsfolk, home and lodge hosts, and the Atlas, Conservancy, Rally, Rescue and region rangers. Tested in `creature-look.test.ts`.
+- Companion gaze: `animateCreature` honours an optional `userData.gaze` while a creature is free to glance; the companion waiting within 2.4 m of the keeper looks up at them instead of darting its eyes about.
 
 Next 3 tasks:
-1. Companion looks up at the keeper when it waits beside them.
-2. Grass and tree crowns sway in the wind.
-3. Drifting cloud shadows over Havenreach.
+1. Grass and tree crowns sway in the wind.
+2. Drifting cloud shadows over Havenreach.
+3. Element-shaped impact sparks in battle.
 
 ## Play
 

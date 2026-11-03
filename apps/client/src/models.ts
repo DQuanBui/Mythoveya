@@ -1206,8 +1206,10 @@ export function animateCreature(
     n = Math.floor(glance),
     t = Math.min(1, (glance - n) * 19),
     still = reduced || !["idle", "walk", "play", "victory"].includes(state),
-    lookX = still ? 0 : spot(n - 1, 0) + (spot(n, 0) - spot(n - 1, 0)) * t,
-    lookY = still ? 0 : spot(n - 1, 1) + (spot(n, 1) - spot(n - 1, 1)) * t;
+    // A gaze set by the scene (e.g. a companion looking up at its keeper) wins.
+    gaze = !still && (g.userData.gaze as { x: number; y: number } | null),
+    lookX = still ? 0 : gaze ? gaze.x : spot(n - 1, 0) + (spot(n, 0) - spot(n - 1, 0)) * t,
+    lookY = still ? 0 : gaze ? gaze.y : spot(n - 1, 1) + (spot(n, 1) - spot(n - 1, 1)) * t;
   eyes?.forEach((eye: T.Group) => {
     eye.scale.y = blink;
     eye.userData.look?.position.set(lookX * 0.036, lookY * 0.022, 0);

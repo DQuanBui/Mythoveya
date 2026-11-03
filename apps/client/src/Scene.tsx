@@ -670,6 +670,7 @@ function stepSound(region: string, x: number, z: number, y: number) {
   if (y > 2 || pathDistance(x, z) < 1.1) return "stoneStep";
   return "grass";
 }
+const COMPANION_GAZE = { x: 0, y: 0.5 };
 const groundFor = (region: string) =>
   region === "haven" ? groundHeight : region === "canyon" ? canyonHeight : region === "hollow" ? hollowHeight : region === "meadow" ? meadowHeight : () => 0;
 /** Where a click ray meets the terrain, found by marching then bisecting. */
@@ -1117,6 +1118,8 @@ export function Explorer({
       player.current.x - follow.current.x,
       player.current.z - follow.current.z,
     );
+    // Waiting at the keeper's side, the companion looks up at them.
+    companion.userData.gaze = !following && !moving && delta.length() < 2.4 ? COMPANION_GAZE : null;
     // Left waiting long enough, the companion curls up for a nap.
     rest.current = following || moving || pet || Date.now() < companionJoy.until || (keeperEmote.name && keeperEmote.name !== "sit") ? 0 : rest.current + dt;
     animateCreature(

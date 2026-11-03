@@ -93,6 +93,15 @@ it("droops a weary creature with heavy-lidded eyes", () => {
   expect(model.userData.eyes.every((e: Object3D) => e.scale.y <= 0.55)).toBe(true);
 });
 
+it("lets the scene set a gaze, which only applies while the creature is free to glance", () => {
+  const model = createCreature("emberfox");
+  model.userData.gaze = { x: 0, y: 0.5 };
+  animateCreature(model, 1, "idle");
+  expect(model.userData.eyes[0].userData.look.position.y).toBeCloseTo(0.5 * 0.022);
+  animateCreature(model, 1, "attack", 0.5);
+  expect(model.userData.eyes[0].userData.look.position.y).toBe(0);
+});
+
 it("puffs Z's only while a creature sleeps", () => {
   const model = createCreature("mossprig");
   animateCreature(model, 2, "sleep");
