@@ -1170,7 +1170,8 @@ export type Motion =
   | "guard"
   | "stunned"
   | "sleep"
-  | "play";
+  | "play"
+  | "weary";
 export function animateCreature(
   g: T.Group,
   time: number,
@@ -1375,6 +1376,16 @@ export function animateCreature(
     limbs.forEach((l: T.Group) => (l.rotation.x = 0));
     tails.forEach((t: T.Group) => (t.rotation.y = 0.5));
     wings.forEach((w: T.Group, i: number) => (w.rotation.z = ((i % 2) * 2 - 1) * -0.1));
+  }
+  if (state === "weary") {
+    // Badly hurt: heavy, quick breaths, a low droop and heavy-lidded eyes.
+    const pant = Math.abs(Math.sin(time * 4.5)) * motion;
+    rig.position.y -= 0.05;
+    rig.rotation.x = 0.14;
+    rig.rotation.z = Math.sin(time * 0.8 + index) * 0.03 * motion;
+    rig.scale.set(1 + pant * 0.025, 0.94 + pant * 0.05, 1);
+    wings.forEach((w: T.Group, i: number) => (w.rotation.z = ((i % 2) * 2 - 1) * -0.25));
+    eyes?.forEach((eye: T.Group) => (eye.scale.y = Math.min(eye.scale.y, 0.55)));
   }
   if (state === "play") {
     // Playful pounces: a crouch, a hop and a happy tilt.

@@ -1922,7 +1922,9 @@ export function BattleScene({
                   ? "victory"
                   : u.statuses.some((s) => s.kind === "stun")
                     ? "stunned"
-                    : "idle";
+                    : shownHp < u.maxHp * 0.25 && battle.winner === null
+                      ? "weary"
+                      : "idle";
         return (
           <group key={u.id} position={p} onClick={() => onTarget(u.id)}>
             <Creature

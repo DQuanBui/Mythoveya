@@ -85,6 +85,13 @@ it("drops an arriving creature in from above and lands it at full size", () => {
   expect(model.userData.rig.scale.y).toBeCloseTo(1);
 });
 
+it("droops a weary creature with heavy-lidded eyes", () => {
+  const model = createCreature("emberfox");
+  animateCreature(model, 1, "weary");
+  expect(model.userData.rig.rotation.x).toBeCloseTo(0.14);
+  expect(model.userData.eyes.every((e: Object3D) => e.scale.y <= 0.55)).toBe(true);
+});
+
 it("puffs Z's only while a creature sleeps", () => {
   const model = createCreature("mossprig");
   animateCreature(model, 2, "sleep");
