@@ -227,9 +227,11 @@ function Fireflies({ haven, lantern = false }: { haven: boolean; lantern?: boole
     const glow = daylight(islandHour()).glow,
       material = points.material as T.PointsMaterial,
       lit = lantern && nightState.glow > 0.45;
-    points.visible = glow > 0.05;
+    // Fireflies shelter from the rain.
+    const shelter = 1 - Math.min(1, weatherFx.rain * 1.4);
+    points.visible = glow > 0.05 && shelter > 0.02;
     if (!points.visible) return;
-    material.opacity = glow * (0.65 + Math.sin(clock.elapsedTime * 3) * 0.2);
+    material.opacity = glow * shelter * (0.65 + Math.sin(clock.elapsedTime * 3) * 0.2);
     if (settings.reduced) return;
     const attr = points.geometry.attributes.position as T.BufferAttribute;
     for (let i = 0; i < count; i++) {
