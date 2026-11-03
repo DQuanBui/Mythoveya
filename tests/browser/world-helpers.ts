@@ -1,8 +1,29 @@
 import { expect, type Page } from "@playwright/test";
 // Shared world drivers, copied from haven.spec.ts: walk the keeper along
 // waypoints with synthetic keys, and click a world point on screen.
+/** Wait until the 3D canvas has registered its React Three Fiber root and
+ * the keeper model is in its scene (they mount a moment after the HUD). */
+export async function waitForScene(page: Page, canvas = ".scene canvas") {
+  await expect
+    .poll(
+      () =>
+        page.evaluate(async (canvas) => {
+          const url = performance
+            .getEntriesByType("resource")
+            .map((r) => r.name)
+            .find((n) => n.includes("@react-three_fiber.js"));
+          if (!url) return false;
+          const { _roots } = await import(/* @vite-ignore */ url);
+          const scene = _roots.get(document.querySelector(canvas))?.store.getState().scene;
+          return !!scene?.children.some((c: any) => c.userData.head && c.userData.limbs);
+        }, canvas),
+      { timeout: 30000 },
+    )
+    .toBe(true);
+}
 export async function walkRoute(page: Page, points: number[][]) {
   await page.bringToFront();
+  await waitForScene(page);
   await page.evaluate(async (points) => {
     const url = performance
       .getEntriesByType("resource")
@@ -70,6 +91,7 @@ export async function walkRoute(page: Page, points: number[][]) {
   await page.waitForTimeout(250);
 }
 export async function clickWorld(page: Page, point: number[], drag = false) {
+  await waitForScene(page);
   // Orbit damping keeps turning briefly after a drag or reset; wait until still.
   await expect
     .poll(

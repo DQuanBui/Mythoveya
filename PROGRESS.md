@@ -4,12 +4,13 @@ Updated November 2, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch
 
 ## Next up
 
-November 2 round is complete: 15 commits from `9d221ef` (creatures, characters, world, battle, hair dyes), all pushed, with the verification record below.
+November 3 round (from `933a869`). Done this round, newest last:
+- Test: `waitForScene` in `tests/browser/world-helpers.ts` polls until the canvas's React Three Fiber root holds the keeper; `walkRoute`, `clickWorld`, `haven.spec`'s walker and `lodges.spec`'s `playerPoint` wait on it (lodges, haven and keeper-life pass).
 
 Next 3 tasks:
-1. Make the browser helpers that read React Three Fiber's internal store (`playerPoint` in `lodges.spec.ts`, the `haven.spec` mouse-picking scenario) wait until the canvas's root is registered; both flaked once and passed on rerun.
-2. Listening pass and a physical phone/tablet check of the effects added in the last two rounds (frame rate with glints, fringe, puffs, links and lantern light).
-3. Show the hair dye in other keeper views (photo mode, rankings and festival ghosts), and offer the wardrobe outside Lanternfair.
+1. Status effects in 3D: stars circle stunned creatures, burning ones smoulder, slowed ones frost over.
+2. Weakened creatures (under 25% HP) pant and droop in battle.
+3. Region ambience: drifting embers in Emberglass, pollen in Whisperleaf.
 
 ## Play
 

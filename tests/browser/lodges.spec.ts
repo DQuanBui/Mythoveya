@@ -4,6 +4,7 @@ import { REGIONS, COMPANIONS, byId } from "../../packages/shared/content";
 import { SUPPLY_NODES } from "../../packages/shared/conservancy";
 import { LODGE_WORKSHOPS } from "../../packages/shared/lodge-workshops";
 import { FIELD_ABILITIES, fieldAbility } from "../../packages/shared/rescue";
+import { waitForScene } from "./world-helpers";
 async function stop(page: Page, id: string) {
   const h = LODGES.find((s) => s.id === id)!;
   const region = h.region;
@@ -44,6 +45,8 @@ async function stop(page: Page, id: string) {
   });
 }
 async function playerPoint(page: Page) {
+  // A room or the outdoors may still be mounting its canvas.
+  await waitForScene(page, "canvas");
   return page.evaluate(async () => {
     const url = performance
       .getEntriesByType("resource")

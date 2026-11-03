@@ -1,7 +1,9 @@
 import { test, expect, type Page } from "@playwright/test";
+import { waitForScene } from "./world-helpers";
 
 async function walkRoute(page: Page, points: number[][]) {
   await page.bringToFront();
+  await waitForScene(page);
   await page.evaluate(async (points) => {
     const url = performance
       .getEntriesByType("resource")
