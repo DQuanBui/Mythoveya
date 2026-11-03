@@ -1957,7 +1957,12 @@ export function BattleScene({
         // An attacker turns to face its target through the strike.
         const base = u.side === 0 ? Math.PI : 0,
           aim = !preview && active && event?.actor === u.id && event.target !== u.id ? battle.units.find((x) => x.id === event.target) : undefined,
-          facing = aim ? turnToward(p, unitPosition(aim.side, aim.slot), base, Math.sin(Math.min(1, elapsed) * Math.PI)) : base;
+          facing = aim
+            ? turnToward(p, unitPosition(aim.side, aim.slot), base, Math.sin(Math.min(1, elapsed) * Math.PI))
+            : // Winners turn round to celebrate toward the camera.
+              !preview && battle.winner === u.side && !active && shownHp > 0
+              ? turnToward(p, [0, 0, 17.5], base, Math.min(1, Math.max(0, (elapsed - 1) / 0.6)))
+              : base;
         const arrive = (Date.now() - opened - (u.side * 3 + (u.slot % 3)) * 110 - Math.floor(u.slot / 3) * 60) / 650;
         const state: Motion =
           !preview && !active && arrive < 1 && shownHp > 0
