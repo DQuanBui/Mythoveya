@@ -1,10 +1,23 @@
 # Mythoveya handoff
 
-Updated November 3, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`, pushed to `origin/main` (https://github.com/DQuanBui/Mythoveya). This handoff covers six rounds: October 29 (from `4619fdc`), October 30 (from `b0d6c3d`), October 31 (from `3497bb3`), November 1 (from `3d8496d`) November 2 (from `9d221ef`) and November 3 (from `933a869`). Earlier handoffs (October 28 online-build session, October 22 Wayfarer Lodges) are archived in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md). Preserve ignored `data/mythoveya.sqlite`. `CLAUDE.md` is the quick project map for new sessions.
+Updated November 4, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`, pushed to `origin/main` (https://github.com/DQuanBui/Mythoveya). This handoff covers seven rounds: October 29 (from `4619fdc`), October 30 (from `b0d6c3d`), October 31 (from `3497bb3`), November 1 (from `3d8496d`) November 2 (from `9d221ef`), November 3 (from `933a869`) and November 4 (from `d37297c`). Earlier handoffs (October 28 online-build session, October 22 Wayfarer Lodges) are archived in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md). Preserve ignored `data/mythoveya.sqlite`. `CLAUDE.md` is the quick project map for new sessions.
 
 ## Next up
 
-November 4 round (from `d37297c`). Done this round, newest last:
+November 4 round is complete: 15 commits from `d37297c` plus this record, all pushed.
+
+Next 3 tasks:
+1. `lodges.spec` fails only inside full Playwright runs (as test 26, the lodge room renders blank and `lodge-furnishings-waiting` is missing) and passes every time on its own (seven standalone passes). Suspect resources accumulating over the long suite (WebGL contexts or GPU memory in the shared browser); try running it in a fresh browser or earlier in the order, and check for leaked canvases.
+2. Listening pass and a physical phone/tablet check of the effects from the last four rounds, with a frame-rate check on a weaker GPU (this machine caps at 60 fps on every preset).
+3. Cloud shadows done properly: shade the ground, trails, plaza and place discs together (a first attempt was reverted because those are separate meshes and would show seams).
+
+## Play
+
+- **Online (single-player):** https://dquanbui.github.io/Mythoveya/. `.github/workflows/pages.yml` publishes it on every push to `main` (Pages source: GitHub Actions). Check a deployment with `node scripts/smoke-pages.mjs https://dquanbui.github.io/Mythoveya/`.
+- **Local (full game, including the human arena):** `npm install`, then run `Play Mythoveya.cmd` or `npm run dev` and open http://127.0.0.1:5173/. For the compiled build, run `npm run build && npm start` and open http://127.0.0.1:2567/.
+
+## Implemented November 4
+
 - Refactor: the hair dye swatch row is one `HairDyePicker` component used by the Lanternfair wardrobe and the keeper appearance panel.
 - Accessibility: the hair dye radiogroup uses roving focus (only the chosen swatch is in the tab order; arrows, Home and End move focus; Enter or Space picks, since each pick may save). `islands.spec` checks it.
 - Villagers watch the keeper: `watchKeeper(model)` marks an NPC whose head eases toward the keeper within 4.5 m (and back afterwards). Used for the village friends, strolling townsfolk, home and lodge hosts, and the Atlas, Conservancy, Rally, Rescue and region rangers. Tested in `creature-look.test.ts`.
@@ -20,16 +33,6 @@ November 4 round (from `d37297c`). Done this round, newest last:
 - Keeper glances at the companion: `userData.watch` can be a point as well as the keeper (with `watchPaused` to look away smoothly); standing still, the keeper glances down at a companion beside them for ~2.6 s of every 7. Tested.
 - Happy tails: creatures in the `victory` or `play` motion (battle wins, greetings, joy hops, cheering along) wag their tails hard; serpent body segments excluded, off under Reduced Motion. Tested.
 - Landing dust: `KnockoutDust` became `LandingDust` (start time and length), still used for knock-outs, and each creature now lands with a small dust puff as the battle opens.
-
-Next 3 tasks:
-1. Full verification, Playwright and docs.
-2. Investigate the intermittent lodges.spec blank room.
-3. Listening and physical-device pass.
-
-## Play
-
-- **Online (single-player):** https://dquanbui.github.io/Mythoveya/. `.github/workflows/pages.yml` publishes it on every push to `main` (Pages source: GitHub Actions). Check a deployment with `node scripts/smoke-pages.mjs https://dquanbui.github.io/Mythoveya/`.
-- **Local (full game, including the human arena):** `npm install`, then run `Play Mythoveya.cmd` or `npm run dev` and open http://127.0.0.1:5173/. For the compiled build, run `npm run build && npm start` and open http://127.0.0.1:2567/.
 
 ## Implemented November 3
 
@@ -157,6 +160,13 @@ Next 3 tasks:
   - Indoor music reuses an existing theme, because `tests/signatures.test.ts` pins ten music themes.
 
 ## Verified
+
+November 4 (final code commit `04fa944`):
+- typecheck and content audit pass;
+- **45 test files, 211 passed** (new cases for head-watching, gaze, weary, happy tails, sparkles and the hair dye radiogroup);
+- both builds pass, entry 453 kB (156 kB gzipped); `smoke-production` and local `smoke-pages` pass;
+- Playwright full run (43.1 min, slower than usual): 31 of 33 passed. `keeper-life.spec` stopped mid-walk ("Route stopped near -8.0, 11.9") and `lodges.spec` hit its blank-room failure again; both passed together on a targeted rerun (5.2 min), so all 33 have passing evidence. The `islands.spec` Lanternfair journey now also checks keyboard movement through the hair dye swatches.
+- Visual checks: gallery screenshots per change (element debris, status auras), a Pages-build world check for shader errors after the wind sway, and a dev-server dusk screenshot with pinned hour and weather.
 
 November 3 (final code commit `bc66a94`):
 - typecheck and content audit pass;
