@@ -214,6 +214,17 @@ describe("villagers who watch the keeper", () => {
     worldFocus.set(0, 0, 5);
   });
 
+  it("talk with their hands while chatting, instead of an idle habit", () => {
+    const friend = createAvatar(4),
+      [, , , rightArm] = friend.userData.limbs as Object3D[],
+      at = 18 + 1.3 - 4 * 2.3;
+    friend.userData.chatting = true;
+    const lifts = [0, 0.3, 0.6, 0.9].map((dt) => (animateAvatar(friend, at + dt), rightArm.rotation.x));
+    expect(Math.min(...lifts)).toBeLessThan(-0.5);
+    // Dax's folded-arms habit would cross the right arm inward; chatting keeps it out.
+    expect(rightArm.rotation.z).toBe(0);
+  });
+
   it("let the keeper glance at a point, and look away while paused", () => {
     const keeper = createAvatar(0),
       pet = new Vector3(-2, 0, 0.5);

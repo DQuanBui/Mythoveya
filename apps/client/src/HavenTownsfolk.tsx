@@ -16,6 +16,9 @@ import { worldFocus } from "./village-materials";
 import { weatherFx } from "./Weather";
 import { useCarried } from "./carried";
 
+// Islanders standing about right now, so neighbours can stop for a chat.
+const standing = new Map<number, T.Vector3>();
+
 // Islanders who stroll between homes and landmarks, then head home at night.
 export const TOWNSFOLK = [
   {
@@ -123,6 +126,7 @@ function Villager({
     state.current.pos.set(x, 0, z);
     model.position.set(x, 0, z);
   }, [index, model]);
+  useEffect(() => () => void standing.delete(index), [index]);
   useFrame(({ clock, camera }, dt) => {
     dt = Math.min(dt, 0.1);
     const s = state.current,
@@ -169,6 +173,19 @@ function Villager({
         s.path = findPath(grid, [s.pos.x, s.pos.z], target, havenWalkable) || [];
         s.wait = 3 + ((index * 1.7 + clock.elapsedTime) % 6);
       }
+    }
+    // Two islanders standing about close together stop for a chat.
+    const idle = !walking && !s.path.length && s.greet <= 0 && !s.inside;
+    if (idle) standing.set(index, s.pos);
+    else standing.delete(index);
+    let partner: T.Vector3 | undefined;
+    if (idle)
+      for (const [other, at] of standing)
+        if (other !== index && at.distanceTo(s.pos) < 2.6) partner = at;
+    model.userData.chatting = !!partner;
+    if (partner) {
+      const turn = Math.atan2(partner.x - s.pos.x, partner.z - s.pos.z) - model.rotation.y;
+      model.rotation.y += Math.atan2(Math.sin(turn), Math.cos(turn)) * Math.min(1, dt * 4);
     }
     model.position.copy(s.pos);
     if (near) {

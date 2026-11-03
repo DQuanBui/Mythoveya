@@ -1684,9 +1684,18 @@ export function animateAvatar(
       }
     }
   }
+  // Chatting villagers talk with their hands and nod along.
+  const chat = g.userData.chatting && !walk && !e;
+  if (chat && !reduced) {
+    const [, leftArm, , rightArm] = g.userData.limbs as T.Group[],
+      beat = t * 2.2 + g.userData.index;
+    rightArm.rotation.x = -0.35 - Math.max(0, Math.sin(beat)) * 0.45;
+    leftArm.rotation.x = -0.15 - Math.max(0, Math.sin(beat * 0.7 + 2)) * 0.3;
+    if (head) head.rotation.x = Math.sin(beat * 1.6) * 0.07;
+  }
   // Standing idle, each keeper falls into a habit of their own every so often.
   const cyc = (t + g.userData.index * 2.3) % 9,
-    h = walk || e || reduced || cyc > 2.6 ? 0 : Math.sin((cyc / 2.6) * Math.PI);
+    h = walk || e || chat || reduced || cyc > 2.6 ? 0 : Math.sin((cyc / 2.6) * Math.PI);
   let lift = 0;
   if (h) {
     const [, leftArm, rightLeg, rightArm] = g.userData.limbs as T.Group[],
