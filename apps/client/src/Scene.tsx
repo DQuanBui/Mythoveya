@@ -1125,6 +1125,9 @@ export function Explorer({
         if (clock.elapsedTime - paw.current > (sprinting ? 0.17 : 0.22)) {
           paw.current = clock.elapsedTime;
           const step = area ? "" : stepSound(profile.region, fx, fz, follow.current.y);
+          // ...and splashes straight through any full puddle.
+          if (profile.region === "haven" && !area && inPuddle(fx, fz))
+            for (const side of [-1, 1]) emitPuff(fx, follow.current.y + 0.05, fz, Math.cos(side), side * 0.8, clock.elapsedTime, "splash");
           if (step === "snowStep" || step === "sandStep") leavePaw(fx, follow.current.y, fz, Math.atan2(delta.x, delta.z), clock.elapsedTime, step === "snowStep");
         }
       }

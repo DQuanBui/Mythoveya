@@ -15,10 +15,11 @@ November 6 round (from `040b6f1`). Done this round, newest last:
 - Perf: puddle spots store their ground height once, so filling puddles no longer looks up 40 terrain heights every frame.
 - Cheer along: villagers, hosts and rangers within 8 m now cheer (both arms up, little hops) while the keeper's cheer emote plays, as well as waving back. Tested.
 - Accessibility: each battle creature's button label now reads its shield and lasting statuses in plain words, e.g. "Mossprig 20 of 61, shield 12, stunned for 1 round" (`battle-labels.ts`, tested).
+- Companion splashes: the following companion throws up small splashes as it trots through a puddle that holds water.
 
 Next 3 tasks:
 1. Villagers stop to chat in pairs.
-2. Companion splashes through puddles.
+2. Refactor the carried lantern and umbrella wiring shared by the keeper and islanders.
 3. Full verification, Playwright and docs.
 
 ## Play
