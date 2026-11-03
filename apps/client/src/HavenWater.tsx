@@ -165,8 +165,14 @@ export function LeapingFish({
 }) {
   const fish = useRef<T.Group>(null),
     splash = useRef<T.Mesh<T.RingGeometry, T.MeshBasicMaterial>>(null);
-  useFrame(({ clock }) => {
+  useFrame(({ clock, camera }) => {
     if (settings.reduced) return;
+    // A far-off lake skips its leaps (and the splash stays hidden).
+    if (Math.hypot(camera.position.x - cx, camera.position.z - cz) > 60) {
+      if (fish.current) fish.current.visible = false;
+      if (splash.current) splash.current.visible = false;
+      return;
+    }
     const cycle = clock.elapsedTime / period,
       n = Math.floor(cycle),
       t = cycle - n,

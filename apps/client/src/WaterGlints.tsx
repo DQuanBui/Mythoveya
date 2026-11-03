@@ -5,6 +5,7 @@ import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js
 import { settings } from "./audio";
 import { daylight, islandHour } from "./daytime";
 
+const FAR = 60;
 const hash = (n: number) => {
   const v = Math.sin(n * 127.1) * 43758.5453;
   return v - Math.floor(v);
@@ -36,8 +37,9 @@ export function WaterGlints({ x, z, rx, rz, y = 0.05, max = 44 }: { x: number; z
   const o = useMemo(() => new T.Object3D(), []),
     warm = useMemo(() => new T.Color("#fff4d2"), []),
     cool = useMemo(() => new T.Color("#c9dcff"), []);
-  useFrame(({ clock }) => {
-    mesh.visible = !settings.reduced;
+  useFrame(({ clock, camera }) => {
+    // Out of sight across the island, the water needs no glints.
+    mesh.visible = !settings.reduced && Math.hypot(camera.position.x - x, camera.position.z - z) < FAR + Math.max(rx, rz);
     if (!mesh.visible) return;
     const day = daylight(islandHour()).day,
       material = mesh.material as T.MeshBasicMaterial,

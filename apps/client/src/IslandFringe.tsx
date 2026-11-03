@@ -33,6 +33,8 @@ export function IslandFringe({
   count?: number;
 }) {
   const L = LOOKS[look];
+  // Low quality hangs half as many pieces.
+  if (settings.quality === "Low") count = Math.round(count / 2);
   const roots = useMemo(() => {
     const parts: T.BufferGeometry[] = [],
       m = new T.Matrix4(),
@@ -91,6 +93,9 @@ export function IslandFringe({
   );
   const o = useMemo(() => new T.Object3D(), []);
   useFrame(({ clock }) => {
+    // Islets hold still under Reduced Motion, so they need no updates after the first frame.
+    if (settings.reduced && islets.rock.userData.placed) return;
+    islets.rock.userData.placed = true;
     const t = settings.reduced ? 0 : clock.elapsedTime;
     islets.seeds.forEach((s, i) => {
       // Each islet bobs and turns slowly on its own rhythm.
