@@ -1988,7 +1988,8 @@ export function BattleScene({
                 height={0.8 * byId[u.species].size}
               />
             )}
-            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.035, 0]} scale={battle.queue[0] === u.id ? 1.15 : 1}>
+            {/* The creature about to act breathes its ring in and out. */}
+            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.035, 0]} scale={battle.queue[0] === u.id ? 1.15 + (settings.reduced || battle.winner !== null ? 0 : Math.sin(Date.now() / 190) * 0.06) : 1}>
               <ringGeometry args={[0.65, battle.queue[0] === u.id ? 0.8 : 0.72, 32]} />
               <meshBasicMaterial
                 color={
