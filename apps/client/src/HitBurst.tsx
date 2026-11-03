@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as T from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import { softDot } from "./glyphs";
 import { settings } from "./audio";
 
 // The attacker's element tints each impact.
@@ -321,4 +322,46 @@ export function ChargeAura({ at, duration, element, height }: { at: number; dura
       <primitive object={parts.sparks} />
     </group>
   );
+}
+
+const DUST = 10;
+/** Dust kicked up where a defeated creature topples onto the field. */
+export function KnockoutDust({ at, duration, size }: { at: number; duration: number; size: number }) {
+  const mesh = useMemo(() => {
+    const m = new T.InstancedMesh(
+      new T.PlaneGeometry(1, 1),
+      new T.MeshBasicMaterial({ map: softDot(), color: "#cdbfa6", transparent: true, opacity: 0.7, depthWrite: false }),
+      DUST,
+    );
+    m.frustumCulled = false;
+    return m;
+  }, []);
+  useEffect(
+    () => () => {
+      mesh.geometry.dispose();
+      const mat = mesh.material as T.MeshBasicMaterial;
+      mat.map?.dispose();
+      mat.dispose();
+    },
+    [mesh],
+  );
+  const o = useMemo(() => new T.Object3D(), []);
+  useFrame(({ camera }) => {
+    // The topple lands about 80% of the way through the event; dust lasts ~0.6 s.
+    const t = ((Date.now() - at) / duration - 0.78) / 0.6;
+    mesh.visible = !settings.reduced && t >= 0 && t <= 1;
+    if (!mesh.visible) return;
+    (mesh.material as T.MeshBasicMaterial).opacity = 0.7 * (1 - t);
+    for (let i = 0; i < DUST; i++) {
+      const a = (i / DUST) * Math.PI * 2,
+        r = size * (0.35 + Math.sqrt(t) * 0.9);
+      o.position.set(Math.cos(a) * r, 0.12 + t * 0.25, Math.sin(a) * r);
+      o.quaternion.copy(camera.quaternion);
+      o.scale.setScalar(size * (0.3 + t * 0.45));
+      o.updateMatrix();
+      mesh.setMatrixAt(i, o.matrix);
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+  });
+  return <primitive object={mesh} />;
 }
