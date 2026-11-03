@@ -10,6 +10,7 @@ describe("rain puddles", () => {
       expect(pathDistance(s.x, s.z)).toBeLessThanOrEqual(1.1);
       expect(slopeAt(s.x, s.z)).toBeLessThanOrEqual(0.06);
       expect(groundHeight(s.x, s.z)).toBeLessThanOrEqual(2);
+      expect(s.y).toBe(groundHeight(s.x, s.z));
       expect(inPond(s.x, s.z, 1.5)).toBe(false);
     }
     for (const a of spots) for (const b of spots) if (a !== b) expect(Math.hypot(a.x - b.x, a.z - b.z)).toBeGreaterThanOrEqual(3);

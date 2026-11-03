@@ -12,11 +12,12 @@ November 6 round (from `040b6f1`). Done this round, newest last:
 - Puddle splashes: `puddles` / `inPuddle` in `puddle-spots.ts` share the live puddles; a keeper footstep inside a puddle that holds water throws up three small splashes (`splash` puff kind). Tested.
 - Stretch before a nap: a new `stretch` motion (slow play-bow, eyes shut) plays over the 1.4 s before a waiting companion curls up to sleep; listed in the asset gallery; tested.
 - Fireflies shelter from rain: their glow fades out as rain builds (gone at about 70% rain) and returns when it clears.
+- Perf: puddle spots store their ground height once, so filling puddles no longer looks up 40 terrain heights every frame.
 
 Next 3 tasks:
 1. Villagers stop to chat in pairs.
-2. Rangers and hosts tip their heads when greeted.
-3. Full verification, Playwright and docs.
+2. Villagers cheer back when the keeper cheers.
+3. Health bar labels name lasting statuses for screen readers.
 
 ## Play
 

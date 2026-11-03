@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as T from "three";
-import { groundHeight } from "../../../packages/shared/haven";
 import { puddleSpots, puddles } from "./puddle-spots";
 import { settings } from "./audio";
 import { weatherFx } from "./Weather";
@@ -39,7 +38,7 @@ export function Puddles() {
     mesh.visible = wet.current > 0.02 && !perf.lite;
     if (!mesh.visible) return;
     spots.forEach((s, i) => {
-      o.position.set(s.x, groundHeight(s.x, s.z) + 0.035, s.z);
+      o.position.set(s.x, s.y + 0.035, s.z);
       o.rotation.set(0, s.turn, 0);
       const k = s.size * Math.sqrt(wet.current);
       o.scale.set(k * 1.3, 1, k);
