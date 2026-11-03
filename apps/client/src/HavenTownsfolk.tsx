@@ -8,12 +8,13 @@ import {
   type Point,
 } from "../../../packages/shared/haven";
 import { buildGrid, findPath, type WalkGrid } from "../../../packages/shared/pathfind";
-import { animateAvatar, createAvatar, watchKeeper, createLantern, createUmbrella, disposeLantern, swingLantern } from "./models";
+import { animateAvatar, createAvatar, watchKeeper, createLantern, createUmbrella, swingLantern } from "./models";
 import { WorldInteraction } from "./WorldInteraction";
 import { daylight, islandHour } from "./daytime";
 import { settings } from "./audio";
 import { worldFocus } from "./village-materials";
 import { weatherFx } from "./Weather";
+import { useCarried } from "./carried";
 
 // Islanders who stroll between homes and landmarks, then head home at night.
 export const TOWNSFOLK = [
@@ -105,19 +106,10 @@ function Villager({
   const folk = TOWNSFOLK[index];
   const model = useMemo(() => watchKeeper(createAvatar(folk.avatar)), [folk.avatar]);
   const home = useMemo(() => door(folk.home), [folk.home]);
-  // From dusk, islanders light their way home with a hand lantern.
-  const lantern = useMemo(() => createLantern(`townsfolk-lantern-${index}`), [index]);
-  // ...and in the rain, a broad leaf held overhead.
-  const umbrella = useMemo(() => createUmbrella(`townsfolk-umbrella-${index}`), [index]);
-  useEffect(() => {
-    const limbs = model.userData.limbs as T.Group[];
-    limbs[3].add(lantern);
-    limbs[1].add(umbrella);
-    return () => {
-      disposeLantern(lantern);
-      disposeLantern(umbrella);
-    };
-  }, [model, lantern, umbrella]);
+  // From dusk, islanders light their way home with a hand lantern, and in
+  // the rain they hold a broad leaf overhead.
+  const lantern = useCarried(model, 3, () => createLantern(`townsfolk-lantern-${index}`));
+  const umbrella = useCarried(model, 1, () => createUmbrella(`townsfolk-umbrella-${index}`));
   const state = useRef({
     pos: new T.Vector3(),
     path: [] as Point[],

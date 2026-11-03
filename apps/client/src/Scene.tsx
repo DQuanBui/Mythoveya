@@ -96,7 +96,6 @@ import {
   watchKeeper,
   createLantern,
   createUmbrella,
-  disposeLantern,
   swingLantern,
   createAvatar,
   createCreature,
@@ -115,6 +114,7 @@ import { useContextRecovery } from "./context-recovery";
 import { frameMonitor } from "./adaptive";
 import { inPuddle } from "./puddle-spots";
 import { unitLabel } from "./battle-labels";
+import { useCarried } from "./carried";
 // Festival lanterns load only while a festival runs.
 const SeasonalLanterns = lazy(() => import("./SeasonalLanterns").then((m) => ({ default: m.SeasonalLanterns })));
 function RenderStats() {
@@ -766,18 +766,10 @@ export function Explorer({
     () => dressKeeper(createAvatar(profile.avatar, hair), outfit),
     [profile.avatar, outfit, hair],
   );
-  // After dark the keeper carries a small lantern in the right hand.
-  const lantern = useMemo(() => createLantern("keeper-lantern"), []);
-  // In the rain, a broad leaf held up in the other hand.
-  const umbrella = useMemo(() => createUmbrella("keeper-umbrella"), []);
-  useEffect(() => {
-    (avatar.userData.limbs as T.Group[])[1].add(umbrella);
-    return () => disposeLantern(umbrella);
-  }, [avatar, umbrella]);
-  useEffect(() => {
-    (avatar.userData.limbs as T.Group[])[3].add(lantern);
-    return () => disposeLantern(lantern);
-  }, [avatar, lantern]);
+  // After dark the keeper carries a small lantern in the right hand, and in
+  // the rain a broad leaf held up in the other.
+  const lantern = useCarried(avatar, 3, () => createLantern("keeper-lantern"));
+  const umbrella = useCarried(avatar, 1, () => createUmbrella("keeper-umbrella"));
   const leader = profile.owned.find((o) => o.id === profile.team[0]);
   const companion = useMemo(
     () =>
