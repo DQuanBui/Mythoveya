@@ -50,6 +50,11 @@ describe("keeper emotes, footprints and photo filters", () => {
     expect(puffs.at(-1)).toMatchObject({ x: 39, kind: "breath" });
   });
 
+  it("keeps shimmer sparkles small and rising", () => {
+    expect(PUFF_LOOK.sparkle.size).toBeLessThan(PUFF_LOOK.dust.size);
+    expect(PUFF_LOOK.sparkle.rise).toBeGreaterThan(PUFF_LOOK.breath.rise);
+  });
+
   it("styles dust and snow kicks shorter-lived and lower than breath", () => {
     for (const kind of ["dust", "snow"] as const) {
       expect(PUFF_LOOK[kind].life).toBeLessThan(PUFF_LOOK.breath.life);

@@ -13,11 +13,12 @@ November 4 round (from `d37297c`). Done this round, newest last:
 - Element debris on impact (`DEBRIS` in `HitBurst.tsx`): flame tongues rise, tide droplets fall, grove leaves flutter, stone chips drop hard, frost shards, storm bolts and light needles point along their flight, shadow wisps drift up. (Tried cloud shadows painted in the ground shader; reverted because the plaza, trails and place discs are separate meshes and would show seams.)
 - Turn ring: the next creature to act has its ring gently pulse (with the battle's 50 ms refresh); still under Reduced Motion and once the battle is won.
 - Knock-out jolt: when an event knocks a creature out, the battle camera gives a short, decaying ~3 px jolt as it topples (only with the camera shake setting on and Reduced Motion off).
+- Shimmer trail: a shimmering lead companion leaves small golden sparkles (`sparkle` puff kind) that rise and fade behind it while it follows the keeper.
 
 Next 3 tasks:
-1. Shimmering companions trail sparkles while walking.
-2. Villagers carry lanterns at night.
-3. Full verification, Playwright and docs.
+1. Villagers carry lanterns at night.
+2. Full verification, Playwright and docs.
+3. Listening and physical-device pass.
 
 ## Play
 

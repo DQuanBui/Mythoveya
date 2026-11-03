@@ -808,6 +808,7 @@ export function Explorer({
   const foot = useRef(0);
   const breath = useRef(0);
   const paw = useRef(0);
+  const sparkle = useRef(0);
   const follow = useRef(new T.Vector3(spawn[0] - 1, 0, spawn[1] + 1.5)),
     rest = useRef(0);
   const route = useRef<Route | null>(null),
@@ -1105,6 +1106,12 @@ export function Explorer({
           allowed,
         );
         follow.current.set(fx, ground(fx, fz), fz);
+        // A shimmering companion trails a few sparkles as it goes.
+        if (leader?.shimmer && clock.elapsedTime - sparkle.current > 0.2) {
+          sparkle.current = clock.elapsedTime;
+          const a = clock.elapsedTime * 7;
+          emitPuff(fx + Math.cos(a) * 0.25, follow.current.y + 0.5 + Math.sin(a * 1.3) * 0.2, fz + Math.sin(a) * 0.25, -delta.x, -delta.z, clock.elapsedTime, "sparkle");
+        }
         // The companion leaves paw prints where the keeper leaves footprints.
         if (clock.elapsedTime - paw.current > (sprinting ? 0.17 : 0.22)) {
           paw.current = clock.elapsedTime;
