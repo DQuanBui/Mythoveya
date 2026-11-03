@@ -19,6 +19,7 @@ November 4 round (from `d37297c`). Done this round, newest last:
 - Glints in every region: Whisperleaf's pond (26) and Moonfrost's lake (32) sparkle like the Havenreach waters, placed in world coordinates so distance culling works.
 - Keeper glances at the companion: `userData.watch` can be a point as well as the keeper (with `watchPaused` to look away smoothly); standing still, the keeper glances down at a companion beside them for ~2.6 s of every 7. Tested.
 - Happy tails: creatures in the `victory` or `play` motion (battle wins, greetings, joy hops, cheering along) wag their tails hard; serpent body segments excluded, off under Reduced Motion. Tested.
+- Landing dust: `KnockoutDust` became `LandingDust` (start time and length), still used for knock-outs, and each creature now lands with a small dust puff as the battle opens.
 
 Next 3 tasks:
 1. Full verification, Playwright and docs.

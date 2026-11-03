@@ -37,7 +37,7 @@ import { BattleArena } from "./BattleArena";
 import { WeatherEffects } from "./Weather";
 import { HavenTreasure } from "./HavenTreasure";
 import { photo } from "./photo";
-import { ChargeAura, Confetti, HitBurst, KnockoutDust, SupportGlow, SupportLink } from "./HitBurst";
+import { ChargeAura, Confetti, HitBurst, LandingDust, SupportGlow, SupportLink } from "./HitBurst";
 import { skillPath } from "./skill-path";
 import { StatusAura } from "./StatusAura";
 import { RegionMotes } from "./RegionMotes";
@@ -1961,7 +1961,12 @@ export function BattleScene({
             )}
             {/* Dust where this creature topples, if this event knocked it out. */}
             {event && !preview && shownHp === 0 && elapsed < 1.5 && event.amounts.some((a) => a.id === u.id && a.amount > 0) && (
-              <KnockoutDust key={`k${event.at}`} at={event.at} duration={event.duration} size={byId[u.species].size} />
+              // The topple lands about 78% of the way through the event.
+              <LandingDust key={`k${event.at}`} start={event.at + event.duration * 0.78} length={event.duration * 0.6} size={byId[u.species].size} />
+            )}
+            {/* A small puff as the creature lands on its ring when the battle opens. */}
+            {!preview && arrive > 0.5 && arrive < 2 && (
+              <LandingDust key={`land${opened}`} start={opened + ((u.side * 3 + (u.slot % 3)) * 110 + Math.floor(u.slot / 3) * 60) + 0.72 * 650} length={500} size={byId[u.species].size * 0.7} />
             )}
             {active && event && !preview && event.actor === u.id && event.action.endsWith("-2") && (
               <ChargeAura key={`c${event.at}`} at={event.at} duration={event.duration} element={byId[u.species].element} height={0.8 * byId[u.species].size} />

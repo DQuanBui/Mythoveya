@@ -342,8 +342,9 @@ export function ChargeAura({ at, duration, element, height }: { at: number; dura
 }
 
 const DUST = 10;
-/** Dust kicked up where a defeated creature topples onto the field. */
-export function KnockoutDust({ at, duration, size }: { at: number; duration: number; size: number }) {
+/** Dust kicked up where a creature lands: a knocked-out one toppling, or a
+ * newcomer dropping onto its ring. Starts at `start` (ms) and lasts `length`. */
+export function LandingDust({ start, length = 600, size }: { start: number; length?: number; size: number }) {
   const mesh = useMemo(() => {
     const m = new T.InstancedMesh(
       new T.PlaneGeometry(1, 1),
@@ -364,8 +365,7 @@ export function KnockoutDust({ at, duration, size }: { at: number; duration: num
   );
   const o = useMemo(() => new T.Object3D(), []);
   useFrame(({ camera }) => {
-    // The topple lands about 80% of the way through the event; dust lasts ~0.6 s.
-    const t = ((Date.now() - at) / duration - 0.78) / 0.6;
+    const t = (Date.now() - start) / length;
     mesh.visible = !settings.reduced && t >= 0 && t <= 1;
     if (!mesh.visible) return;
     (mesh.material as T.MeshBasicMaterial).opacity = 0.7 * (1 - t);
