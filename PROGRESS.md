@@ -18,11 +18,12 @@ November 5 round (from `1e622b9`). Done this round, newest last:
 - Winners face the camera: once the last event ends, the winning team's standing creatures turn round over ~0.6 of an event to celebrate toward the camera.
 - Photo mode gains a seventh filter, Moonlit (cool, desaturated blue); README updated.
 - Photo toolbar on phones: under 600 px it spans the screen (16 px gutters), so the seven filters wrap in two rows and Pose, Take photo and Done share a row, instead of a thin column covering half the view (checked at 390x844).
+- Fix: the Moonlit filter now uses sepia then a 175° hue turn, giving a true cool blue (plain hue-rotate had turned the greens yellow); checked on the Pages build at 390x844.
 
 Next 3 tasks:
-1. Make the Moonlit filter actually blue (hue-rotate turned greens yellow).
-2. Full verification, Playwright and docs.
-3. Listening and physical-device pass.
+1. Full verification, Playwright and docs.
+2. Listening and physical-device pass.
+3. Cloud shadows across all ground surfaces.
 
 ## Play
 
