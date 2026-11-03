@@ -9,7 +9,8 @@ export default defineConfig({
     baseURL: "http://127.0.0.1:5174",
     viewport: { width: 1440, height: 900 },
     screenshot: "only-on-failure",
-    video: "on",
+    // Video only for failures: recording every journey slows long runs.
+    video: "retain-on-failure",
     trace: "retain-on-failure",
     // Render with the real GPU when one is available; software WebGL is far
     // slower than any player's machine and makes 3D checks unrepresentative.

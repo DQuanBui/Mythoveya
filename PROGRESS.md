@@ -4,12 +4,13 @@ Updated November 5, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch
 
 ## Next up
 
-November 5 round is complete: 15 commits from `1e622b9` plus this record, all pushed.
+November 6 round (from `040b6f1`). Done this round, newest last:
+- Test environment: Playwright keeps video only for failing journeys (`retain-on-failure`) instead of recording all 33, to lighten long runs; traces and failure screenshots are unchanged.
 
 Next 3 tasks:
-1. Full Playwright runs keep losing one to three journeys that pass on their own (lodges, keeper-life, atlas, canyon, variants in different runs), and run time grew from 28 to 51 minutes. Frame rate is fine in every hour and weather (about 52 fps in the dev build at 1440x900), so look at the run environment: disable video for passing tests, try a fresh browser per file, and watch for the new graphics-context warning in traces.
-2. Adaptive quality: drop decorative effects automatically when the frame rate stays low on a weak device.
-3. Listening pass and a physical phone/tablet check.
+1. Adaptive effects: drop decorative effects when the frame rate stays low.
+2. Battle health bars show a draining trail after damage.
+3. Low-health bars pulse red.
 
 ## Play
 
