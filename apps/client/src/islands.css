@@ -468,6 +468,11 @@
   border: 2px solid rgba(255, 255, 255, 0.35);
   box-shadow: inset 0 -4px 6px rgba(0, 0, 0, 0.18);
 }
+.avatar-list .hair-dyes {
+  grid-column: 1 / -1;
+  justify-content: flex-start;
+  margin: 2px 0 4px;
+}
 .hair-dyes button.on {
   border-color: #f5d38a;
   outline: 2px solid #f5d38a;

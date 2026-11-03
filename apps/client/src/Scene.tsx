@@ -168,13 +168,16 @@ export function Avatar({
   walk = false,
   gesture = false,
   position = [0, 0, 0],
+  hair,
 }: {
   index?: number;
   walk?: boolean;
   gesture?: boolean;
   position?: [number, number, number];
+  /** A dye colour for the keeper's hair. */
+  hair?: string;
 }) {
-  const model = useMemo(() => createAvatar(index), [index]);
+  const model = useMemo(() => createAvatar(index, hair), [index, hair]);
   useFrame(({ clock }) =>
     animateAvatar(model, clock.elapsedTime, walk, gesture, settings.reduced),
   );
@@ -1574,16 +1577,18 @@ export function Preview({
   species,
   shimmer = false,
   avatar,
+  hair,
   state = "idle",
   paused = false,
 }: {
   species?: string;
   shimmer?: boolean;
   avatar?: number;
+  hair?: string;
   state?: Motion;
   paused?: boolean;
 }) {
-  const framingModel = useMemo(() => species ? createCreature(species, shimmer) : createAvatar(avatar || 0), [species, shimmer, avatar]);
+  const framingModel = useMemo(() => species ? createCreature(species, shimmer) : createAvatar(avatar || 0, hair), [species, shimmer, avatar, hair]);
   const center = useMemo(() => previewFrame(framingModel, 1).center.toArray() as [number, number, number], [framingModel]);
   return (
     <Canvas
@@ -1600,7 +1605,7 @@ export function Preview({
       {species ? (
         <Creature id={species} shimmer={shimmer} state={state} paused={paused} />
       ) : (
-        <Avatar index={avatar} />
+        <Avatar index={avatar} hair={hair} />
       )}
       <mesh
         rotation={[-Math.PI / 2, 0, 0]}

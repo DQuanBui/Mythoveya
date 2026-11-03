@@ -24,7 +24,7 @@
 - Lightning is a brief scene-wide ambient flash (skipped under Reduced Motion), not a visible bolt. Footprints (and the companion's paw prints) are remembered only for the last 48 steps and are not saved. Emotes are local to your screen; the companion joins in (hop, play, settle beside a sitting keeper).
 - Photo mode saves what the 3D canvas shows, at the canvas's resolution. Name tags and HUD are hidden, and filters use the browser's 2D canvas `filter`. Browsers without it (older Safari) save the picture unfiltered.
 - The ticket rewards, shop prices, habitat Gold rates and house costs were chosen by calculation and simulated runs, not long-term playtesting.
-- There are four keeper outfits, eight free hair dyes (chosen in the Lanternfair wardrobe) and three festival companion accessories. The wardrobe previews outfits on your keeper; companion accessories are previewed only once equipped.
+- There are four keeper outfits, eight free hair dyes (chosen in the Lanternfair wardrobe or the pause menu's keeper appearance panel) and three festival companion accessories. The wardrobe previews outfits on your keeper; companion accessories are previewed only once equipped.
 - Island scenes reuse the Havenreach weather, and only Havenreach has wild encounters, regions and villagers. The islands are optional side content.
 
 ## Systems and scope

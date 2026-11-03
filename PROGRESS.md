@@ -13,11 +13,12 @@ November 3 round (from `933a869`). Done this round, newest last:
 - Fireflies and the lantern: every tenth firefly gradually drifts over to circle the keeper's lantern at night (`Fireflies lantern`, blended over a few seconds) and wanders back by day.
 - Fish leap in Reedwater Lake: the pond's leaping fish is now a reusable `LeapingFish` (exported from `HavenWater.tsx`, with an optional `nudge` that keeps the pond's leaps off the bridge); a silver-blue fish leaps in the lake every ~6 s.
 - Festival ghosts wear hair dyes: `fest-run` stores an optional `hair` in the run data beside avatar and outfit (absent when natural, so older runs render as before); the race, course and fishing keepers use `hairColor`. Tested in `festival-games.test.ts`.
+- Hair dyes outside Lanternfair: the pause menu's Change keeper appearance panel has the same eight swatches; the preview shows the dye on the chosen keeper and Save appearance also saves a changed dye. `Avatar` and `Preview` take an optional `hair` colour.
 
 Next 3 tasks:
-1. A hair dye picker outside Lanternfair (Keeper Record).
-2. Night-time in-game check of lantern, fireflies and glints.
-3. Companion reacts when the keeper fishes or opens a cache.
+1. Night-time in-game check of lantern, fireflies and glints.
+2. Companion reacts when the keeper fishes or opens a cache.
+3. Performance pass on Low quality (fringe islets, motes, status auras).
 
 ## Play
 

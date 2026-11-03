@@ -9,6 +9,7 @@ import {
   ALL_SPECIES,
   TIERS,
 } from "../../../packages/shared/content";
+import { HAIR_DYES, hairColor } from "../../../packages/shared/looks";
 import {
   power,
   makeBattle,
@@ -636,14 +637,15 @@ export function Appearance({
   profile: Profile;
   run: Mutation;
 }) {
-  const [avatar, setAvatar] = useState(profile.avatar);
+  const [avatar, setAvatar] = useState(profile.avatar),
+    [dye, setDye] = useState(profile.hair || "natural");
   return (
     <>
       <p className="eyebrow">YOUR KEEPER</p>
       <h2>A familiar face, a new chapter.</h2>
       <div className="detail-grid">
         <div className="model-preview">
-          <Preview avatar={avatar} />
+          <Preview avatar={avatar} hair={hairColor({ hair: dye })} />
         </div>
         <div className="avatar-list">
           {AVATARS.map((a, i) => (
@@ -657,7 +659,28 @@ export function Appearance({
               <small>{a.desc}</small>
             </button>
           ))}
-          <button className="primary" onClick={() => run("avatar", { avatar })}>
+          {/* Hair dyes are free; the natural swatch follows the chosen keeper. */}
+          <div className="hair-dyes" role="radiogroup" aria-label="Hair dye">
+            {HAIR_DYES.map((d) => (
+              <button
+                key={d.id}
+                role="radio"
+                aria-checked={dye === d.id}
+                title={d.name}
+                aria-label={d.name}
+                className={dye === d.id ? "on" : ""}
+                style={{ background: d.color || AVATARS[avatar].hair }}
+                onClick={() => setDye(d.id)}
+              />
+            ))}
+          </div>
+          <button
+            className="primary"
+            onClick={async () => {
+              await run("avatar", { avatar });
+              if (dye !== (profile.hair || "natural")) await run("look-hair", { item: dye });
+            }}
+          >
             Save appearance
           </button>
         </div>
