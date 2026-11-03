@@ -10,11 +10,12 @@ November 5 round (from `1e622b9`). Done this round, newest last:
 - Townsfolk umbrellas: strolling islanders hold up the same leaf umbrella in rain, lowering it while they wave with that hand.
 - Shake dry: a new `shake` motion (fast, fading roll with squeezed eyes); when the companion stops after following the keeper in rain it shakes for 0.9 s and flings eight droplets (`drop` puff kind). Listed in the asset gallery; tested.
 - Puddles (`Puddles.tsx`, spots from `puddle-spots.ts`): up to 40 glossy puddles (16 on Low) on level Havenreach trail ground fill over ~20 s of rain and dry over about a minute. Placement tested in `tests/puddles.test.ts`; seen in a dev screenshot with rain pinned.
+- Raindrop ripples: every water body with glints (Havenreach pond and lake, Whisperleaf pond, Moonfrost lake, island ponds) also spawns expanding raindrop rings while it rains (a third of its glint count), and its sun glints dim under the overcast.
 
 Next 3 tasks:
-1. Raindrop ripples on ponds and lakes.
-2. Villagers wave back when the keeper waves.
-3. A sniff-the-ground idle quirk for creatures.
+1. Villagers wave back when the keeper waves.
+2. A sniff-the-ground idle quirk for creatures.
+3. Snow sparkles around the keeper in Moonfrost.
 
 ## Play
 

@@ -4,6 +4,7 @@ import * as T from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { settings } from "./audio";
 import { daylight, islandHour } from "./daytime";
+import { weatherFx } from "./Weather";
 
 const FAR = 60;
 const hash = (n: number) => {
@@ -11,7 +12,7 @@ const hash = (n: number) => {
   return v - Math.floor(v);
 };
 /** Sun glints that wink on and off across a water ellipse: bright and warm
- * by day, a few faint silver ones at night. Each glint reappears somewhere
+ * by day, a few faint silver ones at night, and raindrop rings in the rain. Each glint reappears somewhere
  * new after it fades. */
 export function WaterGlints({ x, z, rx, rz, y = 0.05, max = 44 }: { x: number; z: number; rx: number; rz: number; y?: number; max?: number }) {
   // Small ponds get fewer glints; Low quality about a third.
@@ -27,12 +28,26 @@ export function WaterGlints({ x, z, rx, rz, y = 0.05, max = 44 }: { x: number; z
     m.frustumCulled = false;
     return m;
   }, [count]);
+  // Raindrops ring the surface while it rains.
+  const drops = Math.max(4, Math.round(count / 3)),
+    rings = useMemo(() => {
+      const m = new T.InstancedMesh(
+        new T.RingGeometry(0.8, 1, 20).rotateX(-Math.PI / 2),
+        new T.MeshBasicMaterial({ color: "#e4f2f6", transparent: true, opacity: 0.5, depthWrite: false }),
+        drops,
+      );
+      m.name = "rain-ripples";
+      m.frustumCulled = false;
+      return m;
+    }, [drops]);
   useEffect(
     () => () => {
-      mesh.geometry.dispose();
-      (mesh.material as T.Material).dispose();
+      for (const m of [mesh, rings]) {
+        m.geometry.dispose();
+        (m.material as T.Material).dispose();
+      }
     },
-    [mesh],
+    [mesh, rings],
   );
   const o = useMemo(() => new T.Object3D(), []),
     warm = useMemo(() => new T.Color("#fff4d2"), []),
@@ -40,11 +55,30 @@ export function WaterGlints({ x, z, rx, rz, y = 0.05, max = 44 }: { x: number; z
   useFrame(({ clock, camera }) => {
     // Out of sight across the island, the water needs no glints.
     mesh.visible = !settings.reduced && Math.hypot(camera.position.x - x, camera.position.z - z) < FAR + Math.max(rx, rz);
+    const rain = weatherFx.snow ? 0 : weatherFx.rain;
+    rings.visible = mesh.visible && rain > 0.15;
+    if (rings.visible) {
+      (rings.material as T.MeshBasicMaterial).opacity = 0.5 * Math.min(1, rain * 1.5);
+      for (let i = 0; i < drops; i++) {
+        const cycle = clock.elapsedTime * 1.6 + i / drops,
+          n = Math.floor(cycle),
+          k = cycle - n,
+          a = hash(i * 31 + n) * Math.PI * 2,
+          r = Math.sqrt(hash(i * 17 + n * 5)) * 0.9;
+        o.position.set(x + Math.cos(a) * rx * r, y, z + Math.sin(a) * rz * r);
+        o.rotation.set(0, 0, 0);
+        o.scale.setScalar(0.05 + k * 0.35);
+        o.updateMatrix();
+        rings.setMatrixAt(i, o.matrix);
+      }
+      rings.instanceMatrix.needsUpdate = true;
+    }
     if (!mesh.visible) return;
     const day = daylight(islandHour()).day,
       material = mesh.material as T.MeshBasicMaterial,
       t = clock.elapsedTime;
-    material.opacity = 0.25 + day * 0.65;
+    // Overcast skies dull the glints.
+    material.opacity = (0.25 + day * 0.65) * (1 - rain * 0.8);
     material.color.copy(cool).lerp(warm, day);
     for (let i = 0; i < count; i++) {
       const cycle = t * (0.45 + hash(i) * 0.4) + hash(i + 7),
@@ -62,5 +96,10 @@ export function WaterGlints({ x, z, rx, rz, y = 0.05, max = 44 }: { x: number; z
     }
     mesh.instanceMatrix.needsUpdate = true;
   });
-  return <primitive object={mesh} />;
+  return (
+    <>
+      <primitive object={mesh} />
+      <primitive object={rings} />
+    </>
+  );
 }
