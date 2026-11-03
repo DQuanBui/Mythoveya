@@ -18,6 +18,7 @@ November 6 round (from `040b6f1`). Done this round, newest last:
 - Companion splashes: the following companion throws up small splashes as it trots through a puddle that holds water.
 - Refactor: `useCarried(model, limb, create)` (`carried.ts`) makes, attaches and disposes a held item; the keeper's and islanders' lanterns and umbrellas use it instead of repeating the wiring.
 - Islander chats: strolling islanders who stop within 2.6 m of another standing islander turn to face them and talk with their hands, nodding along (`userData.chatting` in `animateAvatar`, which skips the idle habit meanwhile). Tested.
+- Super-effective hits: when the attacker's element beats the target's (`elementMultiplier` above 1), the impact flash, ring and debris burst about 45% bigger and wider.
 
 Next 3 tasks:
 1. Full verification, Playwright and docs.

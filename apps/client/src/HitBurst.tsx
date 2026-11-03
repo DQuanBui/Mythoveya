@@ -32,7 +32,9 @@ const DEBRIS: Record<string, { geo: () => T.BufferGeometry; stretch: [number, nu
 
 /** A short impact on a creature that takes damage: a flash, an expanding
  * ring and sparks thrown outward, timed from the battle event. */
-export function HitBurst({ at, duration, element, height }: { at: number; duration: number; element: string; height: number }) {
+export function HitBurst({ at, duration, element, height, strong = false }: { at: number; duration: number; element: string; height: number; strong?: boolean }) {
+  // A super-effective hit bursts bigger and throws its sparks further.
+  const big = strong ? 1.45 : 1;
   const parts = useMemo(() => {
     const color = new T.Color(TINT[element] || "#ffffff");
     const mat = (o: number) =>
@@ -68,15 +70,15 @@ export function HitBurst({ at, duration, element, height }: { at: number; durati
     if (!g.visible) return;
     const fade = 1 - t,
       calm = settings.reduced ? 0.4 : 1;
-    parts.flash.scale.setScalar((0.45 + t * 0.6) * calm);
+    parts.flash.scale.setScalar((0.45 + t * 0.6) * calm * big);
     (parts.flash.material as T.MeshBasicMaterial).opacity = 0.4 * fade * fade;
-    parts.ring.scale.setScalar((0.5 + t * 1.6) * calm);
+    parts.ring.scale.setScalar((0.5 + t * 1.6) * calm * big);
     parts.ring.quaternion.copy(camera.quaternion);
     (parts.ring.material as T.MeshBasicMaterial).opacity = 0.9 * fade;
     parts.sparks.visible = !settings.reduced;
     const { stretch, fall } = parts.debris;
     parts.dirs.forEach((d, i) => {
-      o.position.copy(d).multiplyScalar(0.3 + t * 1.1);
+      o.position.copy(d).multiplyScalar((0.3 + t * 1.1) * big);
       o.position.y -= t * t * fall;
       // Leaves flutter; shards and bolts point the way they fly.
       if (element === "Grove") o.position.x += Math.sin(t * 14 + i) * 0.06;

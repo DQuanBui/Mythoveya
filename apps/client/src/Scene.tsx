@@ -115,6 +115,7 @@ import { frameMonitor } from "./adaptive";
 import { inPuddle } from "./puddle-spots";
 import { unitLabel } from "./battle-labels";
 import { useCarried } from "./carried";
+import { elementMultiplier } from "../../../packages/shared/combat";
 // Festival lanterns load only while a festival runs.
 const SeasonalLanterns = lazy(() => import("./SeasonalLanterns").then((m) => ({ default: m.SeasonalLanterns })));
 function RenderStats() {
@@ -2015,6 +2016,7 @@ export function BattleScene({
                 duration={event.duration}
                 element={byId[battle.units.find((x) => x.id === event.actor)?.species || u.species].element}
                 height={0.8 * byId[u.species].size}
+                strong={elementMultiplier(byId[battle.units.find((x) => x.id === event.actor)?.species || u.species].element, byId[u.species].element) > 1}
               />
             )}
             {/* Dust where this creature topples, if this event knocked it out. */}
