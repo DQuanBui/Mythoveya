@@ -17,6 +17,7 @@ import {
 import { Kit, SHAPES } from "./village-kit";
 import { WorldInteraction } from "./WorldInteraction";
 import { settings } from "./audio";
+import { WaterGlints } from "./WaterGlints";
 function woodland() {
   const k = new Kit();
   MEADOW_TREES.forEach((p, i) => {
@@ -128,6 +129,7 @@ export function MeadowScenery({
       <mesh geometry={geometry} dispose={null} castShadow receiveShadow>
         <meshStandardMaterial vertexColors roughness={0.95} />
       </mesh>
+      <WaterGlints x={MEADOW_POND.x} z={MEADOW_POND.z} rx={MEADOW_POND.rx * 0.9} rz={MEADOW_POND.rz * 0.9} y={0.08} max={26} />
       <group
         name="whisperleaf-pond"
         position={[MEADOW_POND.x, 0.05, MEADOW_POND.z]}

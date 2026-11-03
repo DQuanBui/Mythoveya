@@ -16,10 +16,11 @@ November 4 round (from `d37297c`). Done this round, newest last:
 - Shimmer trail: a shimmering lead companion leaves small golden sparkles (`sparkle` puff kind) that rise and fade behind it while it follows the keeper.
 - Refactor: the keeper's lantern is built, swung and disposed by `createLantern`, `swingLantern` and `disposeLantern` in `models.ts`, ready for other carriers.
 - Townsfolk lanterns: from dusk (night glow above 0.4) each strolling islander carries the same hand lantern as the keeper, swinging as they walk home.
+- Glints in every region: Whisperleaf's pond (26) and Moonfrost's lake (32) sparkle like the Havenreach waters, placed in world coordinates so distance culling works.
 
 Next 3 tasks:
-1. Glints on Moonfrost's lake and Whisperleaf's pond.
-2. The keeper glances at the companion while standing idle.
+1. The keeper glances at the companion while standing idle.
+2. Happy tail wag when a companion celebrates.
 3. Full verification, Playwright and docs.
 
 ## Play

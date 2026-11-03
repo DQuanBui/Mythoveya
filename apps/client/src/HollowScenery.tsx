@@ -16,6 +16,7 @@ import {
 import { Kit, SHAPES } from "./village-kit";
 import { WorldInteraction } from "./WorldInteraction";
 import { settings } from "./audio";
+import { WaterGlints } from "./WaterGlints";
 
 function build() {
   const k = new Kit();
@@ -139,6 +140,7 @@ export function HollowScenery({
       <mesh geometry={geometry} dispose={null} castShadow receiveShadow>
         <meshStandardMaterial vertexColors roughness={0.95} />
       </mesh>
+      <WaterGlints x={lake.x} z={lake.z} rx={lake.rx * 0.9} rz={lake.rz * 0.9} y={0.08} max={32} />
       <group name="moonfrost-lake" position={[lake.x, 0.05, lake.z]}>
         <mesh rotation={[-Math.PI / 2, 0, 0]} scale={[lake.rx, lake.rz, 1]}>
           <circleGeometry args={[1, 80]} />
