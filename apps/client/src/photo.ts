@@ -11,6 +11,7 @@ export const PHOTO_FILTERS = [
   { id: "storybook", name: "Storybook", css: "saturate(1.4) contrast(1.08)" },
   { id: "vintage", name: "Keepsake", css: "sepia(0.55) contrast(0.95) brightness(1.05)" },
   { id: "mono", name: "Ink", css: "grayscale(1) contrast(1.12)" },
+  { id: "moonlit", name: "Moonlit", css: "saturate(0.65) hue-rotate(28deg) brightness(0.9) contrast(1.12)" },
 ] as const;
 export type PhotoFilter = (typeof PHOTO_FILTERS)[number]["id"];
 export const photoCss = (id: PhotoFilter) => PHOTO_FILTERS.find((f) => f.id === id)!.css;

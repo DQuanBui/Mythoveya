@@ -16,9 +16,10 @@ November 5 round (from `1e622b9`). Done this round, newest last:
 - Snow sparkle: `WaterGlints` takes a `color` and a `follow` ground function; in Moonfrost, 36 white-blue sparkles wink on the snow within 9 m of the keeper, sitting on the slopes (fewer and silver at night).
 - Facing the target: during its action a battle creature turns toward the unit it targets (eased in and out over the event, the short way round), so diagonal strikes and lunges head for their target. `turnToward` in `Scene.tsx`.
 - Winners face the camera: once the last event ends, the winning team's standing creatures turn round over ~0.6 of an event to celebrate toward the camera.
+- Photo mode gains a seventh filter, Moonlit (cool, desaturated blue); README updated.
 
 Next 3 tasks:
-1. A golden-hour photo filter.
+1. Lay the photo toolbar out across narrow screens (at 390 px it is a thin column covering half the view).
 2. Full verification, Playwright and docs.
 3. Listening and physical-device pass.
 
