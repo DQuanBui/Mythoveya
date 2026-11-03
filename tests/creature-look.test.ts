@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { Mesh, MeshBasicMaterial, MeshStandardMaterial, Object3D, Vector3 } from "three";
 import { ALL_SPECIES } from "../packages/shared/content";
 import { animateAvatar, animateCreature, createAvatar, createCreature, watchKeeper } from "../apps/client/src/models";
-import { worldFocus } from "../apps/client/src/village-materials";
+import { keeperEmote, worldFocus } from "../apps/client/src/village-materials";
 
 const meshes = (o: Object3D) => {
   const out: Mesh[] = [];
@@ -164,6 +164,22 @@ describe("villagers who watch the keeper", () => {
     worldFocus.set(30, 0, 0);
     for (let i = 0; i < 80; i++) animateAvatar(host, i / 30);
     expect(Math.abs(host.userData.head.rotation.y)).toBeLessThan(0.2);
+    worldFocus.set(0, 0, 5);
+  });
+
+  it("wave back when the keeper waves close by", () => {
+    const friend = watchKeeper(createAvatar(5)),
+      [, leftArm] = friend.userData.limbs as Object3D[];
+    worldFocus.set(2, 0, 2);
+    animateAvatar(friend, 1);
+    expect(leftArm.rotation.z).toBeGreaterThan(-0.5);
+    keeperEmote.name = "wave";
+    animateAvatar(friend, 1);
+    expect(leftArm.rotation.z).toBeLessThan(-1.5);
+    worldFocus.set(20, 0, 20);
+    animateAvatar(friend, 1);
+    expect(leftArm.rotation.z).toBeGreaterThan(-0.5);
+    keeperEmote.name = "";
     worldFocus.set(0, 0, 5);
   });
 

@@ -4,7 +4,7 @@ import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeom
 import { AVATARS, byId } from "../../../packages/shared/content";
 import { dnaOf } from "./creature-dna";
 import { glyphSprite } from "./glyphs";
-import { worldFocus } from "./village-materials";
+import { keeperEmote, worldFocus } from "./village-materials";
 
 // Low graphics quality keeps the lighter geometry and plain materials.
 // (Read directly: this module also runs in Node tests, without audio.ts.)
@@ -1611,7 +1611,9 @@ export function animateAvatar(
   reduced = false,
   emote: Emote = "",
 ) {
-  const e = walk ? "" : gesture ? "wave" : emote,
+  // Villagers who watch the keeper wave back when the keeper waves nearby.
+  const waveBack = g.userData.watch === true && !walk && keeperEmote.name === "wave" && g.getWorldPosition(seen.at).distanceTo(worldFocus) < 8;
+  const e = walk ? "" : gesture || waveBack ? "wave" : emote,
     calm = reduced ? 0.3 : 1;
   g.userData.limbs.forEach((l: T.Group, i: number) => {
     const arm = i % 2 === 1,
