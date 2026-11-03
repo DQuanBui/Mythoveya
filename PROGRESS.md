@@ -13,11 +13,12 @@ November 6 round (from `040b6f1`). Done this round, newest last:
 - Stretch before a nap: a new `stretch` motion (slow play-bow, eyes shut) plays over the 1.4 s before a waiting companion curls up to sleep; listed in the asset gallery; tested.
 - Fireflies shelter from rain: their glow fades out as rain builds (gone at about 70% rain) and returns when it clears.
 - Perf: puddle spots store their ground height once, so filling puddles no longer looks up 40 terrain heights every frame.
+- Cheer along: villagers, hosts and rangers within 8 m now cheer (both arms up, little hops) while the keeper's cheer emote plays, as well as waving back. Tested.
 
 Next 3 tasks:
 1. Villagers stop to chat in pairs.
-2. Villagers cheer back when the keeper cheers.
-3. Health bar labels name lasting statuses for screen readers.
+2. Health bar labels name lasting statuses for screen readers.
+3. Full verification, Playwright and docs.
 
 ## Play
 

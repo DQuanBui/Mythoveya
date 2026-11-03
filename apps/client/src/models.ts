@@ -1627,9 +1627,12 @@ export function animateAvatar(
   reduced = false,
   emote: Emote = "",
 ) {
-  // Villagers who watch the keeper wave back when the keeper waves nearby.
-  const waveBack = g.userData.watch === true && !walk && keeperEmote.name === "wave" && g.getWorldPosition(seen.at).distanceTo(worldFocus) < 8;
-  const e = walk ? "" : gesture || waveBack ? "wave" : emote,
+  // Villagers who watch the keeper wave back, or cheer along, nearby.
+  const answer =
+    g.userData.watch === true && !walk && (keeperEmote.name === "wave" || keeperEmote.name === "cheer") && g.getWorldPosition(seen.at).distanceTo(worldFocus) < 8
+      ? keeperEmote.name
+      : "";
+  const e = walk ? "" : gesture ? "wave" : answer || emote,
     calm = reduced ? 0.3 : 1;
   g.userData.limbs.forEach((l: T.Group, i: number) => {
     const arm = i % 2 === 1,

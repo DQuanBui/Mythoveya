@@ -202,6 +202,18 @@ describe("villagers who watch the keeper", () => {
     worldFocus.set(0, 0, 5);
   });
 
+  it("cheer along when the keeper cheers close by", () => {
+    const friend = watchKeeper(createAvatar(3)),
+      [, leftArm, , rightArm] = friend.userData.limbs as Object3D[];
+    worldFocus.set(2, 0, 2);
+    keeperEmote.name = "cheer";
+    animateAvatar(friend, 1);
+    expect(leftArm.rotation.z).toBeLessThan(-2);
+    expect(rightArm.rotation.z).toBeGreaterThan(2);
+    keeperEmote.name = "";
+    worldFocus.set(0, 0, 5);
+  });
+
   it("let the keeper glance at a point, and look away while paused", () => {
     const keeper = createAvatar(0),
       pet = new Vector3(-2, 0, 0.5);
