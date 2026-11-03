@@ -8,7 +8,7 @@ import {
   type Point,
 } from "../../../packages/shared/haven";
 import { buildGrid, findPath, type WalkGrid } from "../../../packages/shared/pathfind";
-import { animateAvatar, createAvatar, watchKeeper } from "./models";
+import { animateAvatar, createAvatar, watchKeeper, createLantern, disposeLantern, swingLantern } from "./models";
 import { WorldInteraction } from "./WorldInteraction";
 import { daylight, islandHour } from "./daytime";
 import { settings } from "./audio";
@@ -104,6 +104,12 @@ function Villager({
   const folk = TOWNSFOLK[index];
   const model = useMemo(() => watchKeeper(createAvatar(folk.avatar)), [folk.avatar]);
   const home = useMemo(() => door(folk.home), [folk.home]);
+  // From dusk, islanders light their way home with a hand lantern.
+  const lantern = useMemo(() => createLantern(`townsfolk-lantern-${index}`), [index]);
+  useEffect(() => {
+    (model.userData.limbs as T.Group[])[3].add(lantern);
+    return () => disposeLantern(lantern);
+  }, [model, lantern]);
   const state = useRef({
     pos: new T.Vector3(),
     path: [] as Point[],
@@ -165,8 +171,11 @@ function Villager({
       }
     }
     model.position.copy(s.pos);
-    if (near)
+    if (near) {
       animateAvatar(model, clock.elapsedTime + index, walking, s.greet > 0.6, settings.reduced);
+      lantern.visible = daylight(islandHour()).glow > 0.4;
+      if (lantern.visible) swingLantern(lantern, clock.elapsedTime + index, walking, settings.reduced);
+    }
   });
   return (
     <WorldInteraction
