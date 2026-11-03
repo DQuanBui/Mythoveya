@@ -17,6 +17,18 @@ const TINT: Record<string, string> = {
   Shadow: "#b98cff",
 };
 const SPARKS = 8;
+// Each element throws its own debris: shape, stretch and how it falls (a
+// negative fall rises, like flame tongues).
+const DEBRIS: Record<string, { geo: () => T.BufferGeometry; stretch: [number, number, number]; fall: number }> = {
+  Flame: { geo: () => new T.ConeGeometry(0.06, 0.18, 5), stretch: [1, 1, 1], fall: -0.35 },
+  Tide: { geo: () => new T.SphereGeometry(0.05, 6, 4), stretch: [1, 1.4, 1], fall: 0.9 },
+  Grove: { geo: () => new T.SphereGeometry(0.07, 6, 4), stretch: [1, 0.25, 0.6], fall: 0.25 },
+  Stone: { geo: () => new T.DodecahedronGeometry(0.06, 0), stretch: [1, 1, 1], fall: 1.3 },
+  Storm: { geo: () => new T.BoxGeometry(0.025, 0.2, 0.025), stretch: [1, 1, 1], fall: 0 },
+  Frost: { geo: () => new T.OctahedronGeometry(0.06, 0), stretch: [0.6, 2, 0.6], fall: 0.5 },
+  Light: { geo: () => new T.OctahedronGeometry(0.05, 0), stretch: [0.4, 2.6, 0.4], fall: 0 },
+  Shadow: { geo: () => new T.SphereGeometry(0.06, 6, 4), stretch: [1, 1, 1], fall: -0.15 },
+};
 
 /** A short impact on a creature that takes damage: a flash, an expanding
  * ring and sparks thrown outward, timed from the battle event. */
@@ -28,7 +40,8 @@ export function HitBurst({ at, duration, element, height }: { at: number; durati
     return {
       flash: new T.Mesh(new T.SphereGeometry(0.35, 12, 8), mat(0.8)),
       ring: new T.Mesh(new T.TorusGeometry(0.4, 0.04, 6, 32), mat(0.9)),
-      sparks: new T.InstancedMesh(new T.OctahedronGeometry(0.06, 0), mat(1), SPARKS),
+      sparks: new T.InstancedMesh(DEBRIS[element]?.geo() || new T.OctahedronGeometry(0.06, 0), mat(1), SPARKS),
+      debris: DEBRIS[element] || { stretch: [1, 1, 1] as [number, number, number], fall: 0.5 },
       dirs: Array.from({ length: SPARKS }, (_, i) => {
         const a = (i / SPARKS) * Math.PI * 2;
         return new T.Vector3(Math.cos(a), 0.35 + (i % 3) * 0.25, Math.sin(a)).normalize();
@@ -61,11 +74,15 @@ export function HitBurst({ at, duration, element, height }: { at: number; durati
     parts.ring.quaternion.copy(camera.quaternion);
     (parts.ring.material as T.MeshBasicMaterial).opacity = 0.9 * fade;
     parts.sparks.visible = !settings.reduced;
+    const { stretch, fall } = parts.debris;
     parts.dirs.forEach((d, i) => {
       o.position.copy(d).multiplyScalar(0.3 + t * 1.1);
-      o.position.y -= t * t * 0.5;
-      o.rotation.set(t * 6 + i, t * 4, 0);
-      o.scale.setScalar(fade);
+      o.position.y -= t * t * fall;
+      // Leaves flutter; shards and bolts point the way they fly.
+      if (element === "Grove") o.position.x += Math.sin(t * 14 + i) * 0.06;
+      if (element === "Frost" || element === "Light" || element === "Storm" || element === "Flame") o.lookAt(o.position.clone().add(d)), o.rotateX(Math.PI / 2);
+      else o.rotation.set(t * 6 + i, t * 4, 0);
+      o.scale.set(stretch[0] * fade, stretch[1] * fade, stretch[2] * fade);
       o.updateMatrix();
       parts.sparks.setMatrixAt(i, o.matrix);
     });
