@@ -22,11 +22,12 @@ November 7 round (from `a9be583`). Done this round, newest last:
 - Player guide: `docs/LIVING_WORLD.md` explains what the companion, keeper, villagers, wildlife, weather, time of day and battles do on their own, plus the effects setting and shortcuts; linked from the README.
 - CLAUDE.md: the module map covers the new client modules (Ambience chunk, adaptive effects, carried items, context recovery, status auras, labels) and records two conventions learned: keep Node-tested logic out of modules that import `audio.ts`, and watch the entry chunk for heavy imports.
 - Greeting nod: a watching villager, host or ranger gives one small nod when the keeper first comes within reach, then follows them with their eyes. Tested.
+- Test: `settings.spec` now also picks Decorative effects → Minimal and checks it survives a reload.
 
 Next 3 tasks:
-1. Browser test for the Decorative effects setting.
-2. Full verification, Playwright and docs.
-3. Listening and physical-device pass.
+1. Full verification, Playwright and docs.
+2. Listening and physical-device pass.
+3. Cloud shadows across all ground surfaces.
 
 ## Play
 

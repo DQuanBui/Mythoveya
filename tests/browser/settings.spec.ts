@@ -10,6 +10,7 @@ test("title, HUD and pause settings links work and retain separate preferences",
   await page.getByLabel("Camera shake", { exact: true }).check();
   await page.getByLabel("Mute all sound").check();
   await page.getByLabel("Reduced motion").check();
+  await page.getByLabel("Decorative effects").selectOption("Minimal");
   await page.getByLabel("Close panel").click();
   await page.getByRole("button", { name: "Begin your journey" }).click();
   await page.getByLabel("Keeper name").fill("Settings Keeper");
@@ -27,6 +28,7 @@ test("title, HUD and pause settings links work and retain separate preferences",
   await expect(page.getByLabel("Mute all sound")).toBeChecked();
   await expect(page.getByLabel("Reduced motion")).toBeChecked();
   await expect(page.getByLabel("Day and night cycle")).not.toBeChecked();
+  await expect(page.getByLabel("Decorative effects")).toHaveValue("Minimal");
   expect(errors).toEqual([]);
   await page.screenshot({ path: "artifacts/settings-verified.png" });
 });
