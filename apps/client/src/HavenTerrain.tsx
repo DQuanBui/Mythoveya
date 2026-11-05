@@ -4,8 +4,6 @@ import { HavenNature } from "./HavenNature";
 import { HavenWater } from "./HavenWater";
 import { HavenLandmarks } from "./HavenLandmarks";
 import { IslandFringe } from "./IslandFringe";
-import { Puddles } from "./Puddles";
-import { GroundBirds } from "./GroundBirds";
 import {
   HAVEN_PATHS,
   HAVEN_PLACES,
@@ -160,8 +158,6 @@ export function HavenTerrain() {
         <meshStandardMaterial vertexColors flatShading />
       </mesh>
       <IslandFringe />
-      <Puddles />
-      <GroundBirds />
       <TrailSurface points={strips} />
       {HAVEN_PLACES.filter(
         (p) => !["village", "driftshore", "summit", "windrest", "fieldstation"].includes(p.id),

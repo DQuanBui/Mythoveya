@@ -12,11 +12,12 @@ November 7 round (from `a9be583`). Done this round, newest last:
 - Ground birds (`GroundBirds.tsx`, logic in `bird-flock.ts`, tested): small flocks of sparrows (4 each, 2 on Low) hop and peck at the village green, the clearing and the orchard by day; within 3.2 m they burst up and away, returning about 20 s later. Hidden at night, in rain and when decorative effects pause.
 - Morning mist (`MorningMist.tsx`, curve in `mist.ts`, tested): soft flat patches lie low over Havenreach and Whisperleaf around the keeper from 5:30, thickest at 7:00, gone by 9:30; thinned by rain, off without the day cycle or when effects pause.
 - Night company: outdoors after dark the companion follows within about 1.15 m instead of 1.6 m, staying near the keeper's lantern.
+- Perf: region motes, dawn mist, Moonfrost snow glints, puddles and ground birds load as one `Ambience` chunk (5.7 kB) after the world appears; the entry drops from 465.7 to 460.7 kB.
 
 Next 3 tasks:
 1. A living-world player guide.
 2. Refresh CLAUDE.md's module map.
-3. Load decorative world effects in their own chunk.
+3. Full verification, Playwright and docs.
 
 ## Play
 

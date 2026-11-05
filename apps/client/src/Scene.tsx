@@ -40,9 +40,6 @@ import { photo } from "./photo";
 import { ChargeAura, Confetti, HitBurst, LandingDust, SupportGlow, SupportLink } from "./HitBurst";
 import { skillPath } from "./skill-path";
 import { StatusAura } from "./StatusAura";
-import { RegionMotes } from "./RegionMotes";
-import { MorningMist } from "./MorningMist";
-import { WaterGlints } from "./WaterGlints";
 import { Hearts } from "./Hearts";
 import { Footprints, leavePrint, leavePaw } from "./Footprints";
 import { Puffs } from "./Puffs";
@@ -119,6 +116,8 @@ import { useCarried } from "./carried";
 import { elementMultiplier } from "../../../packages/shared/elements";
 // Festival lanterns load only while a festival runs.
 const SeasonalLanterns = lazy(() => import("./SeasonalLanterns").then((m) => ({ default: m.SeasonalLanterns })));
+// Ambient life (motes, mist, puddles, sparrows) follows once the world is up.
+const Ambience = lazy(() => import("./Ambience").then((m) => ({ default: m.Ambience })));
 function RenderStats() {
   const label = useRef<HTMLSpanElement>(null);
   const elapsed = useRef(0),
@@ -382,11 +381,10 @@ function Environment({
           <DayNight sky={sky} fog={r.color} haven={region === "haven"} keeperLight />
           <SkyLife radius={expanded ? 54 : canyon || snow || meadow ? 62 : 26} birds={!expanded} />
           <WeatherEffects region={region} ground={groundFor(region)} />
-          <RegionMotes region={region} />
-          {(region === "haven" || region === "meadow") && <MorningMist ground={groundFor(region)} />}
           <AdaptiveEffects />
-          {/* Fresh snow sparkles in the sun around the keeper. */}
-          {region === "hollow" && <WaterGlints x={0} z={0} rx={9} rz={9} y={0.04} max={36} color="#f4fbff" follow={hollowHeight} />}
+          <Suspense fallback={null}>
+            <Ambience region={region} ground={groundFor(region)} />
+          </Suspense>
         </>
       )}
       {expanded ? (
