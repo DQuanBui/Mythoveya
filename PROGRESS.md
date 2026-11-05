@@ -19,11 +19,12 @@ November 7 round (from `a9be583`). Done this round, newest last:
 - Dawn dew: `WaterGlints` takes an `amount` scale; in Havenreach 30 pale-green sparkles glitter on the grass around the keeper while the morning mist lies (same dawn curve).
 - Butterfly visitor: when the companion naps within 25 m of Sunpetal Clearing, one of the clearing's butterflies drifts over and perches on its head, wings slowly opening and closing (`companionRest` in `village-materials.ts`).
 - Pollen sneezes: in Whisperleaf a waiting companion sneezes every 16-30 s (new `sneeze` motion: wind-up, snap forward, eyes shut, with a small puff); listed in the asset gallery; tested.
+- Player guide: `docs/LIVING_WORLD.md` explains what the companion, keeper, villagers, wildlife, weather, time of day and battles do on their own, plus the effects setting and shortcuts; linked from the README.
 
 Next 3 tasks:
-1. A living-world player guide.
-2. Refresh CLAUDE.md's module map.
-3. Full verification, Playwright and docs.
+1. Refresh CLAUDE.md's module map.
+2. Full verification, Playwright and docs.
+3. Listening and physical-device pass.
 
 ## Play
 
