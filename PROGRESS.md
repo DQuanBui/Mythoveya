@@ -9,11 +9,12 @@ November 7 round (from `a9be583`). Done this round, newest last:
 - Controls guide: the pause menu's Controls list now includes E (use what is within reach), 1-4 emotes and P / G for photo mode and pose; README points to it.
 - Decorative effects setting: Sound & graphics has Auto (pause on a slow device, the default), Full and Minimal; `applyEffects` in `adaptive.ts` applies it (tested). Stored with the other settings in `mythoveya-settings`; older settings default to Auto.
 - Voices: Elian's humming habit floats ♪ and ♫ notes up from the head, and chatting islanders show a "…" bubble in turns (`keeper-voice` sprites made lazily in `animateAvatar`). Fixed along the way: the chatting flag could leave visibility as undefined. Tested.
+- Ground birds (`GroundBirds.tsx`, logic in `bird-flock.ts`, tested): small flocks of sparrows (4 each, 2 on Low) hop and peck at the village green, the clearing and the orchard by day; within 3.2 m they burst up and away, returning about 20 s later. Hidden at night, in rain and when decorative effects pause.
 
 Next 3 tasks:
-1. Ground birds that scatter when the keeper comes near.
-2. Morning mist pooling low over Havenreach.
-3. A living-world player guide.
+1. Morning mist pooling low over Havenreach.
+2. A living-world player guide.
+3. Refresh CLAUDE.md's module map.
 
 ## Play
 
