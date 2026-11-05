@@ -169,6 +169,16 @@ describe("keeper habits", () => {
   });
 });
 
+it("shivers with arms hugged on a cold night, but not while walking", () => {
+  const keeper = createAvatar(0),
+    [, leftArm] = keeper.userData.limbs as Object3D[];
+  keeper.userData.cold = true;
+  animateAvatar(keeper, 6 - 0 + 0.7);
+  expect(leftArm.rotation.z).toBeGreaterThan(0.5);
+  animateAvatar(keeper, 6 + 0.7, true);
+  expect(leftArm.rotation.z).toBe(0);
+});
+
 describe("villagers who watch the keeper", () => {
   it("turn their heads toward a keeper close by, and only when marked", () => {
     worldFocus.set(3, 0, 0.2);

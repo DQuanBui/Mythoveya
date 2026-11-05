@@ -1074,6 +1074,8 @@ export function Explorer({
     avatar.userData.groundY = player.current.y;
     // Moving or an expired timer ends an emote.
     if (moving || Date.now() > keeperEmote.until) keeperEmote.name = "";
+    // Moonfrost's nights are cold enough to shiver.
+    avatar.userData.cold = profile.region === "hollow" && !area && nightState.glow > 0.5;
     // Standing about, the keeper glances at the companion every few seconds.
     avatar.userData.watch = follow.current;
     avatar.userData.watchPaused = moving || !!keeperEmote.name || clock.elapsedTime % 7 > 2.6;

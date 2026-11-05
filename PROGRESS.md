@@ -14,10 +14,11 @@ November 7 round (from `a9be583`). Done this round, newest last:
 - Night company: outdoors after dark the companion follows within about 1.15 m instead of 1.6 m, staying near the keeper's lantern.
 - Perf: region motes, dawn mist, Moonfrost snow glints, puddles and ground birds load as one `Ambience` chunk (5.7 kB) after the world appears; the entry drops from 465.7 to 460.7 kB.
 - Windy smoke: chimney smoke streams off lower and further sideways as rain (and its wind) builds, matching the grass and trees.
+- Cold nights: outdoors in Moonfrost after dark, a keeper standing about hugs themselves and shivers for about a second every six (`userData.cold`, replacing the idle habit meanwhile). Tested.
 
 Next 3 tasks:
-1. Keeper shivers on cold Moonfrost nights.
-2. Wet footprints after stepping in a puddle.
+1. Wet footprints after stepping in a puddle.
+2. Dew sparkle on Havenreach's grass at dawn.
 3. A living-world player guide.
 
 ## Play

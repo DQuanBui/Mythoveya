@@ -1693,9 +1693,18 @@ export function animateAvatar(
     leftArm.rotation.x = -0.15 - Math.max(0, Math.sin(beat * 0.7 + 2)) * 0.3;
     if (head) head.rotation.x = Math.sin(beat * 1.6) * 0.07;
   }
+  // On a cold night a keeper standing about hugs themselves and shivers.
+  const cold = (t + g.userData.index) % 6,
+    shiver = g.userData.cold && !walk && !e && !chat && !reduced && cold < 1.4 ? Math.sin((cold / 1.4) * Math.PI) : 0;
+  if (shiver) {
+    const [, leftArm, , rightArm] = g.userData.limbs as T.Group[];
+    leftArm.rotation.set(-0.55 * shiver, 0, 0.75 * shiver);
+    rightArm.rotation.set(-0.55 * shiver, 0, -0.75 * shiver);
+    if (head) head.rotation.z = Math.sin(t * 46) * 0.05 * shiver;
+  }
   // Standing idle, each keeper falls into a habit of their own every so often.
   const cyc = (t + g.userData.index * 2.3) % 9,
-    h = walk || e || chat || reduced || cyc > 2.6 ? 0 : Math.sin((cyc / 2.6) * Math.PI);
+    h = walk || e || chat || shiver || reduced || cyc > 2.6 ? 0 : Math.sin((cyc / 2.6) * Math.PI);
   let lift = 0;
   if (h) {
     const [, leftArm, rightLeg, rightArm] = g.userData.limbs as T.Group[],
