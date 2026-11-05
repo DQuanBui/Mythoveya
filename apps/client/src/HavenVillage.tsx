@@ -15,6 +15,7 @@ import {
 import { Kit, SHAPES } from "./village-kit";
 import { lampGlow, villageGlow } from "./village-materials";
 import { settings } from "./audio";
+import { weatherFx } from "./Weather";
 
 const TIMBER = "#6d5847",
   TIMBER_DARK = "#584737",
@@ -446,11 +447,13 @@ export function ChimneySmoke({ points }: { points: T.Vector3[] }) {
   );
   const o = useMemo(() => new T.Object3D(), []);
   useFrame(({ clock }) => {
-    const time = settings.reduced ? 0.3 : clock.elapsedTime;
+    const time = settings.reduced ? 0.3 : clock.elapsedTime,
+      // Rainy weather brings wind: the smoke streams off low and sideways.
+      wind = weatherFx.rain;
     points.forEach((p, c) => {
       for (let i = 0; i < per; i++) {
         const t = (time * 0.22 + i / per + c * 0.13) % 1;
-        o.position.set(p.x + t * 0.7 + Math.sin(t * 6 + c) * 0.12, p.y + t * 2.6, p.z + t * 0.25);
+        o.position.set(p.x + t * (0.7 + wind * 1.8) + Math.sin(t * 6 + c) * 0.12, p.y + t * (2.6 - wind * 1.1), p.z + t * (0.25 + wind * 0.5));
         o.scale.setScalar(Math.sin(Math.PI * Math.min(1, t * 1.15)) * (0.6 + t * 1.4));
         o.rotation.set(t * 2, c, 0);
         o.updateMatrix();
