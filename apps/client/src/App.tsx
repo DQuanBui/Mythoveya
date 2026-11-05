@@ -1180,6 +1180,12 @@ export default function App() {
                     <dd>Walk over and interact</dd>
                     <dt>WASD / arrows</dt>
                     <dd>Move directly · hold Shift to sprint</dd>
+                    <dt>E</dt>
+                    <dd>Use whatever is within reach</dd>
+                    <dt>1 · 2 · 3 · 4</dt>
+                    <dd>Wave, cheer, dance or sit</dd>
+                    <dt>P</dt>
+                    <dd>Photo mode · G to pose</dd>
                     <dt>Drag · scroll</dt>
                     <dd>Turn the camera · zoom</dd>
                     <dt>R</dt>
