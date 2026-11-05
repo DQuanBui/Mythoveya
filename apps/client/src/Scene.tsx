@@ -1097,7 +1097,8 @@ export function Explorer({
     umbrella.visible = !area && weatherFx.rain > 0.35 && !weatherFx.snow && !keeperEmote.name;
     if (umbrella.visible) swingLantern(umbrella, clock.elapsedTime * 0.5, moving, settings.reduced);
     const delta = player.current.clone().sub(follow.current);
-    const following = delta.length() > 1.6;
+    // After dark the companion keeps closer to the keeper's side.
+    const following = delta.length() > (!area && nightState.glow > 0.6 ? 1.15 : 1.6);
     if (following) {
       if (delta.length() > 6) follow.current.copy(player.current);
       else {
