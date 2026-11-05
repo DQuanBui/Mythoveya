@@ -67,6 +67,19 @@ export function WorldHUD({
   input: MutableRefObject<ExplorationInput>;
   blocked: boolean;
 }) {
+  // E uses whatever is within reach, as in homes and lodges, so the world
+  // can be played from the keyboard alone.
+  const reach = useRef({ near, blocked, interact, placing });
+  reach.current = { near, blocked, interact, placing };
+  useEffect(() => {
+    const press = (e: KeyboardEvent) => {
+      const r = reach.current,
+        typing = e.target instanceof HTMLElement && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName);
+      if (e.code === "KeyE" && !e.repeat && !typing && !r.blocked && !r.placing && r.near) r.interact(r.near);
+    };
+    window.addEventListener("keydown", press);
+    return () => window.removeEventListener("keydown", press);
+  }, []);
   const region = REGIONS.find((r) => r.id === profile.region) || REGIONS[0];
   const home = profile.island === "home" ? profile.home || defaultHome() : null;
   const fair = profile.island === "festival";

@@ -4,12 +4,13 @@ Updated November 6, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch
 
 ## Next up
 
-November 6 round is complete: 16 commits from `040b6f1` plus this record, all pushed. The full Playwright run passed all 33 journeys in one go (29.2 min) for the first time in five rounds, after video recording was turned off.
+November 7 round (from `a9be583`). Done this round, newest last:
+- Keyboard play outdoors: E uses whatever is within reach (the same as clicking it), as homes and lodges already did; no prompt card is added on desktop. New browser journey `tests/browser/keyboard.spec.ts` gathers Sunseed with E.
 
 Next 3 tasks:
-1. Listening pass and a physical phone/tablet check of the effects from the last six rounds, including whether adaptive effects ever switch on.
-2. Cloud shadows done properly: shade the ground, trails, plaza and place discs together.
-3. Keep an eye on full-suite stability over the next runs now that video is off; if journeys start dropping again, look for graphics-context warnings in the traces.
+1. List every shortcut in the pause menu's Controls guide (P, G, 1-4, E).
+2. Hummed notes and chat bubbles over villagers.
+3. Ground birds that scatter when the keeper comes near.
 
 ## Play
 
