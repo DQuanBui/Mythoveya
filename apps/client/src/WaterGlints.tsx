@@ -25,6 +25,7 @@ export function WaterGlints({
   max = 44,
   color = "#fff4d2",
   follow,
+  amount,
 }: {
   x: number;
   z: number;
@@ -35,6 +36,8 @@ export function WaterGlints({
   color?: string;
   /** Sparkle on the ground around the keeper instead (e.g. snow), at this height. */
   follow?: (x: number, z: number) => number;
+  /** Scales the glints in and out (e.g. dew only at dawn); 1 when absent. */
+  amount?: () => number;
 }) {
   // Small ponds get fewer glints; Low quality about a third.
   const count = settings.quality === "Low" ? Math.max(3, Math.round(max / 3)) : max;
@@ -77,7 +80,8 @@ export function WaterGlints({
     const x = follow ? worldFocus.x : cx,
       z = follow ? worldFocus.z : cz;
     // Out of sight across the island, the water needs no glints.
-    mesh.visible = !settings.reduced && !perf.lite && Math.hypot(camera.position.x - x, camera.position.z - z) < FAR + Math.max(rx, rz);
+    const strength = amount ? amount() : 1;
+    mesh.visible = strength > 0.02 && !settings.reduced && !perf.lite && Math.hypot(camera.position.x - x, camera.position.z - z) < FAR + Math.max(rx, rz);
     const rain = weatherFx.snow ? 0 : weatherFx.rain;
     rings.visible = mesh.visible && rain > 0.15;
     if (rings.visible) {
@@ -101,7 +105,7 @@ export function WaterGlints({
       material = mesh.material as T.MeshBasicMaterial,
       t = clock.elapsedTime;
     // Overcast skies dull the glints.
-    material.opacity = (0.25 + day * 0.65) * (1 - rain * 0.8);
+    material.opacity = (0.25 + day * 0.65) * (1 - rain * 0.8) * strength;
     material.color.copy(cool).lerp(warm, day);
     for (let i = 0; i < count; i++) {
       const cycle = t * (0.45 + hash(i) * 0.4) + hash(i + 7),
