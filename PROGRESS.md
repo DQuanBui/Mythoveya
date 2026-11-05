@@ -18,6 +18,7 @@ November 7 round (from `a9be583`). Done this round, newest last:
 - Wet footprints: after stepping in a puddle, the keeper's next six steps leave dark damp prints on any ground (`wet` prints in `Footprints.tsx`, which fill in like the others). Tested.
 - Dawn dew: `WaterGlints` takes an `amount` scale; in Havenreach 30 pale-green sparkles glitter on the grass around the keeper while the morning mist lies (same dawn curve).
 - Butterfly visitor: when the companion naps within 25 m of Sunpetal Clearing, one of the clearing's butterflies drifts over and perches on its head, wings slowly opening and closing (`companionRest` in `village-materials.ts`).
+- Pollen sneezes: in Whisperleaf a waiting companion sneezes every 16-30 s (new `sneeze` motion: wind-up, snap forward, eyes shut, with a small puff); listed in the asset gallery; tested.
 
 Next 3 tasks:
 1. A living-world player guide.

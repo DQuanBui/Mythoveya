@@ -1174,7 +1174,8 @@ export type Motion =
   | "play"
   | "weary"
   | "shake"
-  | "stretch";
+  | "stretch"
+  | "sneeze";
 export function animateCreature(
   g: T.Group,
   time: number,
@@ -1389,6 +1390,15 @@ export function animateCreature(
     limbs.forEach((l: T.Group) => (l.rotation.x = 0));
     tails.forEach((t: T.Group) => (t.rotation.y = 0.5));
     wings.forEach((w: T.Group, i: number) => (w.rotation.z = ((i % 2) * 2 - 1) * -0.1));
+  }
+  if (state === "sneeze") {
+    // Ah... ah... choo: a slow lift of the head, then a sharp snap forward.
+    const p = Math.min(1, Math.max(0, phase)),
+      wind = p < 0.55 ? Math.sin((p / 0.55) * Math.PI * 0.5) : 0,
+      snap = p >= 0.55 ? Math.sin(((p - 0.55) / 0.45) * Math.PI) : 0;
+    rig.rotation.x = (-0.22 * wind + 0.32 * snap) * motion;
+    rig.position.y += 0.04 * wind * motion;
+    if (p > 0.4) eyes?.forEach((eye: T.Group) => (eye.scale.y = 0.12));
   }
   if (state === "stretch") {
     // A long, slow play-bow stretch with eyes shut, as before a nap.

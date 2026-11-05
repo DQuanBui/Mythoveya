@@ -139,6 +139,15 @@ it("stretches long and low with eyes shut, and ends standing tall", () => {
   expect(model.userData.rig.rotation.x).toBeLessThan(0.01);
 });
 
+it("sneezes: head up on the wind-up, a sharp snap forward, eyes shut", () => {
+  const model = createCreature("mossprig");
+  animateCreature(model, 1, "sneeze", 0.5);
+  expect(model.userData.rig.rotation.x).toBeLessThan(-0.15);
+  animateCreature(model, 1, "sneeze", 0.78);
+  expect(model.userData.rig.rotation.x).toBeGreaterThan(0.25);
+  expect(model.userData.eyes.every((e: Object3D) => e.scale.y < 0.2)).toBe(true);
+});
+
 it("puffs Z's only while a creature sleeps", () => {
   const model = createCreature("mossprig");
   animateCreature(model, 2, "sleep");

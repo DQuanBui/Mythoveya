@@ -802,6 +802,9 @@ export function Explorer({
   const paw = useRef(0);
   const sparkle = useRef(0);
   const wetFeet = useRef(0);
+  const sneezed = useRef(-9);
+  const sneezeNext = useRef(12);
+  const puffed = useRef(false);
   const shook = useRef(-9);
   const wasFollowing = useRef(false);
   const follow = useRef(new T.Vector3(spawn[0] - 1, 0, spawn[1] + 1.5)),
@@ -1153,6 +1156,20 @@ export function Explorer({
     }
     wasFollowing.current = following;
     const shaking = clock.elapsedTime - shook.current < 0.9;
+    // Whisperleaf's pollen sets a waiting companion sneezing now and then.
+    if (profile.region === "meadow" && !area && !following && !moving && rest.current < 12 && clock.elapsedTime > sneezeNext.current) {
+      sneezed.current = clock.elapsedTime;
+      sneezeNext.current = clock.elapsedTime + 16 + ((clock.elapsedTime * 7.3) % 14);
+    }
+    const sneezing = !following && clock.elapsedTime - sneezed.current < 0.9;
+    if (sneezing && !puffed.current && clock.elapsedTime - sneezed.current > 0.5) {
+      puffed.current = true;
+      const cy = companion.rotation.y,
+        [hy, hz] = companion.userData.headAt,
+        size = companion.scale.x;
+      emitPuff(follow.current.x + Math.sin(cy) * (hz + 0.3) * size, follow.current.y + hy * size * 0.9, follow.current.z + Math.cos(cy) * (hz + 0.3) * size, Math.sin(cy), Math.cos(cy), clock.elapsedTime, "breath");
+    }
+    if (!sneezing) puffed.current = false;
     // Waiting at the keeper's side, the companion looks up at them.
     companion.userData.gaze = !following && !moving && delta.length() < 2.4 ? COMPANION_GAZE : null;
     companionRest.napping = !area && rest.current > 14 && !following;
@@ -1165,8 +1182,8 @@ export function Explorer({
       clock.elapsedTime,
       // The companion joins in: it hops at a wave, plays along with a cheer or
       // dance, and settles down low when the keeper sits (later dozing off).
-      shaking && !following ? "shake" : pet || keeperEmote.name === "wave" || (!following && Date.now() < companionJoy.until) ? "victory" : following ? "walk" : keeperEmote.name === "cheer" || keeperEmote.name === "dance" ? "play" : keeperEmote.name === "sit" && rest.current < 14 ? "guard" : rest.current > 14 ? "sleep" : rest.current > 12.6 ? "stretch" : "idle",
-      shaking ? (clock.elapsedTime - shook.current) / 0.9 : rest.current > 12.6 && rest.current <= 14 ? (rest.current - 12.6) / 1.4 : 0,
+      shaking && !following ? "shake" : sneezing ? "sneeze" : pet || keeperEmote.name === "wave" || (!following && Date.now() < companionJoy.until) ? "victory" : following ? "walk" : keeperEmote.name === "cheer" || keeperEmote.name === "dance" ? "play" : keeperEmote.name === "sit" && rest.current < 14 ? "guard" : rest.current > 14 ? "sleep" : rest.current > 12.6 ? "stretch" : "idle",
+      shaking ? (clock.elapsedTime - shook.current) / 0.9 : sneezing ? (clock.elapsedTime - sneezed.current) / 0.9 : rest.current > 12.6 && rest.current <= 14 ? (rest.current - 12.6) / 1.4 : 0,
       settings.reduced,
     );
     if (controls.current)

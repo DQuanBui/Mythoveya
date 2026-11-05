@@ -883,6 +883,7 @@ export function Gallery() {
                 "weary",
                 "shake",
                 "stretch",
+                "sneeze",
               ].map((m) => (
                 <option key={m}>{m}</option>
               ))}
