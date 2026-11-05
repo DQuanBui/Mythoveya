@@ -10,9 +10,11 @@ import {
 import { createCreature, animateCreature } from "./models";
 import { audio, settings } from "./audio";
 import { daylight, islandHour } from "./daytime";
-import { worldFocus } from "./village-materials";
+import { companionRest, worldFocus } from "./village-materials";
 import { glyphSprite } from "./glyphs";
 import { byId } from "../../../packages/shared/content";
+
+const seat = new T.Vector3();
 
 export function HabitatResident({
   site,
@@ -154,9 +156,14 @@ export function HavenWildlife({
   );
 }
 function Butterflies() {
-  const flock = useRef<T.Group>(null);
-  useFrame(({ clock }) => {
+  const flock = useRef<T.Group>(null),
+    // How far the first butterfly has drifted toward a napping companion.
+    visit = useRef(0);
+  useFrame(({ clock }, dt) => {
     if (settings.reduced) return;
+    const r = companionRest,
+      nearby = r.napping && Math.hypot(r.at.x - 8, r.at.z - 26) < 25;
+    visit.current += ((nearby ? 1 : 0) - visit.current) * Math.min(1, Math.min(dt, 0.1) * 0.4);
     flock.current?.children.forEach((g, i) => {
       const t = clock.elapsedTime * 0.6 + i;
       g.position.set(
@@ -165,10 +172,17 @@ function Butterflies() {
         26 + Math.cos(t * 0.8) * 4,
       );
       g.rotation.y = -t;
+      // One settles on the head of a companion napping nearby.
+      const w = i === 0 ? visit.current : 0,
+        perched = w > 0.97;
+      if (w > 0.001) {
+        g.position.lerp(seat.set(r.at.x, r.at.y + r.top, r.at.z), w);
+        if (perched) g.rotation.y = 0.6;
+      }
       g.children.forEach(
-        (w, j) =>
-          (w.rotation.z =
-            (j ? -1 : 1) * (0.25 + Math.abs(Math.sin(t * 14)) * 0.9)),
+        (wing, j) =>
+          (wing.rotation.z =
+            (j ? -1 : 1) * (perched ? 0.5 + Math.abs(Math.sin(t * 1.5)) * 0.6 : 0.25 + Math.abs(Math.sin(t * 14)) * 0.9)),
       );
     });
   });

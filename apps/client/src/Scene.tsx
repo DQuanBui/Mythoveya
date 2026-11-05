@@ -51,7 +51,7 @@ import { HavenTownsfolk } from "./HavenTownsfolk";
 import { HavenShops } from "./HavenShops";
 import { DayNight, SkyLife } from "./Atmosphere";
 import { WalkContext, type Walker } from "./hover";
-import { worldFocus, worldHeading, keeperEmote, EMOTES, playEmote, nightState, companionJoy } from "./village-materials";
+import { worldFocus, worldHeading, keeperEmote, EMOTES, playEmote, nightState, companionJoy, companionRest } from "./village-materials";
 import { buildGrid, findPath, type WalkGrid } from "../../../packages/shared/pathfind";
 import { lazy, Suspense, useMemo, useRef, useEffect, useState, useCallback } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
@@ -1155,6 +1155,9 @@ export function Explorer({
     const shaking = clock.elapsedTime - shook.current < 0.9;
     // Waiting at the keeper's side, the companion looks up at them.
     companion.userData.gaze = !following && !moving && delta.length() < 2.4 ? COMPANION_GAZE : null;
+    companionRest.napping = !area && rest.current > 14 && !following;
+    companionRest.at.copy(follow.current);
+    companionRest.top = companion.userData.headAt[0] * companion.scale.x + 0.25;
     // Left waiting long enough, the companion curls up for a nap.
     rest.current = following || moving || pet || Date.now() < companionJoy.until || (keeperEmote.name && keeperEmote.name !== "sit") ? 0 : rest.current + dt;
     animateCreature(

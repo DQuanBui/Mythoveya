@@ -17,6 +17,7 @@ November 7 round (from `a9be583`). Done this round, newest last:
 - Cold nights: outdoors in Moonfrost after dark, a keeper standing about hugs themselves and shivers for about a second every six (`userData.cold`, replacing the idle habit meanwhile). Tested.
 - Wet footprints: after stepping in a puddle, the keeper's next six steps leave dark damp prints on any ground (`wet` prints in `Footprints.tsx`, which fill in like the others). Tested.
 - Dawn dew: `WaterGlints` takes an `amount` scale; in Havenreach 30 pale-green sparkles glitter on the grass around the keeper while the morning mist lies (same dawn curve).
+- Butterfly visitor: when the companion naps within 25 m of Sunpetal Clearing, one of the clearing's butterflies drifts over and perches on its head, wings slowly opening and closing (`companionRest` in `village-materials.ts`).
 
 Next 3 tasks:
 1. A living-world player guide.

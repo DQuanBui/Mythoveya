@@ -13,6 +13,8 @@ export const villageGlow = new T.MeshStandardMaterial({
   emissiveIntensity: 0.3,
   flatShading: true,
 });
+// Where the following companion naps (if it does), for visitors like butterflies.
+export const companionRest = { napping: false, at: new T.Vector3(), top: 1 };
 // The companion celebrates a find (a cache, a lantern, a gift, gathering) until `until` (ms).
 export const companionJoy = { until: 0 };
 // How dark it is (0 day .. 1 night), for things like the keeper's lantern.
