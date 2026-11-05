@@ -6,7 +6,7 @@ import * as T from "three";
 // on each footstep and this component draws, each print slowly filling in.
 const MAX = 48,
   LIFE = 9;
-type Print = { x: number; y: number; z: number; yaw: number; t: number; snow: boolean; paw?: boolean };
+type Print = { x: number; y: number; z: number; yaw: number; t: number; snow: boolean; paw?: boolean; wet?: boolean };
 const prints: Print[] = [];
 let side = 1,
   pawSide = 1;
@@ -16,10 +16,10 @@ export function leavePaw(x: number, y: number, z: number, yaw: number, t: number
   prints.push({ x: x + Math.cos(yaw) * 0.07 * pawSide, y, z: z - Math.sin(yaw) * 0.07 * pawSide, yaw, t, snow, paw: true });
   if (prints.length > MAX) prints.shift();
 }
-export function leavePrint(x: number, y: number, z: number, yaw: number, t: number, snow: boolean) {
+export function leavePrint(x: number, y: number, z: number, yaw: number, t: number, snow: boolean, wet = false) {
   side = -side;
   // Alternate left and right of the walking line.
-  prints.push({ x: x + Math.cos(yaw) * 0.09 * side, y, z: z - Math.sin(yaw) * 0.09 * side, yaw, t, snow });
+  prints.push({ x: x + Math.cos(yaw) * 0.09 * side, y, z: z - Math.sin(yaw) * 0.09 * side, yaw, t, snow, wet });
   if (prints.length > MAX) prints.shift();
 }
 /** The prints currently remembered (oldest first). */
@@ -34,19 +34,21 @@ export function Footprints() {
         m.renderOrder = 1;
         return m;
       };
-    return { geo, snow: make("#8aa4b6"), sand: make("#a88a5e") };
+    // Wet prints: dark, damp marks left for a few steps after a puddle.
+    return { geo, snow: make("#8aa4b6"), sand: make("#a88a5e"), wet: make("#4f5f63") };
   }, []);
   useEffect(
     () => () => {
       marks.geo.dispose();
-      for (const m of [marks.snow, marks.sand]) (m.material as T.Material).dispose();
+      for (const m of [marks.snow, marks.sand, marks.wet]) (m.material as T.Material).dispose();
     },
     [marks],
   );
   const o = useMemo(() => new T.Object3D(), []);
   useFrame(({ clock }) => {
     let s = 0,
-      d = 0;
+      d = 0,
+      w = 0;
     for (const p of prints) {
       const age = clock.elapsedTime - p.t;
       if (age < 0 || age > LIFE) continue;
@@ -56,17 +58,20 @@ export function Footprints() {
       if (p.paw) o.scale.set(0.09 * fill, 1, 0.1 * fill);
       else o.scale.set(0.13 * fill, 1, 0.22 * fill);
       o.updateMatrix();
-      if (p.snow) marks.snow.setMatrixAt(s++, o.matrix);
+      if (p.wet) marks.wet.setMatrixAt(w++, o.matrix);
+      else if (p.snow) marks.snow.setMatrixAt(s++, o.matrix);
       else marks.sand.setMatrixAt(d++, o.matrix);
     }
     marks.snow.count = s;
     marks.sand.count = d;
-    marks.snow.instanceMatrix.needsUpdate = marks.sand.instanceMatrix.needsUpdate = true;
+    marks.wet.count = w;
+    marks.snow.instanceMatrix.needsUpdate = marks.sand.instanceMatrix.needsUpdate = marks.wet.instanceMatrix.needsUpdate = true;
   });
   return (
     <>
       <primitive object={marks.snow} />
       <primitive object={marks.sand} />
+      <primitive object={marks.wet} />
     </>
   );
 }

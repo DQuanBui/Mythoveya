@@ -801,6 +801,7 @@ export function Explorer({
   const breath = useRef(0);
   const paw = useRef(0);
   const sparkle = useRef(0);
+  const wetFeet = useRef(0);
   const shook = useRef(-9);
   const wasFollowing = useRef(false);
   const follow = useRef(new T.Vector3(spawn[0] - 1, 0, spawn[1] + 1.5)),
@@ -1042,12 +1043,19 @@ export function Explorer({
         const step = area?.step || stepSound(profile.region, nx, nz, ny);
         audio.cue(step);
         if (step === "snowStep" || step === "sandStep") leavePrint(nx, ny, nz, avatar.rotation.y, clock.elapsedTime, step === "snowStep");
+        // Out of a puddle, the next few steps leave wet prints on any ground.
+        if (wetFeet.current > 0 && step !== "snowStep" && step !== "sandStep") {
+          wetFeet.current--;
+          leavePrint(nx, ny, nz, avatar.rotation.y, clock.elapsedTime, false, true);
+        }
         // Stepping in a full puddle throws up a little splash.
-        if (profile.region === "haven" && !area && inPuddle(nx, nz))
+        if (profile.region === "haven" && !area && inPuddle(nx, nz)) {
+          wetFeet.current = 6;
           for (let k = 0; k < 3; k++) {
             const a = avatar.rotation.y + (k - 1) * 1.3;
             emitPuff(nx, ny + 0.06, nz, Math.sin(a), Math.cos(a), clock.elapsedTime, "splash");
           }
+        }
         // A sprint kicks up dust on paths, stone and sand, and powder in snow.
         if (sprinting && (step === "stoneStep" || step === "sandStep" || step === "snowStep")) {
           const bx = -Math.sin(avatar.rotation.y),

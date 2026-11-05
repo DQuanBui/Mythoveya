@@ -37,6 +37,11 @@ describe("keeper emotes, footprints and photo filters", () => {
     expect(Math.sign(prints.at(-1)!.x)).toBe(-Math.sign(prints.at(-2)!.x));
   });
 
+  it("marks wet prints apart from snow and sand", () => {
+    leavePrint(0, 0, 0, 0, 1, false, true);
+    expect(recentPrints().at(-1)).toMatchObject({ wet: true, snow: false });
+  });
+
   it("maps every photo filter to a CSS filter", () => {
     expect(photoCss("natural")).toBe("none");
     for (const f of PHOTO_FILTERS) expect(photoCss(f.id)).toMatch(/none|\w+\(/);
