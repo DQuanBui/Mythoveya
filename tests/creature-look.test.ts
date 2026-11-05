@@ -225,6 +225,15 @@ describe("villagers who watch the keeper", () => {
     expect(rightArm.rotation.z).toBe(0);
   });
 
+  it("hum while Elian sways, and show a speech bubble while chatting", () => {
+    const elian = createAvatar(6),
+      at = 18 + 1.3 - 6 * 2.3;
+    animateAvatar(elian, at);
+    expect(elian.getObjectByName("keeper-voice")?.visible).toBe(true);
+    animateAvatar(elian, at + 4);
+    expect(elian.getObjectByName("keeper-voice")?.visible).toBe(false);
+  });
+
   it("let the keeper glance at a point, and look away while paused", () => {
     const keeper = createAvatar(0),
       pet = new Vector3(-2, 0, 0.5);

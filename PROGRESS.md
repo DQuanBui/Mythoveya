@@ -8,11 +8,12 @@ November 7 round (from `a9be583`). Done this round, newest last:
 - Keyboard play outdoors: E uses whatever is within reach (the same as clicking it), as homes and lodges already did; no prompt card is added on desktop. New browser journey `tests/browser/keyboard.spec.ts` gathers Sunseed with E.
 - Controls guide: the pause menu's Controls list now includes E (use what is within reach), 1-4 emotes and P / G for photo mode and pose; README points to it.
 - Decorative effects setting: Sound & graphics has Auto (pause on a slow device, the default), Full and Minimal; `applyEffects` in `adaptive.ts` applies it (tested). Stored with the other settings in `mythoveya-settings`; older settings default to Auto.
+- Voices: Elian's humming habit floats ♪ and ♫ notes up from the head, and chatting islanders show a "…" bubble in turns (`keeper-voice` sprites made lazily in `animateAvatar`). Fixed along the way: the chatting flag could leave visibility as undefined. Tested.
 
 Next 3 tasks:
-1. Hummed notes and chat bubbles over villagers.
-2. Ground birds that scatter when the keeper comes near.
-3. Morning mist pooling low over Havenreach.
+1. Ground birds that scatter when the keeper comes near.
+2. Morning mist pooling low over Havenreach.
+3. A living-world player guide.
 
 ## Play
 

@@ -1685,7 +1685,7 @@ export function animateAvatar(
     }
   }
   // Chatting villagers talk with their hands and nod along.
-  const chat = g.userData.chatting && !walk && !e;
+  const chat = !!g.userData.chatting && !walk && !e;
   if (chat && !reduced) {
     const [, leftArm, , rightArm] = g.userData.limbs as T.Group[],
       beat = t * 2.2 + g.userData.index;
@@ -1740,6 +1740,37 @@ export function animateAvatar(
         hd.rotation.x = Math.sin(t * 10) * 0.03 * h;
         break;
     }
+  }
+  // Humming (Elian's habit) floats a few notes up; a chat shows a "…" in turns.
+  const humming = h > 0.2 && g.userData.index % 8 === 6,
+    talking = chat && !reduced && Math.sin(t * 0.9 + g.userData.index * 2) > 0.2;
+  if ((humming || talking) && !g.userData.voice) {
+    const voice = new T.Group();
+    voice.name = "keeper-voice";
+    voice.position.set(0.12, 2.05, 0);
+    for (const glyph of ["♪", "♫", "…"]) {
+      const s = glyphSprite(glyph, glyph === "…" ? "#ffffff" : "#ffe9a8", glyph === "…" ? 0.32 : 0.22);
+      if (s) voice.add(s);
+    }
+    g.add(voice);
+    g.userData.voice = voice;
+  }
+  const voice = g.userData.voice as T.Group | undefined;
+  if (voice) {
+    voice.visible = humming || talking;
+    voice.children.forEach((s, i) => {
+      const sprite = s as T.Sprite;
+      if (i < 2) {
+        // Notes rise and drift off one after the other.
+        const k = (t * 0.6 + i * 0.5) % 1;
+        sprite.visible = humming;
+        sprite.position.set(Math.sin(k * 5 + i) * 0.08 + i * 0.06, k * 0.45, 0);
+        sprite.material.opacity = Math.sin(k * Math.PI);
+      } else {
+        sprite.visible = talking;
+        sprite.position.y = Math.abs(Math.sin(t * 4)) * 0.03;
+      }
+    });
   }
   // The walking bob rides on top of whatever ground the keeper stands on.
   g.position.y =
