@@ -221,6 +221,19 @@ describe("villagers who watch the keeper", () => {
     worldFocus.set(0, 0, 5);
   });
 
+  it("nod once when the keeper first comes within reach", () => {
+    const host = watchKeeper(createAvatar(1));
+    worldFocus.set(30, 0, 30);
+    animateAvatar(host, 1);
+    worldFocus.set(1, 0, 2);
+    animateAvatar(host, 2);
+    animateAvatar(host, 2.35);
+    expect(host.userData.head.rotation.x).toBeGreaterThan(0.2);
+    animateAvatar(host, 4);
+    expect(Math.abs(host.userData.head.rotation.x)).toBeLessThan(0.1);
+    worldFocus.set(0, 0, 5);
+  });
+
   it("cheer along when the keeper cheers close by", () => {
     const friend = watchKeeper(createAvatar(3)),
       [, leftArm, , rightArm] = friend.userData.limbs as Object3D[];

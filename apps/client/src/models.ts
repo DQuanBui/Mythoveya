@@ -1692,6 +1692,13 @@ export function animateAvatar(
         // Something low, like a companion, gets a glance down as well.
         if (target !== worldFocus) head.rotation.x += Math.min(1, Math.abs(look) * 3) * 0.18;
       }
+      // A villager greets a keeper who comes within reach with one small nod.
+      if (target === worldFocus) {
+        if (near && !g.userData.seen) g.userData.nodAt = t;
+        g.userData.seen = near;
+        const nod = t - (g.userData.nodAt ?? -9);
+        if (nod >= 0 && nod < 0.7) head.rotation.x += Math.sin((nod / 0.7) * Math.PI) * 0.28;
+      }
     }
   }
   // Chatting villagers talk with their hands and nod along.
