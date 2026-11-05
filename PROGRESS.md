@@ -7,11 +7,12 @@ Updated November 6, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch
 November 7 round (from `a9be583`). Done this round, newest last:
 - Keyboard play outdoors: E uses whatever is within reach (the same as clicking it), as homes and lodges already did; no prompt card is added on desktop. New browser journey `tests/browser/keyboard.spec.ts` gathers Sunseed with E.
 - Controls guide: the pause menu's Controls list now includes E (use what is within reach), 1-4 emotes and P / G for photo mode and pose; README points to it.
+- Decorative effects setting: Sound & graphics has Auto (pause on a slow device, the default), Full and Minimal; `applyEffects` in `adaptive.ts` applies it (tested). Stored with the other settings in `mythoveya-settings`; older settings default to Auto.
 
 Next 3 tasks:
 1. Hummed notes and chat bubbles over villagers.
 2. Ground birds that scatter when the keeper comes near.
-3. A Decorative effects setting (Auto / Full / Minimal).
+3. Morning mist pooling low over Havenreach.
 
 ## Play
 

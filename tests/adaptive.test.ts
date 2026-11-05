@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { frameMonitor } from "../apps/client/src/adaptive";
+import { applyEffects, frameMonitor } from "../apps/client/src/adaptive";
 
 describe("adaptive effects", () => {
   const run = (m: ReturnType<typeof frameMonitor>, state: { lite: boolean }, ms: number, seconds: number) => {
@@ -25,6 +25,16 @@ describe("adaptive effects", () => {
     run(m, state, 16.7, 10);
     expect(state.lite).toBe(true);
     run(m, state, 16.7, 25);
+    expect(state.lite).toBe(false);
+  });
+  it("follows the player's choice of Full or Minimal over the monitor", () => {
+    const m = frameMonitor(),
+      state = { lite: false };
+    for (let i = 0; i < 600; i++) applyEffects("Full", m, 45, state);
+    expect(state.lite).toBe(false);
+    applyEffects("Minimal", m, 16.7, state);
+    expect(state.lite).toBe(true);
+    for (let i = 0; i < 2000; i++) applyEffects("Auto", m, 16.7, state);
     expect(state.lite).toBe(false);
   });
 });

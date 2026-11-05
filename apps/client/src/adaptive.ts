@@ -30,3 +30,11 @@ export function frameMonitor() {
     },
   };
 }
+
+/** Applies the player's choice: "Full" and "Minimal" fix the effects; "Auto"
+ * leaves them to the monitor. Returns the current state. */
+export function applyEffects(choice: string, monitor: ReturnType<typeof frameMonitor>, ms: number, state = perf) {
+  if (choice === "Full") return (state.lite = false);
+  if (choice === "Minimal") return (state.lite = true);
+  return monitor.add(ms, state);
+}

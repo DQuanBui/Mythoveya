@@ -111,7 +111,7 @@ import {
 } from "./world-guide";
 import type { MutableRefObject } from "react";
 import { useContextRecovery } from "./context-recovery";
-import { frameMonitor } from "./adaptive";
+import { applyEffects, frameMonitor } from "./adaptive";
 import { inPuddle } from "./puddle-spots";
 import { unitLabel } from "./battle-labels";
 import { useCarried } from "./carried";
@@ -687,7 +687,7 @@ const COMPANION_GAZE = { x: 0, y: 0.5 };
 /** Feeds the frame time to the adaptive-effects monitor (see adaptive.ts). */
 function AdaptiveEffects() {
   const monitor = useMemo(() => frameMonitor(), []);
-  useFrame((_, dt) => monitor.add(dt * 1000));
+  useFrame((_, dt) => applyEffects(settings.effects, monitor, dt * 1000));
   return null;
 }
 const groundFor = (region: string) =>

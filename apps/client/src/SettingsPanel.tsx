@@ -82,10 +82,23 @@ export function SettingsPanel() {
             ))}
           </select>
         </label>
+        <label className="slider">
+          Decorative effects
+          <select
+            value={settings.effects}
+            onChange={(e) => change("effects", e.target.value)}
+          >
+            {["Auto", "Full", "Minimal"].map((q) => (
+              <option key={q}>{q}</option>
+            ))}
+          </select>
+        </label>
       </div>
       <p className="muted">
-        Graphics density updates when you enter another area. All sounds are
-        composed and synthesized locally.
+        Graphics density updates when you enter another area. Decorative
+        effects (drifting motes, water glints, puddles, puffs) pause on their
+        own on Auto when the frame rate stays low. All sounds are composed and
+        synthesized locally.
       </p>
       <button
         onClick={async () => {

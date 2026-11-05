@@ -11,6 +11,8 @@ export type Settings = {
   reduced: boolean;
   shake: boolean;
   quality: string;
+  /** Decorative effects: "Auto" pauses them on a slow device, or always "Full" / "Minimal". */
+  effects: string;
   daynight: boolean;
   contrast: boolean;
   brightness: number;
@@ -25,6 +27,7 @@ export const defaults: Settings = {
   reduced: false,
   shake: false,
   quality: "Medium",
+  effects: "Auto",
   daynight: true,
   contrast: false,
   brightness: 1,
