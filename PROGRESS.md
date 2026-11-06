@@ -15,6 +15,7 @@ November 9 round (from `6657ade`). Done this round, newest last:
 - Phone layout: all three formation slots of a line now fit at 390 px without sideways scrolling.
 - Title banner: earning a keeper title shows a brief banner, chime and companion joy (`newlyEarned`, tested; checked in the browser).
 - Fight again: the result screen offers Practice again, and Try this stage again after a lost stage (practice checked through two battles on a phone; the stage retry shares that path but was not played).
+- Larger text: Sound & graphics gains Larger interface text, zooming panels and notices by 18% and keeping them on screen (in `settings.spec`; checked at 390 px).
 
 Next 3 tasks:
 1. Finish this round: team lineups, damage estimates, milestones, rematch and larger text.

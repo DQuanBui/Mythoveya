@@ -39,7 +39,7 @@ export function SettingsPanel() {
         )}
       </div>
       <div className="settings-grid">
-        {(["mute", "reduced", "shake", "daynight", "contrast"] as const).map((key) => (
+        {(["mute", "reduced", "shake", "daynight", "contrast", "largeText"] as const).map((key) => (
           <label className="toggle" key={key}>
             <input
               type="checkbox"
@@ -54,7 +54,9 @@ export function SettingsPanel() {
                   ? "Day and night cycle"
                   : key === "contrast"
                     ? "High-contrast interface"
-                    : "Camera shake"}
+                    : key === "largeText"
+                      ? "Larger interface text"
+                      : "Camera shake"}
           </label>
         ))}
         <label className="slider">

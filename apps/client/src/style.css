@@ -1876,3 +1876,13 @@ html[data-contrast="true"] select:focus-visible {
     text-align: center;
   }
 }
+/* Larger interface text (Sound & settings). Sizes here are mostly in pixels,
+   so the panels and notices are zoomed as a whole. */
+html[data-large-text="true"] .panel,
+html[data-large-text="true"] .toast,
+html[data-large-text="true"] .title-banner {
+  zoom: 1.18;
+}
+html[data-large-text="true"] .modal {
+  max-height: calc((100dvh - 56px) / 1.18);
+}

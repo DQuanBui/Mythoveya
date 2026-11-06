@@ -15,6 +15,8 @@ export type Settings = {
   effects: string;
   daynight: boolean;
   contrast: boolean;
+  /** Enlarges panels, dialogue and notices. */
+  largeText: boolean;
   brightness: number;
 };
 export const defaults: Settings = {
@@ -30,6 +32,7 @@ export const defaults: Settings = {
   effects: "Auto",
   daynight: true,
   contrast: false,
+  largeText: false,
   brightness: 1,
 };
 function storedSettings() {
@@ -47,6 +50,7 @@ export const settings: Settings = {
 function applyDocument() {
   document.documentElement.dataset.reduced = String(settings.reduced);
   document.documentElement.dataset.contrast = String(settings.contrast);
+  document.documentElement.dataset.largeText = String(settings.largeText);
 }
 applyDocument();
 class AudioEngine {

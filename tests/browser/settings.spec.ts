@@ -29,6 +29,15 @@ test("title, HUD and pause settings links work and retain separate preferences",
   await expect(page.getByLabel("Reduced motion")).toBeChecked();
   await expect(page.getByLabel("Day and night cycle")).not.toBeChecked();
   await expect(page.getByLabel("Decorative effects")).toHaveValue("Minimal");
+  // Larger text applies at once, survives a reload and keeps panels on screen.
+  await page.getByLabel("Larger interface text").check();
+  await expect(page.locator("html")).toHaveAttribute("data-large-text", "true");
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-large-text", "true");
+  await page.getByRole("button", { name: "Sound & settings" }).click();
+  const box = (await page.locator(".panel.modal").boundingBox())!;
+  expect(box.y).toBeGreaterThanOrEqual(0);
+  expect(box.y + box.height).toBeLessThanOrEqual(page.viewportSize()!.height);
   expect(errors).toEqual([]);
   await page.screenshot({ path: "artifacts/settings-verified.png" });
 });
