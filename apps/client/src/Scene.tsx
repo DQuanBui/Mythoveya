@@ -87,7 +87,7 @@ import {
   type Point,
 } from "../../../packages/shared/haven";
 import { hairColor } from "../../../packages/shared/looks";
-import type { Battle, Profile } from "../../../packages/shared/types";
+import type { Battle, Profile, Unit } from "../../../packages/shared/types";
 import {
   animateAvatar,
   animateCreature,
@@ -113,7 +113,7 @@ import { applyEffects, frameMonitor } from "./adaptive";
 import { inPuddle } from "./puddle-spots";
 import { unitLabel } from "./battle-labels";
 import { useCarried } from "./carried";
-import { elementMultiplier } from "../../../packages/shared/elements";
+import { elementMultiplier, matchupWord } from "../../../packages/shared/elements";
 // Festival lanterns load only while a festival runs.
 const SeasonalLanterns = lazy(() => import("./SeasonalLanterns").then((m) => ({ default: m.SeasonalLanterns })));
 // Ambient life (motes, mist, puddles, sparrows) follows once the world is up.
@@ -1694,6 +1694,12 @@ export function Preview({
     </Canvas>
   );
 }
+/** "Strong!" or "Resisted" under a damage number, when elements decide it. */
+function FloatWord({ attacker, target }: { attacker?: Unit; target: Unit }) {
+  if (!attacker || attacker.side === target.side) return null;
+  const word = matchupWord(byId[attacker.species].element, byId[target.species].element);
+  return word ? <small className={`float-word ${word}`}>{word === "strong" ? "Strong!" : "Resisted"}</small> : null;
+}
 /** A yaw `k` of the way from `base` toward facing `to` from `from`, turning the short way. */
 function turnToward(from: number[], to: number[], base: number, k: number) {
   const yaw = Math.atan2(to[0] - from[0], to[2] - from[2]);
@@ -2137,6 +2143,7 @@ export function BattleScene({
                       className={`float-number ${a.amount > 0 ? "damage" : a.amount < 0 ? "healing" : "shield"} ${event.action.endsWith("-2") ? "big" : ""}`}
                     >
                       {a.amount > 0 ? a.amount : a.amount < 0 ? `+${-a.amount}` : `◇${a.shield}`}
+                      {a.amount > 0 && <FloatWord attacker={battle.units.find((x) => x.id === event.actor)} target={u} />}
                     </span>
                   </Html>
                 ))}
