@@ -280,3 +280,19 @@
 .matchup.resisted {
   color: #f2b39a;
 }
+/* Keyboard hints on the ability buttons, for those with a keyboard. */
+.ability-key {
+  display: inline-block;
+  min-width: 1.3em;
+  margin-right: 5px;
+  padding: 0 3px;
+  border: 1px solid #e8d39c66;
+  border-radius: 4px;
+  font-size: 0.9em;
+  text-align: center;
+}
+@media (pointer: coarse) {
+  .ability-key {
+    display: none;
+  }
+}

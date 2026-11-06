@@ -62,4 +62,4 @@ Creatures drop onto the field with a puff of dust. Each attacks in its family's 
 
 - **Sound & graphics → Decorative effects:** *Auto* (the default) pauses drifting motes, glints, puddles and puffs if the frame rate stays below about 30 fps, and brings them back once it recovers. *Full* always shows them; *Minimal* keeps them off.
 - **Reduced Motion** stills animation everywhere, and **Camera shake** controls the battle jolts.
-- **Esc → Controls** lists every shortcut. Outdoors, **E** uses whatever is within reach.
+- **Esc → Controls** lists every shortcut. Outdoors, **E** uses whatever is within reach. In battle, **1 · 2 · 3** pick an ability, **← →** change the target, **Enter** uses it, **A** toggles Auto and **F** toggles Fast.

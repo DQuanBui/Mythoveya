@@ -127,6 +127,35 @@ export function BattleUI({
     actor && t.side !== actor.side && options[action]?.effects.includes("damage") ? matchupWord(byId[actor.species].element, byId[t.species].element) : "";
   const chosen = ts.some((t) => t.id === target) ? target : ts[0]?.id || "";
   const chosenUnit = ts.find((t) => t.id === chosen);
+  const usable = (i: number) =>
+    myTurn &&
+    battle.energy[side] >= (options[i]?.cost ?? Infinity) &&
+    !actor?.cooldowns[i] &&
+    !(i === 1 && actor?.statuses.some((s) => s.kind === "silence"));
+  // Keyboard play: 1-3 pick an ability, left and right change the target,
+  // Enter uses it; A and F toggle Auto and Fast.
+  const press = useRef<(e: KeyboardEvent) => void>(() => {});
+  press.current = (e) => {
+    const el = e.target as HTMLElement;
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || battle.winner !== null) return;
+    if (/^Digit[1-3]$/.test(e.code)) {
+      const i = Number(e.code.slice(5)) - 1;
+      if (usable(i)) setAction(i);
+    } else if ((e.code === "ArrowLeft" || e.code === "ArrowRight") && ts.length) {
+      const at = ts.findIndex((t) => t.id === chosen),
+        step = e.code === "ArrowLeft" ? -1 : 1;
+      setTarget(ts[(at + step + ts.length) % ts.length].id);
+      e.preventDefault();
+    } else if (e.code === "Enter" && el.tagName !== "BUTTON" && myTurn && now >= battle.readyAt && chosen && !auto) {
+      send(action, chosen);
+    } else if (!human && e.code === "KeyA") setAuto(!auto);
+    else if (!human && e.code === "KeyF") setFast(!fast);
+  };
+  useEffect(() => {
+    const listener = (e: KeyboardEvent) => press.current(e);
+    window.addEventListener("keydown", listener);
+    return () => window.removeEventListener("keydown", listener);
+  }, []);
   return (
     <div className="battle-screen">
       <BattleScene battle={battle} target={chosen} onTarget={setTarget} side={side} />
@@ -209,15 +238,11 @@ export function BattleUI({
                 key={a.id}
                 title={`${a.effects.join(", ")} · ${a.target} · ${a.cooldown} round cooldown`}
                 className={action === i ? "selected" : ""}
-                disabled={
-                  !myTurn ||
-                  battle.energy[side] < a.cost ||
-                  !!actor?.cooldowns[i] ||
-                  (i === 1 && actor?.statuses.some((s) => s.kind === "silence"))
-                }
+                disabled={!usable(i)}
                 onClick={() => setAction(i)}
               >
                 <small>
+                  <kbd className="ability-key" aria-hidden="true">{i + 1}</kbd>
                   {["BASIC", "SKILL", "ULTIMATE"][i]} · {a.cost} ✧
                 </small>
                 <strong>{a.name}</strong>

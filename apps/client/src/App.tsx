@@ -1186,6 +1186,8 @@ export default function App() {
                     <dd>Wave, cheer, dance or sit</dd>
                     <dt>P</dt>
                     <dd>Photo mode · G to pose</dd>
+                    <dt>In battle</dt>
+                    <dd>1 · 2 · 3 pick an ability · ← → change the target · Enter uses it · A Auto · F Fast</dd>
                     <dt>Drag · scroll</dt>
                     <dd>Turn the camera · zoom</dd>
                     <dt>R</dt>
