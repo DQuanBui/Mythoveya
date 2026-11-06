@@ -302,9 +302,15 @@ test("mouse picking opens villagers, gathers seeds, and saves a house visitor st
     page.getByRole("heading", { name: "Warden Liora", exact: true }),
   ).toBeVisible();
   await page.keyboard.press("Escape");
+  // Pass north of the house at (-9.5, 12) and round the cottage: heading straight
+  // at their corners (the line from (-12, 15) to (-18, 8) is blocked) can
+  // wedge this key-driven walker against a wall.
   await walkRoute(page, [
     [0, 11],
+    [-4, 13.2],
+    [-8, 13.6],
     [-12, 15],
+    [-13.5, 10],
     [-18, 8],
     [-14, 7.5],
   ]);

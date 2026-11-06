@@ -4,10 +4,11 @@ Updated November 8, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch
 
 ## Next up
 
-November 8 round is complete: 13 commits from `7661c95` plus this record, all pushed.
+November 9 round (from `6657ade`). Done this round, newest last:
+- Test routes: the two "Route stopped" flakes came from waypoints aimed at walls (one segment crosses a fence), now rerouted; `atlas.spec` waits for the world after reloading.
 
 Next 3 tasks:
-1. Look at the two recurring flaky journeys: `atlas.spec` timing out on the Travel map click as the first test of a run (twice in three runs, so possibly a cold dev server), and walkers reporting "Route stopped" west of the village (`keeper-life` near (-8, 12), `haven` near (-15, 13)).
+1. Finish this round: team lineups, damage estimates, milestones, rematch and larger text.
 2. Listening pass and a physical phone/tablet check.
 3. Cloud shadows across all ground surfaces.
 

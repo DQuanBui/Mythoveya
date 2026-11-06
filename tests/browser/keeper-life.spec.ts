@@ -69,8 +69,10 @@ test("photo mode, the seasonal festival and stepping inside a home", async ({ pa
   // Arrive from the east so the trailing companion stays clear of the lantern.
   await walkRoute(page, [
     [0, 11],
+    [-4, 13.2],
+    [-8, 13.6],
     [-12, 15],
-    [-11.5, 9.5],
+    [-12.5, 10],
     [-14, 8.8],
   ]);
   if (season?.season.id === "lantern-night") {

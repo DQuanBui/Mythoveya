@@ -5,6 +5,7 @@ import {
   atlasEcho,
 } from "../../packages/shared/atlas";
 import { REGIONS } from "../../packages/shared/content";
+import { waitForScene } from "./world-helpers";
 async function stop(page: Page, id: string) {
   const h = ATLAS_STOPS.find((s) => s.id === id)!;
   const region = h.region;
@@ -96,6 +97,9 @@ test("restore all Atlas chapters read daily echoes and preserve companions after
 
   await page.reload();
   await page.getByRole("button", { name: "Continue your journey" }).click();
+  // Let the world finish mounting first: the page can be busy for a few seconds
+  // while it does, which has run out this journey's short click timeout.
+  await waitForScene(page);
 
   let previous = "";
   for (const c of ATLAS_CHAPTERS) {
