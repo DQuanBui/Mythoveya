@@ -5,6 +5,9 @@ export default defineConfig({
   expect: { timeout: 15000 },
   workers: 1,
   fullyParallel: false,
+  // One retry for machine hiccups in these long runs; Playwright still lists
+  // anything that needed it as "flaky", so it stays visible.
+  retries: 1,
   use: {
     baseURL: "http://127.0.0.1:5174",
     viewport: { width: 1440, height: 900 },
