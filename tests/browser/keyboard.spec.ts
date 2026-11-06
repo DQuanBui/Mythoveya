@@ -64,4 +64,6 @@ test("a battle can be played from the keyboard", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Fast ON" })).toBeVisible();
   await page.keyboard.press("Enter");
   await expect(page.getByText("Resolving action…")).toBeVisible({ timeout: 15000 });
+  // Fast is remembered for the next visit.
+  expect(await page.evaluate(() => localStorage.getItem("mythoveya-battle-fast"))).toBe("1");
 });

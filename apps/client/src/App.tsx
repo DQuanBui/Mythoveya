@@ -119,7 +119,13 @@ export default function App() {
     [pet, setPet] = useState(false),
     [battle, setBattle] = useState<Battle | null>(null),
     [auto, setAuto] = useState(false),
-    [fast, setFast] = useState(false),
+    [fast, setFastState] = useState(() => {
+      try {
+        return localStorage.getItem("mythoveya-battle-fast") === "1";
+      } catch {
+        return false;
+      }
+    }),
     [placing, setPlacing] = useState<Placing | null>(null),
     [homeFocus, setHomeFocus] = useState<string | undefined>(),
     [festTab, setFestTab] = useState<FestivalTab>("today"),
@@ -228,6 +234,15 @@ export default function App() {
     );
     return () => clearTimeout(t);
   }, [battle, screen, auto, fast]);
+  // Fast battles stay on between visits.
+  const setFast = (on: boolean) => {
+    setFastState(on);
+    try {
+      localStorage.setItem("mythoveya-battle-fast", on ? "1" : "0");
+    } catch {
+      // Private windows may refuse storage; the choice still lasts this visit.
+    }
+  };
   async function run(kind: string, data: Record<string, unknown> = {}) {
     setBusy(true);
     try {

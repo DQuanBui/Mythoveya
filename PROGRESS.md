@@ -9,11 +9,12 @@ November 8 round (from `7661c95`). Done this round, newest last:
 - Test environment: Playwright retries a failed journey once and reports it as flaky, so a machine hiccup in a long run no longer hides the result; assertions are unchanged.
 - Matchup hints: the battle target list shows each creature's element and, for attacks, whether it is strong or resisted, and a chip beside the picker names the chosen target's matchup (`matchupWord` in `packages/shared/elements.ts`, tested).
 - Battle keyboard: 1-3 pick an ability, left and right change the target, Enter uses it, A and F toggle Auto and Fast; key hints show on the ability buttons (hidden on touch and from screen readers). In `keyboard.spec`, the Controls guide and the player guide.
+- Fast battles are remembered between visits (`mythoveya-battle-fast` in localStorage; Auto still starts off each battle).
 
 Next 3 tasks:
-1. Remember Fast between battles.
-2. An effective-hit label on damage numbers.
-3. A battle result summary.
+1. An effective-hit label on damage numbers.
+2. A battle result summary.
+3. Team element coverage.
 
 ## Play
 
