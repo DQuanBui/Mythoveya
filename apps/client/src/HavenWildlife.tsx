@@ -1,3 +1,4 @@
+import { useMountTurn } from "./mount-turns";
 import { WorldInteraction } from "./WorldInteraction";
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
@@ -16,15 +17,7 @@ import { byId } from "../../../packages/shared/content";
 
 const seat = new T.Vector3();
 
-export function HabitatResident({
-  site,
-  index,
-  onInteract,
-  disabled,
-  ground = groundHeight,
-  allowed = havenWalkable,
-  interactId,
-}: {
+type ResidentProps = {
   site: { species: string; point: [number, number]; radius: number; water?: boolean };
   ground?: (x: number, z: number) => number;
   allowed?: (x: number, z: number) => boolean;
@@ -32,7 +25,20 @@ export function HabitatResident({
   index: number;
   onInteract: (id: string) => void;
   disabled: boolean;
-}) {
+};
+/** Wildlife models are built one at a time so entering a region stays smooth. */
+export function HabitatResident(props: ResidentProps) {
+  return useMountTurn() ? <Resident {...props} /> : null;
+}
+function Resident({
+  site,
+  index,
+  onInteract,
+  disabled,
+  ground = groundHeight,
+  allowed = havenWalkable,
+  interactId,
+}: ResidentProps) {
   const model = useMemo(() => createCreature(site.species), [site.species]),
     lastVoice = useRef(0),
     time = useRef(index * 3.7),
