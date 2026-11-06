@@ -7,7 +7,8 @@ import {
   havenWalkable,
   type Point,
 } from "../../../packages/shared/haven";
-import { buildGrid, findPath, type WalkGrid } from "../../../packages/shared/pathfind";
+import { findPath, startGrid, type GridBuild, type WalkGrid } from "../../../packages/shared/pathfind";
+import { buildInSlices } from "./grid-slices";
 import { animateAvatar, createAvatar, watchKeeper, createLantern, createUmbrella, swingLantern } from "./models";
 import { WorldInteraction } from "./WorldInteraction";
 import { daylight, islandHour } from "./daytime";
@@ -96,6 +97,7 @@ const SPOTS: Point[] = [
   [-16, 9],
 ];
 let grid: WalkGrid | null = null;
+let gridBuild: GridBuild | null = null;
 
 function Villager({
   index,
@@ -219,11 +221,17 @@ export function HavenTownsfolk({
   disabled: boolean;
 }) {
   useEffect(() => {
-    // Plan routes after the first frames so entering the island stays smooth.
+    // Plan routes in slices after the first frames so entering the island stays smooth.
+    if (grid) return;
+    const build = (gridBuild ||= startGrid(havenWalkable, 46));
+    let cancel = () => {};
     const t = setTimeout(() => {
-      grid ||= buildGrid(havenWalkable, 46);
+      cancel = buildInSlices(build, () => (grid = build.grid));
     }, 1200);
-    return () => clearTimeout(t);
+    return () => {
+      clearTimeout(t);
+      cancel();
+    };
   }, []);
   const count = settings.quality === "Low" ? 3 : TOWNSFOLK.length;
   return (

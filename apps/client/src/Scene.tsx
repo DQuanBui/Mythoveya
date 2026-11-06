@@ -52,7 +52,8 @@ import { HavenShops } from "./HavenShops";
 import { DayNight, SkyLife } from "./Atmosphere";
 import { WalkContext, type Walker } from "./hover";
 import { worldFocus, worldHeading, keeperEmote, EMOTES, playEmote, nightState, companionJoy, companionRest } from "./village-materials";
-import { buildGrid, findPath, type WalkGrid } from "../../../packages/shared/pathfind";
+import { findPath, startGrid, type GridBuild, type WalkGrid } from "../../../packages/shared/pathfind";
+import { buildInSlices } from "./grid-slices";
 import { lazy, Suspense, useMemo, useRef, useEffect, useState, useCallback } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Stars } from "@react-three/drei";
@@ -671,6 +672,7 @@ export const getInteractables = (region: string) =>
         resourcesForRegion(region).some((n) => n.id === o.id)),
   ).map(o=>region === "haven" ? o : ({...o,p:[o.p[0],region === "canyon" ? canyonHeight(o.p[0],o.p[2]) : region === "hollow" ? hollowHeight(o.p[0],o.p[2]) : region === "meadow" ? meadowHeight(o.p[0],o.p[2]) : 0,o.p[2]]}))];
 const grids = new Map<string, WalkGrid>();
+const gridBuilds = new Map<string, GridBuild>();
 /** Ground height for a region; including expanded snowy and canyon terrain. */
 /** Footstep cue for the surface underfoot, matching how the ground is drawn. */
 function stepSound(region: string, x: number, z: number, y: number) {
@@ -867,8 +869,12 @@ export function Explorer({
         }
         let grid = grids.get(zone);
         if (!grid) {
-          grid = buildGrid(allowed, extent);
+          // Clicked before the background build finished: complete it now.
+          const build = gridBuilds.get(zone) ?? startGrid(allowed, extent);
+          build.step();
+          grid = build.grid;
           grids.set(zone, grid);
+          gridBuilds.delete(zone);
         }
         const points = findPath(grid, from, target, allowed);
         if (!points?.length) {
@@ -884,11 +890,22 @@ export function Explorer({
     if (blocked) route.current = null;
   }, [blocked]);
   useEffect(() => {
-    // Plan the walk grid once the scene has settled, so the first click is instant.
+    // Plan the walk grid in slices once the scene has settled, so the first
+    // click is instant and building it never holds up a frame.
+    if (grids.has(zone)) return;
+    const build = gridBuilds.get(zone) ?? startGrid(allowed, extent);
+    gridBuilds.set(zone, build);
+    let cancel = () => {};
     const t = setTimeout(() => {
-      if (!grids.has(zone)) grids.set(zone, buildGrid(allowed, extent));
+      cancel = buildInSlices(build, () => {
+        grids.set(zone, build.grid);
+        gridBuilds.delete(zone);
+      });
     }, 1500);
-    return () => clearTimeout(t);
+    return () => {
+      clearTimeout(t);
+      cancel();
+    };
   }, [allowed, zone, extent]);
   useEffect(() => {
     const down = (e: KeyboardEvent) => {

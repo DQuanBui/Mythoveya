@@ -8,30 +8,54 @@ export type WalkGrid = {
   size: number;
   open: Uint8Array;
 };
-export function buildGrid(
+export type GridBuild = {
+  grid: WalkGrid;
+  /** Fills rows while `more()` holds, always at least one; true once complete. */
+  step: (more?: () => boolean) => boolean;
+};
+/** A grid filled a few rows at a time, so a large one need not block a frame. */
+export function startGrid(
   allowed: (x: number, z: number) => boolean,
   extent: number,
   cell = 0.5,
-): WalkGrid {
+): GridBuild {
   const size = Math.ceil((extent * 2) / cell),
     open = new Uint8Array(size * size);
   // A cell is open only if its centre and four near-edge points are walkable,
   // so thin props such as lamp posts can never hide between two open centres.
   const r = cell * 0.44;
-  for (let gz = 0; gz < size; gz++)
-    for (let gx = 0; gx < size; gx++) {
-      const x = -extent + (gx + 0.5) * cell,
-        z = -extent + (gz + 0.5) * cell;
-      open[gz * size + gx] =
-        allowed(x, z) &&
-        allowed(x + r, z) &&
-        allowed(x - r, z) &&
-        allowed(x, z + r) &&
-        allowed(x, z - r)
-          ? 1
-          : 0;
-    }
-  return { extent, cell, size, open };
+  let gz = 0;
+  return {
+    grid: { extent, cell, size, open },
+    step(more = () => true) {
+      while (gz < size) {
+        for (let gx = 0; gx < size; gx++) {
+          const x = -extent + (gx + 0.5) * cell,
+            z = -extent + (gz + 0.5) * cell;
+          open[gz * size + gx] =
+            allowed(x, z) &&
+            allowed(x + r, z) &&
+            allowed(x - r, z) &&
+            allowed(x, z + r) &&
+            allowed(x, z - r)
+              ? 1
+              : 0;
+        }
+        gz++;
+        if (!more()) break;
+      }
+      return gz >= size;
+    },
+  };
+}
+export function buildGrid(
+  allowed: (x: number, z: number) => boolean,
+  extent: number,
+  cell = 0.5,
+): WalkGrid {
+  const build = startGrid(allowed, extent, cell);
+  build.step();
+  return build.grid;
 }
 const toCell = (g: WalkGrid, v: number) =>
   Math.max(0, Math.min(g.size - 1, Math.floor((v + g.extent) / g.cell)));
