@@ -32,3 +32,12 @@ export function teamPower(owned: Owned[], ids: string[]) {
     return sum + (o ? power(o) : 0);
   }, 0);
 }
+
+/** Earlier saved teams, newest first, skipping any with a companion no longer owned. */
+export function recentLineups(p: Pick<Profile, "owned" | "savedFormations">, current: string[], limit = 3) {
+  const same = (a: string[], b: string[]) => a.join("|") === b.join("|");
+  return [...(p.savedFormations || [])]
+    .reverse()
+    .filter((t) => t.length === 6 && !same(t, current) && t.every((id) => p.owned.some((o) => o.id === id)))
+    .slice(0, limit);
+}

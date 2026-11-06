@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ALL_SPECIES, byId } from "../packages/shared/content";
-import { suggestTeam, teamPower } from "../packages/shared/lineups";
+import { recentLineups, suggestTeam, teamPower } from "../packages/shared/lineups";
 import type { Owned } from "../packages/shared/types";
 
 const owned = (species: string, level = 1): Owned => ({ id: species, species, level, xp: 0, shards: 0, upgrade: 0, locked: false });
@@ -32,5 +32,22 @@ describe("teamPower", () => {
     const [a, b] = ofRole("tank");
     const list = [owned(a), owned(b)];
     expect(teamPower(list, [a, b, "gone"])).toBeGreaterThan(teamPower(list, [a]));
+  });
+});
+describe("recentLineups", () => {
+  const ids = ofRole("striker").slice(0, 8),
+    a = ids.slice(0, 6),
+    b = ids.slice(1, 7),
+    c = ids.slice(2, 8);
+  const owned_ = ids.map((s) => owned(s));
+  it("lists the newest first and leaves out the current team", () => {
+    expect(recentLineups({ owned: owned_, savedFormations: [a, b, c] }, c)).toEqual([b, a]);
+  });
+  it("skips teams with a companion no longer owned, and copes with old saves", () => {
+    expect(recentLineups({ owned: owned_.slice(0, 6), savedFormations: [a, b] }, [])).toEqual([a]);
+    expect(recentLineups({ owned: owned_ }, a)).toEqual([]);
+  });
+  it("keeps to the limit", () => {
+    expect(recentLineups({ owned: owned_, savedFormations: [a, b, c] }, [], 2)).toEqual([c, b]);
   });
 });

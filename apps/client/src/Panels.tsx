@@ -11,7 +11,7 @@ import {
 } from "../../../packages/shared/content";
 import { hairColor } from "../../../packages/shared/looks";
 import { teamCoverage } from "../../../packages/shared/elements";
-import { suggestTeam, teamPower } from "../../../packages/shared/lineups";
+import { recentLineups, suggestTeam, teamPower } from "../../../packages/shared/lineups";
 import { HairDyePicker } from "./HairDyePicker";
 import {
   power,
@@ -316,6 +316,7 @@ export function Formation({
     setSlots(copy);
     setSelected("");
   }
+  const recent = recentLineups(profile, slots);
   return (
     <>
       <p className="eyebrow">FORGE YOUR SIX</p>
@@ -396,6 +397,27 @@ export function Formation({
           Suggest a team
         </button>
       </div>
+      {recent.length > 0 && (
+        <div className="recent-lineups">
+          <h3 className="eyebrow">RECENT LINEUPS</h3>
+          {recent.map((team) => (
+            <button
+              key={team.join("|")}
+              aria-label={`Use ${team.map((id) => byId[profile.owned.find((o) => o.id === id)!.species].name).join(", ")}`}
+              onClick={() => {
+                setSlots(team);
+                setSelected("");
+              }}
+            >
+              {team.map((id) => {
+                const o = profile.owned.find((o) => o.id === id)!;
+                return <Portrait key={id} id={o.species} shimmer={o.shimmer} />;
+              })}
+              <small>{teamPower(profile.owned, team).toLocaleString()}</small>
+            </button>
+          ))}
+        </div>
+      )}
     </>
   );
 }
