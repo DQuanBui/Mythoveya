@@ -14,9 +14,10 @@ November 8 round (from `7661c95`). Done this round, newest last:
 - Battle result summary: the result screen adds the round the battle was settled in, companions still standing and foes calmed (`battleSummary`, tested).
 - Team coverage: the formation panel lists which elements the chosen six strike strongly and which they have no advantage over, updating as slots change (`teamCoverage` in `packages/shared/elements.ts`, tested).
 - Sounds for the new details: synthesized `splash` (a footstep in a puddle) and `flutter` (sparrows taking off, once per burst) cues; audio manifest regenerated. Checked for errors only, not by ear.
+- Pages smoke: `smoke-pages.mjs` now accepts the guide's team, starts a practice battle and waits for a turn, so a crash in the battle UI fails the smoke (one such crash this round got past typecheck, build and the old smoke).
 
 Next 3 tasks:
-1. A hint when a companion's level could be raised before a battle.
+1. Announce battle events to screen readers.
 2. Full verification, Playwright and docs.
 3. Listening and physical-device pass.
 

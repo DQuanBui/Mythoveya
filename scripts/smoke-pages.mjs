@@ -38,6 +38,13 @@ try {
   await delay(3000);
   mkdirSync("artifacts", { recursive: true });
   await page.screenshot({ path: "artifacts/pages-world.png" });
+  // The battle UI renders: meet the guide, start a practice fight, reach a turn.
+  await page.locator('.world-label[data-marker="guide"]').dispatchEvent("click");
+  await page.getByRole("button", { name: "Accept companions & quest" }).click({ timeout: 30000 });
+  await page.locator(".companion-strip .portrait").nth(5).waitFor({ timeout: 30000 });
+  await page.getByRole("button", { name: "Arena" }).first().click();
+  await page.getByRole("button", { name: /Practice vs computer/ }).click();
+  await page.getByText("Choose an ability, then its target.").waitFor({ timeout: 60000 });
   // The save lives in this browser: reloading returns to the same keeper.
   await page.reload();
   await page.getByRole("button", { name: "Continue your journey" }).click({ timeout: 30000 });
