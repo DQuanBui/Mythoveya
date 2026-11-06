@@ -41,3 +41,7 @@ export const keeperTitle = (p: Profile) =>
   milestoneProgress(p)
     .filter((m) => m.done)
     .at(-1)?.title;
+export const earnedMilestones = (p: Profile) => new Set(milestoneProgress(p).filter((m) => m.done).map((m) => m.id));
+/** A title earned since `before` was taken from the same save, if any. */
+export const newlyEarned = (before: Set<string>, p: Profile) =>
+  milestoneProgress(p).find((m) => m.done && !before.has(m.id));

@@ -314,3 +314,51 @@
   font-size: 0.85rem;
   opacity: 0.8;
 }
+/* A new keeper title, briefly, above everything but never in the way. */
+.title-banner-slot {
+  position: absolute;
+  top: 16%;
+  left: 0;
+  right: 0;
+  z-index: 110;
+  pointer-events: none;
+  text-align: center;
+}
+.title-banner {
+  display: inline-block;
+  margin: 0;
+  padding: 10px 30px 12px;
+  border: 1px solid #edcf83aa;
+  border-radius: 10px;
+  background: #152e37f2;
+  box-shadow: 0 6px 24px #09262d80;
+  color: #fff4d6;
+  font: 24px Georgia, serif;
+  animation: title-rise 4.5s ease-out forwards;
+}
+.title-banner small {
+  display: block;
+  margin-bottom: 2px;
+  color: #edcf83;
+  font: 700 10px system-ui, sans-serif;
+  letter-spacing: 0.22em;
+}
+@keyframes title-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+  8%,
+  88% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .title-banner {
+    animation: none;
+  }
+}

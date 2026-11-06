@@ -41,6 +41,7 @@ import {
   islandArrival,
 } from "../../../packages/shared/islands";
 import { companionJoy } from "./village-materials";
+import { earnedMilestones, newlyEarned } from "../../../packages/shared/milestones";
 // Panels and region maps load when first opened.
 const LodgePanel = lazy(() => import("./LodgePanel").then((m) => ({ default: m.LodgePanel })));
 const RescuePanel = lazy(() => import("./RescuePanel").then((m) => ({ default: m.RescuePanel })));
@@ -114,6 +115,7 @@ export default function App() {
     [starter, setStarter] = useState("emberfox"),
     [panel, setPanel] = useState(""),
     [toast, setToast] = useState(""),
+    [newTitle, setNewTitle] = useState(""),
     [near, setNear] = useState(""),
     [position, setPosition] = useState([0, 5]),
     [pet, setPet] = useState(false),
@@ -243,6 +245,20 @@ export default function App() {
       // Private windows may refuse storage; the choice still lasts this visit.
     }
   };
+  // Celebrate a title as it is earned; what the save already had stays quiet.
+  const earned = useRef<Set<string> | null>(null),
+    titleTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  useEffect(() => {
+    if (!profile) return void (earned.current = null);
+    const title = earned.current && newlyEarned(earned.current, profile);
+    earned.current = earnedMilestones(profile);
+    if (!title) return;
+    setNewTitle(title.title);
+    audio.cue("quest");
+    companionJoy.until = Date.now() + 2200;
+    clearTimeout(titleTimer.current);
+    titleTimer.current = setTimeout(() => setNewTitle(""), 4500);
+  }, [profile]);
   async function run(kind: string, data: Record<string, unknown> = {}) {
     setBusy(true);
     try {
@@ -1218,6 +1234,10 @@ export default function App() {
         </div>
       )}
       {busy && <div className="saving">✧ Saving your story…</div>}
+      {/* Not role="status": the toast must stay the page's only status. */}
+      <div className="title-banner-slot" aria-live="polite">
+        {newTitle && <p className="title-banner"><small>NEW TITLE EARNED </small>{newTitle}</p>}
+      </div>
       {toast && (
         <div role="status" className="toast" onClick={() => setToast("")}>
           {toast}

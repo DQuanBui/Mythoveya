@@ -13,6 +13,7 @@ November 9 round (from `6657ade`). Done this round, newest last:
 - Recent lineups: the formation panel lists the three newest saved teams with their power, read from the existing `savedFormations` (`recentLineups`, tested); tapping one fills the slots.
 - Damage estimates: the target list and chip say about how much an ability deals (`damageEstimate` shares `hitDamage` with the engine; tested, and 300 seeded battles matched the old engine exactly).
 - Phone layout: all three formation slots of a line now fit at 390 px without sideways scrolling.
+- Title banner: earning a keeper title shows a brief banner, chime and companion joy (`newlyEarned`, tested; checked in the browser).
 
 Next 3 tasks:
 1. Finish this round: team lineups, damage estimates, milestones, rematch and larger text.

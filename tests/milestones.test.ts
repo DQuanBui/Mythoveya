@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { MILESTONES, milestoneProgress, keeperTitle } from "../packages/shared/milestones";
+import { MILESTONES, earnedMilestones, milestoneProgress, keeperTitle, newlyEarned } from "../packages/shared/milestones";
 import { newProfile } from "../apps/server/new-profile";
 
 describe("keeper milestones", () => {
@@ -22,5 +22,15 @@ describe("keeper milestones", () => {
     delete p.town;
     delete p.seasons;
     expect(() => milestoneProgress(p)).not.toThrow();
+  });
+});
+describe("newlyEarned", () => {
+  const save = (wins: number) => ({ ...newProfile("m", "Fresh", 0), wins });
+  it("names a title reached since the last look, and only then", () => {
+    const before = earnedMilestones(save(24));
+    expect(before.has("wins")).toBe(false);
+    expect(newlyEarned(before, save(24))).toBeUndefined();
+    expect(newlyEarned(before, save(25))?.title).toBe("Brave Heart");
+    expect(newlyEarned(earnedMilestones(save(25)), save(26))).toBeUndefined();
   });
 });
