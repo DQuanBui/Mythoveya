@@ -84,6 +84,9 @@ export const CUES: Record<string, Cue> = {
   snowStep: ["sine", 220, 90, 0.12, 0.8, []],
   woodStep: ["triangle", 150, 95, 0.08, 0.22, []],
   sandStep: ["sine", 120, 70, 0.13, 0.9, []],
+  // A soft slosh for puddles, and a dry rush of wings as sparrows scatter.
+  splash: ["sine", 380, 120, 0.2, 0.85, []],
+  flutter: ["triangle", 900, 1500, 0.22, 0.75, []],
   interact: ["sine", 420, 630, 0.3, 0, [0, 4, 7]],
   collect: ["triangle", 660, 990, 0.24, 0.03, [0, 7, 12]],
   // A bell-like rising chime for festival lanterns, a bright unwrapping

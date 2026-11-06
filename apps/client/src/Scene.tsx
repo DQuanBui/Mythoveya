@@ -1054,6 +1054,7 @@ export function Explorer({
         // Stepping in a full puddle throws up a little splash.
         if (profile.region === "haven" && !area && inPuddle(nx, nz)) {
           wetFeet.current = 6;
+          audio.cue("splash");
           for (let k = 0; k < 3; k++) {
             const a = avatar.rotation.y + (k - 1) * 1.3;
             emitPuff(nx, ny + 0.06, nz, Math.sin(a), Math.cos(a), clock.elapsedTime, "splash");

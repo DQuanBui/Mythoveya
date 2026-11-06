@@ -1,10 +1,10 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as T from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { groundHeight, havenWalkable } from "../../../packages/shared/haven";
 import { birdPose, flock } from "./bird-flock";
-import { settings } from "./audio";
+import { audio, settings } from "./audio";
 import { daylight, islandHour } from "./daytime";
 import { perf } from "./adaptive";
 import { worldFocus } from "./village-materials";
@@ -50,7 +50,8 @@ export function GroundBirds() {
     },
     [mesh],
   );
-  const o = useMemo(() => new T.Object3D(), []);
+  const o = useMemo(() => new T.Object3D(), []),
+    flutter = useRef(-9);
   useFrame(({ clock }) => {
     // Birds roost at night and shelter from the rain.
     mesh.visible = !perf.lite && daylight(islandHour()).glow < 0.5 && weatherFx.rain < 0.3;
@@ -59,6 +60,11 @@ export function GroundBirds() {
     birds.forEach((b, i) => {
       const p = birdPose(b, t, worldFocus.x, worldFocus.z),
         calm = settings.reduced && !p.flying;
+      // A rush of wings as a flock takes off, once per burst.
+      if (t - b.fled < 0.1 && t - flutter.current > 3) {
+        flutter.current = t;
+        audio.cue("flutter");
+      }
       o.position.set(p.x, groundHeight(p.x, p.z) + (calm ? 0 : p.lift), p.z);
       o.rotation.set(calm ? 0 : p.flying ? -0.4 : p.peck * 0.7, calm ? 0 : p.yaw, p.flying ? Math.sin(t * 30) * 0.2 : 0);
       o.scale.setScalar(p.visible ? 1 : 0);
