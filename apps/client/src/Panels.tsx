@@ -10,6 +10,7 @@ import {
   TIERS,
 } from "../../../packages/shared/content";
 import { hairColor } from "../../../packages/shared/looks";
+import { teamCoverage } from "../../../packages/shared/elements";
 import { HairDyePicker } from "./HairDyePicker";
 import {
   power,
@@ -281,6 +282,21 @@ export function Collection({
     </>
   );
 }
+/** What the chosen team can strike strongly, and what it has no answer to. */
+function TeamCoverage({ elements }: { elements: string[] }) {
+  const { strong, gaps } = teamCoverage(elements);
+  return (
+    <p className="team-coverage">
+      <b>Strong against:</b> {strong.join(", ") || "nothing yet"}
+      {gaps.length > 0 && (
+        <>
+          {" · "}
+          <b>No advantage over:</b> {gaps.join(", ")}
+        </>
+      )}
+    </p>
+  );
+}
 export function Formation({
   profile,
   run,
@@ -356,6 +372,7 @@ export function Formation({
           </button>
         ))}
       </div>
+      <TeamCoverage elements={slots.map((id) => byId[profile.owned.find((o) => o.id === id)?.species || ""]?.element).filter(Boolean)} />
       <button
         className="primary"
         disabled={slots.length !== 6 || new Set(slots).size !== 6}

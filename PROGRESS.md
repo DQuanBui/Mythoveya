@@ -12,11 +12,12 @@ November 8 round (from `7661c95`). Done this round, newest last:
 - Fast battles are remembered between visits (`mythoveya-battle-fast` in localStorage; Auto still starts off each battle).
 - Damage words: a hit that an element decides shows "Strong!" or "Resisted" under its damage number (`FloatWord` in `Scene.tsx`).
 - Battle result summary: the result screen adds the round the battle was settled in, companions still standing and foes calmed (`battleSummary`, tested).
+- Team coverage: the formation panel lists which elements the chosen six strike strongly and which they have no advantage over, updating as slots change (`teamCoverage` in `packages/shared/elements.ts`, tested).
 
 Next 3 tasks:
-1. Team element coverage.
-2. Splash sound for puddles.
-3. Full verification, Playwright and docs.
+1. Splash sound for puddles.
+2. Full verification, Playwright and docs.
+3. Listening and physical-device pass.
 
 ## Play
 

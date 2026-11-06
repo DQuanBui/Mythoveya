@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { battleSummary, unitLabel } from "../apps/client/src/battle-labels";
-import { elementMultiplier, matchupWord } from "../packages/shared/elements";
+import { elementMultiplier, matchupWord, teamCoverage } from "../packages/shared/elements";
 
 describe("battle creature labels", () => {
   it("read out health alone when nothing else applies", () => {
@@ -42,5 +42,15 @@ describe("battle summary", () => {
     ];
     expect(battleSummary(units, 0, 7)).toBe("Settled in round 7 · 1 of 2 companions still standing · 2 of 3 foes calmed");
     expect(battleSummary(units, 1, 7)).toBe("Settled in round 7 · 1 of 3 companions still standing · 1 of 2 foes calmed");
+  });
+});
+
+describe("team coverage", () => {
+  it("lists what a team strikes strongly and what it has no answer to", () => {
+    expect(teamCoverage([])).toEqual({ strong: [], gaps: ["Flame", "Grove", "Stone", "Storm", "Tide", "Frost", "Light", "Shadow"] });
+    const { strong, gaps } = teamCoverage(["Flame", "Light"]);
+    expect(strong).toEqual(["Grove", "Shadow"]);
+    expect(gaps).toContain("Frost");
+    expect([...strong, ...gaps]).toHaveLength(8);
   });
 });

@@ -14,3 +14,9 @@ export function matchupWord(a: string, b: string) {
   const m = elementMultiplier(a, b);
   return m > 1 ? "strong" : m < 1 ? "resisted" : "";
 }
+export const ELEMENT_NAMES = ["Flame", "Grove", "Stone", "Storm", "Tide", "Frost", "Light", "Shadow"];
+/** Which elements a team strikes strongly, and which of them it has no answer to. */
+export function teamCoverage(team: string[]) {
+  const strong = ELEMENT_NAMES.filter((foe) => team.some((own) => elementMultiplier(own, foe) > 1));
+  return { strong, gaps: ELEMENT_NAMES.filter((foe) => !strong.includes(foe)) };
+}

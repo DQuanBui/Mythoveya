@@ -1822,3 +1822,8 @@ html[data-contrast="true"] select:focus-visible {
     overflow-x: auto;
   }
 }
+.team-coverage {
+  margin: 8px 0;
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
