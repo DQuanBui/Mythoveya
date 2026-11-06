@@ -11,6 +11,7 @@ import {
 } from "../../../packages/shared/content";
 import { hairColor } from "../../../packages/shared/looks";
 import { teamCoverage } from "../../../packages/shared/elements";
+import { suggestTeam, teamPower } from "../../../packages/shared/lineups";
 import { HairDyePicker } from "./HairDyePicker";
 import {
   power,
@@ -373,13 +374,28 @@ export function Formation({
         ))}
       </div>
       <TeamCoverage elements={slots.map((id) => byId[profile.owned.find((o) => o.id === id)?.species || ""]?.element).filter(Boolean)} />
-      <button
-        className="primary"
-        disabled={slots.length !== 6 || new Set(slots).size !== 6}
-        onClick={() => run("formation", { team: slots })}
-      >
-        Save formation
-      </button>
+      <p className="team-coverage">
+        <b>Team power:</b> {teamPower(profile.owned, slots).toLocaleString()}
+      </p>
+      <div className="button-row">
+        <button
+          className="primary"
+          disabled={slots.length !== 6 || new Set(slots).size !== 6}
+          onClick={() => run("formation", { team: slots })}
+        >
+          Save formation
+        </button>
+        <button
+          disabled={profile.owned.length < 6}
+          title="Fills the slots with your strongest companions, a tank and a healer included when you have them. Nothing changes until you save."
+          onClick={() => {
+            setSlots(suggestTeam(profile.owned));
+            setSelected("");
+          }}
+        >
+          Suggest a team
+        </button>
+      </div>
     </>
   );
 }
