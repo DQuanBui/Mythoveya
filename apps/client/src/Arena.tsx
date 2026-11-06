@@ -9,6 +9,7 @@ import { BattleScene } from "./Scene";
 import { audio, settings } from "./audio";
 import { Portrait } from "./portraits";
 import { matchupWord } from "../../../packages/shared/elements";
+import { battleSummary } from "./battle-labels";
 export type Snapshot = {
   code: string;
   players: {
@@ -317,6 +318,7 @@ export function BattleUI({
                       .join(" · ")
                 : "Your companions have recovered. Try another formation or train before returning."}
           </p>
+          <p className="result-summary">{battleSummary(battle.units, side, battle.round)}</p>
           {rating && (
             <p className="rating-result">
               Rating {rating.before} → {rating.after} (

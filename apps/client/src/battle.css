@@ -310,3 +310,7 @@
     display: none;
   }
 }
+.result-summary {
+  font-size: 0.85rem;
+  opacity: 0.8;
+}

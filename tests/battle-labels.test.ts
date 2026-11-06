@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { unitLabel } from "../apps/client/src/battle-labels";
+import { battleSummary, unitLabel } from "../apps/client/src/battle-labels";
 import { elementMultiplier, matchupWord } from "../packages/shared/elements";
 
 describe("battle creature labels", () => {
@@ -28,5 +28,19 @@ describe("element matchups", () => {
         const m = elementMultiplier(a, b);
         expect(matchupWord(a, b)).toBe(m > 1 ? "strong" : m < 1 ? "resisted" : "");
       }
+  });
+});
+
+describe("battle summary", () => {
+  it("counts from the viewer's side", () => {
+    const units = [
+      { side: 0, hp: 10 },
+      { side: 0, hp: 0 },
+      { side: 1, hp: 0 },
+      { side: 1, hp: 0 },
+      { side: 1, hp: 5 },
+    ];
+    expect(battleSummary(units, 0, 7)).toBe("Settled in round 7 · 1 of 2 companions still standing · 2 of 3 foes calmed");
+    expect(battleSummary(units, 1, 7)).toBe("Settled in round 7 · 1 of 3 companions still standing · 1 of 2 foes calmed");
   });
 });

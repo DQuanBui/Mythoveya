@@ -10,3 +10,13 @@ export function unitLabel(name: string, hp: number, maxHp: number, shield: numbe
   for (const s of statuses) parts.push(`${STATUS_WORDS[s.kind] || s.kind} for ${s.turns} ${s.turns === 1 ? "round" : "rounds"}`);
   return parts.join(", ");
 }
+/** One line on how a finished battle went, from the viewer's side. */
+export function battleSummary(units: { side: number; hp: number }[], side: number, round: number) {
+  const mine = units.filter((u) => u.side === side),
+    foes = units.filter((u) => u.side !== side);
+  return [
+    `Settled in round ${round}`,
+    `${mine.filter((u) => u.hp > 0).length} of ${mine.length} companions still standing`,
+    `${foes.filter((u) => u.hp === 0).length} of ${foes.length} foes calmed`,
+  ].join(" · ");
+}

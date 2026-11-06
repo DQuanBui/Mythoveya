@@ -11,11 +11,12 @@ November 8 round (from `7661c95`). Done this round, newest last:
 - Battle keyboard: 1-3 pick an ability, left and right change the target, Enter uses it, A and F toggle Auto and Fast; key hints show on the ability buttons (hidden on touch and from screen readers). In `keyboard.spec`, the Controls guide and the player guide.
 - Fast battles are remembered between visits (`mythoveya-battle-fast` in localStorage; Auto still starts off each battle).
 - Damage words: a hit that an element decides shows "Strong!" or "Resisted" under its damage number (`FloatWord` in `Scene.tsx`).
+- Battle result summary: the result screen adds the round the battle was settled in, companions still standing and foes calmed (`battleSummary`, tested).
 
 Next 3 tasks:
-1. A battle result summary.
-2. Team element coverage.
-3. Splash sound for puddles.
+1. Team element coverage.
+2. Splash sound for puddles.
+3. Full verification, Playwright and docs.
 
 ## Play
 
