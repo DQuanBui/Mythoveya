@@ -121,8 +121,13 @@ test("sail to the home island, build, reload and sail back", async ({ page }) =>
   await page.getByRole("button", { name: "Sail back to Havenreach" }).click();
   await expect(page.locator(".island-card")).toHaveCount(0);
   await expect(page.locator(".location")).toContainText("Havenreach");
-  const [hx, hz] = await position(page, 78);
-  expect(Math.hypot(hx + 0.95, hz - 36.6)).toBeLessThan(1.5);
+  // The location label changes a moment before the minimap dot catches up.
+  await expect
+    .poll(async () => {
+      const [hx, hz] = await position(page, 78);
+      return Math.hypot(hx + 0.95, hz - 36.6);
+    })
+    .toBeLessThan(1.5);
   expect(errors).toEqual([]);
 });
 

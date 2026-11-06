@@ -4,12 +4,13 @@ Updated November 7, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch
 
 ## Next up
 
-November 7 round is complete: 18 commits from `a9be583` plus this record, all pushed.
+November 8 round (from `7661c95`). Done this round, newest last:
+- Test: `islands.spec` polls the minimap after sailing home instead of reading it the instant the location label changes (same 1.5 m assertion).
 
 Next 3 tasks:
-1. Battle clarity: element advantage hints on targets, keyboard shortcuts and remembered Auto/Fast.
-2. Listening pass and a physical phone/tablet check.
-3. Cloud shadows across all ground surfaces.
+1. Playwright retries once and reports flaky journeys.
+2. Element matchup hints on battle targets.
+3. Battle keyboard shortcuts.
 
 ## Play
 
