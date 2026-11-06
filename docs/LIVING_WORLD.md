@@ -56,7 +56,7 @@ Each region has its own air: embers rise in Emberglass, pollen drifts in Whisper
 
 ## Battles
 
-Creatures drop onto the field with a puff of dust. Each attacks in its family's style and turns to face its target, and skills fly along their element's own path. Ultimates gather power first. Hits throw element-shaped debris, bigger when an element strikes its weakness. Health bars leave a draining trail and pulse red when nearly empty. Statuses show on the creatures, and badly hurt ones pant and droop. Knocked-out creatures fall in a puff of dust with a short camera jolt. Winners turn round and celebrate under confetti.
+Creatures drop onto the field with a puff of dust. Each attacks in its family's style and turns to face its target, and skills fly along their element's own path. Ultimates gather power first. Hits throw element-shaped debris, bigger when an element strikes its weakness, and the damage number says "Strong!" or "Resisted". Before you strike, the target picker and the selected ring show the matchup. Health bars leave a draining trail and pulse red when nearly empty. Statuses show on the creatures, and badly hurt ones pant and droop. Knocked-out creatures fall in a puff of dust with a short camera jolt. Winners turn round and celebrate under confetti.
 
 ## Settings
 

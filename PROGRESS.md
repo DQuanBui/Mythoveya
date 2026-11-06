@@ -1,10 +1,23 @@
 # Mythoveya handoff
 
-Updated November 7, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`, pushed to `origin/main` (https://github.com/DQuanBui/Mythoveya). This handoff covers ten rounds: October 29 (from `4619fdc`), October 30 (from `b0d6c3d`), October 31 (from `3497bb3`), November 1 (from `3d8496d`) November 2 (from `9d221ef`), November 3 (from `933a869`), November 4 (from `d37297c`), November 5 (from `1e622b9`), November 6 (from `040b6f1`) and November 7 (from `a9be583`). Earlier handoffs (October 28 online-build session, October 22 Wayfarer Lodges) are archived in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md). Preserve ignored `data/mythoveya.sqlite`. `CLAUDE.md` is the quick project map for new sessions.
+Updated November 8, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`, pushed to `origin/main` (https://github.com/DQuanBui/Mythoveya). This handoff covers eleven rounds: October 29 (from `4619fdc`), October 30 (from `b0d6c3d`), October 31 (from `3497bb3`), November 1 (from `3d8496d`) November 2 (from `9d221ef`), November 3 (from `933a869`), November 4 (from `d37297c`), November 5 (from `1e622b9`), November 6 (from `040b6f1`), November 7 (from `a9be583`) and November 8 (from `7661c95`). Earlier handoffs (October 28 online-build session, October 22 Wayfarer Lodges) are archived in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md). Preserve ignored `data/mythoveya.sqlite`. `CLAUDE.md` is the quick project map for new sessions.
 
 ## Next up
 
-November 8 round (from `7661c95`). Done this round, newest last:
+November 8 round is complete: 13 commits from `7661c95` plus this record, all pushed.
+
+Next 3 tasks:
+1. Look at the two recurring flaky journeys: `atlas.spec` timing out on the Travel map click as the first test of a run (twice in three runs, so possibly a cold dev server), and walkers reporting "Route stopped" west of the village (`keeper-life` near (-8, 12), `haven` near (-15, 13)).
+2. Listening pass and a physical phone/tablet check.
+3. Cloud shadows across all ground surfaces.
+
+## Play
+
+- **Online (single-player):** https://dquanbui.github.io/Mythoveya/. `.github/workflows/pages.yml` publishes it on every push to `main` (Pages source: GitHub Actions). Check a deployment with `node scripts/smoke-pages.mjs https://dquanbui.github.io/Mythoveya/`.
+- **Local (full game, including the human arena):** `npm install`, then run `Play Mythoveya.cmd` or `npm run dev` and open http://127.0.0.1:5173/. For the compiled build, run `npm run build && npm start` and open http://127.0.0.1:2567/.
+
+## Implemented November 8
+
 - Test: `islands.spec` polls the minimap after sailing home instead of reading it the instant the location label changes (same 1.5 m assertion).
 - Test environment: Playwright retries a failed journey once and reports it as flaky, so a machine hiccup in a long run no longer hides the result; assertions are unchanged.
 - Matchup hints: the battle target list shows each creature's element and, for attacks, whether it is strong or resisted, and a chip beside the picker names the chosen target's matchup (`matchupWord` in `packages/shared/elements.ts`, tested).
@@ -17,16 +30,6 @@ November 8 round (from `7661c95`). Done this round, newest last:
 - Pages smoke: `smoke-pages.mjs` now accepts the guide's team, starts a practice battle and waits for a turn, so a crash in the battle UI fails the smoke (one such crash this round got past typecheck, build and the old smoke).
 - Battle announcements: a visually hidden `aria-live` line speaks the latest battle event and, on the player's turn, who acts next (`battleAnnouncement`, tested; checked in `keyboard.spec`).
 - Target ring: the selected enemy's ring on the battlefield turns green when the next attacker is strong against it and salmon when resisted (gold otherwise).
-
-Next 3 tasks:
-1. Full verification, Playwright and docs.
-2. Listening and physical-device pass.
-3. Cloud shadows across all ground surfaces.
-
-## Play
-
-- **Online (single-player):** https://dquanbui.github.io/Mythoveya/. `.github/workflows/pages.yml` publishes it on every push to `main` (Pages source: GitHub Actions). Check a deployment with `node scripts/smoke-pages.mjs https://dquanbui.github.io/Mythoveya/`.
-- **Local (full game, including the human arena):** `npm install`, then run `Play Mythoveya.cmd` or `npm run dev` and open http://127.0.0.1:5173/. For the compiled build, run `npm run build && npm start` and open http://127.0.0.1:2567/.
 
 ## Implemented November 7
 
@@ -228,6 +231,13 @@ Next 3 tasks:
   - Indoor music reuses an existing theme, because `tests/signatures.test.ts` pins ten music themes.
 
 ## Verified
+
+November 8 (final code commit `0867252`):
+- typecheck and content audit pass;
+- **50 test files, 236 passed**;
+- both builds pass, entry 464 kB (160 kB gzipped); `smoke-production` passes, and `smoke-pages` now also reaches a battle turn;
+- Playwright full run (49.4 min, 35 journeys, one retry allowed): all passed, 33 first time and 2 flaky on the retry (`atlas.spec` Travel map click, `haven.spec` "Route stopped").
+- A crash in the battle screen (a variable used before it was declared, inside a callback, so TypeScript missed it) was caught by a throwaway Playwright script before commit; the Pages smoke now covers that path.
 
 November 7 (final code commit `d1a575e`):
 - typecheck and content audit pass;
