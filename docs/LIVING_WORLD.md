@@ -50,6 +50,7 @@ It also leaves paw prints beside your footprints in snow and sand.
 | Dawn (about 5:30 to 9:30) | Mist lies low over Havenreach and Whisperleaf, and dew glitters on the grass. |
 | Rain | Puddles fill on the trails and dry slowly afterwards; raindrops ring the ponds and lakes; grass, trees and chimney smoke lean in the wind; fireflies shelter; birds roost. |
 | After rain | A rainbow may hang ahead of you while the sky clears. |
+| Clear days | About once a minute a cloud crosses the sun: the light softens and shadows fade for several seconds. Off with Reduced Motion. |
 | Night | Fireflies (unless it rains), shooting stars on clear nights, lanterns in hands. |
 
 Each region has its own air: embers rise in Emberglass, pollen drifts in Whisperleaf, fresh snow sparkles around you in Moonfrost, and every pond and lake glints in the sun.
@@ -58,8 +59,13 @@ Each region has its own air: embers rise in Emberglass, pollen drifts in Whisper
 
 Creatures drop onto the field with a puff of dust. Each attacks in its family's style and turns to face its target, and skills fly along their element's own path. Ultimates gather power first. Hits throw element-shaped debris, bigger when an element strikes its weakness, and the damage number says "Strong!" or "Resisted". Before you strike, the target picker and the selected ring show the matchup. Health bars leave a draining trail and pulse red when nearly empty. Statuses show on the creatures, and badly hurt ones pant and droop. Knocked-out creatures fall in a puff of dust with a short camera jolt. Winners turn round and celebrate under confetti.
 
+The target list says how strong each choice is and about how much damage it deals, before critical hits and the random roll. After practice you can go straight into another match, and after losing a story stage you can try it again from the result screen.
+
+In the **Team** panel, *Suggest a team* fills the slots with your strongest six, and *Recent lineups* brings back a team you saved before. Neither changes anything until you press *Save formation*.
+
 ## Settings
 
+- **Sound & graphics → Larger interface text** enlarges panels and notices by about a fifth.
 - **Sound & graphics → Decorative effects:** *Auto* (the default) pauses drifting motes, glints, puddles and puffs if the frame rate stays below about 30 fps, and brings them back once it recovers. *Full* always shows them; *Minimal* keeps them off.
 - **Reduced Motion** stills animation everywhere, and **Camera shake** controls the battle jolts.
 - **Esc → Controls** lists every shortcut. Outdoors, **E** uses whatever is within reach. In battle, **1 · 2 · 3** pick an ability, **← →** change the target, **Enter** uses it, **A** toggles Auto and **F** toggles Fast.

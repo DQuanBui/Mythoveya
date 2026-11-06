@@ -1,32 +1,40 @@
 # Mythoveya handoff
 
-Updated November 8, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`, pushed to `origin/main` (https://github.com/DQuanBui/Mythoveya). This handoff covers eleven rounds: October 29 (from `4619fdc`), October 30 (from `b0d6c3d`), October 31 (from `3497bb3`), November 1 (from `3d8496d`) November 2 (from `9d221ef`), November 3 (from `933a869`), November 4 (from `d37297c`), November 5 (from `1e622b9`), November 6 (from `040b6f1`), November 7 (from `a9be583`) and November 8 (from `7661c95`). Earlier handoffs (October 28 online-build session, October 22 Wayfarer Lodges) are archived in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md). Preserve ignored `data/mythoveya.sqlite`. `CLAUDE.md` is the quick project map for new sessions.
+Updated with the November 9 round; its commits are dated November 6, 2026 (round names ran ahead of the calendar and are kept as a sequence). Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`, pushed to `origin/main` (https://github.com/DQuanBui/Mythoveya). This handoff covers twelve rounds: October 29 (from `4619fdc`), October 30 (from `b0d6c3d`), October 31 (from `3497bb3`), November 1 (from `3d8496d`) November 2 (from `9d221ef`), November 3 (from `933a869`), November 4 (from `d37297c`), November 5 (from `1e622b9`), November 6 (from `040b6f1`), November 7 (from `a9be583`) November 8 (from `7661c95`) and November 9 (from `6657ade`). Earlier handoffs (October 28 online-build session, October 22 Wayfarer Lodges) are archived in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md). Preserve ignored `data/mythoveya.sqlite`. `CLAUDE.md` is the quick project map for new sessions.
 
 ## Next up
 
-November 9 round (from `6657ade`). Done this round, newest last:
-- Test routes: the two "Route stopped" flakes came from waypoints aimed at walls (one segment crosses a fence), now rerouted; `atlas.spec` waits for the world after reloading.
-- Walk grids: click-to-walk and villager grids build in 5 ms slices (`startGrid`, `grid-slices.ts`, tested) instead of blocking for about 0.75 s each after entering a region.
-- Shader warm-up: `WarmShaders` starts the explorer's programs compiling together after mount, halving the wait in the first frames (about 1.2 s to 0.6 s).
-- Wildlife mounting: habitat creatures take turns appearing (`useMountTurn`, one per 60 ms). With the walk grids and shader warm-up, long tasks on entering Havenreach drop from about 4.6 s to 2 s and the longest from 1.3 s to 0.8 s.
-- Team panel: Suggest a team fills the slots from `suggestTeam` (`packages/shared/lineups.ts`, tested) and the panel shows the six's combined power.
-- Recent lineups: the formation panel lists the three newest saved teams with their power, read from the existing `savedFormations` (`recentLineups`, tested); tapping one fills the slots.
-- Damage estimates: the target list and chip say about how much an ability deals (`damageEstimate` shares `hitDamage` with the engine; tested, and 300 seeded battles matched the old engine exactly).
-- Phone layout: all three formation slots of a line now fit at 390 px without sideways scrolling.
-- Title banner: earning a keeper title shows a brief banner, chime and companion joy (`newlyEarned`, tested; checked in the browser).
-- Fight again: the result screen offers Practice again, and Try this stage again after a lost stage (practice checked through two battles on a phone; the stage retry shares that path but was not played).
-- Larger text: Sound & graphics gains Larger interface text, zooming panels and notices by 18% and keeping them on screen (in `settings.spec`; checked at 390 px).
-- Passing clouds: the daylight softens for several seconds about once a minute as a cloud crosses the sun (`cloud-pass.ts`, tested; off with Reduced Motion).
+November 9 round is complete: 12 commits from `6657ade` plus this record, all pushed.
 
 Next 3 tasks:
-1. Read the full browser run recorded in PROGRESS.md and look into anything flaky.
-2. Listening pass and a physical phone/tablet check.
-3. Cloud shadows across all ground surfaces.
+1. Listening pass and a physical phone/tablet check. Neither has been done by a person; every sound and touch check so far is automated.
+2. Keep cutting the entry stall: long tasks are still about 2 s in total, mostly first-render React work, terrain building and normal early frames.
+3. Real cloud shadows across all ground surfaces (the new passing-cloud light only dims the whole scene).
 
 ## Play
 
 - **Online (single-player):** https://dquanbui.github.io/Mythoveya/. `.github/workflows/pages.yml` publishes it on every push to `main` (Pages source: GitHub Actions). Check a deployment with `node scripts/smoke-pages.mjs https://dquanbui.github.io/Mythoveya/`.
 - **Local (full game, including the human arena):** `npm install`, then run `Play Mythoveya.cmd` or `npm run dev` and open http://127.0.0.1:5173/. For the compiled build, run `npm run build && npm start` and open http://127.0.0.1:2567/.
+
+## Implemented November 9
+
+- Flaky journeys, causes found: the "Route stopped" walkers were aimed at walls. The line from (-12, 15) to (-18, 8) crosses a fence, and the eight-way key driver can press into a house corner and never slide free, so both routes now keep clear of them (checked against `havenWalkable`). `atlas.spec`'s "Travel map" timeout fits a busy main thread: a click right after a reload took 5.4 s in the production build, and more in dev. The journey now waits for the world, and the stalls themselves were cut.
+- Entering a region (profiled in Havenreach, production-style build): walk grids build in 5 ms slices (`startGrid` in `pathfind.ts`, `grid-slices.ts`, tested), `WarmShaders` starts all programs compiling together (time waiting on links about 1.2 s to 0.6 s), and wildlife models take turns appearing (`useMountTurn` in `mount-turns.ts`, one per 60 ms). Long main-thread tasks in the first seconds fell from about 4.6 s to about 2 s in total, and the longest from 1.3 s to 0.8 s. One machine, a few runs.
+- Team panel: Suggest a team fills the slots with the strongest companions, keeping a tank and a healer when owned, sturdy ones in front; the panel shows team power (`suggestTeam`, `teamPower` in `packages/shared/lineups.ts`, tested). Nothing changes until Save formation.
+- Recent lineups: the three newest saved teams appear with their power, read from the existing `savedFormations`; a team with a companion no longer owned is skipped. No save or server change (`recentLineups`, tested).
+- Damage estimates: the target list and the chip beside it say about how much the chosen ability deals. `damageEstimate` and the engine share `hitDamage`, and 300 seeded autoplay battles matched the previous engine exactly. It leaves out critical hits and the random roll.
+- Phone layout: all three formation slots of a line fit at 390 px without sideways scrolling.
+- Title banner: earning a keeper title shows a banner, a chime and a happy companion, only for titles reached this session (`newlyEarned`, tested). It uses `aria-live`, not a second `role="status"`.
+- Fight again: the result screen offers Practice again after practice and Try this stage again after a lost stage. Practice was checked through two battles on a phone; the stage retry shares that path but was not played.
+- Larger interface text: a setting zooms panels and notices by 18% and keeps them on screen (`largeText`, older settings default to off; in `settings.spec`).
+- Passing clouds: the daylight eases to half strength for several seconds about once a minute, by day under open sky, off with Reduced Motion (`cloud-pass.ts`, tested). The first version moved screen brightness by only 1-2%, so it was deepened to about 5% and compared in two frames.
+
+Verification:
+
+- Typecheck and content audit pass. Vitest: 54 files, 253 tests pass. The first full run this round took 98 minutes and two tests timed out (`network`, `models`) while the machine stalled; both passed when rerun alone, then the full suite passed in 2 minutes.
+- `npm run build` and `build:pages` pass; entry 466.5 kB, up from 464 kB. `smoke-production` and `smoke-pages` pass locally.
+- Playwright full run (39.5 min, 35 journeys, one retry allowed): all 35 passed first time, none flaky. That is one clean run, not proof the flakes are gone.
+- Not checked: nothing has been listened to or tried on a physical device.
 
 ## Implemented November 8
 
