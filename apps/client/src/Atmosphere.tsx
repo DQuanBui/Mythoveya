@@ -6,6 +6,7 @@ import { daylight, islandHour } from "./daytime";
 import { nightState, setNightGlow, worldFocus } from "./village-materials";
 import { seeded } from "../../../packages/shared/haven";
 import { weatherFx } from "./Weather";
+import { cloudShade } from "./cloud-pass";
 import { weatherAt, WEATHER_SPELL_MS } from "../../../packages/shared/weather";
 
 const BOW = ["#ff6b6b", "#ffa94d", "#ffe066", "#8ce99a", "#74c0fc", "#b197fc"];
@@ -85,11 +86,13 @@ export function DayNight({
     const warm = twilight * 0.65;
     // Cloud cover dims the sun and softens shadows; mist and rain pull the fog in.
     const cover = Math.min(1, weatherFx.rain * 0.55 + weatherFx.mist * 0.3);
-    light.intensity = (day > 0.02 ? lerp(0.6, 2.4, day) : 0.55) * (1 - cover);
+    // Clouds crossing the sun soften the daylight for a moment; rain has its own gloom.
+    const passing = settings.reduced ? 1 : lerp(1, cloudShade(clock.elapsedTime), day * (1 - cover));
+    light.intensity = (day > 0.02 ? lerp(0.6, 2.4, day) : 0.55) * (1 - cover) * passing;
     light.color.copy(day > 0.02 ? SUN : MOON).lerp(WARM_SUN, day > 0.02 ? warm : 0);
-    ambient.current.intensity = lerp(0.55, 1.1, day) * (1 - cover * 0.3);
+    ambient.current.intensity = lerp(0.55, 1.1, day) * (1 - cover * 0.3) * (0.7 + passing * 0.3);
     scene.environmentIntensity = lerp(0.08, 0.35, day);
-    hemi.current.intensity = lerp(0.8, 1.6, day) * (1 - cover * 0.35);
+    hemi.current.intensity = lerp(0.8, 1.6, day) * (1 - cover * 0.35) * (0.7 + passing * 0.3);
     hemi.current.color.copy(HEMI_NIGHT).lerp(HEMI_DAY, day).lerp(DUSK, warm * 0.4);
     hemi.current.groundColor.copy(GROUND_NIGHT).lerp(GROUND_DAY, day);
     if (scene.background instanceof T.Color)

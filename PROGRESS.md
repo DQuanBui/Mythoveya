@@ -16,9 +16,10 @@ November 9 round (from `6657ade`). Done this round, newest last:
 - Title banner: earning a keeper title shows a brief banner, chime and companion joy (`newlyEarned`, tested; checked in the browser).
 - Fight again: the result screen offers Practice again, and Try this stage again after a lost stage (practice checked through two battles on a phone; the stage retry shares that path but was not played).
 - Larger text: Sound & graphics gains Larger interface text, zooming panels and notices by 18% and keeping them on screen (in `settings.spec`; checked at 390 px).
+- Passing clouds: the daylight softens for several seconds about once a minute as a cloud crosses the sun (`cloud-pass.ts`, tested; off with Reduced Motion).
 
 Next 3 tasks:
-1. Finish this round: team lineups, damage estimates, milestones, rematch and larger text.
+1. Read the full browser run recorded in PROGRESS.md and look into anything flaky.
 2. Listening pass and a physical phone/tablet check.
 3. Cloud shadows across all ground surfaces.
 
