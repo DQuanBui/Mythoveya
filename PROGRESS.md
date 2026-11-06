@@ -16,6 +16,7 @@ November 8 round (from `7661c95`). Done this round, newest last:
 - Sounds for the new details: synthesized `splash` (a footstep in a puddle) and `flutter` (sparrows taking off, once per burst) cues; audio manifest regenerated. Checked for errors only, not by ear.
 - Pages smoke: `smoke-pages.mjs` now accepts the guide's team, starts a practice battle and waits for a turn, so a crash in the battle UI fails the smoke (one such crash this round got past typecheck, build and the old smoke).
 - Battle announcements: a visually hidden `aria-live` line speaks the latest battle event and, on the player's turn, who acts next (`battleAnnouncement`, tested; checked in `keyboard.spec`).
+- Target ring: the selected enemy's ring on the battlefield turns green when the next attacker is strong against it and salmon when resisted (gold otherwise).
 
 Next 3 tasks:
 1. Full verification, Playwright and docs.

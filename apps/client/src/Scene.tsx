@@ -1695,6 +1695,13 @@ export function Preview({
     </Canvas>
   );
 }
+/** The selected target's ring: gold, or tinted by the next attacker's matchup. */
+function targetRing(battle: Battle, u: Unit) {
+  const actor = battle.units.find((x) => x.id === battle.queue[0]);
+  if (!actor || actor.side === u.side) return "#f5d38a";
+  const word = matchupWord(byId[actor.species].element, byId[u.species].element);
+  return word === "strong" ? "#9fe6a0" : word === "resisted" ? "#f2b39a" : "#f5d38a";
+}
 /** "Strong!" or "Resisted" under a damage number, when elements decide it. */
 function FloatWord({ attacker, target }: { attacker?: Unit; target: Unit }) {
   if (!attacker || attacker.side === target.side) return null;
@@ -2086,7 +2093,7 @@ export function BattleScene({
               <meshBasicMaterial
                 color={
                   target === u.id
-                    ? "#f5d38a"
+                    ? targetRing(battle, u)
                     : battle.queue[0] === u.id
                       ? "#81f8dc"
                       : u.side === 0
