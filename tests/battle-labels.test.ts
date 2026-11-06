@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { unitLabel } from "../apps/client/src/battle-labels";
+import { elementMultiplier, matchupWord } from "../packages/shared/elements";
 
 describe("battle creature labels", () => {
   it("read out health alone when nothing else applies", () => {
@@ -13,5 +14,19 @@ describe("battle creature labels", () => {
       ]),
     ).toBe("Mossprig 20 of 61, shield 12, stunned for 1 round, burning for 2 rounds");
     expect(unitLabel("Pebblit", 5, 40, 0, [{ kind: "mystery", turns: 3 }])).toBe("Pebblit 5 of 40, mystery for 3 rounds");
+  });
+});
+
+describe("element matchups", () => {
+  it("name strong and resisted attacks, and agree with the damage multiplier", () => {
+    expect(matchupWord("Flame", "Grove")).toBe("strong");
+    expect(matchupWord("Grove", "Flame")).toBe("resisted");
+    expect(matchupWord("Light", "Shadow")).toBe("strong");
+    expect(matchupWord("Frost", "Flame")).toBe("");
+    for (const a of ["Flame", "Grove", "Stone", "Storm", "Tide", "Light", "Shadow", "Frost"])
+      for (const b of ["Flame", "Grove", "Stone", "Storm", "Tide", "Light", "Shadow", "Frost"]) {
+        const m = elementMultiplier(a, b);
+        expect(matchupWord(a, b)).toBe(m > 1 ? "strong" : m < 1 ? "resisted" : "");
+      }
   });
 });

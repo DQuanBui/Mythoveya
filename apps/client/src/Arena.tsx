@@ -1,13 +1,14 @@
 import { guardianIntent } from "../../../packages/shared/guardian";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Client, type Room } from "@colyseus/sdk";
-import type { Battle, Profile } from "../../../packages/shared/types";
+import type { Battle, Profile, Unit } from "../../../packages/shared/types";
 import { session, STANDALONE } from "./api";
 import { byId } from "../../../packages/shared/content";
 import { bondChance, targets } from "../../../packages/shared/combat";
 import { BattleScene } from "./Scene";
 import { audio, settings } from "./audio";
 import { Portrait } from "./portraits";
+import { matchupWord } from "../../../packages/shared/elements";
 export type Snapshot = {
   code: string;
   players: {
@@ -121,7 +122,11 @@ export function BattleUI({
   const options = actor ? byId[actor.species].actions : [];
   const ts = actor ? targets(battle, actor, action) : [];
   const myTurn = actor?.side === side && battle.winner === null;
+  // Whether the chosen ability's element beats the target's (attacks only).
+  const hint = (t: Unit) =>
+    actor && t.side !== actor.side && options[action]?.effects.includes("damage") ? matchupWord(byId[actor.species].element, byId[t.species].element) : "";
   const chosen = ts.some((t) => t.id === target) ? target : ts[0]?.id || "";
+  const chosenUnit = ts.find((t) => t.id === chosen);
   return (
     <div className="battle-screen">
       <BattleScene battle={battle} target={chosen} onTarget={setTarget} side={side} />
@@ -233,10 +238,16 @@ export function BattleUI({
               {ts.map((t) => (
                 <option key={t.id} value={t.id}>
                   {t.side === side ? "Ally" : "Enemy"} · {byId[t.species].name}{" "}
-                  ({t.hp} HP)
+                  ({t.hp} HP) · {byId[t.species].element}
+                  {hint(t) ? ` · ${hint(t)}` : ""}
                 </option>
               ))}
             </select>
+            {chosenUnit && hint(chosenUnit) && (
+              <small className={`matchup ${hint(chosenUnit)}`}>
+                {hint(chosenUnit) === "strong" ? "▲ Strong" : "▼ Resisted"} against {byId[chosenUnit.species].element}
+              </small>
+            )}
             <button
               className="primary"
               disabled={!myTurn || now < battle.readyAt || !chosen || auto}

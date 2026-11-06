@@ -262,4 +262,21 @@
   .target-controls .bond-button {
     flex: 1 0 100%;
   }
+  .target-controls .matchup {
+    flex: 1 0 100%;
+    order: -1;
+  }
+}
+/* The chosen target's elemental matchup, beside its picker. */
+.matchup {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.matchup.strong {
+  color: #9fe6a0;
+}
+.matchup.resisted {
+  color: #f2b39a;
 }

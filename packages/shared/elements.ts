@@ -9,3 +9,8 @@ export function elementMultiplier(a: string, b: string) {
   if (x < 0 || y < 0) return 1;
   return (x + 1) % 5 === y ? 1.2 : (y + 1) % 5 === x ? 0.85 : 1;
 }
+/** How an attack of element `a` fares against element `b`, for the battle UI. */
+export function matchupWord(a: string, b: string) {
+  const m = elementMultiplier(a, b);
+  return m > 1 ? "strong" : m < 1 ? "resisted" : "";
+}
