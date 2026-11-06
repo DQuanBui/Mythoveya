@@ -1,10 +1,23 @@
 # Mythoveya handoff
 
-Updated November 6, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`, pushed to `origin/main` (https://github.com/DQuanBui/Mythoveya). This handoff covers nine rounds: October 29 (from `4619fdc`), October 30 (from `b0d6c3d`), October 31 (from `3497bb3`), November 1 (from `3d8496d`) November 2 (from `9d221ef`), November 3 (from `933a869`), November 4 (from `d37297c`), November 5 (from `1e622b9`) and November 6 (from `040b6f1`). Earlier handoffs (October 28 online-build session, October 22 Wayfarer Lodges) are archived in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md). Preserve ignored `data/mythoveya.sqlite`. `CLAUDE.md` is the quick project map for new sessions.
+Updated November 7, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`, pushed to `origin/main` (https://github.com/DQuanBui/Mythoveya). This handoff covers ten rounds: October 29 (from `4619fdc`), October 30 (from `b0d6c3d`), October 31 (from `3497bb3`), November 1 (from `3d8496d`) November 2 (from `9d221ef`), November 3 (from `933a869`), November 4 (from `d37297c`), November 5 (from `1e622b9`), November 6 (from `040b6f1`) and November 7 (from `a9be583`). Earlier handoffs (October 28 online-build session, October 22 Wayfarer Lodges) are archived in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md). Preserve ignored `data/mythoveya.sqlite`. `CLAUDE.md` is the quick project map for new sessions.
 
 ## Next up
 
-November 7 round (from `a9be583`). Done this round, newest last:
+November 7 round is complete: 18 commits from `a9be583` plus this record, all pushed.
+
+Next 3 tasks:
+1. Battle clarity: element advantage hints on targets, keyboard shortcuts and remembered Auto/Fast.
+2. Listening pass and a physical phone/tablet check.
+3. Cloud shadows across all ground surfaces.
+
+## Play
+
+- **Online (single-player):** https://dquanbui.github.io/Mythoveya/. `.github/workflows/pages.yml` publishes it on every push to `main` (Pages source: GitHub Actions). Check a deployment with `node scripts/smoke-pages.mjs https://dquanbui.github.io/Mythoveya/`.
+- **Local (full game, including the human arena):** `npm install`, then run `Play Mythoveya.cmd` or `npm run dev` and open http://127.0.0.1:5173/. For the compiled build, run `npm run build && npm start` and open http://127.0.0.1:2567/.
+
+## Implemented November 7
+
 - Keyboard play outdoors: E uses whatever is within reach (the same as clicking it), as homes and lodges already did; no prompt card is added on desktop. New browser journey `tests/browser/keyboard.spec.ts` gathers Sunseed with E.
 - Controls guide: the pause menu's Controls list now includes E (use what is within reach), 1-4 emotes and P / G for photo mode and pose; README points to it.
 - Decorative effects setting: Sound & graphics has Auto (pause on a slow device, the default), Full and Minimal; `applyEffects` in `adaptive.ts` applies it (tested). Stored with the other settings in `mythoveya-settings`; older settings default to Auto.
@@ -23,16 +36,6 @@ November 7 round (from `a9be583`). Done this round, newest last:
 - CLAUDE.md: the module map covers the new client modules (Ambience chunk, adaptive effects, carried items, context recovery, status auras, labels) and records two conventions learned: keep Node-tested logic out of modules that import `audio.ts`, and watch the entry chunk for heavy imports.
 - Greeting nod: a watching villager, host or ranger gives one small nod when the keeper first comes within reach, then follows them with their eyes. Tested.
 - Test: `settings.spec` now also picks Decorative effects → Minimal and checks it survives a reload.
-
-Next 3 tasks:
-1. Full verification, Playwright and docs.
-2. Listening and physical-device pass.
-3. Cloud shadows across all ground surfaces.
-
-## Play
-
-- **Online (single-player):** https://dquanbui.github.io/Mythoveya/. `.github/workflows/pages.yml` publishes it on every push to `main` (Pages source: GitHub Actions). Check a deployment with `node scripts/smoke-pages.mjs https://dquanbui.github.io/Mythoveya/`.
-- **Local (full game, including the human arena):** `npm install`, then run `Play Mythoveya.cmd` or `npm run dev` and open http://127.0.0.1:5173/. For the compiled build, run `npm run build && npm start` and open http://127.0.0.1:2567/.
 
 ## Implemented November 6
 
@@ -213,6 +216,12 @@ Next 3 tasks:
   - Indoor music reuses an existing theme, because `tests/signatures.test.ts` pins ten music themes.
 
 ## Verified
+
+November 7 (final code commit `d1a575e`):
+- typecheck and content audit pass;
+- **50 test files, 232 passed** (new: `bird-flock.test.ts`, `morning-mist.test.ts`);
+- both builds pass, entry 463 kB (159 kB gzipped); `smoke-production` and local `smoke-pages` pass;
+- Playwright full run (49.3 min, now 34 journeys with `keyboard.spec`): 32 passed. `lodges.spec` hung for about 15 minutes and then got "Failed to fetch" during setup, so the dev server was unreachable, possibly while the machine slept; it did not reach any game step and has not been rerun since. `islands.spec` read the minimap dot just after sailing home, before it updated, and passed alone (1.7 min).
 
 November 6 (final code commit `6b0aaf7`):
 - typecheck and content audit pass;
