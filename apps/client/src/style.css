@@ -1849,3 +1849,30 @@ html[data-contrast="true"] select:focus-visible {
   margin-left: auto;
   padding-left: 6px;
 }
+/* On a phone all three slots of a line fit without sideways scrolling. */
+@media (max-width: 600px) {
+  .formation-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    margin: 8px 0 14px;
+  }
+  .formation-slot {
+    padding: 6px 3px;
+    min-width: 0;
+  }
+  .formation-slot .portrait {
+    width: 100%;
+    max-width: 90px;
+    height: 74px;
+  }
+  .formation-slot strong {
+    font-size: 13px;
+    overflow-wrap: anywhere;
+    text-align: center;
+  }
+  .formation-slot small {
+    font-size: 10px;
+    margin: 3px 0;
+    text-align: center;
+  }
+}
