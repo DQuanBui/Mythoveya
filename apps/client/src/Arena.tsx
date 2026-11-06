@@ -4,7 +4,7 @@ import { Client, type Room } from "@colyseus/sdk";
 import type { Battle, Profile, Unit } from "../../../packages/shared/types";
 import { session, STANDALONE } from "./api";
 import { byId } from "../../../packages/shared/content";
-import { bondChance, targets } from "../../../packages/shared/combat";
+import { bondChance, damageEstimate, targets } from "../../../packages/shared/combat";
 import { BattleScene } from "./Scene";
 import { audio, settings } from "./audio";
 import { Portrait } from "./portraits";
@@ -126,6 +126,7 @@ export function BattleUI({
   // Whether the chosen ability's element beats the target's (attacks only).
   const hint = (t: Unit) =>
     actor && t.side !== actor.side && options[action]?.effects.includes("damage") ? matchupWord(byId[actor.species].element, byId[t.species].element) : "";
+  const estimate = (t: Unit) => (actor && t.side !== actor.side ? damageEstimate(battle, actor, t, action) : null);
   const chosen = ts.some((t) => t.id === target) ? target : ts[0]?.id || "";
   const chosenUnit = ts.find((t) => t.id === chosen);
   const usable = (i: number) =>
@@ -270,12 +271,15 @@ export function BattleUI({
                   {t.side === side ? "Ally" : "Enemy"} · {byId[t.species].name}{" "}
                   ({t.hp} HP) · {byId[t.species].element}
                   {hint(t) ? ` · ${hint(t)}` : ""}
+                  {estimate(t) ? ` · about ${estimate(t)}` : ""}
                 </option>
               ))}
             </select>
-            {chosenUnit && hint(chosenUnit) && (
+            {chosenUnit && (hint(chosenUnit) || estimate(chosenUnit)) && (
               <small className={`matchup ${hint(chosenUnit)}`}>
-                {hint(chosenUnit) === "strong" ? "▲ Strong" : "▼ Resisted"} against {byId[chosenUnit.species].element}
+                {hint(chosenUnit) && `${hint(chosenUnit) === "strong" ? "▲ Strong" : "▼ Resisted"} against ${byId[chosenUnit.species].element}`}
+                {hint(chosenUnit) && estimate(chosenUnit) ? " · " : ""}
+                {estimate(chosenUnit) ? `about ${estimate(chosenUnit)} damage` : ""}
               </small>
             )}
             <button

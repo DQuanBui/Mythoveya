@@ -219,6 +219,39 @@ export function legal(b: Battle, side: number, n: number, target: string) {
     throw Error("Choose a legal target.");
   return actor;
 }
+/** One hit before shields; `roll` and `crit` are the battle's random factors. */
+function hitDamage(b: Battle, actor: Unit, u: Unit, a: { effects: string[] }, power: number, roll: number, crit: number) {
+  const s = byId[actor.species];
+  return Math.max(
+    1,
+    Math.round(
+      ((actor.attack * power * 100) /
+        (100 + (a.effects.includes("pierce") ? u.defense * 0.4 : u.defense))) *
+        elementMultiplier(s.element, byId[u.species].element) *
+        roll *
+        crit * guardianDamage(b, u) * guardianPower(b, actor) *
+        (has(actor, "weaken") ? 0.8 : 1) *
+        (has(actor, "boost") ? 1.2 : 1) *
+        (has(u, "mark") ? 1.2 : 1) *
+        (has(u, "guard") ? 0.7 : 1) *
+        (byId[u.species].passive.effect === "guard" ? 0.95 : 1) *
+        (s.passive.effect === "boost" ? 1.05 : 1),
+    ),
+  );
+}
+function signatureDamage(sid: string, n: number, u: Unit, dmg: number) {
+  if (sid === "emberfox" && n > 0 && u.shield > 0) return Math.round(dmg * 1.5);
+  if (sid === "murkfang" && n > 0 && has(u, "mark")) return Math.round(dmg * 1.25);
+  return dmg;
+}
+/** What an ability would typically deal to a target, without a critical hit;
+ * null for abilities with no immediate hit. Never touches the battle. */
+export function damageEstimate(b: Battle, actor: Unit, target: Unit, n: number) {
+  const a = byId[actor.species].actions[n];
+  if (!a?.effects.includes("damage") || a.effects.includes("delay")) return null;
+  const hit = hitDamage(b, actor, target, a, a.power * (actor.skill?.[n] ?? 1), 1, 1);
+  return signatureDamage(signatureId(actor.species), n, target, hit);
+}
 export function act(
   b: Battle,
   side: number,
@@ -330,30 +363,9 @@ export function act(
         if (effect === "stun" && a.effects.includes("delay")) continue;
         if (effect === "damage" && !a.effects.includes("delay") && u.hp > 0) {
           const crit = rng(b) < (actor.crit ?? 0.1) ? 1.5 : 1;
-          let dmg = Math.max(
-            1,
-            Math.round(
-              ((actor.attack * power * 100) /
-                (100 +
-                  (a.effects.includes("pierce")
-                    ? u.defense * 0.4
-                    : u.defense))) *
-                elementMultiplier(s.element, byId[u.species].element) *
-                (0.94 + rng(b) * 0.12) *
-                crit * guardianDamage(b, u) * guardianPower(b, actor) *
-                (has(actor, "weaken") ? 0.8 : 1) *
-                (has(actor, "boost") ? 1.2 : 1) *
-                (has(u, "mark") ? 1.2 : 1) *
-                (has(u, "guard") ? 0.7 : 1) *
-                (byId[u.species].passive.effect === "guard" ? 0.95 : 1) *
-                (s.passive.effect === "boost" ? 1.05 : 1),
-            ),
-          );
+          let dmg = hitDamage(b, actor, u, a, power, 0.94 + rng(b) * 0.12, crit);
           if (sid === "obsidrake" && n > 0) u.shield = 0;
-          if (sid === "emberfox" && n > 0 && u.shield > 0)
-            dmg = Math.round(dmg * 1.5);
-          if (sid === "murkfang" && n > 0 && has(u, "mark"))
-            dmg = Math.round(dmg * 1.25);
+          dmg = signatureDamage(sid, n, u, dmg);
           const absorbed = Math.min(u.shield, dmg);
           u.shield -= absorbed;
           dmg -= absorbed;
