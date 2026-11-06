@@ -14,6 +14,7 @@ November 9 round (from `6657ade`). Done this round, newest last:
 - Damage estimates: the target list and chip say about how much an ability deals (`damageEstimate` shares `hitDamage` with the engine; tested, and 300 seeded battles matched the old engine exactly).
 - Phone layout: all three formation slots of a line now fit at 390 px without sideways scrolling.
 - Title banner: earning a keeper title shows a brief banner, chime and companion joy (`newlyEarned`, tested; checked in the browser).
+- Fight again: the result screen offers Practice again, and Try this stage again after a lost stage (practice checked through two battles on a phone; the stage retry shares that path but was not played).
 
 Next 3 tasks:
 1. Finish this round: team lineups, damage estimates, milestones, rematch and larger text.

@@ -245,6 +245,7 @@ export default function App() {
       // Private windows may refuse storage; the choice still lasts this visit.
     }
   };
+  const lastStart = useRef<{ practice: boolean; adventure: MissionStart } | null>(null);
   // Celebrate a title as it is earned; what the save already had stays quiet.
   const earned = useRef<Set<string> | null>(null),
     titleTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -379,6 +380,7 @@ export default function App() {
         practice,
         ...adventure,
       });
+      lastStart.current = { practice, adventure };
       mission.current = !!(adventure.expedition || adventure.stage || adventure.dungeon || adventure.tower);
       missionStage.current = adventure.stage;
       setBattle(b);
@@ -815,6 +817,13 @@ export default function App() {
           setAuto={setAuto}
           fast={fast}
           setFast={setFast}
+          again={
+            battle.mode === "practice"
+              ? { label: "Practice again", start: () => void startBattle(false, true) }
+              : battle.winner === 1 && lastStart.current?.adventure.stage
+                ? { label: "Try this stage again", start: () => void startBattle(false, false, lastStart.current!.adventure) }
+                : undefined
+          }
           finish={() => {
             refresh();
             setScreen("world");

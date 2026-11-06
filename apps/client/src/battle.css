@@ -362,3 +362,6 @@
     animation: none;
   }
 }
+.result-actions {
+  justify-content: center;
+}

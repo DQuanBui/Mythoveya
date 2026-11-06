@@ -58,6 +58,7 @@ export function BattleUI({
   human = false,
   rating,
   finish,
+  again,
   bond,
 }: {
   battle: Battle;
@@ -70,6 +71,8 @@ export function BattleUI({
   human?: boolean;
   rating?: { before: number; after: number };
   finish: () => void;
+  /** Offered on the result screen when this battle can simply be fought again. */
+  again?: { label: string; start: () => void };
   /** Wild encounters: spend a bond token and this turn to befriend the target. */
   bond?: { tokens: number; attempt: (target: string) => void };
 }) {
@@ -360,9 +363,12 @@ export function BattleUI({
               {battle.bonded.map((id) => byId[id].name).join(", ")}
             </p>
           )}
-          <button className="primary" onClick={finish}>
-            Continue your journey →
-          </button>
+          <div className="button-row result-actions">
+            <button className="primary" onClick={finish}>
+              Continue your journey →
+            </button>
+            {again && <button onClick={again.start}>{again.label}</button>}
+          </div>
         </div>
       )}
     </div>
