@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { battleSummary, unitLabel } from "../apps/client/src/battle-labels";
+import { battleAnnouncement, battleSummary, unitLabel } from "../apps/client/src/battle-labels";
 import { elementMultiplier, matchupWord, teamCoverage } from "../packages/shared/elements";
 
 describe("battle creature labels", () => {
@@ -52,5 +52,13 @@ describe("team coverage", () => {
     expect(strong).toEqual(["Grove", "Shadow"]);
     expect(gaps).toContain("Frost");
     expect([...strong, ...gaps]).toHaveLength(8);
+  });
+});
+
+describe("battle announcements", () => {
+  it("speak the latest event and whose turn it is", () => {
+    expect(battleAnnouncement("Emberfox used Strike.", "Mossprig")).toBe("Emberfox used Strike. Your turn: Mossprig.");
+    expect(battleAnnouncement("Emberfox used Strike.", null)).toBe("Emberfox used Strike.");
+    expect(battleAnnouncement(undefined, null)).toBe("");
   });
 });

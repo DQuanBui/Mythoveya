@@ -20,3 +20,8 @@ export function battleSummary(units: { side: number; hp: number }[], side: numbe
     `${foes.filter((u) => u.hp === 0).length} of ${foes.length} foes calmed`,
   ].join(" · ");
 }
+/** What a screen reader hears as a battle moves on: the latest event and, on
+ * the player's turn, who acts next. */
+export function battleAnnouncement(lastLog: string | undefined, myTurnName: string | null) {
+  return [lastLog, myTurnName && `Your turn: ${myTurnName}.`].filter(Boolean).join(" ");
+}

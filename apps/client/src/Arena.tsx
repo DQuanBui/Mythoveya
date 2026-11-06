@@ -9,7 +9,7 @@ import { BattleScene } from "./Scene";
 import { audio, settings } from "./audio";
 import { Portrait } from "./portraits";
 import { matchupWord } from "../../../packages/shared/elements";
-import { battleSummary } from "./battle-labels";
+import { battleAnnouncement, battleSummary } from "./battle-labels";
 export type Snapshot = {
   code: string;
   players: {
@@ -206,6 +206,10 @@ export function BattleUI({
           </span>
         ))}
       </div>
+      {/* Not role="status": the toast must stay the page's only status. */}
+      <p className="sr-only battle-announcer" aria-live="polite">
+        {battleAnnouncement(battle.log.at(-1), myTurn && actor ? byId[actor.species].name : null)}
+      </p>
       <details className="battle-log">
         <summary>Battle log</summary>
         {battle.log.slice(-8).map((s, i) => (

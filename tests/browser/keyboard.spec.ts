@@ -52,6 +52,7 @@ test("a battle can be played from the keyboard", async ({ page }) => {
   await expect(page.getByRole("button", { name: /Auto (ON|OFF)/ })).toBeVisible();
   // Wait for our turn: the enemy may act first.
   await expect(page.getByText("Choose an ability, then its target.")).toBeVisible({ timeout: 60000 });
+  await expect(page.locator(".battle-announcer")).toContainText("Your turn:");
   const target = page.getByLabel("Battle target"),
     first = await target.inputValue();
   await page.keyboard.press("ArrowRight");
