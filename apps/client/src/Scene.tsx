@@ -1355,6 +1355,19 @@ function Roamer({
     </group>
   );
 }
+/** Starts every shader in the scene compiling together right after it mounts.
+ * Browsers link programs off the main thread, so asking for them all at once
+ * spares the first frames from waiting on each one in turn. Goes last so that
+ * everything mounted beside it is already in the scene. */
+function WarmShaders() {
+  const gl = useThree((s) => s.gl),
+    scene = useThree((s) => s.scene),
+    camera = useThree((s) => s.camera);
+  useEffect(() => {
+    gl.compile(scene, camera);
+  }, [gl, scene, camera]);
+  return null;
+}
 export function WorldScene({
   profile,
   blocked,
@@ -1565,6 +1578,7 @@ export function WorldScene({
           </WorldInteraction>
         );
       })}
+      <WarmShaders />
       </WalkContext.Provider>
     </Canvas>
   );

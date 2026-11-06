@@ -7,6 +7,7 @@ Updated November 8, 2026. Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch
 November 9 round (from `6657ade`). Done this round, newest last:
 - Test routes: the two "Route stopped" flakes came from waypoints aimed at walls (one segment crosses a fence), now rerouted; `atlas.spec` waits for the world after reloading.
 - Walk grids: click-to-walk and villager grids build in 5 ms slices (`startGrid`, `grid-slices.ts`, tested) instead of blocking for about 0.75 s each after entering a region.
+- Shader warm-up: `WarmShaders` starts the explorer's programs compiling together after mount, halving the wait in the first frames (about 1.2 s to 0.6 s).
 
 Next 3 tasks:
 1. Finish this round: team lineups, damage estimates, milestones, rematch and larger text.
