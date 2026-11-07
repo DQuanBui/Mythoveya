@@ -10,8 +10,8 @@ import {
   TIERS,
 } from "../../../packages/shared/content";
 import { hairColor } from "../../../packages/shared/looks";
-import { teamCoverage } from "../../../packages/shared/elements";
-import { recentLineups, suggestTeam, teamPower } from "../../../packages/shared/lineups";
+import { ELEMENT_NAMES, teamCoverage } from "../../../packages/shared/elements";
+import { companionChoices, recentLineups, suggestTeam, teamPower } from "../../../packages/shared/lineups";
 import { HairDyePicker } from "./HairDyePicker";
 import {
   power,
@@ -306,7 +306,9 @@ export function Formation({
   run: Mutation;
 }) {
   const [slots, setSlots] = useState(profile.team),
-    [selected, setSelected] = useState("");
+    [selected, setSelected] = useState(""),
+    [element, setElement] = useState(""),
+    [sort, setSort] = useState("");
   function place(slot: number, id = selected) {
     if (!id) return;
     const copy = [...slots],
@@ -360,8 +362,24 @@ export function Formation({
           </div>
         </div>
       ))}
+      {profile.owned.length > 6 && (
+        <div className="strip-controls">
+          <select aria-label="Show element" value={element} onChange={(e) => setElement(e.target.value)}>
+            <option value="">All elements</option>
+            {ELEMENT_NAMES.map((n) => (
+              <option key={n}>{n}</option>
+            ))}
+          </select>
+          <select aria-label="Sort companions" value={sort} onChange={(e) => setSort(e.target.value)}>
+            <option value="">Newest last</option>
+            <option value="power">Strongest first</option>
+            <option value="level">Highest level first</option>
+            <option value="name">By name</option>
+          </select>
+        </div>
+      )}
       <div className="owned-strip">
-        {profile.owned.map((o) => (
+        {companionChoices(profile.owned, element, sort).map((o) => (
           <button
             key={o.id}
             className={selected === o.id ? "selected" : ""}

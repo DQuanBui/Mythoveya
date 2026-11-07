@@ -26,6 +26,15 @@ export function suggestTeam(owned: Owned[]): string[] {
     .map((o) => o.id);
 }
 
+/** The companions to choose from, narrowed to one element and in the asked-for order. */
+export function companionChoices(owned: Owned[], element: string, sort: string) {
+  const list = owned.filter((o) => !element || byId[o.species].element === element);
+  if (sort === "power") list.sort((a, b) => power(b) - power(a));
+  else if (sort === "level") list.sort((a, b) => b.level - a.level || power(b) - power(a));
+  else if (sort === "name") list.sort((a, b) => byId[a.species].name.localeCompare(byId[b.species].name));
+  return list;
+}
+
 export function teamPower(owned: Owned[], ids: string[]) {
   return ids.reduce((sum, id) => {
     const o = owned.find((o) => o.id === id);

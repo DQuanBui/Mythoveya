@@ -13,6 +13,7 @@ November 10 round (from `6d40e46`). Done this round, newest last:
 - Install button: Sound & settings offers to install when the browser allows it, and an accepted install asks for durable storage (`install-prompt.ts`; checked with a stand-in offer).
 - Backup reminder: online keepers with something to lose get a toast at most weekly until they download a backup (`backupDue`, tested).
 - Battle star: the result screen names the companion who did the most (`Unit.dealt`, `battleStar`, tested; checked in a played battle).
+- Companion list: the formation panel can filter by element and sort by strength, level or name (`companionChoices`, tested).
 
 Next 3 tasks:
 1. Finish this round: crash screen, dialogs, gamepad, install and offline play, battle star.

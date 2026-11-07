@@ -1889,3 +1889,13 @@ html[data-large-text="true"] .modal {
 .modal:focus {
   outline: none;
 }
+.strip-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.strip-controls select {
+  flex: 1 1 140px;
+  max-width: 220px;
+}

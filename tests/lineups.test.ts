@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ALL_SPECIES, byId } from "../packages/shared/content";
-import { recentLineups, suggestTeam, teamPower } from "../packages/shared/lineups";
+import { companionChoices, recentLineups, suggestTeam, teamPower } from "../packages/shared/lineups";
 import type { Owned } from "../packages/shared/types";
 
 const owned = (species: string, level = 1): Owned => ({ id: species, species, level, xp: 0, shards: 0, upgrade: 0, locked: false });
@@ -25,6 +25,25 @@ describe("suggestTeam", () => {
       high = [...ofRole("tank").slice(0, 3), ...ofRole("healer").slice(0, 3)].map((s) => owned(s, 40));
     expect(suggestTeam([...low, ...high]).sort()).toEqual(high.map((o) => o.id).sort());
     expect(suggestTeam(low).sort()).toEqual(low.map((o) => o.id).sort());
+  });
+});
+describe("companionChoices", () => {
+  const list = [owned(ofRole("tank")[0], 3), owned(ofRole("striker")[0], 30), owned(ofRole("healer")[0], 9)];
+  it("keeps the save's order until asked otherwise, and leaves the save's array alone", () => {
+    const before = list.map((o) => o.id);
+    expect(companionChoices(list, "", "").map((o) => o.id)).toEqual(before);
+    companionChoices(list, "", "level");
+    expect(list.map((o) => o.id)).toEqual(before);
+  });
+  it("sorts by level and by name", () => {
+    expect(companionChoices(list, "", "level").map((o) => o.level)).toEqual([30, 9, 3]);
+    const names = companionChoices(list, "", "name").map((o) => byId[o.species].name);
+    expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));
+  });
+  it("narrows to one element", () => {
+    const element = byId[list[1].species].element;
+    expect(companionChoices(list, element, "").every((o) => byId[o.species].element === element)).toBe(true);
+    expect(companionChoices(list, element, "").length).toBeGreaterThan(0);
   });
 });
 describe("teamPower", () => {
