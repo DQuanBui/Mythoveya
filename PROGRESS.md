@@ -1,32 +1,43 @@
 # Mythoveya handoff
 
-Updated with the November 9 round; its commits are dated November 6, 2026 (round names ran ahead of the calendar and are kept as a sequence). Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`, pushed to `origin/main` (https://github.com/DQuanBui/Mythoveya). This handoff covers twelve rounds: October 29 (from `4619fdc`), October 30 (from `b0d6c3d`), October 31 (from `3497bb3`), November 1 (from `3d8496d`) November 2 (from `9d221ef`), November 3 (from `933a869`), November 4 (from `d37297c`), November 5 (from `1e622b9`), November 6 (from `040b6f1`), November 7 (from `a9be583`) November 8 (from `7661c95`) and November 9 (from `6657ade`). Earlier handoffs (October 28 online-build session, October 22 Wayfarer Lodges) are archived in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md). Preserve ignored `data/mythoveya.sqlite`. `CLAUDE.md` is the quick project map for new sessions.
+Updated with the November 10 round; its commits are dated November 7, 2026 (round names ran ahead of the calendar and are kept as a sequence). Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`, pushed to `origin/main` (https://github.com/DQuanBui/Mythoveya). This handoff covers thirteen rounds: October 29 (from `4619fdc`), October 30 (from `b0d6c3d`), October 31 (from `3497bb3`), November 1 (from `3d8496d`) November 2 (from `9d221ef`), November 3 (from `933a869`), November 4 (from `d37297c`), November 5 (from `1e622b9`), November 6 (from `040b6f1`), November 7 (from `a9be583`) November 8 (from `7661c95`), November 9 (from `6657ade`) and November 10 (from `6d40e46`). Earlier handoffs (October 28 online-build session, October 22 Wayfarer Lodges) are archived in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md). Preserve ignored `data/mythoveya.sqlite`. `CLAUDE.md` is the quick project map for new sessions.
 
 ## Next up
 
-November 10 round (from `6d40e46`). Done this round, newest last:
-- Cloud shadows: soft shadows drift across everything lit, with no seams (`cloud-shadows.ts`, `cloudField` tested; no measurable frame-rate cost), replacing the whole-scene dimming.
-- Dialogs: panels are modal dialogs named after their heading, holding Tab inside and returning focus on closing (`dialog-focus.ts`, in `keyboard.spec`).
-- Stale tabs: a tab open across an update reloads once instead of showing the error screen when a script file has gone.
-- Controller: standard gamepads walk, turn the camera, work menus and fight (`gamepad-map.ts` tested, `gamepad.spec` with a stand-in pad; no physical controller tried); listed under Esc → Controls.
-- Offline and install: the online build stores its files (`service-worker.js`, generated list in `vite.config.ts`), has a manifest and icons (`scripts/make-icons.mjs`), and the Pages smoke proves it plays with the network cut.
-- Install button: Sound & settings offers to install when the browser allows it, and an accepted install asks for durable storage (`install-prompt.ts`; checked with a stand-in offer).
-- Backup reminder: online keepers with something to lose get a toast at most weekly until they download a backup (`backupDue`, tested).
-- Battle star: the result screen names the companion who did the most (`Unit.dealt`, `battleStar`, tested; checked in a played battle).
-- Companion list: the formation panel can filter by element and sort by strength, level or name (`companionChoices`, tested).
-- Element guide: a table in the Team panel and battle log teaches the matchups, generated from `elementMultiplier` (`elementGuide`, tested).
-- Shortcuts: Q, J, T and M open and close Quests, Journal, Team and the map (in `keyboard.spec`), and a controller's Back opens the Journal.
-- What's new: the title screen lists recent changes with an unread marker (`whats-new.ts`, tested; update its list and id with player-facing changes).
+November 10 round is complete: 12 commits from `6d40e46` plus this record, all pushed.
 
 Next 3 tasks:
-1. Finish this round: crash screen, dialogs, gamepad, install and offline play, battle star.
-2. Listening pass and a physical phone/tablet check.
-3. Keep cutting the entry stall (about 2 s of long tasks remain).
+1. Physical checks only a person can do: listen to the audio, try a real phone or tablet, and try a real controller (all controller testing so far used a stand-in).
+2. Install the online game on a device and check it updates cleanly after a deployment; the offline path is proven in the smoke, but a real install is not.
+3. Trim the entry chunk (474.6 kB, up about 8 kB this round) and the remaining first-frame work when entering a region.
 
 ## Play
 
 - **Online (single-player):** https://dquanbui.github.io/Mythoveya/. `.github/workflows/pages.yml` publishes it on every push to `main` (Pages source: GitHub Actions). Check a deployment with `node scripts/smoke-pages.mjs https://dquanbui.github.io/Mythoveya/`.
 - **Local (full game, including the human arena):** `npm install`, then run `Play Mythoveya.cmd` or `npm run dev` and open http://127.0.0.1:5173/. For the compiled build, run `npm run build && npm start` and open http://127.0.0.1:2567/.
+
+## Implemented November 10
+
+- Cloud shadows (`cloud-shadows.ts`, `cloudField` and `cloudAmount` in `cloud-pass.ts`, tested): soft shadows drift over everything lit by dimming direct light at each point's world position. A hook on `Material.prototype` covers every lit material at once, which is what avoids the seams of the earlier attempt; materials with their own `onBeforeCompile` call `withCloudShadows`. By day under open sky; off with Reduced Motion, Low quality or Minimal effects. Replaces last round's whole-scene dimming. Measured 52-54 fps with and without.
+- Dialogs (`dialog-focus.ts`): panels are modal dialogs named after their heading; Tab stays inside, and closing returns focus to whatever opened them. The old `aria-label` stays as a fallback, and journeys still select by it. In `keyboard.spec`.
+- Stale tabs: a tab open across a deployment reloads once when a script file has gone, instead of showing the error screen (`vite:preloadError` in `main.tsx`; checked by serving a 404 for a panel's script).
+- Controller (`gamepad.ts`, `gamepad-map.ts`, tested): analog walking, camera, sprint, use, emotes, menus by D-pad, A and B, and battles by face buttons. Buttons speak as the keyboard does, so there is one code path. In `gamepad.spec` with a stand-in pad; no physical controller has been tried.
+- Offline and install: the online build stores every file through a generated service worker (`apps/client/service-worker.js`, list and version from `vite.config.ts`), with a manifest and icons (`scripts/make-icons.mjs`). Pages ask the network first. `smoke-pages.mjs` now cuts the network, reloads, continues the save and opens an on-demand panel.
+- Install button (`install-prompt.ts`): Sound & settings offers an install when the browser does, and an accepted install asks for durable storage. Checked with a stand-in browser offer only.
+- Backup reminder (`backupDue`, tested): an online keeper with five victories and no backup in two weeks gets one toast, at most weekly.
+- Battle star (`Unit.dealt`, `battleStar`, tested): the result screen names the companion who did the most, or who fought hardest after a loss. The tally draws no random numbers.
+- Companion list (`companionChoices`, tested): the formation panel filters by element and sorts by strength, level or name, from seven companions on.
+- Element guide (`ElementGuide.tsx`, `elementGuide`, tested): a table in the Team panel and battle log, generated from `elementMultiplier`.
+- Shortcuts: Q, J, T and M open and close Quests, Journal, Team and the map, shown as menu tooltips and in the Controls guide (in `keyboard.spec`). A controller's Back opens the Journal.
+- What's new (`whats-new.ts`, tested): the title screen lists recent changes with an unread marker. Update its list and id with player-facing changes.
+- Measured but left alone: Journal opens with about 0.6 s of long tasks the first time, a battle starts with about 0.7 s, other panels with none. The walk grid costs about 330 ms in total but now runs in slices. What remains on entering a region is mostly ordinary first-frame rendering.
+
+Verification:
+
+- Typecheck and content audit pass. Vitest: 58 files, 277 tests pass.
+- `npm run build` and `build:pages` pass; entry 474.6 kB, up from 466.5 kB. `smoke-production` and `smoke-pages` pass locally.
+- Playwright full run (39.7 min, 37 journeys, one retry allowed): all 37 passed first time, none flaky. The second clean run in a row since the route and stall fixes.
+- Not checked: nothing has been listened to, tried on a physical phone, or played with a real controller, and the game has not been installed on a real device.
 
 ## Implemented November 9
 

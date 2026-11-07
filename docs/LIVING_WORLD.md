@@ -50,7 +50,7 @@ It also leaves paw prints beside your footprints in snow and sand.
 | Dawn (about 5:30 to 9:30) | Mist lies low over Havenreach and Whisperleaf, and dew glitters on the grass. |
 | Rain | Puddles fill on the trails and dry slowly afterwards; raindrops ring the ponds and lakes; grass, trees and chimney smoke lean in the wind; fireflies shelter; birds roost. |
 | After rain | A rainbow may hang ahead of you while the sky clears. |
-| Clear days | About once a minute a cloud crosses the sun: the light softens and shadows fade for several seconds. Off with Reduced Motion. |
+| Clear days | Cloud shadows drift across the land, the houses and everyone on it. Off with Reduced Motion, Low quality or Minimal effects. |
 | Night | Fireflies (unless it rains), shooting stars on clear nights, lanterns in hands. |
 
 Each region has its own air: embers rise in Emberglass, pollen drifts in Whisperleaf, fresh snow sparkles around you in Moonfrost, and every pond and lake glints in the sun.
@@ -61,10 +61,14 @@ Creatures drop onto the field with a puff of dust. Each attacks in its family's 
 
 The target list says how strong each choice is and about how much damage it deals, before critical hits and the random roll. After practice you can go straight into another match, and after losing a story stage you can try it again from the result screen.
 
+Open **How elements work** in the Team panel or the battle log to see what beats what. The result screen names the star of each battle.
+
 In the **Team** panel, *Suggest a team* fills the slots with your strongest six, and *Recent lineups* brings back a team you saved before. Neither changes anything until you press *Save formation*.
 
 ## Settings
 
+- **Q · J · T · M** open Quests, Journal, Team and the map. A game controller works too; **Esc → Controls** lists its buttons.
+- **The online game** can be installed from Sound & settings when your browser offers it, and plays with no connection once it has loaded.
 - **Sound & graphics → Larger interface text** enlarges panels and notices by about a fifth.
 - **Sound & graphics → Decorative effects:** *Auto* (the default) pauses drifting motes, glints, puddles and puffs if the frame rate stays below about 30 fps, and brings them back once it recovers. *Full* always shows them; *Minimal* keeps them off.
 - **Reduced Motion** stills animation everywhere, and **Camera shake** controls the battle jolts.

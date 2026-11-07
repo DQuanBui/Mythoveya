@@ -215,6 +215,10 @@ After 29 pulls without A/S, the next pull guarantees A or S at normalized 5:1 we
 
 Daily objectives reset at **00:00 UTC using server time**: win three PvE battles, train once, and gather three resources. Completing all three unlocks a 100-diamond chest. Selected encounters offer one bond-token attempt at an encountered E–C creature; the displayed chance comes from the server and the attempt cannot be retried by reloading.
 
+A standard game controller also works: walking, the camera, menus and battles. **Esc → Controls** lists its buttons, and **Q · J · T · M** open Quests, Journal, Team and the map.
+
+The online build can be installed from Sound & settings and plays offline after one complete visit.
+
 ## Saves, backup, and test profiles
 
 The default save is **`data/mythoveya.sqlite`**. The browser stores an opaque session token under `mythoveya-session`; the server owns the profile ID and all gameplay state. This is local guest authentication, without password recovery.
