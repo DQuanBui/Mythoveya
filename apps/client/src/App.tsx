@@ -42,6 +42,7 @@ import {
 } from "../../../packages/shared/islands";
 import { companionJoy } from "./village-materials";
 import { earnedMilestones, newlyEarned } from "../../../packages/shared/milestones";
+import { useDialogFocus } from "./dialog-focus";
 // Panels and region maps load when first opened.
 const LodgePanel = lazy(() => import("./LodgePanel").then((m) => ({ default: m.LodgePanel })));
 const RescuePanel = lazy(() => import("./RescuePanel").then((m) => ({ default: m.RescuePanel })));
@@ -245,6 +246,8 @@ export default function App() {
       // Private windows may refuse storage; the choice still lasts this visit.
     }
   };
+  const dialog = useRef<HTMLElement>(null);
+  useDialogFocus(dialog, panel);
   const lastStart = useRef<{ practice: boolean; adventure: MissionStart } | null>(null);
   // Celebrate a title as it is earned; what the save already had stays quiet.
   const earned = useRef<Set<string> | null>(null),
@@ -886,6 +889,10 @@ export default function App() {
         <div className="modal-backdrop">
           <section
             key={panel}
+            ref={dialog}
+            role="dialog"
+            aria-modal="true"
+            tabIndex={-1}
             className={`panel modal ${["collection", "formation", "gallery", "town", "map", "adventure", "training", "events", "smith", "apothecary", "home", "skyferry", "festival"].includes(panel) || panel === "lodges" || panel.startsWith("rescue-") || panel.startsWith("atlas-") || panel.startsWith("cons-") || panel.startsWith("rally-") || panel.startsWith("mea-") || panel.startsWith("hol-") || panel.startsWith("can-") || panel.startsWith("exp-") || panel.startsWith("npc-") ? "wide" : ""}`}
             aria-label={panel}
           >

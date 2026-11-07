@@ -68,3 +68,40 @@ test("a battle can be played from the keyboard", async ({ page }) => {
   // Fast is remembered for the next visit.
   expect(await page.evaluate(() => localStorage.getItem("mythoveya-battle-fast"))).toBe("1");
 });
+
+test("panels hold keyboard focus like dialogs and give it back", async ({ page }) => {
+  test.setTimeout(120000);
+  await page.goto("/");
+  await page.evaluate(async () => {
+    const post = (data: unknown, path: string, token = "") =>
+      fetch("/api/" + path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+        body: JSON.stringify(data),
+      }).then((r) => r.json());
+    const g = await post({ name: "Tab Keeper", avatar: 2 }, "guest");
+    localStorage.setItem("mythoveya-session", g.token);
+    await post({ kind: "starter", species: "emberfox", requestId: crypto.randomUUID() }, "mutate", g.token);
+  });
+  await page.reload();
+  await page.getByRole("button", { name: "Continue your journey" }).click();
+  const quests = page.getByRole("button", { name: "Quests" }).first();
+  await quests.focus();
+  await quests.press("Enter");
+  // Named after its heading rather than its internal id.
+  const dialog = page.getByRole("dialog");
+  await expect(dialog.locator("h1,h2").first()).toBeVisible();
+  const heading = (await dialog.locator("h1,h2").first().textContent())!;
+  await expect(page.getByRole("dialog", { name: heading })).toBeVisible();
+  await expect(dialog).toBeFocused();
+  // Tab never leaves the dialog, however far it goes.
+  for (let i = 0; i < 40; i++) {
+    await page.keyboard.press("Tab");
+    expect(await page.evaluate(() => !!document.activeElement?.closest("[role=dialog]"))).toBe(true);
+  }
+  await page.keyboard.press("Shift+Tab");
+  expect(await page.evaluate(() => !!document.activeElement?.closest("[role=dialog]"))).toBe(true);
+  await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0);
+  await expect(quests).toBeFocused();
+});
