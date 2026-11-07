@@ -54,6 +54,7 @@ import { WalkContext, type Walker } from "./hover";
 import { worldFocus, worldHeading, keeperEmote, EMOTES, playEmote, nightState, companionJoy, companionRest } from "./village-materials";
 import { findPath, startGrid, type GridBuild, type WalkGrid } from "../../../packages/shared/pathfind";
 import { buildInSlices } from "./grid-slices";
+import { padInput } from "./gamepad";
 import { lazy, Suspense, useMemo, useRef, useEffect, useState, useCallback } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Stars } from "@react-three/drei";
@@ -959,18 +960,22 @@ export function Explorer({
     let x = blocked
       ? 0
       : input.current.x +
+        padInput.x +
         Number(k.has("KeyD") || k.has("ArrowRight")) -
         Number(k.has("KeyA") || k.has("ArrowLeft"));
     let z = blocked
       ? 0
       : input.current.z +
+        padInput.z +
         Number(k.has("KeyS") || k.has("ArrowDown")) -
         Number(k.has("KeyW") || k.has("ArrowUp"));
     const steering = !!(x || z);
+    if (padInput.turn && !blocked && controls.current)
+      controls.current.setAzimuthalAngle(controls.current.getAzimuthalAngle() - padInput.turn * Math.min(dt, 0.05) * 2.2);
     if (steering || blocked) route.current = null;
     const shift =
       !blocked &&
-      (input.current.sprint || k.has("ShiftLeft") || k.has("ShiftRight"));
+      (input.current.sprint || padInput.sprint || k.has("ShiftLeft") || k.has("ShiftRight"));
     let v: T.Vector3 | null = null,
       sprinting = shift;
     if (steering) {

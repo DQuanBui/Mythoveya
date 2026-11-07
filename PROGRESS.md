@@ -8,6 +8,7 @@ November 10 round (from `6d40e46`). Done this round, newest last:
 - Cloud shadows: soft shadows drift across everything lit, with no seams (`cloud-shadows.ts`, `cloudField` tested; no measurable frame-rate cost), replacing the whole-scene dimming.
 - Dialogs: panels are modal dialogs named after their heading, holding Tab inside and returning focus on closing (`dialog-focus.ts`, in `keyboard.spec`).
 - Stale tabs: a tab open across an update reloads once instead of showing the error screen when a script file has gone.
+- Controller: standard gamepads walk, turn the camera, work menus and fight (`gamepad-map.ts` tested, `gamepad.spec` with a stand-in pad; no physical controller tried); listed under Esc → Controls.
 
 Next 3 tasks:
 1. Finish this round: crash screen, dialogs, gamepad, install and offline play, battle star.

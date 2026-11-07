@@ -2,6 +2,7 @@ import { createRoot } from "react-dom/client";
 import { Component, type ReactNode } from "react";
 import App from "./App";
 import { STANDALONE } from "./api";
+import { startGamepad } from "./gamepad";
 import "./style.css";
 import "./world-hud.css";
 import "./town.css";
@@ -9,6 +10,7 @@ import "./haven.css";
 import "./adventure.css";
 import "./islands.css";
 import "./battle.css";
+startGamepad();
 // A tab left open across an update asks for script files that are gone. Reload
 // once to pick up the new ones; a second failure soon after is a real problem
 // and goes to the error screen below.

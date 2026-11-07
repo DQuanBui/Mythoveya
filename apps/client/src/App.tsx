@@ -248,6 +248,11 @@ export default function App() {
   };
   const dialog = useRef<HTMLElement>(null);
   useDialogFocus(dialog, panel);
+  useEffect(() => {
+    const hello = () => notify("Controller connected. Its buttons are listed under Esc → Controls.");
+    window.addEventListener("gamepadconnected", hello);
+    return () => window.removeEventListener("gamepadconnected", hello);
+  }, []);
   const lastStart = useRef<{ practice: boolean; adventure: MissionStart } | null>(null);
   // Celebrate a title as it is earned; what the save already had stays quiet.
   const earned = useRef<Set<string> | null>(null),
@@ -1233,6 +1238,12 @@ export default function App() {
                     <dd>Wave, cheer, dance or sit</dd>
                     <dt>P</dt>
                     <dd>Photo mode · G to pose</dd>
+                    <dt>Controller</dt>
+                    <dd>Left stick walks · right stick turns the camera · trigger sprints · A uses · Start pauses · Y resets the camera · D-pad emotes</dd>
+                    <dt>Controller in menus</dt>
+                    <dd>D-pad moves · A selects · B backs out</dd>
+                    <dt>Controller in battle</dt>
+                    <dd>X · Y · RB pick an ability · D-pad ← → change the target · A uses it · LB Auto · Back Fast</dd>
                     <dt>In battle</dt>
                     <dd>1 · 2 · 3 pick an ability · ← → change the target · Enter uses it · A Auto · F Fast</dd>
                     <dt>Drag · scroll</dt>
