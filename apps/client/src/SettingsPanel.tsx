@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { audio, settings, type Settings } from "./audio";
 import { exportSave, importSave, STANDALONE } from "./api";
+import { useInstallPrompt } from "./install-prompt";
 
 export function SettingsPanel() {
   const [, refresh] = useState(0);
@@ -119,6 +120,7 @@ export function SettingsPanel() {
 /** The online build keeps its save in this browser; let players move it. */
 function SaveBackup() {
   const [message, setMessage] = useState("");
+  const install = useInstallPrompt();
   function download() {
     const url = URL.createObjectURL(
       new Blob([exportSave()], { type: "application/json" }),
@@ -143,6 +145,15 @@ function SaveBackup() {
   }
   return (
     <div className="save-backup">
+      {install && (
+        <>
+          <h3>Keep the game close</h3>
+          <p className="muted">Install it for its own icon and window. It also plays without a connection.</p>
+          <div className="button-row">
+            <button onClick={install}>Install the game</button>
+          </div>
+        </>
+      )}
       <h3>Your browser save</h3>
       <p className="muted">
         The online game saves in this browser only. Download a backup before

@@ -3,6 +3,7 @@ import { Component, type ReactNode } from "react";
 import App from "./App";
 import { STANDALONE } from "./api";
 import { startGamepad } from "./gamepad";
+import "./install-prompt";
 import "./style.css";
 import "./world-hud.css";
 import "./town.css";
