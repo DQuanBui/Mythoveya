@@ -10,6 +10,7 @@ import { audio, settings } from "./audio";
 import { Portrait } from "./portraits";
 import { matchupWord } from "../../../packages/shared/elements";
 import { battleAnnouncement, battleStar, battleSummary } from "./battle-labels";
+import { ElementGuide } from "./ElementGuide";
 export type Snapshot = {
   code: string;
   players: {
@@ -217,6 +218,7 @@ export function BattleUI({
       </p>
       <details className="battle-log">
         <summary>Battle log</summary>
+        <ElementGuide />
         {battle.log.slice(-8).map((s, i) => (
           <p key={i}>{s}</p>
         ))}

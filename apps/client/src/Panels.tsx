@@ -13,6 +13,7 @@ import { hairColor } from "../../../packages/shared/looks";
 import { ELEMENT_NAMES, teamCoverage } from "../../../packages/shared/elements";
 import { companionChoices, recentLineups, suggestTeam, teamPower } from "../../../packages/shared/lineups";
 import { HairDyePicker } from "./HairDyePicker";
+import { ElementGuide } from "./ElementGuide";
 import {
   power,
   makeBattle,
@@ -393,6 +394,7 @@ export function Formation({
         ))}
       </div>
       <TeamCoverage elements={slots.map((id) => byId[profile.owned.find((o) => o.id === id)?.species || ""]?.element).filter(Boolean)} />
+      <ElementGuide />
       <p className="team-coverage">
         <b>Team power:</b> {teamPower(profile.owned, slots).toLocaleString()}
       </p>

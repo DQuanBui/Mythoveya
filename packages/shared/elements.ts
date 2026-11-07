@@ -20,3 +20,13 @@ export function teamCoverage(team: string[]) {
   const strong = ELEMENT_NAMES.filter((foe) => team.some((own) => elementMultiplier(own, foe) > 1));
   return { strong, gaps: ELEMENT_NAMES.filter((foe) => !strong.includes(foe)) };
 }
+/** The whole matchup table, in words a player can read. */
+export function elementGuide() {
+  const rows = ELEMENT_NAMES.map((name) => ({
+    name,
+    strong: ELEMENT_NAMES.filter((foe) => elementMultiplier(name, foe) > 1),
+    resisted: ELEMENT_NAMES.filter((foe) => elementMultiplier(name, foe) < 1),
+  }));
+  const all = ELEMENT_NAMES.flatMap((a) => ELEMENT_NAMES.map((b) => elementMultiplier(a, b)));
+  return { rows, strong: Math.max(...all), resisted: Math.min(...all) };
+}

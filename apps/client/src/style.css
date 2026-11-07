@@ -1899,3 +1899,33 @@ html[data-large-text="true"] .modal {
   flex: 1 1 140px;
   max-width: 220px;
 }
+/* The rules behind matchup hints, in the Team panel and the battle log. */
+.element-guide {
+  margin: 8px 0;
+  font-size: 0.85rem;
+}
+.element-guide summary {
+  cursor: pointer;
+  color: #edcf83;
+}
+.element-guide p {
+  margin: 6px 0;
+}
+.element-guide table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.element-guide th,
+.element-guide td {
+  padding: 2px 8px 2px 0;
+  border-bottom: 1px solid #acc6b42e;
+  font-weight: 400;
+  text-align: left;
+  vertical-align: top;
+}
+.element-guide th[scope="row"] {
+  font-weight: 700;
+}
+.element-guide thead th {
+  opacity: 0.7;
+}
