@@ -44,6 +44,7 @@ import {
   type ExplorationInput,
 } from "./world-guide";
 
+const NAV_KEYS: Record<string, string> = { quests: "Q", collection: "J", formation: "T", map: "M" };
 export function WorldHUD({
   profile,
   position,
@@ -556,6 +557,7 @@ export function WorldHUD({
           ].map(([id, icon, label]) => (
             <button
               key={id}
+              title={NAV_KEYS[id] ? `${label} (${NAV_KEYS[id]})` : undefined}
               onClick={() => open((home || fair) && id === "map" ? "skyferry" : id)}
             >
               <span>{icon}</span>

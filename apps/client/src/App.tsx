@@ -103,6 +103,7 @@ const FestivalGame = lazy(() => import("./FestivalGames").then((m) => ({ default
 
 /** Where you step off the ferry in Havenreach: just inland from the dock gate. */
 const FERRY_LANDING: number[] = [SKYFERRY.point[0] * 0.95, SKYFERRY.point[1] * 0.95];
+const PANEL_KEYS: Record<string, string> = { KeyQ: "quests", KeyJ: "collection", KeyT: "formation", KeyM: "map" };
 export default function App() {
   const [lodge, setLodge] = useState<string | null>(null);
   const [home, setHome] = useState<string | null>(null);
@@ -182,6 +183,20 @@ export default function App() {
         setPhotoMode(true);
       if (e.code === "KeyQ" && placing && !panel)
         setPlacing({ ...placing, rot: (placing.rot + 1) % 4 });
+      // Shortcuts open the main panels, and close them again.
+      const shortcut = PANEL_KEYS[e.code];
+      if (
+        shortcut &&
+        !e.repeat &&
+        screen === "world" &&
+        !placing &&
+        !story &&
+        !(e.target instanceof HTMLElement && e.target.matches("input,select,textarea"))
+      ) {
+        const id = shortcut === "map" && profile?.island ? "skyferry" : shortcut;
+        if (!panel) setPanel(id);
+        else if (panel === id) setPanel("");
+      }
       if (e.code === "Escape") {
         if (placing && !panel) setPlacing(null);
         else if (screen === "world") setPanel((p) => (p ? "" : "pause"));
@@ -190,7 +205,7 @@ export default function App() {
     };
     window.addEventListener("keydown", key);
     return () => window.removeEventListener("keydown", key);
-  }, [screen, panel, placing, photoMode]);
+  }, [screen, panel, placing, photoMode, story, profile?.island]);
   useEffect(() => {
     audio.location(
       screen === "battle"
@@ -1250,12 +1265,14 @@ export default function App() {
                     <dd>Move directly · hold Shift to sprint</dd>
                     <dt>E</dt>
                     <dd>Use whatever is within reach</dd>
+                    <dt>Q · J · T · M</dt>
+                    <dd>Quests, Journal, Team, Map</dd>
                     <dt>1 · 2 · 3 · 4</dt>
                     <dd>Wave, cheer, dance or sit</dd>
                     <dt>P</dt>
                     <dd>Photo mode · G to pose</dd>
                     <dt>Controller</dt>
-                    <dd>Left stick walks · right stick turns the camera · trigger sprints · A uses · Start pauses · Y resets the camera · D-pad emotes</dd>
+                    <dd>Left stick walks · right stick turns the camera · trigger sprints · A uses · Start pauses · Back opens the Journal · Y resets the camera · D-pad emotes</dd>
                     <dt>Controller in menus</dt>
                     <dd>D-pad moves · A selects · B backs out</dd>
                     <dt>Controller in battle</dt>

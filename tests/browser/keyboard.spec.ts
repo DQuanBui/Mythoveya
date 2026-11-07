@@ -104,4 +104,19 @@ test("panels hold keyboard focus like dialogs and give it back", async ({ page }
   await page.keyboard.press("Escape");
   await expect(dialog).toHaveCount(0);
   await expect(quests).toBeFocused();
+  // Shortcuts open the main panels, close their own, and leave others alone.
+  await page.keyboard.press("KeyJ");
+  await expect(page.locator('section[aria-label="collection"]')).toBeVisible();
+  await page.keyboard.press("KeyT");
+  await expect(page.locator('section[aria-label="collection"]')).toBeVisible();
+  await page.keyboard.press("KeyJ");
+  await expect(dialog).toHaveCount(0);
+  await page.keyboard.press("KeyT");
+  await expect(page.locator('section[aria-label="formation"]')).toBeVisible();
+  await page.keyboard.press("Escape");
+  await page.keyboard.press("KeyM");
+  await expect(page.locator('section[aria-label="map"]')).toBeVisible();
+  await page.keyboard.press("Escape");
+  await page.keyboard.press("KeyQ");
+  await expect(page.locator('section[aria-label="quests"]')).toBeVisible();
 });

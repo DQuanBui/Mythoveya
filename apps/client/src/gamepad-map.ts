@@ -10,6 +10,7 @@ const COMMANDS: Record<PadMode, Record<number, PadCommand>> = {
     [PAD.A]: { key: "KeyE" },
     [PAD.Y]: { key: "KeyR" },
     [PAD.START]: { key: "Escape" },
+    [PAD.BACK]: { key: "KeyJ" },
     [PAD.UP]: { key: "Digit1" },
     [PAD.RIGHT]: { key: "Digit2" },
     [PAD.DOWN]: { key: "Digit3" },
