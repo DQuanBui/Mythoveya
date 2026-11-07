@@ -130,6 +130,11 @@ function SaveBackup() {
     a.download = `mythoveya-save-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
+    try {
+      localStorage.setItem("mythoveya-backup-at", String(Date.now()));
+    } catch {
+      // Without storage the next reminder simply comes sooner.
+    }
     setMessage("Save downloaded. Keep the file somewhere safe.");
   }
   async function restore(file?: File) {

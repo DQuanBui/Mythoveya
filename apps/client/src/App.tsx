@@ -15,7 +15,7 @@ import {
   STARTERS,
 } from "../../../packages/shared/content";
 import type { Battle, Profile } from "../../../packages/shared/types";
-import { api, mutate, session, setSession } from "./api";
+import { api, mutate, session, setSession, STANDALONE } from "./api";
 import { audio, settings } from "./audio";
 import { Preview, TitleScene, WorldScene } from "./Scene";
 import { Portrait } from "./portraits";
@@ -43,6 +43,7 @@ import {
 import { companionJoy } from "./village-materials";
 import { earnedMilestones, newlyEarned } from "../../../packages/shared/milestones";
 import { useDialogFocus } from "./dialog-focus";
+import { backupDue } from "./backup-reminder";
 // Panels and region maps load when first opened.
 const LodgePanel = lazy(() => import("./LodgePanel").then((m) => ({ default: m.LodgePanel })));
 const RescuePanel = lazy(() => import("./RescuePanel").then((m) => ({ default: m.RescuePanel })));
@@ -253,6 +254,21 @@ export default function App() {
     window.addEventListener("gamepadconnected", hello);
     return () => window.removeEventListener("gamepadconnected", hello);
   }, []);
+  // An online save lives only in this browser, so say so now and then.
+  const backupChecked = useRef(false);
+  useEffect(() => {
+    if (!STANDALONE || screen !== "world" || !profile || backupChecked.current) return;
+    backupChecked.current = true;
+    try {
+      const read = (key: string) => Number(localStorage.getItem(key) || 0),
+        now = Date.now();
+      if (!backupDue({ now, backedUp: read("mythoveya-backup-at"), reminded: read("mythoveya-backup-reminded"), wins: profile.wins })) return;
+      localStorage.setItem("mythoveya-backup-reminded", String(now));
+      notify("Your save lives only in this browser. Download a backup under Sound & settings.");
+    } catch {
+      // Storage is unavailable, so there is nothing to remember the reminder by.
+    }
+  }, [screen, profile]);
   const lastStart = useRef<{ practice: boolean; adventure: MissionStart } | null>(null);
   // Celebrate a title as it is earned; what the save already had stays quiet.
   const earned = useRef<Set<string> | null>(null),

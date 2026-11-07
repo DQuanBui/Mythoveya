@@ -11,6 +11,7 @@ November 10 round (from `6d40e46`). Done this round, newest last:
 - Controller: standard gamepads walk, turn the camera, work menus and fight (`gamepad-map.ts` tested, `gamepad.spec` with a stand-in pad; no physical controller tried); listed under Esc → Controls.
 - Offline and install: the online build stores its files (`service-worker.js`, generated list in `vite.config.ts`), has a manifest and icons (`scripts/make-icons.mjs`), and the Pages smoke proves it plays with the network cut.
 - Install button: Sound & settings offers to install when the browser allows it, and an accepted install asks for durable storage (`install-prompt.ts`; checked with a stand-in offer).
+- Backup reminder: online keepers with something to lose get a toast at most weekly until they download a backup (`backupDue`, tested).
 
 Next 3 tasks:
 1. Finish this round: crash screen, dialogs, gamepad, install and offline play, battle star.
