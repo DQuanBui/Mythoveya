@@ -9,6 +9,17 @@ import "./haven.css";
 import "./adventure.css";
 import "./islands.css";
 import "./battle.css";
+// A tab left open across an update asks for script files that are gone. Reload
+// once to pick up the new ones; a second failure soon after is a real problem
+// and goes to the error screen below.
+window.addEventListener("vite:preloadError", (e) => {
+  const key = "mythoveya-update-reload",
+    last = Number(sessionStorage.getItem(key) || 0);
+  if (Date.now() - last < 60000) return;
+  sessionStorage.setItem(key, String(Date.now()));
+  e.preventDefault();
+  location.reload();
+});
 class Boundary extends Component<{ children: ReactNode }, { error: string }> {
   state = { error: "" };
   static getDerivedStateFromError(e: Error) {
