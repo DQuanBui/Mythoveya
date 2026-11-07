@@ -1,3 +1,4 @@
+import { withCloudShadows } from "./cloud-shadows";
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as T from "three";
@@ -25,6 +26,7 @@ function swaying(material: T.MeshStandardMaterial, part: string) {
   if (!sway) return;
   const [low, high, reach] = sway;
   material.onBeforeCompile = (shader) => {
+    withCloudShadows(shader);
     shader.uniforms.uWindTime = wind.time;
     shader.uniforms.uWindStrength = wind.strength;
     shader.vertexShader = shader.vertexShader

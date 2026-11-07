@@ -4,12 +4,13 @@ Updated with the November 9 round; its commits are dated November 6, 2026 (round
 
 ## Next up
 
-November 9 round is complete: 12 commits from `6657ade` plus this record, all pushed.
+November 10 round (from `6d40e46`). Done this round, newest last:
+- Cloud shadows: soft shadows drift across everything lit, with no seams (`cloud-shadows.ts`, `cloudField` tested; no measurable frame-rate cost), replacing the whole-scene dimming.
 
 Next 3 tasks:
-1. Listening pass and a physical phone/tablet check. Neither has been done by a person; every sound and touch check so far is automated.
-2. Keep cutting the entry stall: long tasks are still about 2 s in total, mostly first-render React work, terrain building and normal early frames.
-3. Real cloud shadows across all ground surfaces (the new passing-cloud light only dims the whole scene).
+1. Finish this round: crash screen, dialogs, gamepad, install and offline play, battle star.
+2. Listening pass and a physical phone/tablet check.
+3. Keep cutting the entry stall (about 2 s of long tasks remain).
 
 ## Play
 

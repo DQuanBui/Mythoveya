@@ -1,3 +1,4 @@
+import { withCloudShadows } from "./cloud-shadows";
 import * as T from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
@@ -138,6 +139,7 @@ function skinFor(surface: Surface, shimmer = false) {
       // Light caught at the silhouette brightens it, in proportion to the
       // light already falling there (so nothing glows at night).
       m.onBeforeCompile = (shader) => {
+        withCloudShadows(shader);
         shader.fragmentShader = shader.fragmentShader.replace(
           "#include <opaque_fragment>",
           `outgoingLight += totalDiffuse * pow(1.0 - saturate(dot(normal, normalize(vViewPosition))), 2.5) * ${rim.toFixed(2)};
