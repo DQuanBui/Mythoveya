@@ -2,6 +2,7 @@
 
 ## Project assets
 
+- `apps/client/public/icons/*.png`: app icons rendered from the project's own `emblem.svg` by `scripts/make-icons.mjs`.
 - `apps/client/src/models.ts`: original procedural Wildbound and keeper geometry, materials, articulated limbs, and animation recipes.
 - `apps/client/src/Scene.tsx`: original floating-island scenery, buildings, ruins, vegetation, crystals, world markers, and battle presentation.
 - `apps/client/src/UltimateEffects.tsx`: ten original mythic effect compositions.

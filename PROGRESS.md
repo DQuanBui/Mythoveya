@@ -9,6 +9,7 @@ November 10 round (from `6d40e46`). Done this round, newest last:
 - Dialogs: panels are modal dialogs named after their heading, holding Tab inside and returning focus on closing (`dialog-focus.ts`, in `keyboard.spec`).
 - Stale tabs: a tab open across an update reloads once instead of showing the error screen when a script file has gone.
 - Controller: standard gamepads walk, turn the camera, work menus and fight (`gamepad-map.ts` tested, `gamepad.spec` with a stand-in pad; no physical controller tried); listed under Esc → Controls.
+- Offline and install: the online build stores its files (`service-worker.js`, generated list in `vite.config.ts`), has a manifest and icons (`scripts/make-icons.mjs`), and the Pages smoke proves it plays with the network cut.
 
 Next 3 tasks:
 1. Finish this round: crash screen, dialogs, gamepad, install and offline play, battle star.

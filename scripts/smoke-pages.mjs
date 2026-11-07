@@ -68,6 +68,16 @@ try {
   ]);
   await page.getByRole("button", { name: "Continue your journey" }).click({ timeout: 30000 });
   await page.locator(".keeper-badge").getByText("Pages Smoke").waitFor({ timeout: 30000 });
+  // Once stored, the game loads and plays with no connection, on-demand panels included.
+  await page.evaluate(() => navigator.serviceWorker.ready);
+  await page.waitForFunction(() => navigator.serviceWorker.controller, null, { timeout: 30000 });
+  await page.context().setOffline(true);
+  await page.reload();
+  await page.getByRole("button", { name: "Continue your journey" }).click({ timeout: 30000 });
+  await page.locator(".keeper-badge").getByText("Pages Smoke").waitFor({ timeout: 30000 });
+  await page.getByRole("button", { name: "Journal" }).first().click();
+  await page.getByRole("dialog").locator("h1,h2").first().waitFor({ timeout: 30000 });
+  await page.context().setOffline(false);
   if (problems.length) throw Error(problems.join("\n"));
   console.log(`Pages smoke passed: ${url}`);
 } finally {

@@ -11,6 +11,11 @@ import "./adventure.css";
 import "./islands.css";
 import "./battle.css";
 startGamepad();
+// The online build has no server, so it can keep playing without a connection.
+if (import.meta.env.PROD && STANDALONE && "serviceWorker" in navigator)
+  addEventListener("load", () => {
+    navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => {});
+  });
 // A tab left open across an update asks for script files that are gone. Reload
 // once to pick up the new ones; a second failure soon after is a real problem
 // and goes to the error screen below.
