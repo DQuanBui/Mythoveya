@@ -44,6 +44,7 @@ import { companionJoy } from "./village-materials";
 import { earnedMilestones, newlyEarned } from "../../../packages/shared/milestones";
 import { useDialogFocus } from "./dialog-focus";
 import { backupDue } from "./backup-reminder";
+import { WHATS_NEW, markWhatsNewRead, whatsNewUnread } from "./whats-new";
 // Panels and region maps load when first opened.
 const LodgePanel = lazy(() => import("./LodgePanel").then((m) => ({ default: m.LodgePanel })));
 const RescuePanel = lazy(() => import("./RescuePanel").then((m) => ({ default: m.RescuePanel })));
@@ -119,6 +120,7 @@ export default function App() {
     [panel, setPanel] = useState(""),
     [toast, setToast] = useState(""),
     [newTitle, setNewTitle] = useState(""),
+    [newsUnread, setNewsUnread] = useState(() => whatsNewUnread()),
     [near, setNear] = useState(""),
     [position, setPosition] = useState([0, 5]),
     [pet, setPet] = useState(false),
@@ -638,6 +640,22 @@ export default function App() {
                   : "Begin your journey"}{" "}
               <span>→</span>
             </button>
+            <details
+              className={`whats-new${newsUnread ? " unread" : ""}`}
+              onToggle={(e) => {
+                if (e.currentTarget.open) {
+                  markWhatsNewRead();
+                  setNewsUnread(false);
+                }
+              }}
+            >
+              <summary>What's new</summary>
+              <ul>
+                {WHATS_NEW.items.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </details>
             <p className="title-foot">EXPLORE · BEFRIEND · BELONG</p>
           </section>
           <div className="title-location">

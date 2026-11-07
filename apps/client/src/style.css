@@ -1929,3 +1929,46 @@ html[data-large-text="true"] .modal {
 .element-guide thead th {
   opacity: 0.7;
 }
+/* What's new, tucked under the title screen's button. */
+.whats-new {
+  margin-top: 12px;
+  max-width: 420px;
+  color: #f1ecdb;
+  font-size: 13px;
+  text-align: left;
+}
+.whats-new summary {
+  cursor: pointer;
+  opacity: 0.85;
+}
+.whats-new.unread summary::after {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-left: 7px;
+  border-radius: 50%;
+  background: #edcf83;
+  vertical-align: 1px;
+}
+/* Opens upward over the title, so it fits whatever the screen's height. */
+.whats-new {
+  position: relative;
+}
+.whats-new ul {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  bottom: calc(100% + 8px);
+  max-height: 60dvh;
+  margin: 0;
+  overflow: auto;
+  padding: 10px 12px 10px 26px;
+  border: 1px solid #acc6b454;
+  border-radius: 10px;
+  background: #102731f5;
+}
+.whats-new li {
+  margin: 3px 0;
+}

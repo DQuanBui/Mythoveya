@@ -16,6 +16,7 @@ November 10 round (from `6d40e46`). Done this round, newest last:
 - Companion list: the formation panel can filter by element and sort by strength, level or name (`companionChoices`, tested).
 - Element guide: a table in the Team panel and battle log teaches the matchups, generated from `elementMultiplier` (`elementGuide`, tested).
 - Shortcuts: Q, J, T and M open and close Quests, Journal, Team and the map (in `keyboard.spec`), and a controller's Back opens the Journal.
+- What's new: the title screen lists recent changes with an unread marker (`whats-new.ts`, tested; update its list and id with player-facing changes).
 
 Next 3 tasks:
 1. Finish this round: crash screen, dialogs, gamepad, install and offline play, battle star.
