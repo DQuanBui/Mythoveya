@@ -159,6 +159,7 @@ function nextRound(b: Battle) {
           amount: before - victim.hp,
           shield: -absorbed,
         });
+        a.dealt = (a.dealt || 0) + before - victim.hp + absorbed;
       }
       b.log.push(`${byId[a.species].name}'s telegraphed strike resolves.`);
     }
@@ -508,6 +509,10 @@ export function act(
         amount: before.hp - u.hp,
         shield: u.shield - before.shield,
       });
+  }
+  for (const x of amounts) {
+    const foe = b.units.find((u) => u.id === x.id)!.side !== side;
+    actor.dealt = (actor.dealt || 0) + (foe ? Math.max(0, x.amount) + Math.max(0, -x.shield) : Math.max(0, -x.amount) + Math.max(0, x.shield));
   }
   for (const u of b.units)
     if (u.hp === 0 && has(u, "rebirth") && !u.revived) {

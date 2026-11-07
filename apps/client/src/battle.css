@@ -365,3 +365,28 @@
 .result-actions {
   justify-content: center;
 }
+.result-star {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px auto;
+  padding: 4px 14px 4px 4px;
+  border: 1px solid #edcf8366;
+  border-radius: 10px;
+  background: #152e37a6;
+  color: #fff4d6;
+  font-size: 0.9rem;
+  text-align: left;
+}
+.result-star .portrait {
+  width: 46px;
+  height: 46px;
+  flex: none;
+}
+.result-star small {
+  display: block;
+  color: #edcf83;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}

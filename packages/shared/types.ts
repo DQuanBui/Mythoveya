@@ -134,6 +134,8 @@ export type Unit = {
   bank: number;
   skill?: number[];
   crit?: number;
+  /** Damage dealt plus healing and shields given so far this battle. */
+  dealt?: number;
 };
 export type BattleEvent = {
   id: number;

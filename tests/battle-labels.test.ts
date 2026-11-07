@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { battleAnnouncement, battleSummary, unitLabel } from "../apps/client/src/battle-labels";
+import { battleAnnouncement, battleStar, battleSummary, unitLabel } from "../apps/client/src/battle-labels";
 import { elementMultiplier, matchupWord, teamCoverage } from "../packages/shared/elements";
 
 describe("battle creature labels", () => {
@@ -60,5 +60,19 @@ describe("battle announcements", () => {
     expect(battleAnnouncement("Emberfox used Strike.", "Mossprig")).toBe("Emberfox used Strike. Your turn: Mossprig.");
     expect(battleAnnouncement("Emberfox used Strike.", null)).toBe("Emberfox used Strike.");
     expect(battleAnnouncement(undefined, null)).toBe("");
+  });
+});
+describe("battleStar", () => {
+  it("names whoever did the most on your side, ignoring foes", () => {
+    const units = [
+      { id: "a", side: 0, dealt: 40 },
+      { id: "b", side: 0, dealt: 90 },
+      { id: "c", side: 1, dealt: 500 },
+    ];
+    expect(battleStar(units, 0)?.id).toBe("b");
+    expect(battleStar(units, 1)?.id).toBe("c");
+  });
+  it("names nobody when nobody did anything", () => {
+    expect(battleStar([{ side: 0 }, { side: 0, dealt: 0 }], 0)).toBeUndefined();
   });
 });

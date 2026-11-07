@@ -43,3 +43,15 @@ describe("damageEstimate", () => {
       });
   });
 });
+describe("credit for what a companion did", () => {
+  it("adds up damage dealt to foes, shields included, for the one who acted", () => {
+    const b = battle(11),
+      actor = b.units.find((u) => u.id === b.queue[0])!,
+      target = targets(b, actor, 0).find((t) => t.side !== actor.side)!,
+      before = target.hp + target.shield;
+    expect(actor.dealt).toBeUndefined();
+    act(b, actor.side, 0, target.id, 0, true);
+    expect(actor.dealt).toBe(before - target.hp - target.shield);
+    expect(b.units.filter((u) => u.id !== actor.id).every((u) => !u.dealt)).toBe(true);
+  });
+});

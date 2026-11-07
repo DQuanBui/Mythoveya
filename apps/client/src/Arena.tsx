@@ -9,7 +9,7 @@ import { BattleScene } from "./Scene";
 import { audio, settings } from "./audio";
 import { Portrait } from "./portraits";
 import { matchupWord } from "../../../packages/shared/elements";
-import { battleAnnouncement, battleSummary } from "./battle-labels";
+import { battleAnnouncement, battleStar, battleSummary } from "./battle-labels";
 export type Snapshot = {
   code: string;
   players: {
@@ -132,6 +132,7 @@ export function BattleUI({
   const estimate = (t: Unit) => (actor && t.side !== actor.side ? damageEstimate(battle, actor, t, action) : null);
   const chosen = ts.some((t) => t.id === target) ? target : ts[0]?.id || "";
   const chosenUnit = ts.find((t) => t.id === chosen);
+  const star = battle.winner !== null ? battleStar(battle.units, side) : undefined;
   const usable = (i: number) =>
     myTurn &&
     battle.energy[side] >= (options[i]?.cost ?? Infinity) &&
@@ -330,6 +331,15 @@ export function BattleUI({
                 : "Your companions have recovered. Try another formation or train before returning."}
           </p>
           <p className="result-summary">{battleSummary(battle.units, side, battle.round)}</p>
+          {star && (
+            <p className="result-star">
+              <Portrait id={star.species} shimmer={star.shimmer} />
+              <span>
+                <small>{battle.winner === side ? "STAR OF THE BATTLE" : "FOUGHT HARDEST"}</small>
+                {byId[star.species].name} · {star.dealt!.toLocaleString()} damage and healing
+              </span>
+            </p>
+          )}
           {rating && (
             <p className="rating-result">
               Rating {rating.before} → {rating.after} (

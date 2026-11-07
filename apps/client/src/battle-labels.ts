@@ -20,6 +20,12 @@ export function battleSummary(units: { side: number; hp: number }[], side: numbe
     `${foes.filter((u) => u.hp === 0).length} of ${foes.length} foes calmed`,
   ].join(" · ");
 }
+/** The companion who did the most on the viewer's side, if any of them did anything. */
+export function battleStar<U extends { side: number; dealt?: number }>(units: U[], side: number): U | undefined {
+  return units
+    .filter((u) => u.side === side && (u.dealt || 0) > 0)
+    .reduce<U | undefined>((best, u) => (!best || u.dealt! > best.dealt! ? u : best), undefined);
+}
 /** What a screen reader hears as a battle moves on: the latest event and, on
  * the player's turn, who acts next. */
 export function battleAnnouncement(lastLog: string | undefined, myTurnName: string | null) {
