@@ -14,11 +14,12 @@ November 12 round (from `0c51d3c`). Done this round, newest last:
 - Silhouettes: creatures never met show as outlines in the Journal until met.
 - Region scenery: Whisperleaf, Moonfrost and Emberglass scenery load on first visit (entry 444.8 kB to 430.4 kB).
 - What's new: updated for this round.
+- Newcomer fix: night and weather creatures appear from five wins, and wander behind the encounter spot so they never hide its label (`NEWCOMER_WINS`, tested; the five affected journeys pass).
 
 Next 3 tasks:
-1. Finish this round: wild visitors in the world, smarter Auto, a smaller first download, the Journal's seen list.
-2. Decide on the balance outliers in docs/BALANCE.md (Iskavelle still weak, Astravelle strong).
-3. Physical checks: audio, a real phone, a real controller, a real install.
+1. Decide on the balance outliers in docs/BALANCE.md (Iskavelle still weak, Astravelle strong).
+2. Physical checks: audio, a real phone, a real controller, a real install.
+3. Look again at early-game difficulty: at level 1 a starter team wins only about 42% of simulated wild battles even against the familiar six.
 
 ## Play
 

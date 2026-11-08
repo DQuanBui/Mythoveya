@@ -58,11 +58,14 @@ export function wildTimes(region: string, now = Date.now()): WildTime[] {
 export function specialsNow(region: string, times: WildTime[]) {
   return [...new Set(times.flatMap((t) => SPECIAL_WILD[region]?.[t] || []))];
 }
+/** Wins before newcomers turn up: a keeper's first battles, where even the
+ * familiar six are an even match, stay as they were until other regions open. */
+export const NEWCOMER_WINS = 5;
 /** The six a wild encounter brings: the familiar faces, with up to two of
- * whoever is out only now. A keeper's first battle is always the familiar six. */
+ * whoever is out only now, once the keeper has found their feet. */
 export function wildLineup(region: string, times: WildTime[], wins: number, random: () => number) {
   const base = BASE_WILD[region] || BASE_WILD.haven,
-    pool = wins === 0 ? [] : specialsNow(region, times).filter((s) => !base.includes(s)),
+    pool = wins < NEWCOMER_WINS ? [] : specialsNow(region, times).filter((s) => !base.includes(s)),
     picked: string[] = [];
   while (picked.length < 2 && pool.length) picked.push(pool.splice(Math.floor(random() * pool.length), 1)[0]);
   return { species: [...base.slice(0, 6 - picked.length), ...picked], specials: picked };

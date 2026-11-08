@@ -19,7 +19,7 @@ import { Portrait } from "./portraits";
 import { useHover } from "./hover";
 import { currentWeather } from "./Weather";
 import { WEATHER_INFO } from "../../../packages/shared/weather";
-import { specialsNow, wildTimes } from "../../../packages/shared/wild";
+import { NEWCOMER_WINS, specialsNow, wildTimes } from "../../../packages/shared/wild";
 import { eventsReady } from "../../../packages/shared/events";
 import { utcDay } from "../../../packages/shared/town";
 import { islandHour, timeLabel } from "./daytime";
@@ -124,7 +124,7 @@ export function WorldHUD({
   const weather = currentWeather(profile.region);
   // Creatures who come out only at this hour or in this weather.
   const wildNow = wildTimes(profile.region),
-    rareOut = home || fair ? [] : specialsNow(profile.region, wildNow),
+    rareOut = home || fair || profile.wins < NEWCOMER_WINS ? [] : specialsNow(profile.region, wildNow),
     rareWords = { night: "Night", dawn: "Dawn", rain: "Rain", mist: "Mist" };
   const [currency, setCurrency] = useState("");
   const [emotes, setEmotes] = useState(false);

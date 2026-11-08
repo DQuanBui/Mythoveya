@@ -1454,7 +1454,7 @@ export function WorldScene({
   objective: Objective;
   input: MutableRefObject<ExplorationInput>;
 }) {
-  const wildOut = useWildNow(profile.region);
+  const wildOut = useWildNow(profile.region, profile.wins);
   const recover = useContextRecovery("world");
   const initialPosition = useMemo(() => position, [profile.region]);
   const walker = useRef<Walker>({ go: (_t, _r, act) => act?.() });
@@ -1533,17 +1533,16 @@ export function WorldScene({
           <Avatar index={n.avatar} position={n.position} watch />
         </WorldInteraction>
       ))}
-      {/* The encounter spot shows who is about: whoever comes out only at this
-          hour or in this weather, with a second one wandering close by. */}
+      {/* Who is about only at this hour or in this weather wanders just behind
+          the encounter spot (beyond its label from the camera), once the
+          keeper can meet them. */}
       <Roamer
-        key={wildOut[0] || "usual"}
         id={
-          wildOut[0] ||
-          (profile.region === "canyon"
+          profile.region === "canyon"
             ? "magmole"
             : profile.region === "hollow"
               ? "snowmew"
-              : "mossprig")
+              : "mossprig"
         }
         activate={() => onInteract("encounter")}
         disabled={blocked}
@@ -1551,16 +1550,16 @@ export function WorldScene({
         hint={wildOut.length ? `${wildOut.map((id) => byId[id].name).join(", ")} ${wildOut.length > 1 ? "are" : "is"} out now · Click to meet Ranger Tali` : "Click to meet Ranger Tali"}
         position={[-6, 0, 6]}
       />
-      {wildOut[1] && (
+      {wildOut.slice(0, 2).map((species, i) => (
         <HabitatResident
-          key={wildOut[1]}
-          site={{ species: wildOut[1], point: [-8.6, 8.2], radius: 1.4 }}
-          index={9}
+          key={species}
+          site={{ species, point: i ? [-3.8, 2.6] : [-8.8, 3.2], radius: 1.2 }}
+          index={9 + i}
           onInteract={onInteract}
           interactId="encounter"
           disabled={blocked}
         />
-      )}
+      ))}
       <Roamer
         id={
           profile.region === "canyon"

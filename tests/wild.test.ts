@@ -43,8 +43,9 @@ describe("wild times", () => {
   });
 });
 describe("wild lineups", () => {
-  it("keeps a keeper's first battle to the familiar six", () => {
-    expect(wildLineup("haven", ["night", "rain"], 0, rand)).toEqual({ species: BASE_WILD.haven, specials: [] });
+  it("keeps a keeper's first battles to the familiar six, until other regions open", () => {
+    for (const wins of [0, 1, 4]) expect(wildLineup("haven", ["night", "rain"], wins, rand)).toEqual({ species: BASE_WILD.haven, specials: [] });
+    expect(wildLineup("haven", ["night", "rain"], 5, rand).specials.length).toBe(2);
   });
   it("brings up to two creatures who are out only now, still six in all", () => {
     const { species, specials } = wildLineup("haven", ["night", "rain"], 5, rand);

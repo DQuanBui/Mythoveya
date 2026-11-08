@@ -32,7 +32,7 @@ describe("wild encounters by time and weather", () => {
   it("bring night creatures out after dark, and offer one a bond after a win", () => {
     vi.useFakeTimers({ toFake: ["Date"] });
     vi.setSystemTime(clearNight());
-    const token = keeper(3),
+    const token = keeper(5),
       b = game.startPve(authenticate(token), false),
       species = b.units.filter((u) => u.side === 1).map((u) => u.species),
       night = species.filter((s) => SPECIAL_WILD.haven.night!.includes(s));

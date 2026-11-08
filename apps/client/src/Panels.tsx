@@ -14,7 +14,7 @@ import { ELEMENT_NAMES, teamCoverage } from "../../../packages/shared/elements";
 import { companionChoices, recentLineups, suggestTeam, teamPower } from "../../../packages/shared/lineups";
 import { HairDyePicker } from "./HairDyePicker";
 import { ElementGuide } from "./ElementGuide";
-import { WILD_TIME_NAMES, matchesWildFilter, seenOrOwned, specialsNow, wildHints, wildTimes } from "../../../packages/shared/wild";
+import { NEWCOMER_WINS, WILD_TIME_NAMES, matchesWildFilter, seenOrOwned, specialsNow, wildHints, wildTimes } from "../../../packages/shared/wild";
 import {
   power,
   makeBattle,
@@ -34,9 +34,9 @@ export type Mutation = (
   data?: Record<string, unknown>,
 ) => Promise<any>;
 /** Who is out in the wild only now, where the keeper is. */
-function WildNow({ region }: { region: string }) {
+function WildNow({ region, wins }: { region: string; wins: number }) {
   const times = wildTimes(region),
-    out = specialsNow(region, times);
+    out = wins < NEWCOMER_WINS ? [] : specialsNow(region, times);
   if (!out.length) return null;
   return (
     <p className="wild-hint">
@@ -218,7 +218,7 @@ export function Collection({
         </small>
       </h2>
       <p className="muted">Every bond begins with a little curiosity.</p>
-      <WildNow region={profile.region} />
+      <WildNow region={profile.region} wins={profile.wins} />
       <div className="filters">
         <input
           placeholder="Search creatures…"
