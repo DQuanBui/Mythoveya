@@ -34,3 +34,15 @@ describe("newlyEarned", () => {
     expect(newlyEarned(earnedMilestones(save(25)), save(26))).toBeUndefined();
   });
 });
+describe("Night Watcher", () => {
+  it("counts different creatures met only at certain times", () => {
+    const p = newProfile("m", "Owl", 0),
+      own = (species: string) => p.owned.push({ id: species, species, level: 1, xp: 0, shards: 0, upgrade: 0, locked: false });
+    const watcher = () => milestoneProgress(p).find((m) => m.id === "after-dark")!;
+    for (const s of ["duskblob", "lanternmoth", "dawnfawn", "bubbloom"]) own(s);
+    own("mossprig");
+    expect(watcher().value).toBe(4);
+    own("prismoth");
+    expect(watcher().done).toBe(true);
+  });
+});

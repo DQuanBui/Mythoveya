@@ -1,6 +1,7 @@
 import type { Profile } from "./types";
 import { byId } from "./content";
 import { lodgeCount } from "./lodges";
+import { SPECIAL_SPECIES } from "./wild";
 
 // Lifetime milestones, read straight from the save (nothing extra is stored).
 // Each completed milestone grants a title; the keeper badge shows the most
@@ -22,6 +23,7 @@ export const MILESTONES: Milestone[] = [
   { id: "caches", title: "Treasure Seeker", text: "Open all eight Skyglass caches.", goal: 8, value: (p) => p.town?.caches?.length || 0 },
   { id: "evolve", title: "Evolver", text: "Evolve a companion.", goal: 1, value: (p) => (p.owned.some((o) => byId[o.species]?.evolvedFrom) ? 1 : 0) },
   { id: "shimmer", title: "Starcatcher", text: "Befriend a shimmering companion.", goal: 1, value: (p) => (p.owned.some((o) => o.shimmer) ? 1 : 0) },
+  { id: "after-dark", title: "Night Watcher", text: "Befriend five creatures that come out only at night, at dawn, or in rain or mist.", goal: 5, value: (p) => new Set(p.owned.map((o) => o.species).filter((s) => SPECIAL_SPECIES.includes(s))).size },
   { id: "season", title: "Lantern Seeker", text: "Find every lantern of a seasonal festival.", goal: 1, value: (p) => p.seasons?.done.length || 0 },
   { id: "lodges", title: "Hearth Host", text: "Host a gathering at all four Wayfarer Lodges.", goal: 4, value: lodgeCount },
   { id: "guardians", title: "Guardian Friend", text: "Calm four region guardians.", goal: 4, value: (p) => p.bosses.length },
