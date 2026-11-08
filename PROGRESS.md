@@ -19,9 +19,10 @@ November 11 round (from `d03d7f8`). Done this round, newest last:
 - Run by default: a setting that makes running the default and Shift walk (`run-rule.ts`, tested; measured in the browser).
 - Journal filter: When to meet narrows the Journal to who is out now, or to night, dawn, rain or mist creatures (`matchesWildFilter`, tested).
 - Journal grid: the third column of cards is no longer cut off on phones; under 480 px it shows two per row.
+- What's new: the title screen lists this round's changes.
 
 Next 3 tasks:
-1. Finish this round: companion activities, creatures by time and weather, balance report, problem reports.
+1. Read the full browser run recorded in PROGRESS.md; then decide on the balance outliers in docs/BALANCE.md (Iskavelle is still weak, Astravelle strong).
 2. Physical checks: audio, a real phone, a real controller, a real install.
 3. Trim the entry chunk and the first-frame work when entering a region.
 
