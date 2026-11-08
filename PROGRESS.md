@@ -13,6 +13,7 @@ November 12 round (from `0c51d3c`). Done this round, newest last:
 - Journal seen: the heading counts seen creatures, their cards say so, and a filter lists those seen but not yet bonded.
 - Silhouettes: creatures never met show as outlines in the Journal until met.
 - Region scenery: Whisperleaf, Moonfrost and Emberglass scenery load on first visit (entry 444.8 kB to 430.4 kB).
+- What's new: updated for this round.
 
 Next 3 tasks:
 1. Finish this round: wild visitors in the world, smarter Auto, a smaller first download, the Journal's seen list.
