@@ -2015,3 +2015,12 @@ html[data-large-text="true"] .modal {
     overflow-wrap: anywhere;
   }
 }
+/* Creatures not yet met show only their outline until you meet them. */
+.creature-card.unmet .portrait {
+  filter: brightness(0) saturate(0);
+  opacity: 0.45;
+}
+html[data-contrast="true"] .creature-card.unmet .portrait {
+  filter: brightness(0) saturate(0) drop-shadow(0 0 1px #fff);
+  opacity: 0.8;
+}

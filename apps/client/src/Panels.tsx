@@ -291,7 +291,7 @@ export function Collection({
           return (
             <button
               key={s.id}
-              className={`creature-card ${o ? "" : "unowned"}`}
+              className={`creature-card ${o ? "" : "unowned"}${met.has(s.id) ? "" : " unmet"}`}
               onClick={() => {
                 audio.voice(s.id);
                 setDetail(s.id);

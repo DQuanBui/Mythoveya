@@ -11,6 +11,7 @@ November 12 round (from `0c51d3c`). Done this round, newest last:
 - Encounter spot: whoever is out only now stands at the wild encounter spot, with a second close by (`wild-now.ts`; checked at night in the browser).
 - Seen list: creatures met in any non-practice battle are noted on the save (`Profile.seen`, optional; `noteSeen`, tested).
 - Journal seen: the heading counts seen creatures, their cards say so, and a filter lists those seen but not yet bonded.
+- Silhouettes: creatures never met show as outlines in the Journal until met.
 
 Next 3 tasks:
 1. Finish this round: wild visitors in the world, smarter Auto, a smaller first download, the Journal's seen list.
