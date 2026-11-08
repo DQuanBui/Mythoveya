@@ -8,6 +8,7 @@ import {
   SPECIAL_WILD,
   bondCandidate,
   matchesWildFilter,
+  specialLevel,
   specialsNow,
   wildHints,
   wildLineup,
@@ -87,5 +88,12 @@ describe("the Journal's when-to-meet filter", () => {
   it("finds a creature by its time in any region", () => {
     expect(matchesWildFilter("murkfang", "night", "haven", [])).toBe(true);
     expect(matchesWildFilter("mossprig", "night", "haven", [])).toBe(false);
+  });
+});
+describe("specialLevel", () => {
+  it("brings newcomers in a little below the usual level, never below 1", () => {
+    expect(specialLevel(1)).toBe(1);
+    expect(specialLevel(10)).toBe(6);
+    expect(specialLevel(30)).toBeLessThan(30);
   });
 });

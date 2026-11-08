@@ -37,6 +37,8 @@ describe("wild encounters by time and weather", () => {
       species = b.units.filter((u) => u.side === 1).map((u) => u.species),
       night = species.filter((s) => SPECIAL_WILD.haven.night!.includes(s));
     expect(night.length).toBe(2);
+    const level = (s: string) => b.units.find((u) => u.side === 1 && u.species === s)!.level;
+    for (const s of night) expect(level(s)).toBeLessThanOrEqual(level(BASE_WILD.haven[0]));
     expect(b.title).toBe("Wild encounter at night");
     for (const u of b.units) if (u.side === 1) u.hp = 0;
     b.winner = 0;

@@ -4,11 +4,12 @@ Updated with the November 11 round; its commits are dated November 8, 2026 (roun
 
 ## Next up
 
-November 11 round is complete: 15 commits from `d03d7f8` plus this record, all pushed. Its full browser run failed one journey; the causes are found and are the first fixes of the next round.
+November 12 round (from `0c51d3c`). Done this round, newest last:
+- Wild balance: newcomers fight at 60% of the usual level and two lopsided picks were swapped, after simulating every region at levels 3-20 (`specialLevel`, tested).
 
 Next 3 tasks:
-1. Fix what the November 11 browser run found: `keeper-life.spec` hard-codes 13 titles (Night Watcher made 14), and the newcomers made wild battles much harder as keepers level up (simulated: a misty lineup beat a starter team 97% of the time at level 10), which also made `lodges.spec` flaky.
-2. Decide on the balance outliers in `docs/BALANCE.md` (Iskavelle still weak, Astravelle strong).
+1. Finish this round: wild visitors in the world, smarter Auto, a smaller first download, the Journal's seen list.
+2. Decide on the balance outliers in docs/BALANCE.md (Iskavelle still weak, Astravelle strong).
 3. Physical checks: audio, a real phone, a real controller, a real install.
 
 ## Play

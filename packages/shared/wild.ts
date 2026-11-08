@@ -17,13 +17,13 @@ export const SPECIAL_WILD: Record<string, Partial<Record<WildTime, string[]>>> =
     night: ["duskblob", "shadecko", "lanternmoth"],
     dawn: ["dawnfawn", "glimlet"],
     rain: ["bubbloom", "reedlet", "coralisk"],
-    mist: ["prismoth", "fernibble"],
+    mist: ["prismoth", "wickwaddle"],
   },
   meadow: {
     night: ["lanternmoth", "duskblob"],
-    dawn: ["dawnfawn", "fernibble"],
+    dawn: ["dawnfawn", "glimlet"],
     rain: ["reedlet", "bubbloom"],
-    mist: ["prismoth", "floraclaw"],
+    mist: ["prismoth", "chimewing"],
   },
   canyon: {
     night: ["murkfang", "shadecko"],
@@ -40,6 +40,9 @@ export const SPECIAL_WILD: Record<string, Partial<Record<WildTime, string[]>>> =
 export const WILD_TIME_NAMES: Record<WildTime, string> = { night: "at night", dawn: "at dawn", rain: "in the rain", mist: "in the mist" };
 const REGION_NAMES: Record<string, string> = { haven: "Havenreach", meadow: "Whisperleaf", canyon: "Emberglass", hollow: "Moonfrost" };
 
+/** Newcomers are higher-tier than the familiar six and grow faster, so they
+ * come in below the usual level (measured with simulated battles). */
+export const specialLevel = (level: number) => Math.max(1, Math.round(level * 0.6));
 /** What is true of the wild right now in a region. */
 export function wildTimes(region: string, now = Date.now()): WildTime[] {
   const hour = worldHour(now),

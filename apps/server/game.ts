@@ -9,7 +9,7 @@ import { canyonOf, CANYON_BEACONS } from "../../packages/shared/canyon";
 import { canyonMutation } from "./canyon-game";
 import { expeditionOf, FIELD_NODES } from "../../packages/shared/wildwood";
 import { expeditionMutation } from "./expedition-game";
-import { BASE_WILD, SPECIAL_WILD, WILD_TIME_NAMES, bondCandidate, wildLineup, wildTimes } from "../../packages/shared/wild";
+import { BASE_WILD, SPECIAL_WILD, WILD_TIME_NAMES, bondCandidate, specialLevel, wildLineup, wildTimes } from "../../packages/shared/wild";
 import { randomInt, randomUUID } from "node:crypto";
 import {
   byId,
@@ -290,10 +290,11 @@ export function startPve(
   // The time of day and the weather bring out creatures seen only then.
   const times = wildTimes(p.region),
     { species: ids, specials } = boss || practice ? { species: BASE_WILD[p.region] || BASE_WILD.haven, specials: [] } : wildLineup(p.region, times, p.wins, random);
+  const level = Math.max(1, p.level - (p.wins === 0 ? 2 : 1) + (boss ? 2 : 0));
   const enemy: Owned[] = ids.map((species, i) => ({
     id: `enemy-${i}`,
     species,
-    level: Math.max(1, p.level - (p.wins === 0 ? 2 : 1) + (boss ? 2 : 0)),
+    level: specials.includes(species) ? specialLevel(level) : level,
     xp: 0,
     shards: 0,
     upgrade: 0,
