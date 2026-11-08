@@ -1991,3 +1991,27 @@ html[data-large-text="true"] .modal {
   border-radius: 8px;
   padding: 8px;
 }
+/* Journal cards: columns may shrink below their names' width, and a phone
+   shows two, so the last column is never cut off. */
+.creature-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+@media (max-width: 1300px) {
+  .creature-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@media (max-width: 850px) {
+  .creature-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 480px) {
+  .creature-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .creature-card strong {
+    font-size: 16px;
+    overflow-wrap: anywhere;
+  }
+}

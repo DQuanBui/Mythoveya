@@ -18,6 +18,7 @@ November 11 round (from `d03d7f8`). Done this round, newest last:
 - Rumble: a connected controller buzzes on ultimates and knock-outs when Camera shake is on (checked with a stand-in pad).
 - Run by default: a setting that makes running the default and Shift walk (`run-rule.ts`, tested; measured in the browser).
 - Journal filter: When to meet narrows the Journal to who is out now, or to night, dawn, rain or mist creatures (`matchesWildFilter`, tested).
+- Journal grid: the third column of cards is no longer cut off on phones; under 480 px it shows two per row.
 
 Next 3 tasks:
 1. Finish this round: companion activities, creatures by time and weather, balance report, problem reports.
