@@ -12,6 +12,7 @@ November 11 round (from `d03d7f8`). Done this round, newest last:
 - Journal hints: each creature's page says where and when it is met in the wild, and the Journal lists who is out right now (`wildHints`, `specialsNow`).
 - Night Watcher: a keeper title for befriending five creatures that come out only at certain times (tested).
 - Iskavelle fix: its Absolute Stillness stunned its own side and did nothing; abilities that lead with a hindrance now target foes (only Iskavelle changed; guarded by `ability-targets.test.ts`).
+- Balance report: `npm run balance` plays 20,000 seeded auto-battles and writes `docs/BALANCE.md` (found the Iskavelle bug; tuning the remaining outliers is a decision for the owner).
 
 Next 3 tasks:
 1. Finish this round: companion activities, creatures by time and weather, balance report, problem reports.
