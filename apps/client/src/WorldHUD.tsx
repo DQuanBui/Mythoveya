@@ -19,6 +19,7 @@ import { Portrait } from "./portraits";
 import { useHover } from "./hover";
 import { currentWeather } from "./Weather";
 import { WEATHER_INFO } from "../../../packages/shared/weather";
+import { specialsNow, wildTimes } from "../../../packages/shared/wild";
 import { eventsReady } from "../../../packages/shared/events";
 import { utcDay } from "../../../packages/shared/town";
 import { islandHour, timeLabel } from "./daytime";
@@ -121,6 +122,10 @@ export function WorldHUD({
   const touch = useCoarsePointer();
   const time = timeLabel(islandHour());
   const weather = currentWeather(profile.region);
+  // Creatures who come out only at this hour or in this weather.
+  const wildNow = wildTimes(profile.region),
+    rareOut = home || fair ? [] : specialsNow(profile.region, wildNow),
+    rareWords = { night: "Night", dawn: "Dawn", rain: "Rain", mist: "Mist" };
   const [currency, setCurrency] = useState("");
   const [emotes, setEmotes] = useState(false);
   // During a festival, sense how close the nearest unfound lantern is.
@@ -203,6 +208,15 @@ export function WorldHUD({
               ? "Snow"
               : WEATHER_INFO[weather].name}
           </em>
+          {rareOut.length > 0 && (
+            <button
+              className="time-chip wild-chip"
+              title={`Out in the wild only now: ${rareOut.map((id) => byId[id].name).join(", ")}. Open the Journal to see more.`}
+              onClick={() => open("collection")}
+            >
+              <span aria-hidden="true">❦</span> {wildNow.map((t) => rareWords[t]).join(" & ")} creatures are out
+            </button>
+          )}
           {sense && (
             <em className={`time-chip lantern-sense ${sense.hot ? "hot" : ""}`} aria-live="polite" title="An unfound festival lantern is close by">
               <span aria-hidden="true">{sense.icon}</span> {sense.hot ? "Lantern very close!" : "A lantern glows nearby"}
