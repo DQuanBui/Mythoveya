@@ -9,6 +9,7 @@ November 11 round (from `d03d7f8`). Done this round, newest last:
 - Creature motions: `sniff`, `dig` and `look` in `animateCreature` (tested).
 - Companion activities: while waiting, the companion explores, sniffs out ungathered things nearby, laps the keeper, digs, pounces and looks about (`companion-idle.ts`, tested; watched in the browser).
 - Wild by time and weather: night, dawn, rain and mist bring their own creatures in each region, and they get the bond offer after a win (`packages/shared/wild.ts`, tested; server test at a fixed night).
+- Journal hints: each creature's page says where and when it is met in the wild, and the Journal lists who is out right now (`wildHints`, `specialsNow`).
 
 Next 3 tasks:
 1. Finish this round: companion activities, creatures by time and weather, balance report, problem reports.

@@ -14,6 +14,7 @@ import { ELEMENT_NAMES, teamCoverage } from "../../../packages/shared/elements";
 import { companionChoices, recentLineups, suggestTeam, teamPower } from "../../../packages/shared/lineups";
 import { HairDyePicker } from "./HairDyePicker";
 import { ElementGuide } from "./ElementGuide";
+import { WILD_TIME_NAMES, specialsNow, wildHints, wildTimes } from "../../../packages/shared/wild";
 import {
   power,
   makeBattle,
@@ -31,6 +32,17 @@ export type Mutation = (
   kind: string,
   data?: Record<string, unknown>,
 ) => Promise<any>;
+/** Who is out in the wild only now, where the keeper is. */
+function WildNow({ region }: { region: string }) {
+  const times = wildTimes(region),
+    out = specialsNow(region, times);
+  if (!out.length) return null;
+  return (
+    <p className="wild-hint">
+      <b>Out in the wild now</b> ({times.map((t) => WILD_TIME_NAMES[t]).join(", ")}): {out.map((id) => byId[id].name).join(", ")}
+    </p>
+  );
+}
 export function Collection({
   profile,
   run,
@@ -87,6 +99,11 @@ export function Collection({
               {s.appearance}. A wild spirit of Mythoveya, drawn to keepers who
               share its courage.
             </p>
+            {wildHints(s.id).length > 0 && (
+              <p className="wild-hint">
+                <b>Met in the wild:</b> {wildHints(s.id).join(" · ")}
+              </p>
+            )}
             <div className="stats-row">
               <span>
                 HP <b>{s.stats.hp}</b>
@@ -194,6 +211,7 @@ export function Collection({
         </small>
       </h2>
       <p className="muted">Every bond begins with a little curiosity.</p>
+      <WildNow region={profile.region} />
       <div className="filters">
         <input
           placeholder="Search creatures…"

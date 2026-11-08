@@ -1972,3 +1972,12 @@ html[data-large-text="true"] .modal {
 .whats-new li {
   margin: 3px 0;
 }
+.wild-hint {
+  margin: 6px 0;
+  font-size: 0.85rem;
+  color: #d4dcc6;
+}
+.wild-hint b {
+  color: #edcf83;
+  font-weight: 600;
+}
