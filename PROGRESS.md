@@ -4,12 +4,13 @@ Updated with the November 10 round; its commits are dated November 7, 2026 (roun
 
 ## Next up
 
-November 10 round is complete: 12 commits from `6d40e46` plus this record, all pushed.
+November 11 round (from `d03d7f8`). Done this round, newest last:
+- Companion space: the follow distance grows with the creature's body, and it steps aside when walked into (`companion-space.ts`, tested; measured 0.5 m before, about 1.2 m now).
 
 Next 3 tasks:
-1. Physical checks only a person can do: listen to the audio, try a real phone or tablet, and try a real controller (all controller testing so far used a stand-in).
-2. Install the online game on a device and check it updates cleanly after a deployment; the offline path is proven in the smoke, but a real install is not.
-3. Trim the entry chunk (474.6 kB, up about 8 kB this round) and the remaining first-frame work when entering a region.
+1. Finish this round: companion activities, creatures by time and weather, balance report, problem reports.
+2. Physical checks: audio, a real phone, a real controller, a real install.
+3. Trim the entry chunk and the first-frame work when entering a region.
 
 ## Play
 

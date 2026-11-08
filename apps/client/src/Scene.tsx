@@ -55,6 +55,7 @@ import { worldFocus, worldHeading, keeperEmote, EMOTES, playEmote, nightState, c
 import { findPath, startGrid, type GridBuild, type WalkGrid } from "../../../packages/shared/pathfind";
 import { buildInSlices } from "./grid-slices";
 import { padInput } from "./gamepad";
+import { bodyReach, personalSpace, stepAside } from "./companion-space";
 import { lazy, Suspense, useMemo, useRef, useEffect, useState, useCallback } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Stars } from "@react-three/drei";
@@ -783,6 +784,7 @@ export function Explorer({
       ),
     [leader?.species, leader?.accessory, leader?.shimmer],
   );
+  const reach = useMemo(() => bodyReach(companion), [companion]);
   const player = useRef(new T.Vector3(spawn[0], 0, spawn[1]));
   const keys = useRef(new Set<string>());
   const { camera, gl, scene } = useThree();
@@ -1131,8 +1133,15 @@ export function Explorer({
     umbrella.visible = !area && weatherFx.rain > 0.35 && !weatherFx.snow && !keeperEmote.name;
     if (umbrella.visible) swingLantern(umbrella, clock.elapsedTime * 0.5, moving, settings.reduced);
     const delta = player.current.clone().sub(follow.current);
-    // After dark the companion keeps closer to the keeper's side.
-    const following = delta.length() > (!area && nightState.glow > 0.6 ? 1.15 : 1.6);
+    // The companion keeps room for its own body: it follows once the keeper is
+    // a little way off (closer after dark) and steps aside if walked into.
+    const space = personalSpace(reach, !area && nightState.glow > 0.6),
+      following = delta.length() > space.follow,
+      aside = following ? null : stepAside(delta.x, delta.z, space.min, dt);
+    if (aside) {
+      const [ax, az] = slideStep(follow.current.x, follow.current.z, aside[0], aside[1], allowed);
+      follow.current.set(ax, ground(ax, az), az);
+    }
     if (following) {
       if (delta.length() > 6) follow.current.copy(player.current);
       else {
