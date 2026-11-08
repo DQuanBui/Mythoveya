@@ -92,3 +92,12 @@ export function matchesWildFilter(species: string, filter: string, region: strin
   if (filter === "now") return specialsNow(region, times).includes(species);
   return Object.values(SPECIAL_WILD).some((r) => r[filter as WildTime]?.includes(species));
 }
+/** Notes the creatures met in a battle in the keeper's Journal. */
+export function noteSeen(p: { seen?: string[] }, species: string[]) {
+  const seen = new Set(p.seen || []);
+  for (const s of species) seen.add(s);
+  if (seen.size !== (p.seen?.length || 0)) p.seen = [...seen];
+}
+/** Every species the keeper has met or befriended. */
+export const seenOrOwned = (p: { seen?: string[]; owned: { species: string }[] }) =>
+  new Set([...(p.seen || []), ...p.owned.map((o) => o.species)]);

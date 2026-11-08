@@ -107,6 +107,8 @@ export type Profile = {
   seasons?: import("./seasons").SeasonState;
   /** Optional hair dye id from `HAIR_DYES` (looks.ts); absent means natural. */
   hair?: string;
+  /** Species met in battle, bonded or not (optional; older saves start empty). */
+  seen?: string[];
 };
 export type Status = {
   kind: string;

@@ -9,7 +9,7 @@ import { canyonOf, CANYON_BEACONS } from "../../packages/shared/canyon";
 import { canyonMutation } from "./canyon-game";
 import { expeditionOf, FIELD_NODES } from "../../packages/shared/wildwood";
 import { expeditionMutation } from "./expedition-game";
-import { BASE_WILD, SPECIAL_WILD, WILD_TIME_NAMES, bondCandidate, specialLevel, wildLineup, wildTimes } from "../../packages/shared/wild";
+import { BASE_WILD, SPECIAL_WILD, WILD_TIME_NAMES, bondCandidate, noteSeen, specialLevel, wildLineup, wildTimes } from "../../packages/shared/wild";
 import { randomInt, randomUUID } from "node:crypto";
 import {
   byId,
@@ -535,6 +535,8 @@ export function finishPve(profileId: string, b: Battle) {
     };
     const meta = battleMeta.get(b.id);
     const town = ensureTown(p);
+    // Everyone met in battle goes in the Journal as seen, won or lost.
+    if (meta?.region !== "practice") noteSeen(p, b.units.filter((u) => u.side === 1).map((u) => u.species));
     if (meta?.canyon) {
       const c=canyonOf(p), rewarded=b.winner===0 && !c.guardian;
       if(rewarded) { c.guardian=true;p.canyon=c;p.gold+=90;gainXp(p,100);p.wins++;p.daily.wins++;track(p,"wins"); }

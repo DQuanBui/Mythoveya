@@ -8,6 +8,8 @@ import {
   SPECIAL_WILD,
   bondCandidate,
   matchesWildFilter,
+  noteSeen,
+  seenOrOwned,
   specialLevel,
   specialsNow,
   wildHints,
@@ -95,5 +97,15 @@ describe("specialLevel", () => {
     expect(specialLevel(1)).toBe(1);
     expect(specialLevel(10)).toBe(6);
     expect(specialLevel(30)).toBeLessThan(30);
+  });
+});
+describe("the Journal's seen list", () => {
+  it("adds new creatures once, and leaves an untouched save alone", () => {
+    const p: { seen?: string[]; owned: { species: string }[] } = { owned: [{ species: "emberfox" }] };
+    noteSeen(p, []);
+    expect(p.seen).toBeUndefined();
+    noteSeen(p, ["mossprig", "duskblob", "mossprig"]);
+    expect(p.seen).toEqual(["mossprig", "duskblob"]);
+    expect(seenOrOwned(p)).toEqual(new Set(["mossprig", "duskblob", "emberfox"]));
   });
 });
