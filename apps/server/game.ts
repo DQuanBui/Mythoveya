@@ -9,6 +9,7 @@ import { canyonOf, CANYON_BEACONS } from "../../packages/shared/canyon";
 import { canyonMutation } from "./canyon-game";
 import { expeditionOf, FIELD_NODES } from "../../packages/shared/wildwood";
 import { expeditionMutation } from "./expedition-game";
+import { BASE_WILD, SPECIAL_WILD, WILD_TIME_NAMES, bondCandidate, wildLineup, wildTimes } from "../../packages/shared/wild";
 import { randomInt, randomUUID } from "node:crypto";
 import {
   byId,
@@ -79,7 +80,7 @@ export type Mission = {
 };
 export const battleMeta = new Map<
   string,
-  { region: string; boss: boolean } & Mission
+  { region: string; boss: boolean; specials?: string[] } & Mission
 >();
 const random = () => randomInt(0, 0x100000000) / 0x100000000;
 /** Consumes pending Apothecary tonics and adds their bonus to a battle team. */
@@ -286,26 +287,9 @@ export function startPve(
   if (mission.expedition) return startExpedition(p);
   if (mission.stage || mission.dungeon || mission.tower)
     return startMission(p, mission);
-  const ids =
-    p.region === "canyon"
-      ? ["magmole", "cragpup", "voltwing", "flintuff", "cindermite", "emberfox"]
-      : p.region === "hollow"
-        ? [
-            "snowmew",
-            "shadecko",
-            "glimlet",
-            "frostwhisk",
-            "duskblob",
-            "rimeowl",
-          ]
-        : [
-            "mossprig",
-            "pebblit",
-            "puddlepip",
-            "cindermite",
-            "zippinch",
-            "thornhare",
-          ];
+  // The time of day and the weather bring out creatures seen only then.
+  const times = wildTimes(p.region),
+    { species: ids, specials } = boss || practice ? { species: BASE_WILD[p.region] || BASE_WILD.haven, specials: [] } : wildLineup(p.region, times, p.wins, random);
   const enemy: Owned[] = ids.map((species, i) => ({
     id: `enemy-${i}`,
     species,
@@ -329,7 +313,9 @@ export function startPve(
         : p.region === "hollow"
           ? "Hollow Sentinel"
           : "Thorncrown"
-      : "Wild encounter";
+      : specials.length
+        ? `Wild encounter ${WILD_TIME_NAMES[times.find((t) => specials.some((x) => SPECIAL_WILD[p.region]?.[t]?.includes(x)))!]}`
+        : "Wild encounter";
   b.arena = practice
     ? "arena"
     : p.region === "canyon"
@@ -354,7 +340,7 @@ export function startPve(
   }
   b.wild = !practice && !boss;
   pve.set(p.id, b);
-  battleMeta.set(b.id, { region: practice ? "practice" : p.region, boss });
+  battleMeta.set(b.id, { region: practice ? "practice" : p.region, boss, specials });
   return b;
 }
 const enemyTeam = (species: string[], level: number): Owned[] =>
@@ -604,11 +590,11 @@ export function finishPve(profileId: string, b: Battle) {
       p.gold += 80;
       p.tokens++;
       gainXp(p, 90);
-      const candidate = b.units.find(
-        (u) => u.side === 1 && ["E", "D", "C"].includes(byId[u.species].tier),
+      const candidate = bondCandidate(
+        b.units.filter((u) => u.side === 1).map((u) => u.species),
+        meta?.specials || [],
       );
-      if (candidate)
-        p.bond = { species: candidate.species, chance: 0.8, used: false };
+      if (candidate) p.bond = { species: candidate, chance: 0.8, used: false };
       if (meta?.boss && !p.bosses.includes(meta.region)) {
         p.bosses.push(meta.region);
         own(

@@ -8,6 +8,7 @@ November 11 round (from `d03d7f8`). Done this round, newest last:
 - Companion space: the follow distance grows with the creature's body, and it steps aside when walked into (`companion-space.ts`, tested; measured 0.5 m before, about 1.2 m now).
 - Creature motions: `sniff`, `dig` and `look` in `animateCreature` (tested).
 - Companion activities: while waiting, the companion explores, sniffs out ungathered things nearby, laps the keeper, digs, pounces and looks about (`companion-idle.ts`, tested; watched in the browser).
+- Wild by time and weather: night, dawn, rain and mist bring their own creatures in each region, and they get the bond offer after a win (`packages/shared/wild.ts`, tested; server test at a fixed night).
 
 Next 3 tasks:
 1. Finish this round: companion activities, creatures by time and weather, balance report, problem reports.
