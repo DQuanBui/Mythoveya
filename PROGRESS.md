@@ -1,30 +1,34 @@
 # Mythoveya handoff
 
-Updated with the November 11 round; its commits are dated November 8, 2026 (round names ran ahead of the calendar and are kept as a sequence). Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`, pushed to `origin/main` (https://github.com/DQuanBui/Mythoveya). This handoff covers fourteen rounds: October 29 (from `4619fdc`), October 30 (from `b0d6c3d`), October 31 (from `3497bb3`), November 1 (from `3d8496d`) November 2 (from `9d221ef`), November 3 (from `933a869`), November 4 (from `d37297c`), November 5 (from `1e622b9`), November 6 (from `040b6f1`), November 7 (from `a9be583`) November 8 (from `7661c95`), November 9 (from `6657ade`), November 10 (from `6d40e46`) and November 11 (from `d03d7f8`). Earlier handoffs (October 28 online-build session, October 22 Wayfarer Lodges) are archived in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md). Preserve ignored `data/mythoveya.sqlite`. `CLAUDE.md` is the quick project map for new sessions.
+Updated with the November 12 round; its commits are dated November 8, 2026 (round names ran ahead of the calendar and are kept as a sequence). Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`, pushed to `origin/main` (https://github.com/DQuanBui/Mythoveya). This handoff covers fifteen rounds: October 29 (from `4619fdc`), October 30 (from `b0d6c3d`), October 31 (from `3497bb3`), November 1 (from `3d8496d`) November 2 (from `9d221ef`), November 3 (from `933a869`), November 4 (from `d37297c`), November 5 (from `1e622b9`), November 6 (from `040b6f1`), November 7 (from `a9be583`) November 8 (from `7661c95`), November 9 (from `6657ade`), November 10 (from `6d40e46`), November 11 (from `d03d7f8`) and November 12 (from `0c51d3c`). Earlier handoffs (October 28 online-build session, October 22 Wayfarer Lodges) are archived in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md). Preserve ignored `data/mythoveya.sqlite`. `CLAUDE.md` is the quick project map for new sessions.
 
 ## Next up
 
-November 12 round (from `0c51d3c`). Done this round, newest last:
-- Wild balance: newcomers fight at 60% of the usual level and two lopsided picks were swapped, after simulating every region at levels 3-20 (`specialLevel`, tested).
-- Title count: `keeper-life.spec` reads the number of titles from `MILESTONES` instead of a fixed 13.
-- Smaller first download: the battle stage moved to `BattleScene.tsx`, loaded with the battle screens (entry 483.5 kB to 444.3 kB).
-- Encounter spot: whoever is out only now stands at the wild encounter spot, with a second close by (`wild-now.ts`; checked at night in the browser).
-- Seen list: creatures met in any non-practice battle are noted on the save (`Profile.seen`, optional; `noteSeen`, tested).
-- Journal seen: the heading counts seen creatures, their cards say so, and a filter lists those seen but not yet bonded.
-- Silhouettes: creatures never met show as outlines in the Journal until met.
-- Region scenery: Whisperleaf, Moonfrost and Emberglass scenery load on first visit (entry 444.8 kB to 430.4 kB).
-- What's new: updated for this round.
-- Newcomer fix: night and weather creatures appear from five wins, and wander behind the encounter spot so they never hide its label (`NEWCOMER_WINS`, tested; the five affected journeys pass).
+November 12 round is complete: 10 commits from `0c51d3c` plus this record, all pushed.
 
 Next 3 tasks:
-1. Decide on the balance outliers in docs/BALANCE.md (Iskavelle still weak, Astravelle strong).
+1. Decide on the balance outliers in `docs/BALANCE.md` (Iskavelle still weak, Astravelle strong). Tuning creature numbers is the owner's call.
 2. Physical checks: audio, a real phone, a real controller, a real install.
-3. Look again at early-game difficulty: at level 1 a starter team wins only about 42% of simulated wild battles even against the familiar six.
+3. Early-game difficulty: at level 1 a starter team wins only about 42% of simulated wild battles even against the familiar six, which is why scripted journeys sometimes need several tries to earn five wins.
 
 ## Play
 
 - **Online (single-player):** https://dquanbui.github.io/Mythoveya/. `.github/workflows/pages.yml` publishes it on every push to `main` (Pages source: GitHub Actions). Check a deployment with `node scripts/smoke-pages.mjs https://dquanbui.github.io/Mythoveya/`.
 - **Local (full game, including the human arena):** `npm install`, then run `Play Mythoveya.cmd` or `npm run dev` and open http://127.0.0.1:5173/. For the compiled build, run `npm run build && npm start` and open http://127.0.0.1:2567/.
+
+## Implemented November 12
+
+- Wild balance (`specialLevel`, `NEWCOMER_WINS` in `packages/shared/wild.ts`, tested): the night, dawn, rain and mist newcomers are higher-tier and grew faster than keepers, so wild battles got far harder with levels (simulated: a misty lineup beat a starter team 97% of the time at level 10). They now fight at 60% of the usual level, two lopsided picks (Fernibble, Floraclaw) were swapped, and newcomers appear only from five wins, when other regions open. Simulated across all regions at levels 3-20: night is a little tougher, nothing lopsided.
+- `keeper-life.spec` counts titles from `MILESTONES` instead of a fixed 13.
+- Smaller first download: the battle stage moved to `BattleScene.tsx` (loaded with the battle screens), and Whisperleaf, Moonfrost and Emberglass scenery load on first visit. Entry 483.5 kB to 430.2 kB.
+- Encounter spot: whoever is out only now wanders just behind each region's wild encounter spot, and the hover hint names them (`wild-now.ts`). They stand behind the spot because world labels hide when something blocks the camera's view, and a newcomer at the spot hid its label in one journey.
+- Journal: creatures met in any non-practice battle are remembered (`Profile.seen`, optional; `noteSeen`, tested), counted in the heading, marked "Seen in the wild", and listed by a "Seen, not yet bonded" filter. Creatures never met show as silhouettes.
+- Tried and dropped: a smarter keeper Auto. In 4,000 simulated battles each, aiming at elemental weaknesses lowered the win rate from 52.0% to 47.5%, and saving heals or finishing off foes first made no difference. Focusing the weakest foe is already the better rule, so nothing changed.
+
+Verification:
+
+- Typecheck and content audit pass. Vitest: 65 files, 319 tests pass (more since, for the final fix). Both builds and both smokes pass.
+- Playwright full run (51.2 min): all 37 passed, 3 only on retry (`canyon` and `rally` could not earn five wins to unlock a region; `journey` waited on a hidden encounter label). All three were traced to the newcomers and fixed in the last commit; the five affected journeys then passed without retries. The full suite was not rerun after that fix.
 
 ## Implemented November 11
 

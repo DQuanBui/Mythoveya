@@ -61,6 +61,8 @@ Creatures drop onto the field with a puff of dust. Each attacks in its family's 
 
 The target list says how strong each choice is and about how much damage it deals, before critical hits and the random roll. After practice you can go straight into another match, and after losing a story stage you can try it again from the result screen.
 
+Once you have five wins, night, dawn, rain and mist bring their own wild creatures, and they wander near each region's wild encounter spot. The Journal remembers every creature you have met and shows the rest as silhouettes.
+
 Open **How elements work** in the Team panel or the battle log to see what beats what. The result screen names the star of each battle.
 
 In the **Team** panel, *Suggest a team* fills the slots with your strongest six, and *Recent lineups* brings back a team you saved before. Neither changes anything until you press *Save formation*.
