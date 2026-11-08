@@ -56,6 +56,7 @@ import { findPath, startGrid, type GridBuild, type WalkGrid } from "../../../pac
 import { buildInSlices } from "./grid-slices";
 import { padInput } from "./gamepad";
 import { bodyReach, personalSpace, stepAside } from "./companion-space";
+import { DURATION, activityPose, outingTarget, pickActivity, type Activity } from "./companion-idle";
 import { lazy, Suspense, useMemo, useRef, useEffect, useState, useCallback } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Stars } from "@react-three/drei";
@@ -812,6 +813,10 @@ export function Explorer({
   const puffed = useRef(false);
   const shook = useRef(-9);
   const wasFollowing = useRef(false);
+  // Something the companion is doing on its own while it waits.
+  const activity = useRef<{ kind: Activity; start: number; from: { x: number; z: number }; to: { x: number; z: number } } | null>(null),
+    nextActivity = useRef(4),
+    activities = useRef(0);
   const follow = useRef(new T.Vector3(spawn[0] - 1, 0, spawn[1] + 1.5)),
     rest = useRef(0);
   const route = useRef<Route | null>(null),
@@ -1135,8 +1140,50 @@ export function Explorer({
     const delta = player.current.clone().sub(follow.current);
     // The companion keeps room for its own body: it follows once the keeper is
     // a little way off (closer after dark) and steps aside if walked into.
-    const space = personalSpace(reach, !area && nightState.glow > 0.6),
-      following = delta.length() > space.follow,
+    const space = personalSpace(reach, !area && nightState.glow > 0.6);
+    // While it waits, the companion finds things to do: a sniff about (at
+    // anything still to be gathered nearby), a lap round the keeper, a dig,
+    // a pounce or a good look around. Any move of the keeper's ends it.
+    const free =
+      !moving && !pet && !keeperEmote.name && Date.now() >= companionJoy.until && !settings.reduced && rest.current < 12 &&
+      clock.elapsedTime - shook.current > 0.9 && clock.elapsedTime - sneezed.current > 0.9;
+    let act = activity.current;
+    if (act && (!free || clock.elapsedTime - act.start > DURATION[act.kind])) {
+      activity.current = act = null;
+      nextActivity.current = clock.elapsedTime + 2.5 + ((clock.elapsedTime * 3.7) % 3);
+    }
+    if (!act && free && rest.current > 2.5 && clock.elapsedTime > nextActivity.current && delta.length() <= space.follow) {
+      const kind = pickActivity(activities.current++, companion.userData.index || 0),
+        from = { x: follow.current.x, z: follow.current.z },
+        keeperAt = { x: player.current.x, z: player.current.z };
+      let interest: { x: number; z: number } | undefined;
+      if (kind === "explore" && !area)
+        for (const obj of getInteractables(profile.region))
+          if (
+            obj.id.startsWith("resource") &&
+            !profile.resources.includes(`${profile.region}:${obj.id}`) &&
+            Math.hypot(obj.p[0] - from.x, obj.p[2] - from.z) < 7
+          )
+            interest = { x: obj.p[0], z: obj.p[2] };
+      act = activity.current = { kind, start: clock.elapsedTime, from, to: outingTarget(from, keeperAt, clock.elapsedTime % 1, interest) };
+      // A lap needs room to pass the keeper without brushing them.
+      if (kind === "circle" && delta.length() < space.min + 0.2) act.kind = "play";
+    }
+    const pose = act ? activityPose(act.kind, (clock.elapsedTime - act.start) / DURATION[act.kind], act.from, { x: player.current.x, z: player.current.z }, act.to) : null;
+    let heading: number | null = null;
+    if (pose) {
+      const mx = pose.x - follow.current.x,
+        mz = pose.z - follow.current.z,
+        d = Math.hypot(mx, mz),
+        step = Math.min(d, dt * 4.5);
+      if (d > 0.02) {
+        const [ax, az] = slideStep(follow.current.x, follow.current.z, (mx / d) * step, (mz / d) * step, allowed);
+        if (Math.hypot(ax - follow.current.x, az - follow.current.z) < step * 0.3) activity.current = null;
+        follow.current.set(ax, ground(ax, az), az);
+        heading = Math.atan2(mx, mz);
+      }
+    }
+    const following = !pose && delta.length() > space.follow,
       aside = following ? null : stepAside(delta.x, delta.z, space.min, dt);
     if (aside) {
       const [ax, az] = slideStep(follow.current.x, follow.current.z, aside[0], aside[1], allowed);
@@ -1172,10 +1219,18 @@ export function Explorer({
       }
     }
     companion.position.copy(follow.current);
-    companion.rotation.y = Math.atan2(
-      player.current.x - follow.current.x,
-      player.current.z - follow.current.z,
-    );
+    companion.rotation.y =
+      heading ??
+      Math.atan2(
+        player.current.x - follow.current.x,
+        player.current.z - follow.current.z,
+      );
+    // A dig throws up a little earth.
+    if (pose?.motion === "dig" && clock.elapsedTime - paw.current > 0.18) {
+      paw.current = clock.elapsedTime;
+      const cy = companion.rotation.y;
+      emitPuff(follow.current.x + Math.sin(cy) * 0.3, follow.current.y + 0.05, follow.current.z + Math.cos(cy) * 0.3, -Math.sin(cy), -Math.cos(cy), clock.elapsedTime, "dust");
+    }
     // Stopping after a walk in the rain, the companion shakes itself dry.
     if (wasFollowing.current && !following && weatherFx.rain > 0.35 && !area) {
       shook.current = clock.elapsedTime;
@@ -1203,19 +1258,20 @@ export function Explorer({
     }
     if (!sneezing) puffed.current = false;
     // Waiting at the keeper's side, the companion looks up at them.
-    companion.userData.gaze = !following && !moving && delta.length() < 2.4 ? COMPANION_GAZE : null;
+    companion.userData.gaze = !pose && !following && !moving && delta.length() < 2.4 ? COMPANION_GAZE : null;
     companionRest.napping = !area && rest.current > 14 && !following;
     companionRest.at.copy(follow.current);
     companionRest.top = companion.userData.headAt[0] * companion.scale.x + 0.25;
-    // Left waiting long enough, the companion curls up for a nap.
-    rest.current = following || moving || pet || Date.now() < companionJoy.until || (keeperEmote.name && keeperEmote.name !== "sit") ? 0 : rest.current + dt;
+    // Left waiting long enough, the companion curls up for a nap (its own
+    // little outings don't count towards it).
+    rest.current = following || moving || pet || Date.now() < companionJoy.until || (keeperEmote.name && keeperEmote.name !== "sit") ? 0 : rest.current + (pose ? 0 : dt);
     animateCreature(
       companion,
       clock.elapsedTime,
       // The companion joins in: it hops at a wave, plays along with a cheer or
       // dance, and settles down low when the keeper sits (later dozing off).
-      shaking && !following ? "shake" : sneezing ? "sneeze" : pet || keeperEmote.name === "wave" || (!following && Date.now() < companionJoy.until) ? "victory" : following ? "walk" : keeperEmote.name === "cheer" || keeperEmote.name === "dance" ? "play" : keeperEmote.name === "sit" && rest.current < 14 ? "guard" : rest.current > 14 ? "sleep" : rest.current > 12.6 ? "stretch" : "idle",
-      shaking ? (clock.elapsedTime - shook.current) / 0.9 : sneezing ? (clock.elapsedTime - sneezed.current) / 0.9 : rest.current > 12.6 && rest.current <= 14 ? (rest.current - 12.6) / 1.4 : 0,
+      pose ? pose.motion : shaking && !following ? "shake" : sneezing ? "sneeze" : pet || keeperEmote.name === "wave" || (!following && Date.now() < companionJoy.until) ? "victory" : following ? "walk" : keeperEmote.name === "cheer" || keeperEmote.name === "dance" ? "play" : keeperEmote.name === "sit" && rest.current < 14 ? "guard" : rest.current > 14 ? "sleep" : rest.current > 12.6 ? "stretch" : "idle",
+      pose ? pose.phase : shaking ? (clock.elapsedTime - shook.current) / 0.9 : sneezing ? (clock.elapsedTime - sneezed.current) / 0.9 : rest.current > 12.6 && rest.current <= 14 ? (rest.current - 12.6) / 1.4 : 0,
       settings.reduced,
     );
     if (controls.current)
