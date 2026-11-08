@@ -1,35 +1,35 @@
 # Mythoveya handoff
 
-Updated with the November 10 round; its commits are dated November 7, 2026 (round names ran ahead of the calendar and are kept as a sequence). Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`, pushed to `origin/main` (https://github.com/DQuanBui/Mythoveya). This handoff covers thirteen rounds: October 29 (from `4619fdc`), October 30 (from `b0d6c3d`), October 31 (from `3497bb3`), November 1 (from `3d8496d`) November 2 (from `9d221ef`), November 3 (from `933a869`), November 4 (from `d37297c`), November 5 (from `1e622b9`), November 6 (from `040b6f1`), November 7 (from `a9be583`) November 8 (from `7661c95`), November 9 (from `6657ade`) and November 10 (from `6d40e46`). Earlier handoffs (October 28 online-build session, October 22 Wayfarer Lodges) are archived in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md). Preserve ignored `data/mythoveya.sqlite`. `CLAUDE.md` is the quick project map for new sessions.
+Updated with the November 11 round; its commits are dated November 8, 2026 (round names ran ahead of the calendar and are kept as a sequence). Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`, pushed to `origin/main` (https://github.com/DQuanBui/Mythoveya). This handoff covers fourteen rounds: October 29 (from `4619fdc`), October 30 (from `b0d6c3d`), October 31 (from `3497bb3`), November 1 (from `3d8496d`) November 2 (from `9d221ef`), November 3 (from `933a869`), November 4 (from `d37297c`), November 5 (from `1e622b9`), November 6 (from `040b6f1`), November 7 (from `a9be583`) November 8 (from `7661c95`), November 9 (from `6657ade`), November 10 (from `6d40e46`) and November 11 (from `d03d7f8`). Earlier handoffs (October 28 online-build session, October 22 Wayfarer Lodges) are archived in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md). Preserve ignored `data/mythoveya.sqlite`. `CLAUDE.md` is the quick project map for new sessions.
 
 ## Next up
 
-November 11 round (from `d03d7f8`). Done this round, newest last:
-- Companion space: the follow distance grows with the creature's body, and it steps aside when walked into (`companion-space.ts`, tested; measured 0.5 m before, about 1.2 m now).
-- Creature motions: `sniff`, `dig` and `look` in `animateCreature` (tested).
-- Companion activities: while waiting, the companion explores, sniffs out ungathered things nearby, laps the keeper, digs, pounces and looks about (`companion-idle.ts`, tested; watched in the browser).
-- Wild by time and weather: night, dawn, rain and mist bring their own creatures in each region, and they get the bond offer after a win (`packages/shared/wild.ts`, tested; server test at a fixed night).
-- Journal hints: each creature's page says where and when it is met in the wild, and the Journal lists who is out right now (`wildHints`, `specialsNow`).
-- Night Watcher: a keeper title for befriending five creatures that come out only at certain times (tested).
-- Iskavelle fix: its Absolute Stillness stunned its own side and did nothing; abilities that lead with a hindrance now target foes (only Iskavelle changed; guarded by `ability-targets.test.ts`).
-- Balance report: `npm run balance` plays 20,000 seeded auto-battles and writes `docs/BALANCE.md` (found the Iskavelle bug; tuning the remaining outliers is a decision for the owner).
-- Problem reports: Sound & settings copies the build, device, graphics, place, settings and recent errors for a bug message (`diagnostics.ts`, tested).
-- Rare-creature chip: the HUD says when night, dawn, rain or mist creatures are out and opens the Journal (hidden on phones with the other location chips).
-- Rumble: a connected controller buzzes on ultimates and knock-outs when Camera shake is on (checked with a stand-in pad).
-- Run by default: a setting that makes running the default and Shift walk (`run-rule.ts`, tested; measured in the browser).
-- Journal filter: When to meet narrows the Journal to who is out now, or to night, dawn, rain or mist creatures (`matchesWildFilter`, tested).
-- Journal grid: the third column of cards is no longer cut off on phones; under 480 px it shows two per row.
-- What's new: the title screen lists this round's changes.
+November 11 round is complete: 15 commits from `d03d7f8` plus this record, all pushed. Its full browser run failed one journey; the causes are found and are the first fixes of the next round.
 
 Next 3 tasks:
-1. Read the full browser run recorded in PROGRESS.md; then decide on the balance outliers in docs/BALANCE.md (Iskavelle is still weak, Astravelle strong).
-2. Physical checks: audio, a real phone, a real controller, a real install.
-3. Trim the entry chunk and the first-frame work when entering a region.
+1. Fix what the November 11 browser run found: `keeper-life.spec` hard-codes 13 titles (Night Watcher made 14), and the newcomers made wild battles much harder as keepers level up (simulated: a misty lineup beat a starter team 97% of the time at level 10), which also made `lodges.spec` flaky.
+2. Decide on the balance outliers in `docs/BALANCE.md` (Iskavelle still weak, Astravelle strong).
+3. Physical checks: audio, a real phone, a real controller, a real install.
 
 ## Play
 
 - **Online (single-player):** https://dquanbui.github.io/Mythoveya/. `.github/workflows/pages.yml` publishes it on every push to `main` (Pages source: GitHub Actions). Check a deployment with `node scripts/smoke-pages.mjs https://dquanbui.github.io/Mythoveya/`.
 - **Local (full game, including the human arena):** `npm install`, then run `Play Mythoveya.cmd` or `npm run dev` and open http://127.0.0.1:5173/. For the compiled build, run `npm run build && npm start` and open http://127.0.0.1:2567/.
+
+## Implemented November 11
+
+- Companion space (`companion-space.ts`, tested): the follow distance grows with the creature's body, and when walked into it steps back and aside faster than the keeper walks. Walking straight at Thornhare got to about 0.5 m before and about 1.2 m after.
+- Companion activities (`companion-idle.ts`, tested; new `sniff`, `dig` and `look` motions in `animateCreature`): while waiting, the companion explores and comes back, sniffs at ungathered resources within 7 m, laps the keeper, digs, pounces and looks about. Outings pause the nap timer; off with Reduced Motion. Watched in the browser.
+- Wild by time and weather (`packages/shared/wild.ts`, tested; `wild-server.test.ts` at a fixed night): night, dawn, rain and mist bring up to two extra creatures into wild encounters, and one of them gets the bond offer. A keeper's first battle, guardians and practice are unchanged.
+- Journal: where and when each creature is met, who is out now, and a When to meet filter. HUD chip when such creatures are out (hidden on phones with the other location chips). Night Watcher title for befriending five.
+- Iskavelle fix: abilities that do no damage were assumed to help allies, so its stun and slow targeted its own side and did nothing. A dump of every ability shows it is the only one changed; `ability-targets.test.ts` guards both directions.
+- Balance report: `npm run balance` plays 20,000 seeded auto-battles and writes `docs/BALANCE.md`.
+- Problem reports (`diagnostics.ts`, tested), controller rumble on ultimates and knock-outs (follows Camera shake), Run by default setting (`run-rule.ts`, tested), Journal grid fixed on phones, What's new updated.
+
+Verification:
+
+- Typecheck and content audit pass. Vitest: 65 files, 317 tests pass. Both builds and both smokes pass; entry 483.5 kB, up about 9 kB.
+- Playwright full run (43.1 min): 35 passed, 1 flaky, 1 failed. `keeper-life.spec` failed twice: it expects 13 titles and Night Watcher made 14. `lodges.spec` failed once (its script could not win five wild battles in twelve tries) and passed on retry. Simulation then showed why: the newcomers grow faster than the familiar six, so wild battles got far harder as keepers level up. Both are fixed at the start of the next round.
 
 ## Implemented November 10
 
