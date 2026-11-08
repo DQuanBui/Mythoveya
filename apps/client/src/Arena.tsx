@@ -5,7 +5,7 @@ import type { Battle, Profile, Unit } from "../../../packages/shared/types";
 import { session, STANDALONE } from "./api";
 import { byId } from "../../../packages/shared/content";
 import { bondChance, damageEstimate, targets } from "../../../packages/shared/combat";
-import { BattleScene } from "./Scene";
+import { BattleScene } from "./BattleScene";
 import { audio, settings } from "./audio";
 import { Portrait } from "./portraits";
 import { matchupWord } from "../../../packages/shared/elements";

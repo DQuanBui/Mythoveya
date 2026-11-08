@@ -7,6 +7,7 @@ Updated with the November 11 round; its commits are dated November 8, 2026 (roun
 November 12 round (from `0c51d3c`). Done this round, newest last:
 - Wild balance: newcomers fight at 60% of the usual level and two lopsided picks were swapped, after simulating every region at levels 3-20 (`specialLevel`, tested).
 - Title count: `keeper-life.spec` reads the number of titles from `MILESTONES` instead of a fixed 13.
+- Smaller first download: the battle stage moved to `BattleScene.tsx`, loaded with the battle screens (entry 483.5 kB to 444.3 kB).
 
 Next 3 tasks:
 1. Finish this round: wild visitors in the world, smarter Auto, a smaller first download, the Journal's seen list.

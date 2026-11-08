@@ -24,7 +24,8 @@ import {
 import type { Profile, Battle } from "../../../packages/shared/types";
 import { audio, settings } from "./audio";
 import { Portrait } from "./portraits";
-import { Preview, BattleScene } from "./Scene";
+import { Preview } from "./Scene";
+import { BattleScene } from "./BattleScene";
 import { api } from "./api";
 import type { Motion } from "./models";
 import { RecruitmentStage } from "./RecruitmentStage";
