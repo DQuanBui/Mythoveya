@@ -296,7 +296,12 @@ export const SPECIES: Species[] = roster.map((r, i) => {
   const tank = r.role === "tank",
     healer = r.role === "healer";
   const fx = mechanics[i];
-  const support = !fx.includes("damage") && !fx.includes("delay");
+  // An ability helps allies unless it hurts: it deals damage, plants a delayed
+  // strike, or leads with a hindrance such as a stun (Iskavelle once stunned
+  // its own side, which the engine then ignored). Crysalune's shield-and-slow
+  // leads with the shield, and combat turns its slow on the foes.
+  const support =
+    !fx.includes("damage") && !fx.includes("delay") && !["stun", "slow", "silence", "weaken", "mark", "burn"].includes(fx[0]);
   const signature = r.signature.split(
     / (?:applies|heals|grants|reduces|gains|temporarily|cleanses|briefly|shields|removes|lowers|deals|protects|chains|makes|plants|hits|burns|delays|provides|raises|interrupts|advances|damages|absorbs|breaks|reflects|suppresses|sweeps|intercepts|follows|slows|boosts|partially|banks|marks|charges|distributes|restores|erects|revives|weakens|sends)/,
   )[0];

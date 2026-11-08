@@ -11,6 +11,7 @@ November 11 round (from `d03d7f8`). Done this round, newest last:
 - Wild by time and weather: night, dawn, rain and mist bring their own creatures in each region, and they get the bond offer after a win (`packages/shared/wild.ts`, tested; server test at a fixed night).
 - Journal hints: each creature's page says where and when it is met in the wild, and the Journal lists who is out right now (`wildHints`, `specialsNow`).
 - Night Watcher: a keeper title for befriending five creatures that come out only at certain times (tested).
+- Iskavelle fix: its Absolute Stillness stunned its own side and did nothing; abilities that lead with a hindrance now target foes (only Iskavelle changed; guarded by `ability-targets.test.ts`).
 
 Next 3 tasks:
 1. Finish this round: companion activities, creatures by time and weather, balance report, problem reports.
