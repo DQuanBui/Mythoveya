@@ -14,7 +14,7 @@ import { ELEMENT_NAMES, teamCoverage } from "../../../packages/shared/elements";
 import { companionChoices, recentLineups, suggestTeam, teamPower } from "../../../packages/shared/lineups";
 import { HairDyePicker } from "./HairDyePicker";
 import { ElementGuide } from "./ElementGuide";
-import { WILD_TIME_NAMES, matchesWildFilter, specialsNow, wildHints, wildTimes } from "../../../packages/shared/wild";
+import { WILD_TIME_NAMES, matchesWildFilter, seenOrOwned, specialsNow, wildHints, wildTimes } from "../../../packages/shared/wild";
 import {
   power,
   makeBattle,
@@ -62,7 +62,8 @@ export function Collection({
     [detail, setDetail] = useState<string | null>(null),
     [confirm, setConfirm] = useState(false),
     [when, setWhen] = useState("");
-  const times = wildTimes(profile.region);
+  const times = wildTimes(profile.region),
+    met = seenOrOwned(profile);
   const list = ALL_SPECIES.filter(
     (s) =>
       s.name.toLowerCase().includes(query.toLowerCase()) &&
@@ -70,7 +71,9 @@ export function Collection({
       (!element || s.element === element) &&
       (!role || s.role === role) &&
       (!owned ||
-        (owned === "owned") === profile.owned.some((o) => o.species === s.id)) &&
+        (owned === "seen"
+          ? met.has(s.id) && !profile.owned.some((o) => o.species === s.id)
+          : (owned === "owned") === profile.owned.some((o) => o.species === s.id))) &&
       matchesWildFilter(s.id, when, profile.region, times),
   ).sort((a, b) => {
     const oa = profile.owned.find((o) => o.species === a.id),
@@ -211,7 +214,7 @@ export function Collection({
       <h2>
         {training ? "Training grounds" : "Meet the Wildbound"}{" "}
         <small>
-          {profile.owned.length} / {ALL_SPECIES.length} bonded
+          {profile.owned.length} / {ALL_SPECIES.length} bonded · {met.size} seen
         </small>
       </h2>
       <p className="muted">Every bond begins with a little curiosity.</p>
@@ -261,6 +264,7 @@ export function Collection({
           <option value="">All species</option>
           <option value="owned">Owned</option>
           <option value="unowned">Unowned</option>
+          <option value="seen">Seen, not yet bonded</option>
         </select>
         <select aria-label="When to meet" value={when} onChange={(e) => setWhen(e.target.value)}>
           <option value="">Any time</option>
@@ -303,7 +307,7 @@ export function Collection({
               <small>
                 {o
                   ? `Lv. ${o.level} · ${power(o)} power${o.locked ? " · ★" : ""}`
-                  : "Not yet bonded"}
+                  : met.has(s.id) ? "Seen in the wild" : "Not yet bonded"}
               </small>
             </button>
           );
