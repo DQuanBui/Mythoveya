@@ -15,6 +15,7 @@ November 11 round (from `d03d7f8`). Done this round, newest last:
 - Balance report: `npm run balance` plays 20,000 seeded auto-battles and writes `docs/BALANCE.md` (found the Iskavelle bug; tuning the remaining outliers is a decision for the owner).
 - Problem reports: Sound & settings copies the build, device, graphics, place, settings and recent errors for a bug message (`diagnostics.ts`, tested).
 - Rare-creature chip: the HUD says when night, dawn, rain or mist creatures are out and opens the Journal (hidden on phones with the other location chips).
+- Rumble: a connected controller buzzes on ultimates and knock-outs when Camera shake is on (checked with a stand-in pad).
 
 Next 3 tasks:
 1. Finish this round: companion activities, creatures by time and weather, balance report, problem reports.

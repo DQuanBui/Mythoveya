@@ -54,7 +54,7 @@ import { WalkContext, type Walker } from "./hover";
 import { worldFocus, worldHeading, keeperEmote, EMOTES, playEmote, nightState, companionJoy, companionRest } from "./village-materials";
 import { findPath, startGrid, type GridBuild, type WalkGrid } from "../../../packages/shared/pathfind";
 import { buildInSlices } from "./grid-slices";
-import { padInput } from "./gamepad";
+import { padInput, rumble } from "./gamepad";
 import { bodyReach, personalSpace, stepAside } from "./companion-space";
 import { DURATION, activityPose, outingTarget, pickActivity, type Activity } from "./companion-idle";
 import { lazy, Suspense, useMemo, useRef, useEffect, useState, useCallback } from "react";
@@ -1836,6 +1836,7 @@ function BattleCamera({
 }) {
   const { camera, size } = useThree();
   const saved = useRef<{ pos: T.Vector3; look: T.Vector3 } | null>(null);
+  const rumbled = useRef("");
   useFrame(() => {
     const cam = camera as T.PerspectiveCamera;
     const e = battle.event;
@@ -1876,6 +1877,12 @@ function BattleCamera({
     cam.fov = Math.max(base, fit) - amount;
     // A knock-out lands with a short jolt as the creature topples.
     const knockout = !preview && !!e && p > 0.78 && p < 0.9 && e.amounts.some((a) => a.amount > 0 && battle.units.find((u) => u.id === a.id)?.hp === 0);
+    // A controller buzzes with the jolts: ultimates hit hard, knock-outs thud.
+    const jolt = !preview && settings.shake && !settings.reduced && e ? (ultimate && p > 0.43 && p < 0.57 ? "ultimate" : knockout ? "knockout" : "") : "";
+    if (jolt && rumbled.current !== `${e!.id}-${jolt}`) {
+      rumbled.current = `${e!.id}-${jolt}`;
+      rumble(jolt === "ultimate" ? 0.9 : 0.5, jolt === "ultimate" ? 260 : 140);
+    }
     cam.setViewOffset(
       size.width,
       size.height,

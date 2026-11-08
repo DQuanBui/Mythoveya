@@ -1290,7 +1290,7 @@ export default function App() {
                     <dt>P</dt>
                     <dd>Photo mode · G to pose</dd>
                     <dt>Controller</dt>
-                    <dd>Left stick walks · right stick turns the camera · trigger sprints · A uses · Start pauses · Back opens the Journal · Y resets the camera · D-pad emotes</dd>
+                    <dd>Left stick walks · right stick turns the camera · trigger sprints · A uses · Start pauses · Back opens the Journal · Y resets the camera · D-pad emotes · rumbles in battle when Camera shake is on</dd>
                     <dt>Controller in menus</dt>
                     <dd>D-pad moves · A selects · B backs out</dd>
                     <dt>Controller in battle</dt>

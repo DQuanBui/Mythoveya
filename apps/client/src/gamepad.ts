@@ -59,3 +59,8 @@ export function startGamepad() {
     }
   });
 }
+/** A short buzz on a controller that can, scaled 0-1. Silent without one. */
+export function rumble(strength: number, ms: number) {
+  const pad = [...navigator.getGamepads()].find((p) => p?.connected) as (Gamepad & { vibrationActuator?: { playEffect: (type: string, params: object) => Promise<unknown> } }) | undefined;
+  pad?.vibrationActuator?.playEffect("dual-rumble", { duration: ms, strongMagnitude: strength, weakMagnitude: Math.min(1, strength * 1.4) }).catch(() => {});
+}
