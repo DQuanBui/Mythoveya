@@ -14,7 +14,7 @@ import { ELEMENT_NAMES, teamCoverage } from "../../../packages/shared/elements";
 import { companionChoices, recentLineups, suggestTeam, teamPower } from "../../../packages/shared/lineups";
 import { HairDyePicker } from "./HairDyePicker";
 import { ElementGuide } from "./ElementGuide";
-import { WILD_TIME_NAMES, specialsNow, wildHints, wildTimes } from "../../../packages/shared/wild";
+import { WILD_TIME_NAMES, matchesWildFilter, specialsNow, wildHints, wildTimes } from "../../../packages/shared/wild";
 import {
   power,
   makeBattle,
@@ -59,7 +59,9 @@ export function Collection({
     [owned, setOwned] = useState(training ? "owned" : ""),
     [sort, setSort] = useState("roster"),
     [detail, setDetail] = useState<string | null>(null),
-    [confirm, setConfirm] = useState(false);
+    [confirm, setConfirm] = useState(false),
+    [when, setWhen] = useState("");
+  const times = wildTimes(profile.region);
   const list = ALL_SPECIES.filter(
     (s) =>
       s.name.toLowerCase().includes(query.toLowerCase()) &&
@@ -67,7 +69,8 @@ export function Collection({
       (!element || s.element === element) &&
       (!role || s.role === role) &&
       (!owned ||
-        (owned === "owned") === profile.owned.some((o) => o.species === s.id)),
+        (owned === "owned") === profile.owned.some((o) => o.species === s.id)) &&
+      matchesWildFilter(s.id, when, profile.region, times),
   ).sort((a, b) => {
     const oa = profile.owned.find((o) => o.species === a.id),
       ob = profile.owned.find((o) => o.species === b.id);
@@ -257,6 +260,15 @@ export function Collection({
           <option value="">All species</option>
           <option value="owned">Owned</option>
           <option value="unowned">Unowned</option>
+        </select>
+        <select aria-label="When to meet" value={when} onChange={(e) => setWhen(e.target.value)}>
+          <option value="">Any time</option>
+          <option value="now">Out in the wild now</option>
+          {(Object.keys(WILD_TIME_NAMES) as (keyof typeof WILD_TIME_NAMES)[]).map((t) => (
+            <option key={t} value={t}>
+              Seen {WILD_TIME_NAMES[t]}
+            </option>
+          ))}
         </select>
         <select
           aria-label="Sort"

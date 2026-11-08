@@ -82,3 +82,10 @@ export function wildHints(species: string) {
 }
 /** Every creature that turns up only at certain times, anywhere. */
 export const SPECIAL_SPECIES = [...new Set(Object.values(SPECIAL_WILD).flatMap((r) => Object.values(r).flat()))] as string[];
+/** The Journal's "when to meet" filter: "" for all, "now" for who is out where
+ * the keeper is, or a time such as "night" anywhere. */
+export function matchesWildFilter(species: string, filter: string, region: string, times: WildTime[]) {
+  if (!filter) return true;
+  if (filter === "now") return specialsNow(region, times).includes(species);
+  return Object.values(SPECIAL_WILD).some((r) => r[filter as WildTime]?.includes(species));
+}

@@ -7,6 +7,7 @@ import {
   SPECIAL_SPECIES,
   SPECIAL_WILD,
   bondCandidate,
+  matchesWildFilter,
   specialsNow,
   wildHints,
   wildLineup,
@@ -75,5 +76,16 @@ describe("wildHints", () => {
     expect(wildHints("duskblob")).toEqual(expect.arrayContaining(["Moonfrost, any time", "Havenreach, at night"]));
     expect(wildHints("mossprig")).toContain("Havenreach, any time");
     expect(wildHints("astralynx")).toEqual([]);
+  });
+});
+describe("the Journal's when-to-meet filter", () => {
+  it("shows everyone with no filter, and who is out now with 'now'", () => {
+    expect(matchesWildFilter("astralynx", "", "haven", [])).toBe(true);
+    expect(matchesWildFilter("duskblob", "now", "haven", ["night"])).toBe(true);
+    expect(matchesWildFilter("duskblob", "now", "haven", ["rain"])).toBe(false);
+  });
+  it("finds a creature by its time in any region", () => {
+    expect(matchesWildFilter("murkfang", "night", "haven", [])).toBe(true);
+    expect(matchesWildFilter("mossprig", "night", "haven", [])).toBe(false);
   });
 });
