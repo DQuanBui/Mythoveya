@@ -50,6 +50,7 @@ import { worldFocus, worldHeading, keeperEmote, EMOTES, playEmote, nightState, c
 import { findPath, startGrid, type GridBuild, type WalkGrid } from "../../../packages/shared/pathfind";
 import { buildInSlices } from "./grid-slices";
 import { padInput } from "./gamepad";
+import { useWildNow } from "./wild-now";
 import { runs } from "./run-rule";
 import { bodyReach, personalSpace, stepAside } from "./companion-space";
 import { DURATION, activityPose, outingTarget, pickActivity, type Activity } from "./companion-idle";
@@ -61,7 +62,7 @@ import { byId, REGIONS } from "../../../packages/shared/content";
 import { NPCS, npcSignal } from "../../../packages/shared/town";
 import { TownScenery, dressCompanion, dressKeeper } from "./TownScenery";
 import { HavenTerrain } from "./HavenTerrain";
-import { HavenWildlife } from "./HavenWildlife";
+import { HabitatResident, HavenWildlife } from "./HavenWildlife";
 import {
   havenWalkable,
   HAVEN_PLACES,
@@ -1452,6 +1453,7 @@ export function WorldScene({
   objective: Objective;
   input: MutableRefObject<ExplorationInput>;
 }) {
+  const wildOut = useWildNow(profile.region);
   const recover = useContextRecovery("world");
   const initialPosition = useMemo(() => position, [profile.region]);
   const walker = useRef<Walker>({ go: (_t, _r, act) => act?.() });
@@ -1530,20 +1532,34 @@ export function WorldScene({
           <Avatar index={n.avatar} position={n.position} watch />
         </WorldInteraction>
       ))}
+      {/* The encounter spot shows who is about: whoever comes out only at this
+          hour or in this weather, with a second one wandering close by. */}
       <Roamer
+        key={wildOut[0] || "usual"}
         id={
-          profile.region === "canyon"
+          wildOut[0] ||
+          (profile.region === "canyon"
             ? "magmole"
             : profile.region === "hollow"
               ? "snowmew"
-              : "mossprig"
+              : "mossprig")
         }
         activate={() => onInteract("encounter")}
         disabled={blocked}
         title="Wild encounter"
-        hint="Click to meet Ranger Tali"
+        hint={wildOut.length ? `${wildOut.map((id) => byId[id].name).join(", ")} ${wildOut.length > 1 ? "are" : "is"} out now · Click to meet Ranger Tali` : "Click to meet Ranger Tali"}
         position={[-6, 0, 6]}
       />
+      {wildOut[1] && (
+        <HabitatResident
+          key={wildOut[1]}
+          site={{ species: wildOut[1], point: [-8.6, 8.2], radius: 1.4 }}
+          index={9}
+          onInteract={onInteract}
+          interactId="encounter"
+          disabled={blocked}
+        />
+      )}
       <Roamer
         id={
           profile.region === "canyon"
