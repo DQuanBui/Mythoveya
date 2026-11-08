@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { activeSeason } from "../../packages/shared/seasons";
-import { keeperTitle, milestoneProgress } from "../../packages/shared/milestones";
+import { MILESTONES, keeperTitle, milestoneProgress } from "../../packages/shared/milestones";
 import { clickWorld, walkRoute } from "./world-helpers";
 
 test("photo mode, the seasonal festival and stepping inside a home", async ({ page }) => {
@@ -53,8 +53,8 @@ test("photo mode, the seasonal festival and stepping inside a home", async ({ pa
   // The guide's team of six already earns the first title.
   expect(earned).toBeGreaterThanOrEqual(1);
   await page.locator(".keeper-badge").getByRole("button", { name: `★ ${keeperTitle(profile)}` }).click();
-  await expect(page.getByText(`KEEPER RECORD · ${earned} OF 13 TITLES`)).toBeVisible();
-  await expect(page.getByRole("progressbar")).toHaveCount(13);
+  await expect(page.getByText(`KEEPER RECORD · ${earned} OF ${MILESTONES.length} TITLES`)).toBeVisible();
+  await expect(page.getByRole("progressbar")).toHaveCount(MILESTONES.length);
   await page.keyboard.press("Escape");
   await expect(page.locator(".modal")).toHaveCount(0);
 
