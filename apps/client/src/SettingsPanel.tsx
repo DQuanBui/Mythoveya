@@ -2,7 +2,41 @@ import { useState } from "react";
 import { audio, settings, type Settings } from "./audio";
 import { exportSave, importSave, STANDALONE } from "./api";
 import { useInstallPrompt } from "./install-prompt";
+import { collectReport } from "./diagnostics";
 
+/** Copies a description of this device and session for a bug report. */
+function ReportProblem() {
+  const [text, setText] = useState(""),
+    [copied, setCopied] = useState(false);
+  async function report() {
+    const where = [document.querySelector(".battle-screen") ? "battle" : document.querySelector(".world-hud") ? "world" : "title", document.querySelector(".location")?.textContent?.trim()]
+      .filter(Boolean)
+      .join(" · ");
+    const body = collectReport(where, STANDALONE, { ...settings });
+    setText(body);
+    try {
+      await navigator.clipboard.writeText(body);
+      setCopied(true);
+    } catch {
+      setCopied(false);
+    }
+  }
+  return (
+    <div className="report-problem">
+      <h3>Something wrong?</h3>
+      <p className="muted">Copy a short description of this device and session to paste into a message. It holds no save or name.</p>
+      <div className="button-row">
+        <button onClick={report}>Report a problem</button>
+      </div>
+      {text && (
+        <>
+          <p role="note">{copied ? "Copied. Paste it into your message and add what happened." : "Select the text below and copy it."}</p>
+          <textarea aria-label="Problem report" readOnly rows={8} value={text} onFocus={(e) => e.currentTarget.select()} />
+        </>
+      )}
+    </div>
+  );
+}
 export function SettingsPanel() {
   const [, refresh] = useState(0);
   function change<K extends keyof Settings>(key: K, value: Settings[K]) {
@@ -113,6 +147,7 @@ export function SettingsPanel() {
         Play sound test ♫
       </button>
       {STANDALONE && <SaveBackup />}
+      <ReportProblem />
     </>
   );
 }

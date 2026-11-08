@@ -1981,3 +1981,13 @@ html[data-large-text="true"] .modal {
   color: #edcf83;
   font-weight: 600;
 }
+.report-problem textarea {
+  box-sizing: border-box;
+  width: 100%;
+  font: 11px/1.4 ui-monospace, monospace;
+  color: inherit;
+  background: #0b1f26;
+  border: 1px solid #acc6b454;
+  border-radius: 8px;
+  padding: 8px;
+}

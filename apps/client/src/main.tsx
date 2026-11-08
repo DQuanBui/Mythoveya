@@ -4,6 +4,7 @@ import App from "./App";
 import { STANDALONE } from "./api";
 import { startGamepad } from "./gamepad";
 import "./install-prompt";
+import { watchErrors } from "./diagnostics";
 import "./style.css";
 import "./world-hud.css";
 import "./town.css";
@@ -12,6 +13,7 @@ import "./adventure.css";
 import "./islands.css";
 import "./battle.css";
 startGamepad();
+watchErrors();
 // The online build has no server, so it can keep playing without a connection.
 if (import.meta.env.PROD && STANDALONE && "serviceWorker" in navigator)
   addEventListener("load", () => {

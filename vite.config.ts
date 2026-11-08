@@ -1,5 +1,6 @@
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
+import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -47,7 +48,16 @@ const offlineWorker = (): Plugin => ({
     });
   },
 });
+/** The commit a build came from, shown in problem reports. */
+const build = (() => {
+  try {
+    return execSync("git rev-parse --short HEAD", { stdio: ["ignore", "pipe", "ignore"] }).toString().trim();
+  } catch {
+    return "unknown";
+  }
+})();
 export default defineConfig(({ mode }) => ({
+  define: { "import.meta.env.VITE_BUILD": JSON.stringify(build) },
   root: "apps/client",
   base: mode === "pages" ? process.env.PAGES_BASE || "/Mythoveya/" : "/",
   plugins: [react(), standaloneServer(mode === "pages"), ...(mode === "pages" ? [offlineWorker()] : [])],

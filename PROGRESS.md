@@ -13,6 +13,7 @@ November 11 round (from `d03d7f8`). Done this round, newest last:
 - Night Watcher: a keeper title for befriending five creatures that come out only at certain times (tested).
 - Iskavelle fix: its Absolute Stillness stunned its own side and did nothing; abilities that lead with a hindrance now target foes (only Iskavelle changed; guarded by `ability-targets.test.ts`).
 - Balance report: `npm run balance` plays 20,000 seeded auto-battles and writes `docs/BALANCE.md` (found the Iskavelle bug; tuning the remaining outliers is a decision for the owner).
+- Problem reports: Sound & settings copies the build, device, graphics, place, settings and recent errors for a bug message (`diagnostics.ts`, tested).
 
 Next 3 tasks:
 1. Finish this round: companion activities, creatures by time and weather, balance report, problem reports.
