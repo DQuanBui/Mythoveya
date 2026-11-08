@@ -1280,7 +1280,7 @@ export default function App() {
                     <dt>Click a person, home or object</dt>
                     <dd>Walk over and interact</dd>
                     <dt>WASD / arrows</dt>
-                    <dd>Move directly · hold Shift to sprint</dd>
+                    <dd>Move directly · hold Shift to sprint (or to walk, with Run by default on)</dd>
                     <dt>E</dt>
                     <dd>Use whatever is within reach</dd>
                     <dt>Q · J · T · M</dt>

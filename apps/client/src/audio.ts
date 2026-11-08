@@ -17,6 +17,8 @@ export type Settings = {
   contrast: boolean;
   /** Enlarges panels, dialogue and notices. */
   largeText: boolean;
+  /** Run unless Shift is held, instead of the other way round. */
+  alwaysRun: boolean;
   brightness: number;
 };
 export const defaults: Settings = {
@@ -33,6 +35,7 @@ export const defaults: Settings = {
   daynight: true,
   contrast: false,
   largeText: false,
+  alwaysRun: false,
   brightness: 1,
 };
 function storedSettings() {

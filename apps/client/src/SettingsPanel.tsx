@@ -74,7 +74,7 @@ export function SettingsPanel() {
         )}
       </div>
       <div className="settings-grid">
-        {(["mute", "reduced", "shake", "daynight", "contrast", "largeText"] as const).map((key) => (
+        {(["mute", "reduced", "shake", "daynight", "contrast", "largeText", "alwaysRun"] as const).map((key) => (
           <label className="toggle" key={key}>
             <input
               type="checkbox"
@@ -91,6 +91,8 @@ export function SettingsPanel() {
                     ? "High-contrast interface"
                     : key === "largeText"
                       ? "Larger interface text"
+                      : key === "alwaysRun"
+                        ? "Run by default (Shift walks)"
                       : "Camera shake"}
           </label>
         ))}

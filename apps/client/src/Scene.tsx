@@ -55,6 +55,7 @@ import { worldFocus, worldHeading, keeperEmote, EMOTES, playEmote, nightState, c
 import { findPath, startGrid, type GridBuild, type WalkGrid } from "../../../packages/shared/pathfind";
 import { buildInSlices } from "./grid-slices";
 import { padInput, rumble } from "./gamepad";
+import { runs } from "./run-rule";
 import { bodyReach, personalSpace, stepAside } from "./companion-space";
 import { DURATION, activityPose, outingTarget, pickActivity, type Activity } from "./companion-idle";
 import { lazy, Suspense, useMemo, useRef, useEffect, useState, useCallback } from "react";
@@ -982,7 +983,7 @@ export function Explorer({
     if (steering || blocked) route.current = null;
     const shift =
       !blocked &&
-      (input.current.sprint || padInput.sprint || k.has("ShiftLeft") || k.has("ShiftRight"));
+      runs(settings.alwaysRun, k.has("ShiftLeft") || k.has("ShiftRight"), !!input.current.sprint || padInput.sprint);
     let v: T.Vector3 | null = null,
       sprinting = shift;
     if (steering) {

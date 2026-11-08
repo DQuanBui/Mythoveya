@@ -16,6 +16,7 @@ November 11 round (from `d03d7f8`). Done this round, newest last:
 - Problem reports: Sound & settings copies the build, device, graphics, place, settings and recent errors for a bug message (`diagnostics.ts`, tested).
 - Rare-creature chip: the HUD says when night, dawn, rain or mist creatures are out and opens the Journal (hidden on phones with the other location chips).
 - Rumble: a connected controller buzzes on ultimates and knock-outs when Camera shake is on (checked with a stand-in pad).
+- Run by default: a setting that makes running the default and Shift walk (`run-rule.ts`, tested; measured in the browser).
 
 Next 3 tasks:
 1. Finish this round: companion activities, creatures by time and weather, balance report, problem reports.
