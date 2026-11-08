@@ -8,18 +8,12 @@ import { ConservancySites } from "./ConservancySites";
 import { conservancyStops, conservancyBlocked } from "../../../packages/shared/conservancy";
 import { RallyCamp } from "./RallyCamp";
 import { rallyHost, rallyBlocked } from "../../../packages/shared/rally";
-import { MeadowWildlife } from "./MeadowWildlife";
-import { MeadowScenery } from "./MeadowScenery";
 import { meadowOf } from "../../../packages/shared/meadow";
 import { MeadowTerrain } from "./MeadowTerrain";
 import { MEADOW_EXTENT, MEADOW_STOPS, meadowHeight, meadowWalkable, meadowPathDistance } from "../../../packages/shared/meadow";
-import { HollowWildlife } from "./HollowWildlife";
-import { HollowScenery } from "./HollowScenery";
 import { hollowOf } from "../../../packages/shared/hollow";
 import { HollowTerrain } from "./HollowTerrain";
 import { HOLLOW_EXTENT, HOLLOW_STOPS, hollowHeight, hollowWalkable, hollowPathDistance } from "../../../packages/shared/hollow";
-import { CanyonWildlife } from "./CanyonWildlife";
-import { CanyonScenery } from "./CanyonScenery";
 import { canyonOf } from "../../../packages/shared/canyon";
 import { CanyonTerrain } from "./CanyonTerrain";
 import { CANYON_EXTENT, CANYON_STOPS, canyonHeight, canyonWalkable, canyonPathDistance } from "../../../packages/shared/canyon";
@@ -116,6 +110,13 @@ import { useCarried } from "./carried";
 const SeasonalLanterns = lazy(() => import("./SeasonalLanterns").then((m) => ({ default: m.SeasonalLanterns })));
 // Ambient life (motes, mist, puddles, sparrows) follows once the world is up.
 const Ambience = lazy(() => import("./Ambience").then((m) => ({ default: m.Ambience })));
+// Each region's own scenery and wildlife load when the keeper first goes there.
+const MeadowScenery = lazy(() => import("./MeadowScenery").then((m) => ({ default: m.MeadowScenery })));
+const HollowScenery = lazy(() => import("./HollowScenery").then((m) => ({ default: m.HollowScenery })));
+const CanyonScenery = lazy(() => import("./CanyonScenery").then((m) => ({ default: m.CanyonScenery })));
+const MeadowWildlife = lazy(() => import("./MeadowWildlife").then((m) => ({ default: m.MeadowWildlife })));
+const HollowWildlife = lazy(() => import("./HollowWildlife").then((m) => ({ default: m.HollowWildlife })));
+const CanyonWildlife = lazy(() => import("./CanyonWildlife").then((m) => ({ default: m.CanyonWildlife })));
 function RenderStats() {
   const label = useRef<HTMLSpanElement>(null);
   const elapsed = useRef(0),
@@ -1478,9 +1479,9 @@ export function WorldScene({
       <AtlasSites profile={profile} onInteract={onInteract} disabled={blocked}/>
           <ConservancySites profile={profile} onInteract={onInteract} disabled={blocked}/>
       <RallyCamp region={profile.region} onInteract={onInteract} disabled={blocked}/>
-      {profile.region === "meadow" && <><MeadowScenery journey={meadowOf(profile)} onInteract={onInteract} disabled={blocked} /><MeadowWildlife onInteract={onInteract} disabled={blocked}/></>}
-      {profile.region === "hollow" && <><HollowScenery journey={hollowOf(profile)} onInteract={onInteract} disabled={blocked} /><HollowWildlife onInteract={onInteract} disabled={blocked}/></>}
-      {profile.region === "canyon" && <><CanyonScenery beacons={canyonOf(profile).beacons} restored={canyonOf(profile).restored} onInteract={onInteract} disabled={blocked} /><CanyonWildlife onInteract={onInteract} disabled={blocked}/></>}
+      {profile.region === "meadow" && <Suspense fallback={null}><MeadowScenery journey={meadowOf(profile)} onInteract={onInteract} disabled={blocked} /><MeadowWildlife onInteract={onInteract} disabled={blocked}/></Suspense>}
+      {profile.region === "hollow" && <Suspense fallback={null}><HollowScenery journey={hollowOf(profile)} onInteract={onInteract} disabled={blocked} /><HollowWildlife onInteract={onInteract} disabled={blocked}/></Suspense>}
+      {profile.region === "canyon" && <Suspense fallback={null}><CanyonScenery beacons={canyonOf(profile).beacons} restored={canyonOf(profile).restored} onInteract={onInteract} disabled={blocked} /><CanyonWildlife onInteract={onInteract} disabled={blocked}/></Suspense>}
       {profile.region === "haven" && (
         <HavenHouses onInteract={onInteract} disabled={blocked} />
       )}
