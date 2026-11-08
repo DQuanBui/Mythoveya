@@ -6,6 +6,7 @@ Updated with the November 10 round; its commits are dated November 7, 2026 (roun
 
 November 11 round (from `d03d7f8`). Done this round, newest last:
 - Companion space: the follow distance grows with the creature's body, and it steps aside when walked into (`companion-space.ts`, tested; measured 0.5 m before, about 1.2 m now).
+- Creature motions: `sniff`, `dig` and `look` in `animateCreature` (tested).
 
 Next 3 tasks:
 1. Finish this round: companion activities, creatures by time and weather, balance report, problem reports.

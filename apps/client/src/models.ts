@@ -1177,7 +1177,10 @@ export type Motion =
   | "weary"
   | "shake"
   | "stretch"
-  | "sneeze";
+  | "sneeze"
+  | "sniff"
+  | "dig"
+  | "look";
 export function animateCreature(
   g: T.Group,
   time: number,
@@ -1429,6 +1432,28 @@ export function animateCreature(
     rig.scale.set(1 + pant * 0.025, 0.94 + pant * 0.05, 1);
     wings.forEach((w: T.Group, i: number) => (w.rotation.z = ((i % 2) * 2 - 1) * -0.25));
     eyes?.forEach((eye: T.Group) => (eye.scale.y = Math.min(eye.scale.y, 0.55)));
+  }
+  if (state === "sniff") {
+    // Nose to the ground, working along in quick little dabs.
+    const dab = Math.abs(Math.sin(time * 11)) * motion;
+    rig.rotation.x = (0.32 + dab * 0.08) * Math.min(1, phase * 6, (1 - phase) * 6);
+    rig.rotation.y = Math.sin(time * 1.7) * 0.25 * motion;
+    rig.position.y -= 0.03;
+  }
+  if (state === "dig") {
+    // Head down and front paws scrabbling, tail up and busy.
+    const p = Math.min(1, phase * 5, (1 - phase) * 5);
+    rig.rotation.x = 0.22 * p;
+    limbs.forEach((l: T.Group, i: number) => {
+      if (i < 2) l.rotation.x = Math.sin(time * 18 + i * Math.PI) * 0.7 * p * motion - 0.3 * p;
+    });
+    tails.forEach((t: T.Group, i: number) => (t.rotation.y += Math.sin(time * 14 + i) * 0.35 * p * motion));
+  }
+  if (state === "look") {
+    // A slow look one way, a pause, then the other: something caught its interest.
+    const sweep = Math.sin(Math.min(1, Math.max(0, phase)) * Math.PI * 2);
+    rig.rotation.y = sweep * 0.55 * motion;
+    rig.rotation.x = -0.08 * Math.abs(sweep) * motion;
   }
   if (state === "play") {
     // Playful pounces: a crouch, a hop and a happy tilt.

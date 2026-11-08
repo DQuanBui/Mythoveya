@@ -278,3 +278,26 @@ describe("villagers who watch the keeper", () => {
     expect(Math.abs(keeper.userData.head.rotation.y)).toBeLessThan(0.2);
   });
 });
+it("sniffs nose-down, digs with the front paws and looks one way then the other", () => {
+  const model = createCreature("emberfox"),
+    { rig, limbs } = model.userData;
+  animateCreature(model, 1, "sniff", 0.5);
+  expect(rig.rotation.x).toBeGreaterThan(0.25);
+  animateCreature(model, 1.03, "dig", 0.5);
+  const front = limbs[0].rotation.x;
+  animateCreature(model, 1.09, "dig", 0.5);
+  expect(limbs[0].rotation.x).not.toBeCloseTo(front);
+  animateCreature(model, 1, "look", 0.25);
+  const one = rig.rotation.y;
+  animateCreature(model, 1, "look", 0.75);
+  expect(Math.sign(rig.rotation.y)).toBe(-Math.sign(one));
+  expect(Math.abs(one)).toBeGreaterThan(0.4);
+});
+it("eases sniffing and digging in and out, and keeps them small under Reduced Motion", () => {
+  const model = createCreature("thornhare"),
+    { rig } = model.userData;
+  animateCreature(model, 1, "sniff", 0);
+  expect(rig.rotation.x).toBeCloseTo(0);
+  animateCreature(model, 1, "look", 0.25, true);
+  expect(Math.abs(rig.rotation.y)).toBeLessThan(0.15);
+});
