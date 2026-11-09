@@ -11,6 +11,8 @@ import {
   noteSeen,
   seenOrOwned,
   specialLevel,
+  wildEase,
+  wildLevelGap,
   specialsNow,
   wildHints,
   wildLineup,
@@ -108,5 +110,23 @@ describe("the Journal's seen list", () => {
     noteSeen(p, ["mossprig", "duskblob", "mossprig"]);
     expect(p.seen).toEqual(["mossprig", "duskblob"]);
     expect(seenOrOwned(p)).toEqual(new Set(["mossprig", "duskblob", "emberfox"]));
+  });
+});
+describe("new keepers' first wild battles", () => {
+  it("keep the very first at half strength, as before", () => {
+    expect(wildEase(0)).toEqual({ hp: 0.5, attack: 0.6 });
+  });
+  it("go a little easy for two more, then not at all until the margin narrows", () => {
+    expect(wildEase(1)).toEqual({ hp: 0.8, attack: 0.85 });
+    expect(wildEase(3)).toBeNull();
+    expect(wildEase(9)).toBeNull();
+  });
+  it("widen the level margin for the first ten wins, then taper the ease off by the twentieth", () => {
+    expect(wildLevelGap(9)).toBe(2);
+    expect(wildLevelGap(10)).toBe(1);
+    const eases = Array.from({ length: 10 }, (_, i) => wildEase(10 + i)!.hp);
+    for (let i = 1; i < eases.length; i++) expect(eases[i]).toBeGreaterThan(eases[i - 1]);
+    expect(eases.at(-1)).toBeLessThan(1);
+    expect(wildEase(20)).toBeNull();
   });
 });

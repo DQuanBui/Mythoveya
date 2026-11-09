@@ -9,7 +9,7 @@ import { canyonOf, CANYON_BEACONS } from "../../packages/shared/canyon";
 import { canyonMutation } from "./canyon-game";
 import { expeditionOf, FIELD_NODES } from "../../packages/shared/wildwood";
 import { expeditionMutation } from "./expedition-game";
-import { BASE_WILD, SPECIAL_WILD, WILD_TIME_NAMES, bondCandidate, noteSeen, specialLevel, wildLineup, wildTimes } from "../../packages/shared/wild";
+import { BASE_WILD, SPECIAL_WILD, WILD_TIME_NAMES, bondCandidate, noteSeen, specialLevel, wildEase, wildLevelGap, wildLineup, wildTimes } from "../../packages/shared/wild";
 import { randomInt, randomUUID } from "node:crypto";
 import {
   byId,
@@ -290,7 +290,8 @@ export function startPve(
   // The time of day and the weather bring out creatures seen only then.
   const times = wildTimes(p.region),
     { species: ids, specials } = boss || practice ? { species: BASE_WILD[p.region] || BASE_WILD.haven, specials: [] } : wildLineup(p.region, times, p.wins, random);
-  const level = Math.max(1, p.level - (p.wins === 0 ? 2 : 1) + (boss ? 2 : 0));
+  // Guardians keep their own margin; wild creatures give new keepers more room.
+  const level = Math.max(1, p.level - (boss ? (p.wins === 0 ? 2 : 1) - 2 : wildLevelGap(p.wins)));
   const enemy: Owned[] = ids.map((species, i) => ({
     id: `enemy-${i}`,
     species,
@@ -324,10 +325,12 @@ export function startPve(
       : p.region === "hollow"
         ? "frost"
         : "grove";
-  if (p.wins === 0 && !boss)
+  // A keeper's first wild battles go easy on them while they learn.
+  const ease = boss ? null : wildEase(p.wins);
+  if (ease)
     for (const u of b.units.filter((u) => u.side === 1)) {
-      u.hp = u.maxHp = Math.round(u.maxHp * 0.5);
-      u.attack = Math.round(u.attack * 0.6);
+      u.hp = u.maxHp = Math.round(u.maxHp * ease.hp);
+      u.attack = Math.round(u.attack * ease.attack);
     }
   if (boss) {
     const s =

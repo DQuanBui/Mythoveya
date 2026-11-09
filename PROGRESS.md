@@ -4,12 +4,13 @@ Updated with the November 12 round; its commits are dated November 8, 2026 (roun
 
 ## Next up
 
-November 12 round is complete: 10 commits from `0c51d3c` plus this record, all pushed.
+November 13 round (from `de458b4`). Done this round, newest last:
+- Early game: wild creatures sit two levels lower for the first ten wins with a gentle taper to twenty (`wildLevelGap`, `wildEase`, tested; simulated with 100-150 new keepers).
 
 Next 3 tasks:
-1. Decide on the balance outliers in `docs/BALANCE.md` (Iskavelle still weak, Astravelle strong). Tuning creature numbers is the owner's call.
-2. Physical checks: audio, a real phone, a real controller, a real install.
-3. Early-game difficulty: at level 1 a starter team wins only about 42% of simulated wild battles even against the familiar six, which is why scripted journeys sometimes need several tries to earn five wins.
+1. Finish this round: choose a walking companion, key remapping, a lighter first download.
+2. Decide on the balance outliers in docs/BALANCE.md (Iskavelle still weak, Astravelle strong).
+3. Physical checks: audio, a real phone, a real controller, a real install.
 
 ## Play
 

@@ -104,3 +104,17 @@ export function noteSeen(p: { seen?: string[] }, species: string[]) {
 /** Every species the keeper has met or befriended. */
 export const seenOrOwned = (p: { seen?: string[]; owned: { species: string }[] }) =>
   new Set([...(p.seen || []), ...p.owned.map((o) => o.species)]);
+/** How many levels below the keeper wild creatures fight. New keepers get a
+ * wider margin while they learn, easing to the usual one by their tenth win
+ * (measured with simulated keepers). */
+export const wildLevelGap = (wins: number) => (wins < 10 ? 2 : 1);
+/** Softer wild creatures in a keeper's first battles: the very first at half
+ * strength, as it always was, a gentler step for the next two, and a taper
+ * from the tenth win to the twentieth as the level margin narrows. */
+export function wildEase(wins: number) {
+  if (wins === 0) return { hp: 0.5, attack: 0.6 };
+  if (wins < 3) return { hp: 0.8, attack: 0.85 };
+  // Past the wider level margin, ease off gradually rather than all at once.
+  if (wins >= 10 && wins < 20) return { hp: 0.8 + (wins - 10) * 0.02, attack: 0.85 + (wins - 10) * 0.015 };
+  return null;
+}
