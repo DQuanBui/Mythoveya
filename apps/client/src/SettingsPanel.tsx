@@ -1,9 +1,65 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { audio, settings, type Settings } from "./audio";
 import { exportSave, importSave, STANDALONE } from "./api";
 import { useInstallPrompt } from "./install-prompt";
 import { collectReport } from "./diagnostics";
+import { KEY_ACTIONS, bind, keyFor, keyName, loadBindings, pauseKeybinds, saveBindings, type Bindings } from "./keybinds";
 
+/** Lets a player choose their own keys; arrows, Esc, Enter and 1-4 stay as they are. */
+function KeySettings() {
+  const [bindings, setBindings] = useState<Bindings>(loadBindings),
+    [waiting, setWaiting] = useState<(typeof KEY_ACTIONS)[number] | null>(null);
+  useEffect(() => {
+    if (!waiting) return;
+    pauseKeybinds(true);
+    const take = (e: KeyboardEvent) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      if (e.code !== "Escape") {
+        const next = bind(bindings, waiting.id, e.code);
+        setBindings(next);
+        saveBindings(next);
+      }
+      setWaiting(null);
+    };
+    window.addEventListener("keydown", take, true);
+    return () => {
+      window.removeEventListener("keydown", take, true);
+      pauseKeybinds(false);
+    };
+  }, [waiting, bindings]);
+  return (
+    <details className="key-settings">
+      <summary>Keyboard keys</summary>
+      <p className="muted">Choose a key, then press the new one (Esc cancels). Arrows, Esc, Enter and 1-4 keep their meaning.</p>
+      <table>
+        <tbody>
+          {KEY_ACTIONS.map((a) => (
+            <tr key={a.id}>
+              <th scope="row">{a.label}</th>
+              <td>
+                <button aria-label={waiting?.id === a.id ? `${a.label}: press a new key` : `${a.label}: ${keyName(keyFor(bindings, a.id))}. Change`} onClick={() => setWaiting(a)}>
+                  {waiting?.id === a.id ? "Press a key…" : keyName(keyFor(bindings, a.id))}
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div className="button-row">
+        <button
+          disabled={!Object.keys(bindings).length}
+          onClick={() => {
+            setBindings({});
+            saveBindings({});
+          }}
+        >
+          Reset keys
+        </button>
+      </div>
+    </details>
+  );
+}
 /** Copies a description of this device and session for a bug report. */
 function ReportProblem() {
   const [text, setText] = useState(""),
@@ -149,6 +205,7 @@ export function SettingsPanel() {
         Play sound test ♫
       </button>
       {STANDALONE && <SaveBackup />}
+      <KeySettings />
       <ReportProblem />
     </>
   );

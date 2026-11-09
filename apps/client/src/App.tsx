@@ -1299,6 +1299,8 @@ export default function App() {
                     <dd>Turn the camera · zoom</dd>
                     <dt>R</dt>
                     <dd>Reset the camera</dd>
+                    <dt>Your own keys</dt>
+                    <dd>Sound & settings → Keyboard keys</dd>
                     <dt>Esc</dt>
                     <dd>Pause or close a panel</dd>
                   </dl>

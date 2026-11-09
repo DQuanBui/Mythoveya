@@ -2024,3 +2024,17 @@ html[data-contrast="true"] .creature-card.unmet .portrait {
   filter: brightness(0) saturate(0) drop-shadow(0 0 1px #fff);
   opacity: 0.8;
 }
+.key-settings table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 6px 0;
+}
+.key-settings th {
+  text-align: left;
+  font-weight: 400;
+  padding: 3px 8px 3px 0;
+}
+.key-settings td button {
+  min-width: 96px;
+  padding: 4px 10px;
+}

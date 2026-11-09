@@ -120,3 +120,48 @@ test("panels hold keyboard focus like dialogs and give it back", async ({ page }
   await page.keyboard.press("KeyQ");
   await expect(page.locator('section[aria-label="quests"]')).toBeVisible();
 });
+
+test("keys can be changed in settings and the game answers to them", async ({ page }) => {
+  test.setTimeout(120000);
+  await page.goto("/");
+  await page.evaluate(async () => {
+    const post = (data: unknown, path: string, token = "") =>
+      fetch("/api/" + path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+        body: JSON.stringify(data),
+      }).then((r) => r.json());
+    const g = await post({ name: "Rebind Keeper", avatar: 4 }, "guest");
+    localStorage.setItem("mythoveya-session", g.token);
+    await post({ kind: "starter", species: "emberfox", requestId: crypto.randomUUID() }, "mutate", g.token);
+  });
+  await page.reload();
+  await page.getByRole("button", { name: "Continue your journey" }).click();
+  await page.locator(".keeper-badge").waitFor();
+  await page.getByRole("button", { name: "Open settings" }).click();
+  await page.getByText("Keyboard keys").click();
+  await page.getByRole("button", { name: "Journal: J. Change" }).click();
+  await expect(page.getByRole("button", { name: "Journal: press a new key" })).toBeVisible();
+  await page.keyboard.press("KeyK");
+  await expect(page.getByRole("button", { name: "Journal: K. Change" })).toBeVisible();
+  // Waiting for a key, Esc cancels without closing the panel.
+  await page.getByRole("button", { name: "Team: T. Change" }).click();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("button", { name: "Team: T. Change" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await page.keyboard.press("KeyK");
+  await expect(page.locator('section[aria-label="collection"]')).toBeVisible();
+  await page.keyboard.press("Escape");
+  // The choice lasts, and Reset keys puts the defaults back.
+  await page.reload();
+  await page.getByRole("button", { name: "Continue your journey" }).click();
+  await page.locator(".keeper-badge").waitFor();
+  await page.keyboard.press("KeyK");
+  await expect(page.locator('section[aria-label="collection"]')).toBeVisible();
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "Open settings" }).click();
+  await page.getByText("Keyboard keys").click();
+  await page.getByRole("button", { name: "Reset keys" }).click();
+  await expect(page.getByRole("button", { name: "Journal: J. Change" })).toBeVisible();
+});
