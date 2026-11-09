@@ -8,6 +8,7 @@ import {
   SPECIAL_WILD,
   bondCandidate,
   matchesWildFilter,
+  nextWildChange,
   noteSeen,
   seenOrOwned,
   specialLevel,
@@ -128,5 +129,17 @@ describe("new keepers' first wild battles", () => {
     for (let i = 1; i < eases.length; i++) expect(eases[i]).toBeGreaterThan(eases[i - 1]);
     expect(eases.at(-1)).toBeLessThan(1);
     expect(wildEase(20)).toBeNull();
+  });
+});
+describe("nextWildChange", () => {
+  it("finds the next change and agrees with the clocks at that moment", () => {
+    for (let now = Date.UTC(2026, 10, 1); now < Date.UTC(2026, 10, 1) + 3 * 3600000; now += 7 * 60000 + 13000) {
+      const next = nextWildChange("haven", now)!;
+      expect(next.in).toBeGreaterThan(0);
+      expect(next.times).toEqual(wildTimes("haven", now + next.in));
+      expect(next.times).not.toEqual(wildTimes("haven", now));
+      expect(wildTimes("haven", now + next.in - 15000)).toEqual(wildTimes("haven", now));
+      expect(next.out).toEqual(specialsNow("haven", next.times));
+    }
   });
 });

@@ -15,7 +15,7 @@ import { companionChoices, recentLineups, suggestTeam, teamPower } from "../../.
 import { walkingCompanion } from "../../../packages/shared/follower";
 import { HairDyePicker } from "./HairDyePicker";
 import { ElementGuide } from "./ElementGuide";
-import { NEWCOMER_WINS, WILD_TIME_NAMES, matchesWildFilter, seenOrOwned, specialsNow, wildHints, wildTimes } from "../../../packages/shared/wild";
+import { NEWCOMER_WINS, WILD_TIME_NAMES, matchesWildFilter, nextWildChange, seenOrOwned, specialsNow, wildHints, wildTimes } from "../../../packages/shared/wild";
 import {
   power,
   makeBattle,
@@ -36,13 +36,27 @@ export type Mutation = (
 ) => Promise<any>;
 /** Who is out in the wild only now, where the keeper is. */
 function WildNow({ region, wins }: { region: string; wins: number }) {
+  if (wins < NEWCOMER_WINS) return null;
   const times = wildTimes(region),
-    out = wins < NEWCOMER_WINS ? [] : specialsNow(region, times);
-  if (!out.length) return null;
+    out = specialsNow(region, times),
+    next = nextWildChange(region),
+    minutes = next && Math.max(1, Math.round(next.in / 60000));
   return (
-    <p className="wild-hint">
-      <b>Out in the wild now</b> ({times.map((t) => WILD_TIME_NAMES[t]).join(", ")}): {out.map((id) => byId[id].name).join(", ")}
-    </p>
+    <>
+      {out.length > 0 && (
+        <p className="wild-hint">
+          <b>Out in the wild now</b> ({times.map((t) => WILD_TIME_NAMES[t]).join(", ")}): {out.map((id) => byId[id].name).join(", ")}
+        </p>
+      )}
+      {next && (
+        <p className="wild-hint">
+          <b>In about {minutes} minute{minutes === 1 ? "" : "s"}:</b>{" "}
+          {next.out.length
+            ? `${next.times.map((t) => WILD_TIME_NAMES[t]).join(" and ")}, ${next.out.map((id) => byId[id].name).join(", ")}`
+            : "only the usual creatures"}
+        </p>
+      )}
+    </>
   );
 }
 export function Collection({

@@ -118,3 +118,14 @@ export function wildEase(wins: number) {
   if (wins >= 10 && wins < 20) return { hp: 0.8 + (wins - 10) * 0.02, attack: 0.85 + (wins - 10) * 0.015 };
   return null;
 }
+/** When the creatures out in a region next change, and who comes then, looking
+ * up to an hour ahead (the clocks are shared, so this is a sure forecast). */
+export function nextWildChange(region: string, now = Date.now()) {
+  const key = (t: WildTime[]) => t.join(",");
+  const at = wildTimes(region, now);
+  for (let ahead = 15000; ahead <= 3600000; ahead += 15000) {
+    const times = wildTimes(region, now + ahead);
+    if (key(times) !== key(at)) return { in: ahead, times, out: specialsNow(region, times) };
+  }
+  return null;
+}

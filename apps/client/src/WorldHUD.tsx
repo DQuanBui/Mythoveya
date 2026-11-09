@@ -18,7 +18,7 @@ import {
 import { Portrait } from "./portraits";
 import { useHover } from "./hover";
 import { currentWeather } from "./Weather";
-import { WEATHER_INFO } from "../../../packages/shared/weather";
+import { WEATHER_INFO, weatherAt, regionWeather } from "../../../packages/shared/weather";
 import { NEWCOMER_WINS, specialsNow, wildTimes } from "../../../packages/shared/wild";
 import { eventsReady } from "../../../packages/shared/events";
 import { utcDay } from "../../../packages/shared/town";
@@ -46,6 +46,17 @@ import {
 } from "./world-guide";
 
 const NAV_KEYS: Record<string, string> = { quests: "Q", collection: "J", formation: "T", map: "M" };
+/** "Rain for about 3 more minutes, then Clear." */
+function weatherForecast(region: string) {
+  const w = weatherAt(),
+    minutes = Math.max(1, Math.round((w.endsAt - Date.now()) / 60000)),
+    name = (x: typeof w.weather) => (region === "hollow" && x === "rain" ? "Snow" : WEATHER_INFO[x].name),
+    now = regionWeather(w.weather, region),
+    next = regionWeather(w.next, region);
+  return now === next
+    ? `${name(now)} for at least ${minutes} more minute${minutes === 1 ? "" : "s"}.`
+    : `${name(now)} for about ${minutes} more minute${minutes === 1 ? "" : "s"}, then ${name(next).toLowerCase()}.`;
+}
 export function WorldHUD({
   profile,
   position,
@@ -200,7 +211,7 @@ export function WorldHUD({
           )}
           <em
             className="time-chip weather-chip"
-            title={WEATHER_INFO[weather].perk}
+            title={`${WEATHER_INFO[weather].perk}. ${weatherForecast(profile.region)}`}
             data-weather={weather}
           >
             <span aria-hidden="true">{WEATHER_INFO[weather].icon}</span>{" "}
