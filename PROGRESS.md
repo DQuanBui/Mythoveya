@@ -9,6 +9,7 @@ November 13 round (from `de458b4`). Done this round, newest last:
 - Walking companion: `follower` mutation and optional `Profile.follower`, with `walkingCompanion` in `packages/shared/follower.ts` (tested).
 - Walk with me: the Journal chooses the walking companion, used by the world and the greeting (checked in the browser).
 - Keyboard keys: players choose their own keys in Sound & settings, translated into the defaults before the game sees them (`keybinds.ts`, tested; in `keyboard.spec`).
+- Trail map: `HavenMap` loads when opened; its destinations live in `map-destinations.ts` (entry 433.3 kB to 428.5 kB).
 
 Next 3 tasks:
 1. Finish this round: choose a walking companion, key remapping, a lighter first download.

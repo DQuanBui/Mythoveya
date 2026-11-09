@@ -21,7 +21,7 @@ import { Preview, TitleScene, WorldScene } from "./Scene";
 import { Portrait } from "./portraits";
 import { WorldHUD } from "./WorldHUD";
 import { NPCS } from "../../../packages/shared/town";
-import { HavenMap, MAP_DESTINATIONS } from "./HavenMap";
+import { MAP_DESTINATIONS } from "./map-destinations";
 import { HouseVisit } from "./HavenHouses";
 import { weatherFx } from "./Weather";
 import { TOWNSFOLK } from "./HavenTownsfolk";
@@ -47,6 +47,7 @@ import { walkingCompanion } from "../../../packages/shared/follower";
 import { backupDue } from "./backup-reminder";
 import { WHATS_NEW, markWhatsNewRead, whatsNewUnread } from "./whats-new";
 // Panels and region maps load when first opened.
+const HavenMap = lazy(() => import("./HavenMap").then((m) => ({ default: m.HavenMap })));
 const LodgePanel = lazy(() => import("./LodgePanel").then((m) => ({ default: m.LodgePanel })));
 const RescuePanel = lazy(() => import("./RescuePanel").then((m) => ({ default: m.RescuePanel })));
 const AtlasPanel = lazy(() => import("./AtlasPanel").then((m) => ({ default: m.AtlasPanel })));
