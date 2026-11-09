@@ -12,6 +12,7 @@ import {
 import { hairColor } from "../../../packages/shared/looks";
 import { ELEMENT_NAMES, teamCoverage } from "../../../packages/shared/elements";
 import { companionChoices, recentLineups, suggestTeam, teamPower } from "../../../packages/shared/lineups";
+import { walkingCompanion } from "../../../packages/shared/follower";
 import { HairDyePicker } from "./HairDyePicker";
 import { ElementGuide } from "./ElementGuide";
 import { NEWCOMER_WINS, WILD_TIME_NAMES, matchesWildFilter, seenOrOwned, specialsNow, wildHints, wildTimes } from "../../../packages/shared/wild";
@@ -160,6 +161,13 @@ export function Collection({
                   </button>
                   <button onClick={() => run("lock", { id: o.id })}>
                     {o.locked ? "★ Favorite" : "☆ Favorite"}
+                  </button>
+                  <button
+                    aria-pressed={walkingCompanion(profile)?.id === o.id}
+                    title="Choose who walks beside you in the world. Your team is unchanged."
+                    onClick={() => run("follower", { id: walkingCompanion(profile)?.id === o.id && profile.follower ? "" : o.id })}
+                  >
+                    {walkingCompanion(profile)?.id === o.id ? "✓ Walks with you" : "Walk with me"}
                   </button>
                   <button
                     disabled={o.shards < 3 || o.upgrade >= 5}

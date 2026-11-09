@@ -7,6 +7,7 @@ Updated with the November 12 round; its commits are dated November 8, 2026 (roun
 November 13 round (from `de458b4`). Done this round, newest last:
 - Early game: wild creatures sit two levels lower for the first ten wins with a gentle taper to twenty (`wildLevelGap`, `wildEase`, tested; simulated with 100-150 new keepers).
 - Walking companion: `follower` mutation and optional `Profile.follower`, with `walkingCompanion` in `packages/shared/follower.ts` (tested).
+- Walk with me: the Journal chooses the walking companion, used by the world and the greeting (checked in the browser).
 
 Next 3 tasks:
 1. Finish this round: choose a walking companion, key remapping, a lighter first download.

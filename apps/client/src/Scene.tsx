@@ -45,6 +45,7 @@ import { findPath, startGrid, type GridBuild, type WalkGrid } from "../../../pac
 import { buildInSlices } from "./grid-slices";
 import { padInput } from "./gamepad";
 import { useWildNow } from "./wild-now";
+import { walkingCompanion } from "../../../packages/shared/follower";
 import { runs } from "./run-rule";
 import { bodyReach, personalSpace, stepAside } from "./companion-space";
 import { DURATION, activityPose, outingTarget, pickActivity, type Activity } from "./companion-idle";
@@ -771,7 +772,7 @@ export function Explorer({
   // the rain a broad leaf held up in the other.
   const lantern = useCarried(avatar, 3, () => createLantern("keeper-lantern"));
   const umbrella = useCarried(avatar, 1, () => createUmbrella("keeper-umbrella"));
-  const leader = profile.owned.find((o) => o.id === profile.team[0]);
+  const leader = walkingCompanion(profile);
   const companion = useMemo(
     () =>
       dressCompanion(
