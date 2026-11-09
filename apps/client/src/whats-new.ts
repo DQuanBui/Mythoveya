@@ -1,13 +1,14 @@
 // Shown on the title screen. Change the id whenever the list changes, so the
 // marker lights up again for returning players.
 export const WHATS_NEW = {
-  id: "2026-11-09",
+  id: "2026-11-10",
   items: [
-    "The wild encounter spot shows who is out: a night creature after dark, a rain lover in the rain.",
-    "The Journal remembers every creature you have met, and shows the ones you haven't as silhouettes.",
-    "New Journal filter: creatures seen but not yet befriended.",
-    "Night, dawn, rain and mist creatures were too strong for growing keepers; they now come in at a fairer level.",
-    "The game's first download is about 11% smaller, so it opens sooner.",
+    "Choose who walks beside you: open a companion in the Journal and press Walk with me.",
+    "Choose your own keys under Sound & settings → Keyboard keys.",
+    "Your first wild battles are gentler while you learn, easing into the usual challenge by your twentieth win.",
+    "In battle, creatures you have never met are tagged NEW, and the result names your first meetings.",
+    "The Journal forecasts when the next night, dawn, rain or mist creatures come out.",
+    "Meet 40 species to earn the Field Naturalist title.",
   ],
 };
 const KEY = "mythoveya-whats-new";

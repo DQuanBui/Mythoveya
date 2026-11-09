@@ -15,6 +15,7 @@ November 13 round (from `de458b4`). Done this round, newest last:
 - Field Naturalist: a keeper title for meeting 40 species (tested).
 - First meetings: the result screen names creatures met for the first time (checked in the browser).
 - Update notice: online players hear when a new version arrives, and long sessions check every half hour (checked with two builds).
+- What's new: updated for this round.
 
 Next 3 tasks:
 1. Finish this round: choose a walking companion, key remapping, a lighter first download.
