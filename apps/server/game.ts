@@ -228,6 +228,13 @@ export function mutate(p: Profile, kind: string, v: any, now = Date.now()) {
       o.upgrade++;
       break;
     }
+    case "follower": {
+      // Choose who walks beside the keeper; an empty id goes back to the team's first.
+      if (v.id && !p.owned.some((o) => o.id === v.id)) throw Error("That companion isn't yours.");
+      if (v.id) p.follower = v.id;
+      else delete p.follower;
+      break;
+    }
     case "lock": {
       const o = p.owned.find((o) => o.id === v.id);
       if (o) o.locked = !o.locked;

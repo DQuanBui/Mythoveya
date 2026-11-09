@@ -54,6 +54,7 @@ const mutation = z.object({
     "train",
     "upgrade",
     "lock",
+    "follower",
     "avatar",
     "travel",
     "daily",

@@ -109,6 +109,8 @@ export type Profile = {
   hair?: string;
   /** Species met in battle, bonded or not (optional; older saves start empty). */
   seen?: string[];
+  /** The companion who walks beside the keeper (an owned id); absent means the team's first. */
+  follower?: string;
 };
 export type Status = {
   kind: string;
