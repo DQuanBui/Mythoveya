@@ -13,6 +13,7 @@ November 13 round (from `de458b4`). Done this round, newest last:
 - Forecast: the Journal says when the creatures out next change and who comes, and the weather chip says how long the weather lasts (`nextWildChange`, tested).
 - NEW tags: never-met foes are tagged on their health bars in battle (checked in the browser).
 - Field Naturalist: a keeper title for meeting 40 species (tested).
+- First meetings: the result screen names creatures met for the first time (checked in the browser).
 
 Next 3 tasks:
 1. Finish this round: choose a walking companion, key remapping, a lighter first download.

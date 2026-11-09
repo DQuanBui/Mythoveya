@@ -1,5 +1,5 @@
 import { guardianIntent } from "../../../packages/shared/guardian";
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { Client, type Room } from "@colyseus/sdk";
 import type { Battle, Profile, Unit } from "../../../packages/shared/types";
 import { session, STANDALONE } from "./api";
@@ -137,6 +137,10 @@ export function BattleUI({
   const chosen = ts.some((t) => t.id === target) ? target : ts[0]?.id || "";
   const chosenUnit = ts.find((t) => t.id === chosen);
   const star = battle.winner !== null ? battleStar(battle.units, side) : undefined;
+  // Who was known when this battle began, so first meetings stay first meetings
+  // even after the save catches up.
+  const metBefore = useMemo(() => known, [battle.id]),
+    firsts = metBefore && battle.mode !== "practice" ? [...new Set(battle.units.filter((u) => u.side !== side && !metBefore.has(u.species)).map((u) => byId[u.species].name))] : [];
   const usable = (i: number) =>
     myTurn &&
     battle.energy[side] >= (options[i]?.cost ?? Infinity) &&
@@ -168,7 +172,7 @@ export function BattleUI({
   }, []);
   return (
     <div className="battle-screen">
-      <BattleScene battle={battle} target={chosen} onTarget={setTarget} side={side} known={known} />
+      <BattleScene battle={battle} target={chosen} onTarget={setTarget} side={side} known={metBefore} />
       <UltimateMoment battle={battle} now={now} />
       {guardianIntent(battle) && battle.winner === null && <aside className="guardian-intent" role="status"><strong>{guardianIntent(battle)!.title}</strong><span>{guardianIntent(battle)!.text}</span></aside>}
       <header className="battle-top">
@@ -336,6 +340,11 @@ export function BattleUI({
                 : "Your companions have recovered. Try another formation or train before returning."}
           </p>
           <p className="result-summary">{battleSummary(battle.units, side, battle.round)}</p>
+          {firsts.length > 0 && (
+            <p className="result-items">
+              ✦ First meeting{firsts.length > 1 ? "s" : ""}: {firsts.join(", ")}, now in your Journal
+            </p>
+          )}
           {star && (
             <p className="result-star">
               <Portrait id={star.species} shimmer={star.shimmer} />
