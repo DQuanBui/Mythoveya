@@ -17,10 +17,23 @@ startGamepad();
 watchErrors();
 startKeybinds();
 // The online build has no server, so it can keep playing without a connection.
-if (import.meta.env.PROD && STANDALONE && "serviceWorker" in navigator)
-  addEventListener("load", () => {
-    navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => {});
+if (import.meta.env.PROD && STANDALONE && "serviceWorker" in navigator) {
+  // A new version takes over in the background; say so, unless this is the
+  // very first visit, when the worker taking charge is nothing new.
+  const hadWorker = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (hadWorker) dispatchEvent(new Event("mythoveya-updated"));
   });
+  addEventListener("load", () => {
+    navigator.serviceWorker
+      .register(`${import.meta.env.BASE_URL}sw.js`)
+      .then((r) => {
+        // Long sessions check for a new version every half hour.
+        setInterval(() => r.update().catch(() => {}), 30 * 60 * 1000);
+      })
+      .catch(() => {});
+  });
+}
 // A tab left open across an update asks for script files that are gone. Reload
 // once to pick up the new ones; a second failure soon after is a real problem
 // and goes to the error screen below.

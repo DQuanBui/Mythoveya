@@ -270,6 +270,11 @@ export default function App() {
   const dialog = useRef<HTMLElement>(null);
   useDialogFocus(dialog, panel);
   useEffect(() => {
+    const updated = () => notify("Mythoveya has updated. Reload when convenient to play the newest version; your save is safe.");
+    addEventListener("mythoveya-updated", updated);
+    return () => removeEventListener("mythoveya-updated", updated);
+  }, []);
+  useEffect(() => {
     const hello = () => notify("Controller connected. Its buttons are listed under Esc → Controls.");
     window.addEventListener("gamepadconnected", hello);
     return () => window.removeEventListener("gamepadconnected", hello);
