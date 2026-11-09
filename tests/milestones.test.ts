@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { MILESTONES, earnedMilestones, milestoneProgress, keeperTitle, newlyEarned } from "../packages/shared/milestones";
 import { newProfile } from "../apps/server/new-profile";
+import { ALL_SPECIES } from "../packages/shared/content";
 
 describe("keeper milestones", () => {
   it("start empty for a new keeper and have unique ids and titles", () => {
@@ -44,5 +45,16 @@ describe("Night Watcher", () => {
     expect(watcher().value).toBe(4);
     own("prismoth");
     expect(watcher().done).toBe(true);
+  });
+});
+describe("Field Naturalist", () => {
+  it("counts creatures met in battle as well as companions, each once", () => {
+    const p = newProfile("m", "Naturalist", 0);
+    const naturalist = () => milestoneProgress(p).find((m) => m.id === "naturalist")!;
+    p.seen = ALL_SPECIES.slice(0, 30).map((s) => s.id);
+    p.owned.push(...ALL_SPECIES.slice(25, 39).map((s) => ({ id: s.id, species: s.id, level: 1, xp: 0, shards: 0, upgrade: 0, locked: false })));
+    expect(naturalist().value).toBe(39);
+    p.seen.push(ALL_SPECIES[39].id);
+    expect(naturalist().done).toBe(true);
   });
 });

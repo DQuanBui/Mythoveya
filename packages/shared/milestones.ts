@@ -1,7 +1,7 @@
 import type { Profile } from "./types";
 import { byId } from "./content";
 import { lodgeCount } from "./lodges";
-import { SPECIAL_SPECIES } from "./wild";
+import { SPECIAL_SPECIES, seenOrOwned } from "./wild";
 
 // Lifetime milestones, read straight from the save (nothing extra is stored).
 // Each completed milestone grants a title; the keeper badge shows the most
@@ -27,6 +27,7 @@ export const MILESTONES: Milestone[] = [
   { id: "season", title: "Lantern Seeker", text: "Find every lantern of a seasonal festival.", goal: 1, value: (p) => p.seasons?.done.length || 0 },
   { id: "lodges", title: "Hearth Host", text: "Host a gathering at all four Wayfarer Lodges.", goal: 4, value: lodgeCount },
   { id: "guardians", title: "Guardian Friend", text: "Calm four region guardians.", goal: 4, value: (p) => p.bosses.length },
+  { id: "naturalist", title: "Field Naturalist", text: "Meet 40 different species, in battle or as companions.", goal: 40, value: (p) => seenOrOwned(p).size },
   { id: "collector", title: "Collector", text: "Befriend 30 different species.", goal: 30, value: (p) => new Set(p.owned.map((o) => o.species)).size },
   { id: "level", title: "Seasoned Keeper", text: "Reach keeper level 20.", goal: 20, value: (p) => p.level },
   { id: "tower", title: "Tower Climber", text: "Clear floor 20 of the Rift Tower.", goal: 20, value: (p) => p.adventure?.tower || 0 },

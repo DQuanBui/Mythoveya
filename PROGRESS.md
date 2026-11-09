@@ -12,6 +12,7 @@ November 13 round (from `de458b4`). Done this round, newest last:
 - Trail map: `HavenMap` loads when opened; its destinations live in `map-destinations.ts` (entry 433.3 kB to 428.5 kB).
 - Forecast: the Journal says when the creatures out next change and who comes, and the weather chip says how long the weather lasts (`nextWildChange`, tested).
 - NEW tags: never-met foes are tagged on their health bars in battle (checked in the browser).
+- Field Naturalist: a keeper title for meeting 40 species (tested).
 
 Next 3 tasks:
 1. Finish this round: choose a walking companion, key remapping, a lighter first download.
