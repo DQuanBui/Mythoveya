@@ -61,6 +61,7 @@ export function BattleUI({
   finish,
   again,
   bond,
+  known,
 }: {
   battle: Battle;
   side?: number;
@@ -72,6 +73,8 @@ export function BattleUI({
   human?: boolean;
   rating?: { before: number; after: number };
   finish: () => void;
+  /** Species the keeper has met, so new foes can be tagged. */
+  known?: Set<string>;
   /** Offered on the result screen when this battle can simply be fought again. */
   again?: { label: string; start: () => void };
   /** Wild encounters: spend a bond token and this turn to befriend the target. */
@@ -165,7 +168,7 @@ export function BattleUI({
   }, []);
   return (
     <div className="battle-screen">
-      <BattleScene battle={battle} target={chosen} onTarget={setTarget} side={side} />
+      <BattleScene battle={battle} target={chosen} onTarget={setTarget} side={side} known={known} />
       <UltimateMoment battle={battle} now={now} />
       {guardianIntent(battle) && battle.winner === null && <aside className="guardian-intent" role="status"><strong>{guardianIntent(battle)!.title}</strong><span>{guardianIntent(battle)!.text}</span></aside>}
       <header className="battle-top">

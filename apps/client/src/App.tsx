@@ -44,6 +44,7 @@ import { companionJoy } from "./village-materials";
 import { earnedMilestones, newlyEarned } from "../../../packages/shared/milestones";
 import { useDialogFocus } from "./dialog-focus";
 import { walkingCompanion } from "../../../packages/shared/follower";
+import { seenOrOwned } from "../../../packages/shared/wild";
 import { backupDue } from "./backup-reminder";
 import { WHATS_NEW, markWhatsNewRead, whatsNewUnread } from "./whats-new";
 // Panels and region maps load when first opened.
@@ -867,6 +868,7 @@ export default function App() {
       {screen === "battle" && battle && (
         <BattleUI
           battle={battle}
+          known={profile ? seenOrOwned(profile) : undefined}
           send={battleAction}
           bond={profile ? { tokens: profile.tokens, attempt: bondAttempt } : undefined}
           auto={auto}

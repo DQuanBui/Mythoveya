@@ -245,6 +245,7 @@ export function BattleScene({
   paused = false,
   previewPhase = 0.55,
   side = 0,
+  known,
 }: {
   battle: Battle;
   target: string;
@@ -254,6 +255,8 @@ export function BattleScene({
   previewPhase?: number;
   /** The viewer's team, which gets confetti when it wins. */
   side?: number;
+  /** Species the keeper has met; foes outside it are tagged as new. */
+  known?: Set<string>;
 }) {
   const recover = useContextRecovery("battle");
   const [, tick] = useState(0);
@@ -445,8 +448,9 @@ export function BattleScene({
                 <button
                   className={`unit-bar side-${u.side} ${target === u.id ? "selected" : ""} ${battle.queue[0] === u.id ? "acting" : ""} ${shownHp === 0 ? "down" : shownHp < u.maxHp * 0.25 ? "low" : ""}`}
                   onClick={() => onTarget(u.id)}
-                  aria-label={unitLabel(byId[u.species].name, shownHp, u.maxHp, u.shield, u.statuses)}
+                  aria-label={`${unitLabel(byId[u.species].name, shownHp, u.maxHp, u.shield, u.statuses)}${known && u.side !== side && !known.has(u.species) ? ", never met before" : ""}`}
                 >
+                  {known && u.side !== side && !known.has(u.species) && <em className="new-tag">NEW</em>}
                   <strong>{byId[u.species].name}</strong>
                   <span className="hp">
                     {/* A pale trail lingers where health was lost, then drains away. */}

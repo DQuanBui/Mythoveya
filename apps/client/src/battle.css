@@ -390,3 +390,16 @@
   font-weight: 700;
   letter-spacing: 0.16em;
 }
+/* A foe the keeper has never met. */
+.unit-bar .new-tag {
+  position: absolute;
+  top: -9px;
+  right: -6px;
+  padding: 0 5px;
+  border-radius: 6px;
+  background: #edcf83;
+  color: #10282d;
+  font: 800 8px/14px system-ui, sans-serif;
+  font-style: normal;
+  letter-spacing: 0.08em;
+}
