@@ -69,6 +69,7 @@ In the **Team** panel, *Suggest a team* fills the slots with your strongest six,
 
 ## Settings
 
+- **Sound & settings → Keyboard keys** lets you choose your own keys. **Walk with me** on a companion's Journal page chooses who walks beside you.
 - **Q · J · T · M** open Quests, Journal, Team and the map. A game controller works too; **Esc → Controls** lists its buttons.
 - **The online game** can be installed from Sound & settings when your browser offers it, and plays with no connection once it has loaded.
 - **Sound & graphics → Larger interface text** enlarges panels and notices by about a fifth.

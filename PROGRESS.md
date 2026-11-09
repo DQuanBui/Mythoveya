@@ -1,31 +1,38 @@
 # Mythoveya handoff
 
-Updated with the November 12 round; its commits are dated November 8, 2026 (round names ran ahead of the calendar and are kept as a sequence). Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`, pushed to `origin/main` (https://github.com/DQuanBui/Mythoveya). This handoff covers fifteen rounds: October 29 (from `4619fdc`), October 30 (from `b0d6c3d`), October 31 (from `3497bb3`), November 1 (from `3d8496d`) November 2 (from `9d221ef`), November 3 (from `933a869`), November 4 (from `d37297c`), November 5 (from `1e622b9`), November 6 (from `040b6f1`), November 7 (from `a9be583`) November 8 (from `7661c95`), November 9 (from `6657ade`), November 10 (from `6d40e46`), November 11 (from `d03d7f8`) and November 12 (from `0c51d3c`). Earlier handoffs (October 28 online-build session, October 22 Wayfarer Lodges) are archived in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md). Preserve ignored `data/mythoveya.sqlite`. `CLAUDE.md` is the quick project map for new sessions.
+Updated with the November 13 round; its commits are dated November 9, 2026 (round names ran ahead of the calendar and are kept as a sequence). Workspace: `C:/Users/ASUS/Downloads/Mythoveya`; branch `main`, pushed to `origin/main` (https://github.com/DQuanBui/Mythoveya). This handoff covers sixteen rounds: October 29 (from `4619fdc`), October 30 (from `b0d6c3d`), October 31 (from `3497bb3`), November 1 (from `3d8496d`) November 2 (from `9d221ef`), November 3 (from `933a869`), November 4 (from `d37297c`), November 5 (from `1e622b9`), November 6 (from `040b6f1`), November 7 (from `a9be583`) November 8 (from `7661c95`), November 9 (from `6657ade`), November 10 (from `6d40e46`), November 11 (from `d03d7f8`), November 12 (from `0c51d3c`) and November 13 (from `de458b4`). Earlier handoffs (October 28 online-build session, October 22 Wayfarer Lodges) are archived in [docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md). Preserve ignored `data/mythoveya.sqlite`. `CLAUDE.md` is the quick project map for new sessions.
 
 ## Next up
 
-November 13 round (from `de458b4`). Done this round, newest last:
-- Early game: wild creatures sit two levels lower for the first ten wins with a gentle taper to twenty (`wildLevelGap`, `wildEase`, tested; simulated with 100-150 new keepers).
-- Walking companion: `follower` mutation and optional `Profile.follower`, with `walkingCompanion` in `packages/shared/follower.ts` (tested).
-- Walk with me: the Journal chooses the walking companion, used by the world and the greeting (checked in the browser).
-- Keyboard keys: players choose their own keys in Sound & settings, translated into the defaults before the game sees them (`keybinds.ts`, tested; in `keyboard.spec`).
-- Trail map: `HavenMap` loads when opened; its destinations live in `map-destinations.ts` (entry 433.3 kB to 428.5 kB).
-- Forecast: the Journal says when the creatures out next change and who comes, and the weather chip says how long the weather lasts (`nextWildChange`, tested).
-- NEW tags: never-met foes are tagged on their health bars in battle (checked in the browser).
-- Field Naturalist: a keeper title for meeting 40 species (tested).
-- First meetings: the result screen names creatures met for the first time (checked in the browser).
-- Update notice: online players hear when a new version arrives, and long sessions check every half hour (checked with two builds).
-- What's new: updated for this round.
+November 13 round is complete: 11 commits from `de458b4` plus this record, all pushed.
 
 Next 3 tasks:
-1. Finish this round: choose a walking companion, key remapping, a lighter first download.
-2. Decide on the balance outliers in docs/BALANCE.md (Iskavelle still weak, Astravelle strong).
-3. Physical checks: audio, a real phone, a real controller, a real install.
+1. Decide on the balance outliers in `docs/BALANCE.md` (Iskavelle still weak, Astravelle strong). Tuning creature numbers is the owner's call.
+2. Physical checks: audio, a real phone, a real controller, a real install (and the new update notice on a real deployment).
+3. Controller button remapping, to match the new keyboard keys.
 
 ## Play
 
 - **Online (single-player):** https://dquanbui.github.io/Mythoveya/. `.github/workflows/pages.yml` publishes it on every push to `main` (Pages source: GitHub Actions). Check a deployment with `node scripts/smoke-pages.mjs https://dquanbui.github.io/Mythoveya/`.
 - **Local (full game, including the human arena):** `npm install`, then run `Play Mythoveya.cmd` or `npm run dev` and open http://127.0.0.1:5173/. For the compiled build, run `npm run build && npm start` and open http://127.0.0.1:2567/.
+
+## Implemented November 13
+
+- Early game (`wildLevelGap`, `wildEase` in `packages/shared/wild.ts`, tested): simulating 150 new keepers with Auto showed wins sliding from 77% in the second battle to 53% by the eighth. Wild creatures now sit two levels lower for the first ten wins, the second and third battles are a little softer, and the ease tapers from the tenth win to the twentieth. Simulated: 93-100% for the first ten battles, then a gradual slope to about 59% by the twenty-fourth (the old difficulty for an untrained starter team). The first battle and guardians are unchanged.
+- Walking companion (`follower` mutation, optional `Profile.follower`, `walkingCompanion` in `packages/shared/follower.ts`, tested): the Journal's Walk with me chooses who walks beside the keeper without touching the team. Kept apart from `lineups.ts` so the world scene does not pull in the battle engine. Checked in the browser.
+- Keyboard keys (`keybinds.ts`, tested; in `keyboard.spec`): players choose their own keys in Sound & settings; a chosen key is translated into the default before the game sees it. Arrows, Esc, Enter, Tab, Space and 1-4 keep their meaning. Stored in `mythoveya-keys`.
+- Trail map: `HavenMap` loads when opened; its destinations moved to `map-destinations.ts`. Entry 433.3 kB to 428.5 kB (429.5 kB at the end of the round).
+- Forecast (`nextWildChange`, tested): the Journal says when the creatures out next change and who comes; the weather chip's tooltip says how long the weather lasts.
+- Battles: never-met foes carry a NEW tag (and "never met before" for screen readers), and the result screen names first meetings, both taken from who the keeper knew when the battle began.
+- Field Naturalist title for meeting 40 species (tested).
+- Update notice: the online game says when a new version has taken over, stays quiet on a first visit, and checks every half hour in long sessions. Checked by building twice under a running page.
+
+Verification:
+
+- Typecheck and content audit pass. Vitest: 67 files, 332 tests pass.
+- `npm run build` and `build:pages` pass; entry 429.5 kB. `smoke-production` and `smoke-pages` pass locally.
+- Playwright full run (29.0 min, 38 journeys): all passed first time, none flaky.
+- Not checked: audio, a real phone, a real controller, a real install.
 
 ## Implemented November 12
 
